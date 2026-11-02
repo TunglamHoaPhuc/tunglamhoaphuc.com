@@ -59,7 +59,7 @@ START: Countup CSS
 	display: inline-flex;
 	align-items: center;
 	margin-bottom: 5px;
-	letter-spacing: -1.48px;
+	letter-spacing: var(--tlhp-tracking-display);
 	.odometer {
 		font-weight: var(--tj-fw-medium);
 		color: var(--tj-color-common-white);

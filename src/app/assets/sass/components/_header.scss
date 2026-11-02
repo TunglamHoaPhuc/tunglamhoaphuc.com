@@ -277,7 +277,7 @@ START: Theme Header CSS
 	}
 }
 .header-bottom {
-	border-bottom: 1px dashed #c9d1d1;
+	border-bottom: 1px dashed var(--tj-color-border-1);
 }
 
 .header-wrapper {

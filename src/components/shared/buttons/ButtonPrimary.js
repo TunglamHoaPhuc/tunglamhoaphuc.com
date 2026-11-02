@@ -1,5 +1,8 @@
 import Link from "next/link";
 
+/**
+ * @param {{ text: string, url?: string, className?: string, isTextBtn?: boolean, type?: "button" | "submit" | "reset", iconName?: string }} props
+ */
 const ButtonPrimary = ({ className, text, isTextBtn, url, type, iconName }) => {
 	return (
 		<>
@@ -11,7 +14,7 @@ const ButtonPrimary = ({ className, text, isTextBtn, url, type, iconName }) => {
 					<span className="btn-text">
 						<span>{text}</span>
 					</span>
-					<span className="btn-icon">
+					<span className="btn-icon" aria-hidden="true">
 						<i className="tji-arrow-right-long"></i>
 					</span>
 				</button>
@@ -25,7 +28,7 @@ const ButtonPrimary = ({ className, text, isTextBtn, url, type, iconName }) => {
 					<span className="btn-text">
 						<span>{text}</span>
 					</span>
-					<span className="btn-icon">
+					<span className="btn-icon" aria-hidden="true">
 						<i className="tji-arrow-right-long"></i>
 					</span>
 				</Link>

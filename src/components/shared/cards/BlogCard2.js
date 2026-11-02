@@ -8,7 +8,8 @@ const BlogCard2 = ({ blog, idx }) => {
 	return (
 		<div className="blog-item style-2">
 			<div className="blog-thumb">
-				<Link href={`/blogs/${id}`}>
+				{/* Same target as the title link below, so keep it out of the tab order and screen readers. */}
+				<Link href={`/blogs/${id}`} tabIndex={-1} aria-hidden="true">
 					<img src={img1 ? img1 : "/images/blog/blog-4.webp"} alt="" />
 				</Link>
 				<div className="blog-date">

@@ -164,8 +164,8 @@ START: Blog CSS
 			&::before {
 				background: linear-gradient(
 					0deg,
-					rgba(12, 30, 33, 1) 0%,
-					rgba(12, 30, 33, 0) 100%
+					var(--tj-color-theme-dark) 0%,
+					color-mix(in srgb, var(--tj-color-theme-dark) 0%, transparent) 100%
 				);
 				opacity: 1;
 			}
@@ -273,7 +273,7 @@ START: Blog CSS
 		font-size: 32px;
 		color: var(--tj-color-common-white);
 		font-weight: var(--tj-fw-medium);
-		letter-spacing: -0.96px;
+		letter-spacing: var(--tlhp-tracking-display);
 		margin-bottom: 8px;
 		line-height: 1;
 	}

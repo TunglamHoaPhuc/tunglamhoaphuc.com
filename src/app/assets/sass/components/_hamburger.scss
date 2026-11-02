@@ -163,7 +163,7 @@
 						letter-spacing: 0.5px;
 						font-family: var(--tj-ff-body);
 						font-weight: var(--tj-fw-medium);
-						text-transform: capitalize;
+						text-transform: none; // Vietnamese menus use sentence case
 						padding: 18px 0;
 						border-top: none;
 						border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -267,7 +267,7 @@
 .hamburger-title {
 	color: var(--tj-color-common-white);
 	font-size: 22px;
-	line-height: 1;
+	line-height: 1.2;
 	margin-bottom: 25px;
 	position: relative;
 	z-index: 1;

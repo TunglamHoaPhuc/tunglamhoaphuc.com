@@ -79,7 +79,7 @@ START: Hero CSS
 	}
 	.banner-title {
 		color: var(--tj-color-common-white);
-		line-height: 1.135;
+		line-height: var(--tlhp-leading-display);
 		margin-bottom: 15px;
 		span {
 			display: inline-block;
@@ -341,7 +341,7 @@ START: Hero CSS
 	color: var(--tj-color-theme-dark);
 	font-size: 58px;
 	line-height: 0.8;
-	letter-spacing: -1.2px;
+	letter-spacing: var(--tlhp-tracking-display);
 	font-family: var(--tj-ff-heading);
 	font-weight: var(--tj-fw-sbold);
 	padding: 45px 0 13px 0;

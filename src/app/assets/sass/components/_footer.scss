@@ -93,7 +93,7 @@ START: Theme Footer CSS
 				width: 28px;
 				height: 28px;
 				border-radius: 50%;
-				background-color: rgba(12, 30, 33, 0.3);
+				background-color: color-mix(in srgb, var(--tj-color-theme-dark) 30%, transparent);
 				font-size: 16px;
 				line-height: 1;
 				i {

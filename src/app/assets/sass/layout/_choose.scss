@@ -128,7 +128,7 @@ START: Choose CSS
 		line-height: 0.75;
 		font-family: var(--tj-ff-heading);
 		font-weight: var(--tj-fw-light);
-		letter-spacing: -8.08px;
+		letter-spacing: var(--tlhp-tracking-display);
 		display: inline-flex;
 		padding: 17px 30px 38px 0;
 		border-inline-end: 1px dashed rgba(0, 0, 0, 0.16);

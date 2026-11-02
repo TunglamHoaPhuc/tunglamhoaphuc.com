@@ -36,7 +36,7 @@ START: Theme Slider CSS
 
 .tj-slider-item {
 	min-height: 92.5vh;
-	background-color: #0c1e21;
+	background-color: var(--tj-color-theme-dark);
 	position: relative;
 	z-index: 1;
 	&::after {
@@ -49,9 +49,9 @@ START: Theme Slider CSS
 		z-index: 2;
 		background: linear-gradient(
 			90deg,
-			rgba(12, 30, 33, 1) 20%,
-			rgba(12, 30, 33, 0.4) 60%,
-			rgba(12, 30, 33, 0.1) 100%
+			var(--tj-color-theme-dark) 20%,
+			color-mix(in srgb, var(--tj-color-theme-dark) 40%, transparent) 60%,
+			color-mix(in srgb, var(--tj-color-theme-dark) 10%, transparent) 100%
 		);
 	}
 	.slider-wrapper {
@@ -77,8 +77,8 @@ START: Theme Slider CSS
 		.slider-title {
 			color: var(--tj-color-common-white);
 			font-size: 96px;
-			line-height: 1.042;
-			letter-spacing: -2.88px;
+			line-height: var(--tlhp-leading-display);
+			letter-spacing: var(--tlhp-tracking-display);
 			margin-bottom: 10px;
 			span {
 				color: var(--tj-color-text-body-2);

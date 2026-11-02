@@ -57,4 +57,7 @@
 	--tj-fs-h6: var(--tlhp-text-body-lg);
 	--tj-fs-body: var(--tlhp-text-body);
 	--tj-fs-p: var(--tlhp-text-body);
+
+	// Bootstrap's own pink <code> fails contrast on ngà and on dark sections.
+	--bs-code-color: var(--tlhp-accent-text);
 }

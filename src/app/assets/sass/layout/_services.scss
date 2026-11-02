@@ -77,12 +77,12 @@ START: Services CSS
 		height: 80px;
 		background: linear-gradient(
 			-45deg,
-			rgba(30, 138, 138, 0.3) 0%,
-			rgba(30, 138, 138, 0) 50%,
-			rgba(30, 138, 138, 0.3) 100%
+			color-mix(in srgb, var(--tj-color-theme-primary) 30%, transparent) 0%,
+			color-mix(in srgb, var(--tj-color-theme-primary) 0%, transparent) 50%,
+			color-mix(in srgb, var(--tj-color-theme-primary) 30%, transparent) 100%
 		);
 		border-radius: 50%;
-		border: 1px solid rgba(30, 138, 138, 0.15);
+		border: 1px solid color-mix(in srgb, var(--tj-color-theme-primary) 15%, transparent);
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;

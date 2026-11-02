@@ -95,12 +95,13 @@ h6 {
 	margin-top: 0px;
 	font-weight: var(--tj-fw-medium);
 	line-height: 1.2;
-	letter-spacing: -0.03em;
+	letter-spacing: 0;
 }
 
 h1 {
 	font-size: var(--tj-fs-h1);
-	line-height: 1.108;
+	line-height: var(--tlhp-leading-display);
+	letter-spacing: var(--tlhp-tracking-display);
 
 	@media #{$xl} {
 		font-size: 60px;
@@ -115,7 +116,7 @@ h1 {
 
 h2 {
 	font-size: var(--tj-fs-h2);
-	line-height: 1.125;
+	line-height: var(--tlhp-leading-h2);
 
 	@media #{$lg, $md} {
 		font-size: 40px;
@@ -550,9 +551,9 @@ img {
 	cursor: pointer;
 }
 .goverlay {
-	background: rgba(23, 23, 23, 0.95);
+	background: color-mix(in srgb, var(--tj-color-theme-dark) 95%, transparent);
 	@media (min-width: 769px) {
-		background: rgba(23, 23, 23, 0.95);
+		background: color-mix(in srgb, var(--tj-color-theme-dark) 95%, transparent);
 	}
 }
 .gslide video,

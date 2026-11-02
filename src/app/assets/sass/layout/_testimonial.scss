@@ -128,7 +128,7 @@ START: Testimonial CSS
 	}
 	.title {
 		margin-bottom: 0;
-		line-height: 1;
+		line-height: 1.2;
 	}
 	.designation {
 		font-size: 14px;
@@ -275,7 +275,7 @@ START: Testimonial CSS
 	}
 	.title {
 		font-size: 74px;
-		line-height: 1;
+		line-height: var(--tlhp-leading-display);
 		color: var(--tj-color-common-white);
 		margin-bottom: 58px;
 		@media #{$sm, $xs} {
@@ -334,7 +334,7 @@ START: Testimonial CSS
 				height: 80px;
 			}
 			.title {
-				line-height: 1;
+				line-height: 1.2;
 				font-weight: var(--tj-fw-sbold);
 				margin-bottom: 2px;
 			}
@@ -422,7 +422,7 @@ START: Testimonial CSS
 			visibility: hidden;
 			.title {
 				font-size: 20px;
-				line-height: 1;
+				line-height: 1.2;
 			}
 		}
 		.swiper-slide-active {
@@ -501,10 +501,10 @@ START: Testimonial CSS
 	.slider-prev {
 		margin-top: -52px;
 		margin-inline-start: -24px;
-		background-color: #ecf0f0;
+		background-color: var(--tj-color-grey-1);
 	}
 	.slider-next {
-		background-color: #ecf0f0;
+		background-color: var(--tj-color-grey-1);
 		margin-top: -52px;
 		margin-inline-end: -24px;
 	}

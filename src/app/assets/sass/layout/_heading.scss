@@ -59,9 +59,10 @@ START: Heading CSS
 				color: var(--tj-color-text-body-2);
 			}
 		}
+		// TLHP overline chip; the accent pair flips with the theme, unlike Bexon's white.
 		.sub-title {
-			color: var(--tj-color-theme-primary);
-			background-color: var(--tj-color-common-white);
+			color: var(--tlhp-accent-text);
+			background-color: var(--tlhp-accent-soft);
 			border: 0;
 			padding: 7px 10px;
 		}
@@ -197,8 +198,10 @@ START: Heading CSS
 }
 
 .title-anim {
+	// Masks the rising letters like overflow: hidden, but leaves room for
+	// Vietnamese marks that sit above and below the line box.
 	> div {
-		overflow: hidden;
+		clip-path: inset(-0.35em -0.1em -0.25em -0.1em);
 	}
 }
 .tj-text-invert > div {

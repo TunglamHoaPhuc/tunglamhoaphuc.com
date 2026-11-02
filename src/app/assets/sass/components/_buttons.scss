@@ -1,5 +1,24 @@
 @use "../utilities" as *;
 
+// The label rolls up on hover inside a clipped box. Give the box room for
+// Vietnamese marks above and below the line, and roll by 2em so the copy
+// waiting below never shows through that extra room.
+@mixin tlhp-btn-text {
+	overflow: hidden;
+	padding-block: 0.3em;
+	span {
+		line-height: var(--tlhp-leading-button);
+		text-shadow: 0 2em 0;
+	}
+}
+
+@mixin tlhp-btn-focus {
+	&:focus-visible {
+		outline: none;
+		box-shadow: var(--tlhp-shadow-focus);
+	}
+}
+
 /**
   Buttons CSS
 */
@@ -19,13 +38,13 @@
 	z-index: 2;
 	overflow: hidden;
 	white-space: nowrap;
+	min-height: 48px;
+	transition: background-color var(--tlhp-duration-fast) var(--tlhp-ease-calm);
 	.btn-text {
-		color: var(--tj-color-common-white);
-		overflow: hidden;
+		color: var(--tlhp-primary-fg);
+		@include tlhp-btn-text;
 		span {
 			display: flex;
-			line-height: 1;
-			text-shadow: 0 30px 0;
 			backface-visibility: hidden;
 			transform: translateY(0);
 			transition: 0.4s ease-in-out;
@@ -40,12 +59,19 @@
 		width: 42px;
 		height: 42px;
 		overflow: hidden;
-		background-color: var(--tj-color-theme-dark);
+		background-color: var(--tlhp-accent);
 		border-radius: 50%;
 		i {
-			color: var(--tj-color-common-white);
+			color: var(--tlhp-accent-fg);
 			transform: rotate(-45deg);
 			transition: all 0.3s ease-in-out;
+		}
+		// On dark themes the button itself is hoại sắc, so invert the cell.
+		:is([data-theme="dark"], .tlhp-dark) & {
+			background-color: var(--tlhp-primary-fg);
+			i {
+				color: var(--tlhp-primary);
+			}
 		}
 	}
 	&.btn-dark {
@@ -68,9 +94,10 @@
 		}
 	}
 	&:hover {
+		background-color: var(--tlhp-primary-hover);
 		.btn-text {
 			span {
-				transform: translateY(-30px);
+				transform: translateY(-2em);
 			}
 		}
 		.btn-icon {
@@ -79,6 +106,13 @@
 			}
 		}
 	}
+	&.btn-dark:hover {
+		background-color: var(--tj-color-theme-dark);
+	}
+	&.transparent-btn:hover {
+		background-color: transparent;
+	}
+	@include tlhp-btn-focus;
 	&-lg {
 		font-size: 20px;
 		padding: 7px 7px 7px 44px;
@@ -104,11 +138,9 @@
 	z-index: 2;
 	.btn-text {
 		color: var(--tj-color-heading-primary);
-		overflow: hidden;
+		@include tlhp-btn-text;
 		span {
 			display: flex;
-			line-height: 1;
-			text-shadow: 0 30px 0;
 			backface-visibility: hidden;
 			transform: translateY(0);
 			transition: 0.4s ease-in-out;
@@ -134,7 +166,7 @@
 	&:hover {
 		.btn-text {
 			span {
-				transform: translateY(-30px);
+				transform: translateY(-2em);
 			}
 		}
 		.btn-icon {
@@ -144,9 +176,11 @@
 			}
 		}
 	}
+	@include tlhp-btn-focus;
 }
 
 .tji-icon-btn {
+	@include tlhp-btn-focus;
 	width: 64px;
 	height: 64px;
 	border-radius: 50%;

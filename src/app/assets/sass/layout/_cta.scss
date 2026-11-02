@@ -32,7 +32,7 @@ START: CTA CSS
 		padding: 44px 15px 60px 55px;
 		.title {
 			font-size: 74px;
-			line-height: 1.12;
+			line-height: var(--tlhp-leading-display);
 			color: var(--tj-color-common-white);
 			margin-bottom: 17px;
 

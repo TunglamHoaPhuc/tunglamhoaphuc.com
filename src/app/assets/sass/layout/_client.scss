@@ -92,7 +92,7 @@ START: Client CSS
 			bottom: 3px;
 			inset-inline-start: auto;
 			width: 100%;
-			border-bottom: 1px solid rgba(12, 30, 33, 0.2);
+			border-bottom: 1px solid color-mix(in srgb, var(--tj-color-theme-dark) 20%, transparent);
 		}
 	}
 	@media #{$lg} {
@@ -125,7 +125,7 @@ START: Client CSS
 			max-width: 100%;
 			line-height: 1.2;
 			margin-bottom: 0;
-			letter-spacing: -0.6px;
+			letter-spacing: 0;
 		}
 		.client-numbers {
 			color: var(--tj-color-theme-primary);
@@ -161,8 +161,8 @@ START: Client CSS
 		height: 100%;
 		background-image: linear-gradient(
 			90deg,
-			rgba(233, 237, 237, 1) 0%,
-			rgba(233, 237, 237, 0) 100%
+			var(--tj-color-grey-1) 0%,
+			color-mix(in srgb, var(--tj-color-grey-1) 0%, transparent) 100%
 		);
 		top: 0;
 		inset-inline-start: 0;
@@ -182,8 +182,8 @@ START: Client CSS
 		inset-inline-end: 0;
 		background-image: linear-gradient(
 			-90deg,
-			rgba(233, 237, 237, 1) 0%,
-			rgba(233, 237, 237, 0) 100%
+			var(--tj-color-grey-1) 0%,
+			color-mix(in srgb, var(--tj-color-grey-1) 0%, transparent) 100%
 		);
 	}
 }
