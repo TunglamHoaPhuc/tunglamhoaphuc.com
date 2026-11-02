@@ -223,13 +223,32 @@
 
 **File Bexon:** `components/layout/header/Header.js` (popup tìm kiếm viết thẳng trong file này; `HeaderSearchForm.js` không được dùng và đã xóa ở T2), `assets/sass/components/_search.scss`
 
+**Kết quả 03/11/2026:** xong, đã deploy `v2.`.
+- **Popup tìm kiếm** (cờ `site.features.search`, đang tắt; `/styleguide` bật sẵn để xem trước):
+  - Là hộp thoại có bẫy focus, focus vào ô nhập khi mở; Esc, nút Đóng hoặc bấm ra ngoài đều đóng và trả focus về nút mở.
+  - Gửi `GET /tim-kiem?q=`. Khi đóng thì ẩn hẳn (trước đó chỉ trượt khỏi màn hình nên vẫn nhận focus).
+  - Bexon ẩn tìm kiếm dưới 992px; nay dùng được ở mọi cỡ. Dưới 576px ô tìm kiếm nằm trong menu trượt để header vẫn một hàng.
+  - Nút "Đăng ký khóa tu" nhường chỗ ở 768–1023px và 1280–1599px khi có nút tìm kiếm.
+- **Dải thông báo** (`AnnouncementBar`, đọc `site.announcement`, đang để trống; `/styleguide` có mẫu):
+  - Nằm trong luồng ở đầu `#smooth-content` của mọi trang (trừ `error.js`), nền `accent-soft`, cao tối thiểu 48px, có hạn hiển thị theo giờ Việt Nam.
+  - Nút "Đóng" nhớ trong phiên (`sessionStorage`), đưa focus về logo.
+  - Một đoạn script nhỏ chạy trước khi vẽ trang: ẩn dải đã đóng (không nháy) và báo chiều cao thật cho header nổi qua `--tlhp-announcement-offset`. Header dính không bị ảnh hưởng.
+- **Sửa lỗi gốc của Bexon phát hiện trong lúc làm:**
+  - `a:focus` và `button:focus-visible` bị đặt `outline: none` trên toàn site, nên dùng phím không thấy mình đang ở đâu (WCAG 2.4.7). Nay có vòng focus kép cho mọi liên kết, nút và ô nhập.
+  - `transition: all` trên `a`, `button`, `span`, `li`, `input`… làm phần tử con của bảng vừa mở bị ẩn thêm 0,3 giây và không nhận focus; nay `visibility` đổi ngay.
+  - ScrollSmoother cuộn trang khi focus vào phần tử nằm ngoài nội dung cuộn (header, popup), làm trang nhảy và đổi sang header dính; nay bỏ qua những phần tử đó (`onFocusIn`).
+  - `useFocusTrap` thử focus lại qua vài khung hình cho bảng hiện bằng chuyển `visibility`. Menu trượt của T5a dính đúng lỗi này; test T5a nay kiểm cả focus ban đầu.
+- **Lưu ý:** token `--tlhp-announcement-h` (48px) là chiều cao chuẩn của dải, không phải độ lệch của header; lần đầu đặt trùng tên làm header mọi trang lệch 48px, test đã bắt được.
+- **Để T6:** khi đưa header/footer vào `src/app/(site)/layout.js`, chuyển `AnnouncementBar` theo, bỏ dòng thêm vào từng trang.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Popup tìm kiếm: Esc đóng và trả focus về nút mở; focus không thoát ra ngoài khi đang mở
-- [ ] Đóng dải thông báo thì không hiện lại trong phiên; dải không làm header dính nhảy vị trí
-- [ ] Khi cờ tìm kiếm tắt, không còn nút hay đường dẫn nào trỏ tới `/tim-kiem`
+- [x] Popup tìm kiếm: Esc đóng và trả focus về nút mở; focus không thoát ra ngoài khi đang mở (1440px và 768px; điện thoại dùng ô trong menu trượt)
+- [x] Đóng dải thông báo thì không hiện lại trong phiên (phiên mới hiện lại); dải không làm header dính nhảy vị trí
+- [x] Khi cờ tìm kiếm tắt, không còn nút hay đường dẫn nào trỏ tới `/tim-kiem` (kiểm trên `/`, `/blogs`, `/contact`)
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- header-extras`
+- [x] `npm run test:e2e -- header-extras` (34 test, chạy lặp 2 lần vẫn xanh); toàn bộ e2e 125 xanh trên `v2.`; unit 24 xanh
+- [x] Ảnh: `docs/anh/t5b-tim-kiem-va-thong-bao.png`
 
 **Phụ thuộc:** T5a
 
