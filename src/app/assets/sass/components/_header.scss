@@ -315,7 +315,8 @@ START: Theme Header CSS
 		> li {
 			position: relative;
 			z-index: 1;
-			> a {
+			> a,
+			> .tlhp-menu-toggle {
 				position: relative;
 				font-size: 16px;
 				color: var(--tj-color-heading-primary);
@@ -326,7 +327,8 @@ START: Theme Header CSS
 			}
 			&.menu-item-has-children,
 			&.has-dropdown {
-				> a {
+				> a,
+				> .tlhp-menu-toggle {
 					padding-inline-end: 20px;
 					&::after {
 						content: "\e929";
@@ -340,7 +342,8 @@ START: Theme Header CSS
 					}
 				}
 				&:hover {
-					> a {
+					> a,
+					> .tlhp-menu-toggle {
 						&::after {
 							transform: rotate(-180deg);
 						}
@@ -350,7 +353,8 @@ START: Theme Header CSS
 			&.current-menu-ancestor,
 			&.current-menu-item,
 			&:hover {
-				> a {
+				> a,
+				> .tlhp-menu-toggle {
 					color: var(--tj-color-theme-primary);
 					&::after {
 						color: var(--tj-color-theme-primary);
@@ -623,14 +627,16 @@ START: Theme Header CSS
 		.mainmenu {
 			> ul {
 				> li {
-					> a {
+					> a,
+					> .tlhp-menu-toggle {
 						color: var(--tj-color-common-white);
 						padding-top: 32px;
 						padding-bottom: 32px;
 					}
 					&.menu-item-has-children,
 					&.has-dropdown {
-						> a {
+						> a,
+						> .tlhp-menu-toggle {
 							&::after {
 								color: currentColor;
 								top: 35px;
@@ -639,7 +645,8 @@ START: Theme Header CSS
 					}
 					&:hover,
 					&.current-menu-ancestor {
-						> a {
+						> a,
+						> .tlhp-menu-toggle {
 							color: var(--tj-color-text-body-2);
 							&::after {
 								color: currentColor;
@@ -663,13 +670,15 @@ START: Theme Header CSS
 		.mainmenu {
 			> ul {
 				> li {
-					> a {
+					> a,
+					> .tlhp-menu-toggle {
 						padding-top: 32px;
 						padding-bottom: 32px;
 					}
 					&.menu-item-has-children,
 					&.has-dropdown {
-						> a {
+						> a,
+						> .tlhp-menu-toggle {
 							&::after {
 								color: currentColor;
 								top: 35px;
@@ -683,3 +692,169 @@ START: Theme Header CSS
 }
 
 /* !END: Theme Header CSS */
+
+/**----------------------------------------
+TLHP header (T5a)
+----------------------------------------*/
+// Horizontal menu from 1280px; the hamburger offcanvas below that.
+.menu-area.tlhp-desktop-only {
+	display: inline-flex;
+}
+@media (max-width: 1279.98px) {
+	.tlhp-desktop-only {
+		display: none !important;
+	}
+}
+@media (min-width: 1280px) {
+	.tlhp-below-desktop {
+		display: none !important;
+	}
+}
+@media (max-width: 767.98px) {
+	.tlhp-from-md {
+		display: none !important;
+	}
+}
+// Between 1280 and 1439px the full menu leaves no room for the pill, and the menu already
+// has "Đăng ký khóa tu"; the pill returns once there is space again.
+@media (min-width: 1280px) and (max-width: 1439.98px) {
+	.tlhp-header-cta {
+		display: none !important;
+	}
+}
+
+// Seal plus the temple name in type (the name in the seal is too small to read).
+.site_logo.tlhp-logo .logo,
+.mobile_logo.tlhp-logo {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	max-width: none;
+	width: auto;
+}
+.tlhp-logo-seal {
+	height: 48px;
+	width: auto;
+	@media (max-width: 767.98px) {
+		height: 40px;
+	}
+}
+.tlhp-logo-name {
+	font-family: var(--tj-ff-heading);
+	font-size: 20px;
+	font-weight: 600;
+	line-height: 1.2;
+	color: var(--tj-color-heading-primary);
+	white-space: nowrap;
+	// Two short lines on phones so the call button and the menu fit beside it.
+	@media (max-width: 575.98px) {
+		font-size: 17px;
+		white-space: normal;
+		max-width: 5.5em;
+	}
+}
+.header-2.header-absolute .tlhp-logo-name,
+.hamburger-area .tlhp-logo-name {
+	color: var(--tj-color-common-white);
+}
+
+// Dropdown parents are buttons that open on click (disclosure pattern), not on hover.
+.mainmenu .tlhp-menu-toggle {
+	background: none;
+	border: 0;
+	font-family: inherit;
+	cursor: pointer;
+}
+.mainmenu ul > li.tlhp-dropdown {
+	&:hover:not(.is-open) {
+		> .tlhp-menu-toggle::after {
+			transform: none;
+		}
+		> .sub-menu {
+			opacity: 0;
+			visibility: hidden;
+			transform: scaleY(0);
+			pointer-events: none;
+		}
+	}
+	&.is-open {
+		> .tlhp-menu-toggle::after {
+			transform: rotate(-180deg);
+		}
+		> .sub-menu {
+			opacity: 1;
+			visibility: visible;
+			transform: scaleY(1);
+			transition: all 0.5s ease;
+			pointer-events: inherit;
+		}
+	}
+}
+
+// The temple's icons are gold, drawn for dark grounds: set them on đen mun.
+.mainmenu .mega-menu-service .mega-menu-service-single .mega-menu-service-icon.tlhp-brand-icon {
+	background: var(--tj-color-theme-dark);
+	overflow: hidden;
+	img {
+		width: 40px;
+		height: 40px;
+		object-fit: contain;
+	}
+}
+
+// Round 48px "Gọi điện" and "Chỉ đường" buttons, styled like Bexon's search button.
+.tlhp-header-actions {
+	gap: 12px;
+}
+.tlhp-header-icon-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	width: 48px;
+	height: 48px;
+	border-radius: 50%;
+	font-size: 20px;
+	line-height: 1;
+	color: var(--tj-color-heading-primary);
+	background-color: var(--tj-color-grey-1);
+	transition: background-color var(--tlhp-duration-fast) var(--tlhp-ease-calm);
+	&:hover {
+		color: var(--tlhp-primary-fg);
+		background-color: var(--tj-color-theme-primary);
+	}
+	&:focus-visible {
+		outline: none;
+		box-shadow: var(--tlhp-shadow-focus);
+	}
+}
+.menu_bar.mobile_menu_bar {
+	border: 0;
+	&:focus-visible {
+		outline: none;
+		box-shadow: var(--tlhp-shadow-focus);
+	}
+}
+
+// Mobile accordion row: the label button stretches across, the arrow sits at the end.
+.hamburger_menu .mean-nav ul li .tlhp-mobile-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	background: none;
+	border-inline: 0;
+	border-top: 0;
+	text-align: start;
+	.mean-expand {
+		transition: transform 0.3s;
+		&.mean-clicked {
+			transform: rotate(180deg);
+		}
+	}
+}
+.hamburger_menu .mean-nav ul li .sub-menu {
+	padding-inline-start: 16px;
+}
+.tlhp-mobile-actions {
+	margin-bottom: 30px;
+}

@@ -1,31 +1,36 @@
 "use client";
-
+import { isCurrentLink } from "@/libs/nav";
 import Link from "next/link";
-import { useState } from "react";
+import { useId, useState } from "react";
 
-const MobileMenuItem = ({ children, text, url, submenuClass }) => {
-	const [isOpen, setIsOpen] = useState(false);
-	const handleClick = () => {
-		setIsOpen(prevIsOpen => !prevIsOpen);
-	};
+// One accordion row of the mobile menu: the label opens its pages in place.
+const MobileMenuItem = ({ item, isCurrent, pathname }) => {
+	const [isOpen, setIsOpen] = useState(isCurrent);
+	const panelId = useId();
 
 	return (
-		<li className={`has-dropdown ${isOpen ? "dropdown-opened" : ""}`}>
-			<Link href={url ? url : "#"}>{text}</Link>
-			<ul
-				className={`sub-menu ${submenuClass ? submenuClass : ""}`}
-				style={{ display: !isOpen ? "none" : "" }}
+		<li className={`has-dropdown ${isOpen ? "dropdown-opened" : ""} ${isCurrent ? "current-menu-ancestor" : ""}`}>
+			<button
+				type="button"
+				className="tlhp-mobile-toggle"
+				aria-expanded={isOpen}
+				aria-controls={panelId}
+				onClick={() => setIsOpen((open) => !open)}
 			>
-				{children}
+				{item.label}
+				<span className={`mean-expand ${isOpen ? "mean-clicked" : ""}`} aria-hidden="true">
+					<i className="tji-arrow-down"></i>
+				</span>
+			</button>
+			<ul id={panelId} className="sub-menu" hidden={!isOpen}>
+				{item.children.map((child) => (
+					<li key={child.href} className={isCurrentLink(pathname, child) ? "current-menu-item" : ""}>
+						<Link href={child.href} aria-current={isCurrentLink(pathname, child) ? "page" : undefined}>
+							{child.label}
+						</Link>
+					</li>
+				))}
 			</ul>
-			<Link
-				className={`mean-expand ${isOpen ? "mean-clicked" : ""}`}
-				href="#"
-				style={{ fontSize: "18px" }}
-				onClick={() => handleClick()}
-			>
-				<i className="tji-arrow-down"></i>
-			</Link>
 		</li>
 	);
 };

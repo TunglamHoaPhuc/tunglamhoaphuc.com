@@ -1,26 +1,14 @@
-"use client";
-
-import Image from "next/image";
+import { site } from "@/config/site";
 import Link from "next/link";
-const Logo = ({ headerType, isStickyHeader }) => {
+
+// The Mộc Ấn seal carries the name in tiny letters, so the name is also set beside it
+// in type; the seal is decorative and the link is named by that text.
+const Logo = () => {
 	return (
-		<div className="site_logo">
+		<div className="site_logo tlhp-logo">
 			<Link className="logo" href="/">
-				<Image
-					src={
-						(headerType === 2 ||
-							headerType === 5 ||
-							headerType === 7 ||
-							headerType === 9) &&
-						!isStickyHeader
-							? "/images/logos/logo-2.webp"
-							: "/images/logos/logo.webp"
-					}
-					alt=""
-					width={544}
-					height={152}
-					style={{ height: "auto" }}
-				/>
+				<img src={site.logo.src} alt="" width={site.logo.width} height={site.logo.height} className="tlhp-logo-seal" />
+				<span className="tlhp-logo-name">{site.name}</span>
 			</Link>
 		</div>
 	);

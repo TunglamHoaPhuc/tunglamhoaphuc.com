@@ -1,219 +1,128 @@
 "use client";
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
+import { formatPhone, site } from "@/config/site";
 import useIsSticky from "@/hooks/useIsSticky";
-import Link from "next/link";
-import { useState } from "react";
-import ContactMenu from "./ContactMenu";
-import HeaderTop from "./HeaderTop";
+import { useId, useRef, useState } from "react";
 import Logo from "./Logo";
 import MobileMenu from "./MobileMenu";
 import Navbar from "./Navbar";
 
-const Header = ({
-	headerType = 1,
-	isHeaderTop = false,
-	topbarType = 1,
-	isStickyHeader = false,
-}) => {
+// Each page renders this twice, like Bexon: the header floating over the hero and a copy
+// that slides down when the visitor scrolls back up. Whichever copy is out of view is
+// `inert`, so keyboard and screen reader users meet one header, never two.
+const Header = ({ headerType = 1, isStickyHeader = false }) => {
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
-	const [isContactOpen, setIsContactOpen] = useState(false);
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-	const isSticky = useIsSticky(isStickyHeader);
-	const handleContactTogglerClick = () => {
-		setIsContactOpen(true);
-	};
-	const handleMobileTogglerClick = () => {
-		setIsMobileMenuOpen(true);
+	const mobileToggleRef = useRef(null);
+	const mobileMenuId = useId();
+	const isStickyShown = useIsSticky(true);
+	const isHidden = isStickyHeader ? !isStickyShown : isStickyShown;
+
+	const closeMobileMenu = () => {
+		setIsMobileMenuOpen(false);
+		mobileToggleRef.current?.focus();
 	};
 
 	return (
 		<>
-			{/* <!-- start: Offcanvas Menu --> */}
-			<ContactMenu
-				isContactOpen={isContactOpen}
-				setIsContactOpen={setIsContactOpen}
-			/>
-			{/* <!-- end: Offcanvas Menu --> */}
+			<MobileMenu id={mobileMenuId} isOpen={isMobileMenuOpen} onClose={closeMobileMenu} />
 
-			{/* <!-- start: Offcanvas Menu --> */}
-			<MobileMenu
-				isMobileMenuOpen={isMobileMenuOpen}
-				setIsMobileMenuOpen={setIsMobileMenuOpen}
-			/>
-			{/* <!-- end: Offcanvas Menu --> */}
-
-			{/* Search Popup --> */}
-			<div
-				className={`search-popup-overlay ${
-					isSearchOpen ? "search-popup-overlay-open" : ""
-				}`}
-				onClick={() => setIsSearchOpen(false)}
-			></div>
+			{site.features.search ? (
+				<div
+					className={`search-popup-overlay ${isSearchOpen ? "search-popup-overlay-open" : ""}`}
+					onClick={() => setIsSearchOpen(false)}
+				></div>
+			) : null}
 			<header
-				className={`header-area ${
-					headerType === 11
-						? "header-1 h11-header"
-						: headerType === 10
-							? "header-3 h10-header"
-							: headerType === 9
-								? isStickyHeader
-									? "header-3"
-									: "h9-header"
-								: headerType === 8
-									? "header-1 h8-header"
-									: headerType === 7
-										? "header-2 h7-header"
-										: headerType === 6
-											? "header-1 h6-header"
-											: headerType === 5
-												? `header-2 ${isStickyHeader ? "" : "header-5"}`
-												: headerType === 3
-													? "header-3"
-													: headerType === 2
-														? "header-2"
-														: "header-1"
-				} section-gap-x ${
-					isStickyHeader
-						? `header-duplicate header-sticky ${isSticky ? "sticky" : ""}`
-						: "header-absolute"
-				} `}
+				className={`header-area ${headerType === 2 ? "header-2" : "header-1"} section-gap-x ${
+					isStickyHeader ? `header-duplicate header-sticky ${isStickyShown ? "sticky" : ""}` : "header-absolute"
+				}`}
+				inert={isHidden}
 			>
-				{isHeaderTop && <HeaderTop type={topbarType} />}
-				{headerType === 8 && !isStickyHeader ? (
-					<div className="h8-header-mainmenu-bg-shape"></div>
-				) : (
-					""
-				)}
 				<div className="container-fluid">
 					<div className="row">
 						<div className="col-12">
 							<div className="header-wrapper">
-								{/* <!-- site logo --> */}
-								<Logo headerType={headerType} isStickyHeader={isStickyHeader} />
-
-								{/* <!-- navigation --> */}
+								<Logo />
 								<Navbar />
-								{/* <!-- header right info --> */}
-								<div className="header-right-item d-none d-lg-inline-flex">
-									{headerType === 4 || headerType === 6 || headerType === 11 ? (
-										<Link
-											className="header-contact d-none d-xl-inline-flex"
-											href="tel:18884521505"
-										>
-											<span className="call-icon">
-												<i className="tji-phone"></i>
-											</span>
-											<span className="call-text">1-888-452-1505</span>
-										</Link>
-									) : headerType === 5 ? (
-										""
-									) : (
+								<div className="header-right-item tlhp-header-actions">
+									{site.features.search ? (
 										<div className="header-search">
 											<button
-												className={`search  ${
-													isSearchOpen ? "search-hide" : ""
-												}`}
+												type="button"
+												className={`search ${isSearchOpen ? "search-hide" : ""}`}
+												aria-label="Tìm kiếm"
 												onClick={() => setIsSearchOpen(true)}
 											>
-												<i className="tji-search"></i>
-											</button>
-											<button
-												type="button"
-												className={`search_close_btn ${
-													isSearchOpen ? "close-show" : ""
-												}`}
-												onClick={() => setIsSearchOpen(false)}
-											>
-												<svg
-													width="18"
-													height="18"
-													viewBox="0 0 18 18"
-													fill="none"
-													xmlns="http://www.w3.org/2000/svg"
-												>
-													<path
-														d="M17 1L1 17"
-														stroke="currentColor"
-														strokeWidth="1.5"
-														strokeLinecap="round"
-														strokeLinejoin="round"
-													/>
-													<path
-														d="M1 1L17 17"
-														stroke="currentColor"
-														strokeWidth="1.5"
-														strokeLinecap="round"
-														strokeLinejoin="round"
-													/>
-												</svg>
+												<i className="tji-search" aria-hidden="true"></i>
 											</button>
 										</div>
-									)}
-									{headerType !== 5 ? (
-										<div className="header-button">
-											<ButtonPrimary text={"Let’s Talk"} url={"/contact"} />
-										</div>
-									) : (
-										""
-									)}
-									{headerType === 3 ||
-									headerType === 8 ||
-									headerType === 9 ||
-									headerType === 10 ? (
-										""
-									) : (
-										<div
-											className="menu_bar menu_offcanvas d-none d-lg-inline-flex"
-											onClick={handleContactTogglerClick}
-										>
-											<span></span>
-											<span></span>
-											<span></span>
-										</div>
-									)}
-								</div>
-								{/* <!-- menu bar --> */}
-								<div
-									className="menu_bar mobile_menu_bar d-lg-none"
-									onClick={handleMobileTogglerClick}
-								>
-									<span></span>
-									<span></span>
-									<span></span>
+									) : null}
+									<a className="tlhp-header-icon-btn" href={`tel:${site.phone}`} aria-label={`Gọi điện ${formatPhone(site.phone)}`}>
+										<i className="tji-phone" aria-hidden="true"></i>
+									</a>
+									<a
+										className="tlhp-header-icon-btn tlhp-from-md"
+										href={site.mapsUrl}
+										target="_blank"
+										rel="noopener noreferrer"
+										aria-label="Chỉ đường đến chùa (mở Google Maps)"
+									>
+										<i className="tji-location" aria-hidden="true"></i>
+									</a>
+									<div className="header-button tlhp-from-md tlhp-header-cta">
+										<ButtonPrimary text={site.register.label} url={site.register.href} />
+									</div>
+									<button
+										ref={mobileToggleRef}
+										type="button"
+										className="menu_bar mobile_menu_bar tlhp-below-desktop"
+										aria-label="Mở menu"
+										aria-expanded={isMobileMenuOpen}
+										aria-controls={mobileMenuId}
+										onClick={() => setIsMobileMenuOpen(true)}
+									>
+										<span></span>
+										<span></span>
+										<span></span>
+									</button>
 								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				{/* <!-- Search Popup --> */}
-				<div className={`search_popup ${isSearchOpen ? "search-opened" : ""}`}>
-					<div className="container">
-						<div className="row justify-content-center">
-							<div className="col-8">
-								<div className="tj_search_wrapper">
-									<div className="search_form">
-										<form action="#">
-											<div className="search_input">
-												<div className="search-box">
-													<input
-														className="search-form-input"
-														type="text"
-														placeholder="Type Words and Hit Enter"
-														required
-													/>
-													<button type="submit">
-														<i className="tji-search"></i>
-													</button>
+				{site.features.search ? (
+					<div className={`search_popup ${isSearchOpen ? "search-opened" : ""}`}>
+						<div className="container">
+							<div className="row justify-content-center">
+								<div className="col-8">
+									<div className="tj_search_wrapper">
+										<div className="search_form">
+											<form action="/tim-kiem" role="search">
+												<div className="search_input">
+													<div className="search-box">
+														<input
+															className="search-form-input"
+															type="search"
+															name="q"
+															aria-label="Từ khóa tìm kiếm"
+															placeholder="Nhập từ khóa rồi bấm Enter"
+															required
+														/>
+														<button type="submit" aria-label="Tìm">
+															<i className="tji-search" aria-hidden="true"></i>
+														</button>
+													</div>
 												</div>
-											</div>
-										</form>
+											</form>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
+				) : null}
 			</header>
 		</>
 	);

@@ -1,89 +1,95 @@
+"use client";
+import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
+import { formatPhone, site } from "@/config/site";
+import { useFocusTrap } from "@/hooks/useFocusTrap";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useRef } from "react";
 import MobileNavbar from "./MobileNavbar";
 
-const MobileMenu = ({ isMobileMenuOpen, setIsMobileMenuOpen }) => {
-	const handleClick = () => {
-		setIsMobileMenuOpen(false);
-	};
+// Bexon's hamburger offcanvas, used below 1280px. A modal dialog while open (focus stays
+// inside, Esc closes); `inert` while closed, since it only slides off-screen.
+const MobileMenu = ({ id, isOpen, onClose }) => {
+	const panelRef = useRef(null);
+	const pathname = usePathname();
+	useFocusTrap(panelRef, isOpen, onClose);
+
+	const lastPathname = useRef(pathname);
+	useEffect(() => {
+		if (pathname !== lastPathname.current && isOpen) onClose();
+		lastPathname.current = pathname;
+	}, [pathname, isOpen, onClose]);
 
 	return (
 		<>
+			<div className={`body-overlay ${isOpen ? "opened" : ""}`} onClick={onClose}></div>
 			<div
-				className={`body-overlay  ${isMobileMenuOpen ? "opened" : ""}`}
-				onClick={handleClick}
-			></div>
-			<div
-				className={`hamburger-area d-lg-none ${
-					isMobileMenuOpen ? "opened" : ""
-				}`}
+				ref={panelRef}
+				id={id}
+				className={`hamburger-area tlhp-below-desktop ${isOpen ? "opened" : ""}`}
+				role="dialog"
+				aria-modal="true"
+				aria-label="Menu"
+				inert={!isOpen}
 			>
 				<div className="hamburger_bg"></div>
 				<div className="hamburger_wrapper">
 					<div className="hamburger_inner">
 						<div className="hamburger_top d-flex align-items-center justify-content-between">
 							<div className="hamburger_logo">
-								<Link href="/" className="mobile_logo">
-									<img src="/images/logos/logo-2.webp" alt="Logo" />
+								<Link href="/" className="mobile_logo tlhp-logo">
+									<img src={site.logo.src} alt="" width={site.logo.width} height={site.logo.height} className="tlhp-logo-seal" />
+									<span className="tlhp-logo-name">{site.name}</span>
 								</Link>
 							</div>
 							<div className="hamburger_close">
-								<button className="hamburger_close_btn" onClick={handleClick}>
-									<i className="fa-thin fa-times"></i>
+								<button type="button" className="hamburger_close_btn" aria-label="Đóng menu" onClick={onClose}>
+									<i className="fa-thin fa-times" aria-hidden="true"></i>
 								</button>
 							</div>
 						</div>
 						<MobileNavbar />
+						<div className="tlhp-mobile-actions">
+							<ButtonPrimary text={site.register.label} url={site.register.href} />
+						</div>
 						<div className="hamburger-infos">
-							<h5 className="hamburger-title">Contact Info</h5>
+							<h2 className="hamburger-title">Liên hệ</h2>
 							<div className="contact-info">
 								<div className="contact-item">
-									<span className="subtitle">Phone</span>
-									<Link className="contact-link" href="tel:8089091313">
-										808-909-1313
-									</Link>
+									<span className="subtitle">Điện thoại</span>
+									<a className="contact-link" href={`tel:${site.phone}`}>
+										{formatPhone(site.phone)}
+									</a>
 								</div>
 								<div className="contact-item">
-									<span className="subtitle">Email</span>
-									<Link className="contact-link" href="mailto:info@bexon.com">
-										info@bexon.com
-									</Link>
+									<span className="subtitle">Giờ mở cửa</span>
+									<span className="contact-link">{site.openingHours}</span>
 								</div>
 								<div className="contact-item">
-									<span className="subtitle">Location</span>
-									<span className="contact-link">
-										993 Renner Burg, West Rond, MT 94251-030
-									</span>
+									<span className="subtitle">Địa chỉ</span>
+									<a className="contact-link" href={site.mapsUrl} target="_blank" rel="noopener noreferrer">
+										{site.address}
+									</a>
 								</div>
 							</div>
 						</div>
 					</div>
-					<div className="hamburger-socials">
-						<h5 className="hamburger-title">Follow Us</h5>
-						<div className="social-links style-3">
-							<ul>
-								<li>
-									<Link href="https://www.facebook.com/" target="_blank">
-										<i className="fa-brands fa-facebook-f"></i>
-									</Link>
-								</li>
-								<li>
-									<Link href="https://www.instagram.com/" target="_blank">
-										<i className="fa-brands fa-instagram"></i>
-									</Link>
-								</li>
-								<li>
-									<Link href="https://x.com/" target="_blank">
-										<i className="fa-brands fa-x-twitter"></i>
-									</Link>
-								</li>
-								<li>
-									<Link href="https://www.linkedin.com/" target="_blank">
-										<i className="fa-brands fa-linkedin-in"></i>
-									</Link>
-								</li>
-							</ul>
+					{site.social.length ? (
+						<div className="hamburger-socials">
+							<h2 className="hamburger-title">Theo dõi</h2>
+							<div className="social-links style-3">
+								<ul>
+									{site.social.map((link) => (
+										<li key={link.href}>
+											<a href={link.href} target="_blank" rel="noopener noreferrer" aria-label={link.label}>
+												<i className={link.icon} aria-hidden="true"></i>
+											</a>
+										</li>
+									))}
+								</ul>
+							</div>
 						</div>
-					</div>
+					) : null}
 				</div>
 			</div>
 		</>

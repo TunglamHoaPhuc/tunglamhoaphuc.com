@@ -20,7 +20,11 @@
 		&::-webkit-scrollbar {
 			display: none;
 		}
+		// Off-screen alone still counts as shown; hide the closed panel outright. The
+		// `transition: all` above keeps it visible until the slide-out ends.
+		visibility: hidden;
 		&.opened {
+			visibility: visible;
 			inset-inline-end: 15px;
 			@media #{$sm, $xs} {
 				inset-inline-end: 0;
