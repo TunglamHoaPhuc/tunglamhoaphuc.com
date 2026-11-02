@@ -41,3 +41,16 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+/dist/
+.vinext/
+.cloudflare/
+
+# tlhp
+node_modules/
+*.zip
+/reference/
+/data/snapshot/
+.dev.vars*
+/test-results/
+/playwright-report/
+/graphify-out/cache/
