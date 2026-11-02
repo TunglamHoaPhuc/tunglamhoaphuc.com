@@ -190,14 +190,24 @@
 
 **File Bexon:** `components/layout/header/Header.js`, `Navbar.js`, `Logo.js`, `MobileMenu.js`, `MobileNavbar.js`, `ContactMenu.js`, `hooks/useIsSticky.js`, `assets/sass/components/_header.scss`, `_mega-menu.scss`, `_hamburger.scss`
 
+**Kết quả 02/11/2026:** xong, đã deploy `v2.`.
+- **`src/config/site.ts`:** menu 5 mục (2 menu thả), 7 số liên hệ, giờ mở cửa, địa chỉ lấy từ footer site cũ; logo, nút "Đăng ký khóa tu" và cờ bật tìm kiếm. `src/libs/nav.ts` xác định mục đang mở (liên kết có `#` không sáng, để "Đăng ký khóa tu" không sáng cùng "Lịch tu học"). 21 unit test.
+- **Logo:** ấn Mộc Ấn từ bộ nhận diện (`public/brand/`) kèm chữ "Tùng Lâm Hòa Phúc" vì chữ trong ấn quá nhỏ ở cỡ 48px; điện thoại xuống 2 dòng.
+- **Menu ngang từ 1280px:** mục cha là nút (mở khi bấm, không mở khi rê chuột), Esc đóng và trả focus, đóng khi focus hoặc cú bấm ra ngoài. Menu thả dùng kiểu `mega-menu-service` của Bexon, icon vàng của chùa đặt trên nền đen mun.
+- **Cụm phải:** nút tròn 48px Gọi điện (số Trưởng ban lãnh chúng) và Chỉ đường (Google Maps), nút "Đăng ký khóa tu". Ở 1280–1439px ẩn nút này (menu đã có mục cùng tên) để header không rớt dòng; dưới 768px chỉ giữ Gọi điện + menu.
+- **Dưới 1280px:** offcanvas của Bexon là hộp thoại (`role="dialog"`, bẫy focus, Esc đóng, trả focus về nút mở), ẩn hẳn khi đóng; mục con mở dạng accordion; có nút đăng ký và khối liên hệ.
+- **Hai header của Bexon:** bản đang khuất đặt `inert`, nên bàn phím và trình đọc màn hình chỉ gặp một header.
+- **Gỡ:** `ContactMenu` (offcanvas liên hệ trên desktop, không có trong đặc tả 5.3), `HeaderTop`, `getNavItems`, `useActiveLink`, `nav-items.json`.
+- **Còn chờ:** đường dẫn mạng xã hội chính thức và link Google Maps của chùa (GD-06; hiện dùng link tìm kiếm). Slug 3 trang Giới thiệu (`lich-su-bon-tu`, `chu-ton-duc`, `thanh-quy`) tạm đặt, T13a chốt theo dữ liệu. Icon menu chọn tạm theo nghĩa gần nhất, đổi trong `site.ts`.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Bàn phím: Tab tới mọi mục, Enter mở menu thả, Esc đóng menu thả / offcanvas và trả focus (Playwright)
-- [ ] Không tràn ngang, không cắt chữ menu ở 375 / 768 / 1024 / 1280 / 1440px (lỗi của site cũ ở 1024px)
-- [ ] axe không báo trùng landmark `navigation`; đổi menu chỉ cần sửa `src/config/site.ts`
+- [x] Bàn phím: Tab tới mọi mục, Enter mở menu thả, Esc đóng menu thả / offcanvas và trả focus (Playwright)
+- [x] Không tràn ngang, không cắt chữ menu ở 375 / 768 / 1024 / 1280 / 1440px (lỗi của site cũ ở 1024px); header nằm một hàng ở cả 5 độ rộng
+- [x] axe không báo trùng landmark `navigation`; đổi menu chỉ cần sửa `src/config/site.ts`
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- header`
-- [ ] Ảnh chụp header ở 5 độ rộng, trạng thái chưa cuộn và đã cuộn
+- [x] `npm run test:e2e -- header` (14 test); toàn bộ e2e 94 xanh cục bộ và trên `v2.`. Test canh gác "không hộp thoại khi tải trang" bắt được bảng menu đóng vẫn tính là đang hiện; đã sửa.
+- [x] Ảnh chụp header ở 5 độ rộng, chưa cuộn và đã cuộn, kèm menu thả: `docs/anh/t5a-header-5-do-rong.png`
 
 **Phụ thuộc:** T3b; chuẩn bị #2 (logo)
 

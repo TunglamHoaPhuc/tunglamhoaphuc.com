@@ -63,7 +63,7 @@ Lộ trình có 3 mốc:
 | # | Việc | Ai | Cần trước |
 |---|---|---|---|
 | 1 | Sao chép 13 file JSON trong thư mục `database/` của Ổ Z: (B2) vào `data/snapshot/` | Chủ site | T4 |
-| 2 | Sao chép thư mục `09-icon-minh-hoa/` (logo Mộc Ấn, logo tròn, icon minh họa) vào `public/brand/` | Chủ site | T5a |
+| 2 | ~~Sao chép thư mục `09-icon-minh-hoa/` (logo Mộc Ấn, logo tròn, icon minh họa) vào `public/brand/`~~ – **xong 02/11**: bộ nhận diện gốc ở `bo-nhan-dien/` (logo, favicon, 20 icon chuyên mục, font UTM, bảng màu; không đưa vào git). Bản dùng cho web chép sang `public/brand/`: 2 logo, 6 favicon, 14 icon thu về 128px (112 KB). Font UTM không dùng (đã chốt Noto Serif + Be Vietnam Pro) | Chủ site | T5a |
 | 3 | Node.js 20 LTS trở lên. Cloudflare **đã có**: tài khoản sở hữu zone (id `b91a395bd9b7ab86ef4cba41d1d828ae`), `cf` profile `tlhp`, Worker `tlhp-web` gắn `v2.tunglamhoaphuc.com`. Khi chạy lệnh đặt `CLOUDFLARE_ACCOUNT_ID` | Đội kỹ thuật | T1 |
 | 4 | Xác định bucket B2 chứa 13 file JSON mà admin cũ đang ghi; tạo **khóa ứng dụng B2 chỉ đọc** cho đúng bucket đó | Chủ site | T19 |
 | 5 | Quyền vào project Vercel của site cũ (gắn tên miền `quantri.`, bật Deployment Protection) | Chủ site | T21 |
@@ -219,7 +219,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [x] T3a: Cầu nối theme TLHP: màu, font, cỡ chữ
 - [x] T3b: Quét màu viết cứng, chỉnh chữ tiếng Việt và trang styleguide
 - [ ] T4: Lớp nội dung: snapshot JSON → repository (lát Dòng Chảy)
-- [ ] T5a: Header và menu
+- [x] T5a: Header và menu
 - [ ] T5b: Popup tìm kiếm và dải thông báo
 - [ ] T6: Footer, khối kết trang, nút lên đầu trang và trang 404
 - [ ] **Checkpoint A** – duyệt giao diện nền trên `v2.` với Ban Truyền Thông
