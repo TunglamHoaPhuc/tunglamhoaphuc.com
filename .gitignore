@@ -49,6 +49,8 @@ next-env.d.ts
 node_modules/
 *.zip
 /reference/
+# Brand kit as received (UTM fonts, full-size PNGs); web copies live in public/brand
+/bo-nhan-dien/
 /data/snapshot/
 .dev.vars*
 /test-results/
