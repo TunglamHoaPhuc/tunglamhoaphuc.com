@@ -136,13 +136,24 @@
 
 **File Bexon:** `components/_buttons.scss`, `_preloader.scss`, `_cursor.scss`, `_backtotop.scss`, `layout/_heading.scss`, `src/libs/titleAnim*.js`
 
+**Kết quả 02/11/2026:** xong, đã deploy `v2.`.
+- **Màu:** thay 28 chỗ teal và đen-xanh viết cứng ở 12 partial bằng `var(--tj-…)` / `color-mix(…)`. Tô lại `shape-blur.svg` (quầng sáng section dịch vụ, nay hoại sắc đậm), `map.svg` (Contact2) và ảnh `404/error.webp`; xóa `h11-hero-img-shape.svg` không dùng. `--bs-code-color` của Bootstrap trỏ về `--tlhp-accent-text`. Logo Bexon vẫn teal, để T5a thay.
+- **Chữ tiếng Việt:** tiêu đề h1 và tiêu đề hero dùng `--tlhp-leading-display` (1.15) và giãn chữ −0.01em; h2 1.25; mọi giãn chữ âm khác về 0 hoặc −0.01em. Nới 11 tiêu đề một dòng của Bexon đang để `line-height: 1` (hamburger, mega-menu, cảm nhận, bảng giá, page header, sidebar blog…). Test đo trên 11 trang còn giữ.
+- **Tách chữ:** GSAP 3.13 SplitText tự gắn `aria-label` nguyên câu và tách theo cụm chữ (`Intl.Segmenter`), nên dấu không rời chữ. Lớp che dòng `.title-anim > div` đổi từ `overflow: hidden` sang `clip-path` có chừa chỗ, không còn cắt dấu chồng và dấu nặng.
+- **Nút:** nền mộc, chữ ngà, ô icon tròn nền hoại sắc (đảo màu trong `.tlhp-dark`), cao ≥ 48px, vòng focus kép `--tlhp-shadow-focus`, hover đổi `primary-hover`. Hộp nhãn có đệm 0.3em và hiệu ứng cuộn nhãn dịch 2em để không cắt dấu. Ô icon `aria-hidden`. Bỏ `text-transform: capitalize` ở menu. Chip `style-2` dùng cặp `accent-soft` / `accent-text`.
+- **Preloader và magic cursor:** Home-02 không có (T2 đã gỡ), không có gì để đổi màu. `BackToTop` đã đọc biến theme.
+- **`/styleguide`:** màu, h1–h6 có "Ẫ Ộ Ữ Ỹ ạ ợ", 3 kiểu tách chữ, nút, thẻ blog/team/service, biểu mẫu có nhãn, section `.tlhp-dark`. `noindex`; trả 404 trên `www` và tên miền gốc (`src/libs/hosts.ts`, có unit test). Ảnh: `docs/anh/t3b-styleguide.png`.
+- **Phát hiện và sửa lỗi của T2:** khi trình duyệt cuộn tới phần tử (tìm trong trang, `scrollIntoView`), cách "tạm tắt độ mượt rồi nhảy" chỉ chạy ở trang có nhiều ScrollTrigger; trên `/styleguide` nội dung đứng im. Nay dùng `smoother.scrollTo(y, false)` như ScrollSmoother tự làm khi focus (lướt khoảng 1,5 giây). Test chạy trên cả `/` và `/styleguide`.
+- **Tên liên kết trong thẻ Bexon** (axe phát hiện trên styleguide; trang chủ cũng dính vì test trang chủ chỉ kiểm tương phản): ảnh đầu `BlogCard2` trùng đích với tiêu đề nên rút khỏi Tab và trình đọc màn hình; icon thư và mạng xã hội của `TeamCard` có `aria-label`.
+- **Giới hạn đã biết:** đặt `data-theme="dark"` lên cả trang làm thẻ và biểu mẫu Bexon (nền `common-white` cố định) thành chữ sáng trên nền sáng. Theo quyết định 9, chủ đề chỉ đặt trên khung đọc hoặc `.tlhp-dark`, nên chưa xử lý; T8 làm khung đọc Đêm thiền thì kiểm lại.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Không còn màu teal trên Home-02 và styleguide (test quét computed style mọi phần tử, không có `rgb(30, 138, 138)`)
-- [ ] Tiêu đề h1–h6 có dòng "Ẫ Ộ Ữ Ỹ" không chạm dòng, kể cả khi đang chạy hiệu ứng tách chữ; trình đọc màn hình đọc nguyên câu
-- [ ] axe 0 lỗi trên styleguide (nền sáng và section tối); nút `md` cao ≥ 48px
+- [x] Không còn màu teal trên Home-02 và styleguide (test quét computed style mọi phần tử, cả `::before`/`::after`, và nội dung các ảnh SVG đang hiển thị)
+- [x] Tiêu đề h1–h6 có dòng "Ẫ Ộ Ữ Ỹ" không chạm dòng, kể cả khi đang chạy hiệu ứng tách chữ; trình đọc màn hình đọc nguyên câu
+- [x] axe 0 lỗi WCAG A/AA trên styleguide (nền sáng và section tối, 1440px và Pixel 7); nút `md` cao ≥ 48px
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- styleguide home`
+- [x] `npm run test:e2e -- styleguide` cùng toàn bộ e2e: 78 xanh cục bộ và trên `v2.` (6 test bàn phím chỉ chạy trên desktop); unit 13 xanh; Worker 492 KB nén
 
 **Phụ thuộc:** T3a
 

@@ -217,7 +217,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [ ] T1b: Kho mã GitHub riêng tư và CI
 - [x] T2: Gỡ trang, thư viện thừa và thêm công tắc giảm chuyển động
 - [x] T3a: Cầu nối theme TLHP: màu, font, cỡ chữ
-- [ ] T3b: Quét màu viết cứng, chỉnh chữ tiếng Việt và trang styleguide
+- [x] T3b: Quét màu viết cứng, chỉnh chữ tiếng Việt và trang styleguide
 - [ ] T4: Lớp nội dung: snapshot JSON → repository (lát Dòng Chảy)
 - [ ] T5a: Header và menu
 - [ ] T5b: Popup tìm kiếm và dải thông báo

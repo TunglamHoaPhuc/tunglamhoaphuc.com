@@ -37,7 +37,7 @@ Hệ thống giao thoa hai nguồn:
 |---|---|---|
 | **Khoảng lặng** | Khoảng trống là một phần của nội dung | Section 64→120px; tối đa 1 lời kêu gọi chính mỗi màn hình; đoạn văn ≤ 720px |
 | **Chất liệu thật** | Màu đến từ vật liệu chùa, không từ màu điện tử | Không dùng xanh neon, tím, gradient cầu vồng; không glow vàng phát sáng như site cũ |
-| **Nhịp chậm** | Chuyển động chỉ để dẫn mắt, không để gây chú ý | Fade 250–300ms; không parallax, không chữ chạy, không carousel tự chạy, không âm thanh tự phát |
+| **Nhịp chậm** | Chuyển động chỉ để dẫn mắt, không để gây chú ý | Giữ bộ hiệu ứng của Bexon (hiện dần khi cuộn, cuộn mượt + parallax, chữ tách từng ký tự, dải chữ chạy, slider tự chạy, nút về đầu trang) theo quyết định ngày 02/11/2026. Mọi hiệu ứng tắt hẳn khi hệ điều hành bật "giảm chuyển động"; slider tự chạy ≥ 7 giây/khung, có nút tạm dừng, dừng khi di chuột hoặc focus; không âm thanh tự phát |
 | **Khiêm nhường** | Nội dung Phật pháp đứng trước, giao diện lùi sau | Thẻ phẳng, viền 1px; đỏ chu sa chỉ dành cho dấu ấn, đại lễ (≤ 5% bề mặt) |
 | **Dễ đọc cho người cao tuổi** | Ai cũng đọc được trên điện thoại | Thân bài 17–18px, dòng cao 1.7; tương phản thân bài ≥ 7:1; vùng chạm ≥ 48×48px |
 
@@ -61,9 +61,9 @@ Các giá trị bên trái đo trực tiếp trên trang mẫu (Bootstrap 5, fon
 | Nút pill bo 50px, cao 48px, đệm 5/5/5/25px, ô icon tròn 38–42px | Giữ nguyên dạng; nền mộc, ô icon nền hoại sắc |
 | Thẻ blog nền trắng, bo 12px, đệm nội dung 35×30px, không bóng | Nền trắng ngọc, bo 12px, viền 1px, đệm 24→32px, không bóng |
 | Thẻ quy trình bo 10px; thẻ cảm nhận đệm 60×50px | Input/thẻ nhỏ bo 10px; thẻ lớn đệm 32→56px |
-| Header tuyệt đối cách đỉnh 30px, cao 80px, kính mờ `rgba(255,255,255,.1)` blur 10px, bo 14px; thêm một header trắng dính riêng | Một header sticky duy nhất cao 80px (64px mobile); khi cuộn: nền ngà 92% + blur 10px (bỏ bản header nhân đôi để tránh nhảy bố cục) |
-| Footer tối 4 cột (`col-xl-3`), dòng chữ khổng lồ chạy ngang | Footer tối 4 cột; bỏ chữ chạy, thay bằng khẩu hiệu tĩnh |
-| Hiệu ứng wow `fadeInUp`, chữ hiện từng ký tự, nút tiến trình cuộn nổi góc phải | Chỉ giữ fade nhẹ; **bỏ nút nổi** (vi phạm Zero Floating UI) |
+| Header tuyệt đối cách đỉnh 30px, cao 80px, kính mờ `rgba(255,255,255,.1)` blur 10px, bo 14px; thêm một header trắng dính riêng | Giữ cơ chế 2 header của Bexon (header nổi trên hero + header dính trượt xuống khi cuộn); bản đang ẩn đặt `inert` để trình đọc màn hình không đọc hai lần |
+| Footer tối 4 cột (`col-xl-3`), dòng chữ khổng lồ chạy ngang | Footer tối 4 cột; dải chữ chạy đổi thành "Nơi để trở về – Chốn thiêng bình yên" (đứng yên khi giảm chuyển động) |
+| Hiệu ứng wow `fadeInUp`, chữ hiện từng ký tự, nút tiến trình cuộn nổi góc phải | Giữ nguyên cả ba (quyết định 02/11/2026); chữ tách giữ `aria-label` nguyên câu và không cắt dấu tiếng Việt; nút về đầu trang có nhãn "Về đầu trang", vùng chạm ≥ 48px; tất cả tắt khi giảm chuyển động |
 | Section padding 120px, container 1320px + lề 12px | 64→120px, container 1320px + lề 16/24/32px |
 
 ---
@@ -370,7 +370,7 @@ Cỡ chữ co giãn mượt từ màn hình 375px (giá trị nhỏ) đến 1320
 | Kích thước | `sm` 40px (chỉ trong bảng admin) · `md` 48px (mặc định) · `lg` 56px (hero) |
 | Chữ | `text-button` 16px/600, viết hoa đầu câu ("Đăng ký khóa tu", không "ĐĂNG KÝ KHÓA TU") |
 | Biến thể | **Primary** nền mộc, chữ ngà, ô icon tròn nền hoại sắc bên phải · **Secondary** viền `border-strong`, nền trong · **Ceremonial** nền chu sa – tối đa 1 nút/màn hình, cho đại lễ · **Ghost** dạng liên kết |
-| Hover | Đổi nền sang `primary-hover` trong 150ms; mũi tên trong ô icon trượt 2px trong 250ms |
+| Hover | Đổi nền sang `primary-hover` trong 150ms; giữ hiệu ứng Bexon: nhãn cuộn lên thay bằng bản sao, mũi tên trong ô icon xoay về nằm ngang |
 | Focus | Vòng kép `shadow-focus` (luôn thấy trên mọi nền) |
 | Disabled / Loading | Độ mờ 50% · giữ nguyên độ rộng, nhãn "Đang gửi…", `aria-busy="true"` |
 | Cấm | Bóng phát sáng màu (glow), gradient, nhấp nháy, rung |
@@ -458,21 +458,61 @@ Lưới: 1 cột (mobile) → 2 (md) → 4 (xl). Dải cuối: "© Phật lịch
 
 ### 5.6. Quy tắc ZERO FLOATING UI
 
+Ngày 02/11/2026 chủ dự án quyết định giữ toàn bộ hiệu ứng của Bexon, nên hai mục nút về đầu trang và carousel tự chạy được nới như ghi trong bảng (đảo ngược UX-01, UX-03). Các mục còn lại vẫn cấm.
+
 | Cấm tuyệt đối | Thay bằng |
 |---|---|
 | Toast, snackbar "Đã lưu/Đã gửi" | Dòng trạng thái in-line cạnh nút (`role="status"`) |
 | Modal/popup tự bật (kể cả popup chào mừng của site cũ) | Khối "Lời chào" tĩnh trên trang chủ hoặc trang Giới thiệu |
 | Banner nổi, thanh dính đáy, bong bóng chat nổi | Dải thông báo trong luồng đầu trang (Q12); khối "Hỏi AI Hòa Phúc" là một section trong trang |
-| Nút "lên đầu trang" nổi, thanh tiến trình cuộn nổi | Liên kết "Về đầu trang" ở footer |
+| ~~Nút "lên đầu trang" nổi, thanh tiến trình cuộn nổi~~ **Được giữ** | Nút `BackToTop` của Bexon (vòng tiến trình cuộn) có nhãn "Về đầu trang", vùng chạm ≥ 48px, không che nội dung ở 375px; footer vẫn có liên kết "Về đầu trang" |
 | Banner cookie nổi | Dùng phân tích không cookie (Cloudflare Web Analytics) để khỏi cần banner; nếu bắt buộc, đặt thông tin trong trang Chính sách và footer |
 | Đếm ngược nhảy từng giây (Q7) | Đếm theo ngày, tĩnh: "Còn 12 ngày đến khóa tu" |
-| Carousel tự chạy | Mặc định đứng yên, người dùng bấm mũi tên; nếu bắt buộc tự chạy: ≥ 7 giây/slide, có nút tạm dừng, dừng khi di chuột/focus |
+| ~~Carousel tự chạy~~ **Được giữ** | Slider của Bexon tự chạy ≥ 7 giây/khung, có nút tạm dừng dùng được bằng bàn phím, dừng khi di chuột/focus (WCAG 2.2.2); không tự chạy khi giảm chuyển động |
 
 **Được phép** (do người dùng chủ động mở, đóng bằng Esc, có bẫy focus, không tự mở lại): menu con, accordion, tab, `<details>`, lightbox xem ảnh album (Q8).
 
 ---
 
 ## 6. Áp dụng vào mã nguồn Next.js
+
+### 6.1. Áp vào Bexon (Bootstrap/SCSS) – cách website chùa đang dùng
+
+Website dựng lại từ theme Bexon (Bootstrap 5 + SCSS), giữ nguyên markup và hiệu ứng, chỉ đổi màu, chữ và nội dung. Bộ token không thay Bootstrap mà nằm trên nó qua một **cầu nối biến CSS**.
+
+**Thứ tự nạp** (`src/app/layout.js` → `src/app/globals.scss`):
+
+1. `design-system/tokens.css` – nguồn duy nhất của màu, chữ, khoảng cách (`--tlhp-*`).
+2. Bootstrap + các partial Bexon còn giữ – đọc mọi màu, font, cỡ tiêu đề từ `--tj-*`.
+3. `utilities/_tlhp-bridge.scss` – trỏ từng `--tj-*` sang `--tlhp-*`. Khai báo trên `:root, [data-theme], .tlhp-dark` để giá trị tự đổi theo chủ đề.
+4. `components/_reduced-motion.scss` – tắt chuyển động khi hệ điều hành bật "giảm chuyển động".
+
+| Biến Bexon | Trỏ sang | Ghi chú |
+|---|---|---|
+| `--tj-color-grey-1` / `--tj-color-theme-bg` | `--tlhp-bg` / `--tlhp-bg-alt` | Nền trang ngà, section xen kẽ kem |
+| `--tj-color-theme-primary` | `--tlhp-primary` | Mộc; trong `.tlhp-dark` và chủ đề tối thành hoại sắc |
+| `--tj-color-theme-dark` | `--tlhp-moc-950` | Đen mun cho section tối, footer |
+| `--tj-color-heading-primary` / `--tj-color-text-body` | `--tlhp-heading` / `--tlhp-fg` | Gỗ lim / đá |
+| `--tj-color-border-1` | `--tlhp-border` | Viền 1px |
+| `--tj-ff-heading` / `--tj-ff-body` | `--tlhp-font-serif` / `--tlhp-font-sans` | Biến của `next/font` đặt trên `<html>` |
+| `--tj-fs-h1` … `--tj-fs-h6` | `--tlhp-text-display` … `--tlhp-text-body-lg` | Cỡ tiêu đề theo token |
+| `--bs-code-color` | `--tlhp-accent-text` | Thay màu hồng mặc định của Bootstrap |
+
+**Quy tắc khi sửa SCSS của Bexon:**
+
+- **Không viết cứng mã màu.** Partial Bexon dùng `var(--tj-…)`; mã mới dùng thẳng `var(--tlhp-…)`. Màu trong suốt viết `color-mix(in srgb, var(--tj-color-theme-dark) 40%, transparent)` thay cho `rgba(…)`. Ảnh SVG trang trí tô bằng mã hex của token (ví dụ hoại sắc `#D4A373`).
+- **Chữ tiếng Việt:** tiêu đề line-height ≥ 1.15 (dùng `--tlhp-leading-*`), giãn chữ không âm hơn −0.01em; tiêu đề một dòng cũng không để `line-height: 1`. Không `text-transform: capitalize` cho menu (giữ viết hoa đầu câu).
+- **Hiệu ứng tách chữ** (`titleAnim*`, GSAP SplitText 3.13): SplitText tự gắn `aria-label` nguyên câu và tách theo cụm chữ (không rời dấu). Lớp che dòng dùng `clip-path: inset(-0.35em -0.1em -0.25em -0.1em)` thay cho `overflow: hidden` để không cắt dấu chồng và dấu nặng.
+- **Nút** (`ButtonPrimary` → `.tj-primary-btn`): nền mộc, chữ ngà, ô icon tròn nền hoại sắc (đảo thành nền tối, mũi tên hoại sắc trong section tối), cao ≥ 48px, focus `--tlhp-shadow-focus`. Ô icon đặt `aria-hidden`. Nhãn cuộn lên khi hover nằm trong hộp có đệm 0.3em và dịch 2em để không cắt dấu.
+- **Chip trên tiêu đề** (`.sec-heading.style-2 .sub-title`): nền `--tlhp-accent-soft`, chữ `--tlhp-accent-text`.
+- **Section tối:** thêm lớp `.tlhp-dark` (mọi biến bên trong tự đổi), hoặc giữ section tối gốc của Bexon (`.tj-service-section`, footer) vốn dùng `--tj-color-theme-dark`.
+- **Chuyển động:** mọi hiệu ứng kiểm `prefersReducedMotion()` (`src/libs/motion.ts`); CSS ẩn phần tử chờ hiệu ứng phải nằm trong `@media (prefers-reduced-motion: no-preference)`.
+
+**Kiểm tra:** trang `/styleguide` (noindex, trả 404 trên `www`) bày đủ màu, h1–h6 có "Ẫ Ộ Ữ Ỹ ạ ợ", hiệu ứng tách chữ, nút, thẻ, biểu mẫu và section tối. Test: `tests/e2e/theme.spec.ts`, `tests/e2e/styleguide.spec.ts` (không còn teal `rgb(30, 138, 138)`, số đo tiêu đề, nút, axe ở nền sáng và tối).
+
+### 6.2. Dự án dùng Tailwind (tham khảo)
+
+Các đoạn dưới đây dành cho ứng dụng mới viết bằng Tailwind (ví dụ trang quản trị nếu dựng riêng).
 
 ```tsx
 // app/layout.tsx
