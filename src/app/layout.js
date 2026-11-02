@@ -46,6 +46,9 @@ export default function RootLayout({ children }) {
 			data-scroll-behavior="smooth"
 			dir="ltr"
 			className={`${headingFont.variable} ${bodyFont.variable}`}
+			// The notice strip's inline script sets an attribute and a CSS variable here
+			// before React hydrates.
+			suppressHydrationWarning
 		>
 			<body>{children}</body>
 		</html>

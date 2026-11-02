@@ -1,3 +1,4 @@
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import Footer from "@/components/layout/footer/Footer";
 import Header from "@/components/layout/header/Header";
 import Brands1 from "@/components/sections/brands/Brands1";
@@ -17,6 +18,7 @@ export default function Services() {
 			<Header isStickyHeader={true} />
 			<div id="smooth-wrapper">
 				<div id="smooth-content">
+					<AnnouncementBar />
 					<main>
 						<HeaderSpace />
 						<HeroInner title={"Services"} text={"Services"} />

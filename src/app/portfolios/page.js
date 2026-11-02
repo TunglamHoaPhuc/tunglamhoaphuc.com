@@ -1,3 +1,4 @@
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import Footer from "@/components/layout/footer/Footer";
 import Header from "@/components/layout/header/Header";
 import Cta from "@/components/sections/cta/Cta";
@@ -14,6 +15,7 @@ export default function Portfolios() {
 			<Header isStickyHeader={true} />
 			<div id="smooth-wrapper">
 				<div id="smooth-content">
+					<AnnouncementBar />
 					<main>
 						<HeaderSpace />
 						<HeroInner title={"Portfolio"} text={"Portfolio"} />

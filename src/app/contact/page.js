@@ -1,3 +1,4 @@
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import Footer from "@/components/layout/footer/Footer";
 import Header from "@/components/layout/header/Header";
 import Contact3 from "@/components/sections/contacts/Contact3";
@@ -15,6 +16,7 @@ export default function Contact() {
 			<Header isStickyHeader={true} />
 			<div id="smooth-wrapper">
 				<div id="smooth-content">
+					<AnnouncementBar />
 					<main>
 						<HeaderSpace />
 						<HeroInner title={"Contact Us"} text={"Contact Us"} />

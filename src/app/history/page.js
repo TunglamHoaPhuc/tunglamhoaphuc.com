@@ -1,3 +1,4 @@
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import Footer from "@/components/layout/footer/Footer";
 import Header from "@/components/layout/header/Header";
 import About12 from "@/components/sections/about/About12";
@@ -16,6 +17,7 @@ export default function Histor() {
 			<Header isStickyHeader={true} />
 			<div id="smooth-wrapper">
 				<div id="smooth-content">
+					<AnnouncementBar />
 					<main>
 						<HeaderSpace />
 						<HeroInner title={"Company History"} text={"Company History"} />

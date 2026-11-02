@@ -715,6 +715,16 @@ TLHP header (T5a)
 		display: none !important;
 	}
 }
+@media (max-width: 575.98px) {
+	.tlhp-from-sm {
+		display: none !important;
+	}
+}
+@media (min-width: 576px) {
+	.tlhp-below-sm {
+		display: none !important;
+	}
+}
 // Between 1280 and 1439px the full menu leaves no room for the pill, and the menu already
 // has "Đăng ký khóa tu"; the pill returns once there is space again.
 @media (min-width: 1280px) and (max-width: 1439.98px) {
@@ -722,10 +732,16 @@ TLHP header (T5a)
 		display: none !important;
 	}
 }
+// The search button costs the pill its room at 768–1023px and 1280–1599px.
+@media (min-width: 768px) and (max-width: 1023.98px), (min-width: 1280px) and (max-width: 1599.98px) {
+	.has-search .tlhp-header-cta {
+		display: none !important;
+	}
+}
 
 // Seal plus the temple name in type (the name in the seal is too small to read).
 .site_logo.tlhp-logo .logo,
-.mobile_logo.tlhp-logo {
+.hamburger_logo .mobile_logo.tlhp-logo {
 	display: inline-flex;
 	align-items: center;
 	gap: 10px;

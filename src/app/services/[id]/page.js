@@ -1,3 +1,4 @@
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import Footer from "@/components/layout/footer/Footer";
 import Header from "@/components/layout/header/Header";
 import ServiceDetailsMain from "@/components/layout/main/ServiceDetailsMain";
@@ -23,6 +24,7 @@ export default async function ServiceDetails({ params }) {
 			<Header isStickyHeader={true} />
 			<div id="smooth-wrapper">
 				<div id="smooth-content">
+					<AnnouncementBar />
 					<main>
 						<HeaderSpace />
 						<ServiceDetailsMain currentItemId={parseInt(id)} />

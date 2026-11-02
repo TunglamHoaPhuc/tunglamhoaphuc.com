@@ -16,6 +16,16 @@ export type NavItem = NavLink & {
 
 export type Contact = { role: string; name: string; phone: string };
 
+/** Static notice above the header (UX-02). Visitors can close it for the session. */
+export type Announcement = {
+	/** Change it with the text, so a new notice shows again to people who closed the old one. */
+	id: string;
+	text: string;
+	link?: { label: string; href: string };
+	/** Last day to show it, YYYY-MM-DD in Vietnam time. */
+	expires?: string;
+};
+
 /** "0979345373" → "0979.345.373", the way the temple writes numbers. */
 export function formatPhone(digits: string): string {
 	return digits.replace(/^(\d{4})(\d{3})(\d{3})$/, "$1.$2.$3");
@@ -51,6 +61,10 @@ export const site = {
 
 	// Official page links are still pending (GD-06); empty entries are not rendered.
 	social: [] as NavLink[],
+
+	// No notice for now; T29 moves this into the admin. Example:
+	// { id: "2026-12-vu-lan", text: "Khóa tu mùa đông mở đăng ký từ 01/12.", link: { label: "Xem lịch", href: "/lich-tu-hoc" }, expires: "2026-12-31" }
+	announcement: null as Announcement | null,
 
 	features: {
 		// The header search button waits for the /tim-kiem page (T18); T5b finishes the popup.

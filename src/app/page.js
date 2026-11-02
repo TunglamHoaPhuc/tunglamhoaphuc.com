@@ -1,3 +1,4 @@
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import Footer2 from "@/components/layout/footer/Footer2";
 import Header from "@/components/layout/header/Header";
 import About2 from "@/components/sections/about/About2";
@@ -21,6 +22,7 @@ export default function Home() {
 			<Header headerType={2} isStickyHeader={true} />
 			<div id="smooth-wrapper">
 				<div id="smooth-content">
+					<AnnouncementBar />
 					<main>
 						<div className="top-space-15"></div>
 						<Hero2 />

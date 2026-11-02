@@ -9,7 +9,7 @@ import MobileNavbar from "./MobileNavbar";
 
 // Bexon's hamburger offcanvas, used below 1280px. A modal dialog while open (focus stays
 // inside, Esc closes); `inert` while closed, since it only slides off-screen.
-const MobileMenu = ({ id, isOpen, onClose }) => {
+const MobileMenu = ({ id, isOpen, onClose, showSearch = false }) => {
 	const panelRef = useRef(null);
 	const pathname = usePathname();
 	useFocusTrap(panelRef, isOpen, onClose);
@@ -48,6 +48,15 @@ const MobileMenu = ({ id, isOpen, onClose }) => {
 								</button>
 							</div>
 						</div>
+						{showSearch ? (
+							// On phones the header has no room for a search button; search sits here instead.
+							<form className="hamburger_search tlhp-below-sm" action="/tim-kiem" method="get" role="search">
+								<input type="search" name="q" aria-label="Từ khóa tìm kiếm" placeholder="Tìm kiếm" autoComplete="off" enterKeyHint="search" required />
+								<button type="submit" aria-label="Tìm">
+									<i className="tji-search" aria-hidden="true"></i>
+								</button>
+							</form>
+						) : null}
 						<MobileNavbar />
 						<div className="tlhp-mobile-actions">
 							<ButtonPrimary text={site.register.label} url={site.register.href} />

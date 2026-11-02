@@ -1,0 +1,64 @@
+/**----------------------------------------
+TLHP notice strip (T5b, UX-02)
+----------------------------------------*/
+// In the page flow above the header: static, never floating or sliding.
+.tlhp-announcement {
+	position: relative;
+	background-color: var(--tlhp-accent-soft);
+	color: var(--tlhp-fg);
+	border-bottom: 1px solid var(--tlhp-border);
+	font-size: var(--tlhp-text-body-sm);
+	line-height: 1.5;
+}
+.tlhp-announcement-inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	min-height: var(--tlhp-announcement-h);
+}
+.tlhp-announcement-text {
+	margin: 0;
+	padding-block: 10px;
+	color: inherit;
+	font-size: inherit;
+	line-height: inherit;
+	a {
+		color: var(--tlhp-accent-text);
+		font-weight: 600;
+		text-decoration: underline;
+		text-underline-offset: 3px;
+	}
+}
+.tlhp-announcement-close {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	flex-shrink: 0;
+	min-height: 48px;
+	padding: 0 4px;
+	background: none;
+	border: 0;
+	color: var(--tlhp-fg);
+	font-weight: 600;
+	cursor: pointer;
+	&:hover {
+		color: var(--tlhp-accent-text);
+	}
+	&:focus-visible {
+		outline: none;
+		box-shadow: var(--tlhp-shadow-focus);
+		border-radius: 8px;
+	}
+}
+// Set before first paint by the strip's inline script, or by "Đóng".
+:root[data-announcement-hidden] .tlhp-announcement {
+	display: none;
+}
+
+// The floating header is absolutely positioned, so it does not move with the strip by
+// itself. The sticky copy is fixed to the top and appears only after the strip has
+// scrolled away, so it stays where it is.
+.header-area.header-absolute {
+	margin-top: var(--tlhp-announcement-offset, 0px);
+}

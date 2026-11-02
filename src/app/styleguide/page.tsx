@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import type { CSSProperties, ReactNode } from "react";
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
+import Header from "@/components/layout/header/Header";
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import BlogCard2 from "@/components/shared/cards/BlogCard2";
 import ServiceCard2 from "@/components/shared/cards/ServiceCard2";
@@ -37,6 +39,13 @@ const HEADINGS = [
 	["h5", "Lịch sinh hoạt – Ẫ Ộ Ữ Ỹ ạ ợ"],
 	["h6", "Ghi chú nhỏ – Ẫ Ộ Ữ Ỹ ạ ợ"],
 ] as const;
+
+// Sample notice so the strip can be reviewed before the temple publishes a real one.
+const SAMPLE_ANNOUNCEMENT = {
+	id: "styleguide-mau",
+	text: "Mẫu dải thông báo: khóa tu mùa đông mở đăng ký từ ngày 01/12.",
+	link: { label: "Xem lịch tu học", href: "/lich-tu-hoc" },
+};
 
 // Sample content in the shape the Bexon cards read; real data arrives with T4.
 const SAMPLE_POST = {
@@ -75,9 +84,15 @@ export default async function StyleguidePage() {
 
 	return (
 		<div>
+			{/* The search popup is previewed here only, until /tim-kiem exists (T18). */}
+			<Header showSearch />
+			<Header showSearch isStickyHeader />
 			<div id="smooth-wrapper">
 				<div id="smooth-content">
+					<AnnouncementBar announcement={SAMPLE_ANNOUNCEMENT} />
 					<main>
+						{/* Clear the floating header, as Bexon's inner page banners do. */}
+						<div style={{ height: 120 }} aria-hidden="true" />
 						<Block title="Giới thiệu">
 							<h1>Bảng mẫu giao diện</h1>
 							<p>

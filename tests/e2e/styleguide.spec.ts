@@ -66,7 +66,7 @@ test.describe("with reduced motion", () => {
 
 	test("buttons follow the TLHP button spec", async ({ page }) => {
 		await open(page, "/styleguide");
-		const buttons = await page.locator(".tj-primary-btn").evaluateAll((els) =>
+		const buttons = await page.locator("main .tj-primary-btn").evaluateAll((els) =>
 			els.map((el) => {
 				const label = el.querySelector(".btn-text") as HTMLElement;
 				const icon = el.querySelector(".btn-icon") as HTMLElement;
