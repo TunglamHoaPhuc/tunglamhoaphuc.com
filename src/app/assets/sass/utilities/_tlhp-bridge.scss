@@ -1,0 +1,60 @@
+// Bexon reads every colour, font and heading size from --tj-* custom properties
+// (utilities/_root.scss). Point them at the TLHP tokens in design-system/tokens.css so
+// the template keeps its markup and only the theme changes. Declared on every element
+// that can switch theme, so values re-resolve inside [data-theme] and .tlhp-dark.
+:root,
+[data-theme],
+.tlhp-dark {
+	// Surfaces
+	--tj-color-grey-1: var(--tlhp-bg); // page background
+	--tj-color-theme-bg: var(--tlhp-bg-alt); // alternating sections
+	--tj-color-theme-bg-2: var(--tlhp-nen-do);
+	--tj-color-common-white: var(--tlhp-nen-ngoc); // cards; text on dark and primary fills
+
+	// Brand
+	--tj-color-theme-primary: var(--tlhp-primary);
+
+	// Dark sections and footer
+	--tj-color-theme-dark: var(--tlhp-moc-950);
+	--tj-color-theme-dark-2: var(--tlhp-moc-900);
+	--tj-color-theme-bg-3: var(--tlhp-moc-900);
+
+	// Text
+	--tj-color-heading-primary: var(--tlhp-heading);
+	--tj-color-text-body: var(--tlhp-fg);
+	--tj-color-theme-dark-3: var(--tlhp-fg);
+	--tj-color-text-body-3: var(--tlhp-muted);
+	--tj-color-theme-dark-4: var(--tlhp-muted);
+	--tj-color-theme-dark-5: var(--tlhp-da-500);
+	--tj-color-text-body-2: var(--tlhp-da-300); // text on dark sections, 9.9:1 on đen mun
+	--tj-color-text-body-4: var(--tlhp-moc-900);
+	--tj-color-text-body-5: color-mix(in srgb, var(--tlhp-nen-ngoc) 80%, transparent);
+	--tj-color-grey-2: var(--tlhp-da-300);
+	--tj-color-grey-3: color-mix(in srgb, var(--tlhp-nen-ngoc) 10%, transparent);
+	--tj-color-common-black: var(--tlhp-moc-950);
+	--tj-color-common-black-2: var(--tlhp-heading);
+
+	// Lines
+	--tj-color-border-1: var(--tlhp-border);
+	--tj-color-border-2: var(--tlhp-hoaisac-900); // borders on dark sections
+	--tj-color-border-3: color-mix(in srgb, var(--tlhp-nen-ngoc) 15%, transparent);
+	--tj-color-border-4: color-mix(in srgb, var(--tlhp-nen-ngoc) 20%, transparent);
+	--tj-color-border-5: color-mix(in srgb, var(--tlhp-primary) 15%, transparent);
+
+	// Ceremonial accent (logo cinnabar)
+	--tj-color-red-1: var(--tlhp-chusa-600);
+
+	// Fonts
+	--tj-ff-heading: var(--tlhp-font-serif);
+	--tj-ff-body: var(--tlhp-font-sans);
+
+	// Sizes: Bexon applies these on desktop; its own breakpoints take over below 1400px.
+	--tj-fs-h1: var(--tlhp-text-display);
+	--tj-fs-h2: var(--tlhp-text-h2);
+	--tj-fs-h3: var(--tlhp-text-h3);
+	--tj-fs-h4: var(--tlhp-text-h4);
+	--tj-fs-h5: var(--tlhp-text-title);
+	--tj-fs-h6: var(--tlhp-text-body-lg);
+	--tj-fs-body: var(--tlhp-text-body);
+	--tj-fs-p: var(--tlhp-text-body);
+}

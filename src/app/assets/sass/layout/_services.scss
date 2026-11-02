@@ -18,7 +18,8 @@ START: Services CSS
 			margin-inline-start: 0;
 			margin-inline-end: 0;
 			.sub-title {
-				color: var(--tj-color-theme-primary);
+				// Mộc is too dark on this section; TLHP's dark-theme accent text.
+				color: var(--tlhp-hoaisac-300);
 				background-color: var(--tj-color-theme-dark-2);
 			}
 		}

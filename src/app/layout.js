@@ -1,4 +1,4 @@
-import { Mona_Sans } from "next/font/google";
+import { Be_Vietnam_Pro, Noto_Serif } from "next/font/google";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/effect-fade";
@@ -13,19 +13,22 @@ import "./assets/css/glightbox.min.css";
 import "./assets/css/meanmenu.css";
 import "./assets/css/nice-select2.css";
 import "./assets/css/odometer-theme-default.css";
+import "../../design-system/tokens.css";
 import "./globals.scss";
 
-const bodyFont = Mona_Sans({
-	variable: "--tj-ff-body",
-	subsets: ["latin"],
-	weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
+// Variable names match design-system/tokens.css (--tlhp-font-serif / --tlhp-font-sans);
+// utilities/_tlhp-bridge.scss points Bexon's --tj-ff-* at them.
+const headingFont = Noto_Serif({
+	variable: "--font-noto-serif",
+	subsets: ["latin", "vietnamese"],
+	weight: ["400", "500", "600", "700"],
 	style: ["normal", "italic"],
 	display: "swap",
 });
-const headingFont = Mona_Sans({
-	variable: "--tj-ff-heading",
-	subsets: ["latin"],
-	weight: ["200", "300", "400", "500", "600", "700", "800", "900"],
+const bodyFont = Be_Vietnam_Pro({
+	variable: "--font-be-vietnam-pro",
+	subsets: ["latin", "vietnamese"],
+	weight: ["400", "500", "600", "700"],
 	style: ["normal", "italic"],
 	display: "swap",
 });
@@ -37,10 +40,14 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
 	return (
-		<html lang="en" data-scroll-behavior="smooth" dir="ltr">
-			<body className={`${bodyFont.variable} ${headingFont.variable}`}>
-				{children}
-			</body>
+		// Font variables sit on <html> because the bridge resolves them at :root.
+		<html
+			lang="vi"
+			data-scroll-behavior="smooth"
+			dir="ltr"
+			className={`${headingFont.variable} ${bodyFont.variable}`}
+		>
+			<body>{children}</body>
 		</html>
 	);
 }

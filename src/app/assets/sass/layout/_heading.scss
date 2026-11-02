@@ -50,7 +50,12 @@ START: Heading CSS
 	}
 	&.style-2 {
 		.sec-title {
+			// Bexon used one muted grey for the highlighted word on light and dark
+			// sections alike; TLHP needs a dark accent on light, light stone on dark.
 			span {
+				color: var(--tlhp-accent-text);
+			}
+			&.text-white span {
 				color: var(--tj-color-text-body-2);
 			}
 		}
