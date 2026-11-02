@@ -28,7 +28,21 @@ export default tseslint.config(
 			parserOptions: { ecmaFeatures: { jsx: true } },
 		},
 		plugins: { "react-hooks": reactHooks },
-		rules: reactHooks.configs.recommended.rules,
+		rules: {
+			...reactHooks.configs.recommended.rules,
+			"no-restricted-imports": [
+				"error",
+				{
+					paths: [
+						{ name: "sweetalert2", message: "Không dùng hộp thông báo nổi: phản hồi hiện ngay trong trang (UX-05)." },
+						{ name: "isotope-layout", message: "Đã gỡ ở T2: lọc danh sách làm phía server." },
+						{ name: "imagesloaded", message: "Đã gỡ ở T2 cùng isotope-layout." },
+						{ name: "nice-select2", message: "Đã gỡ ở T2: ô chọn dùng <select> gốc." },
+						{ name: "react-range-slider-input", message: "Đã gỡ ở T2 cùng trang shop." },
+					],
+				},
+			],
+		},
 	},
 	{
 		// Bexon template code as shipped: report, don't block. Clean each file up when a

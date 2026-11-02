@@ -1,5 +1,4 @@
 import { Mona_Sans } from "next/font/google";
-import "react-range-slider-input/dist/style.css";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/effect-fade";
