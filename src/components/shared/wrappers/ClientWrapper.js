@@ -5,6 +5,7 @@ import arrangeAnim2 from "@/libs/arrangeAnim2";
 import fadeInRightOnScrollAnim from "@/libs/fadeInRightOnScrollAnim";
 import { useGSAP } from "@/libs/gsap.config";
 import initSmoothScroller from "@/libs/initSmoothScroller";
+import { hasFinePointer, prefersReducedMotion, stopAutoplayingSliders } from "@/libs/motion";
 import onePageNavAnim from "@/libs/onePageNavAnim";
 import progressBar from "@/libs/progressBar";
 import sidebarSticky from "@/libs/sidebarSticky";
@@ -26,16 +27,21 @@ import tjZoomInScroll from "@/libs/tjZoomInScroll";
 import { useEffect } from "react";
 const ClientWrapper = () => {
 	useEffect(() => {
+		smoothScrollToTop();
+		if (prefersReducedMotion()) {
+			stopAutoplayingSliders();
+			return;
+		}
 		import("wow.js").then(({ default: WOW }) => {
 			new WOW().init();
 		});
-		smoothScrollToTop();
-		const cleanup = tjMagicCursorAnimation();
+		const cleanup = hasFinePointer() ? tjMagicCursorAnimation() : undefined;
 		return () => {
 			if (cleanup) cleanup();
 		};
 	}, []);
 	useGSAP((context, contextSafe) => {
+		if (prefersReducedMotion()) return;
 		initSmoothScroller();
 		tjRightSwipeAnimation();
 		tjLeftSwipeAnimation();

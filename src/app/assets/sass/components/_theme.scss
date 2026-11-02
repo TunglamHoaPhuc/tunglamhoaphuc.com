@@ -526,12 +526,16 @@ img {
 	}
 }
 
-.title-anim,
-.text-anim,
-.hero-text-anim {
-	opacity: 0;
-	&.start-anim {
-		opacity: 1;
+// Hidden until GSAP adds .start-anim. GSAP does not run under reduced motion,
+// so only hide them when motion is allowed.
+@media (prefers-reduced-motion: no-preference) {
+	.title-anim,
+	.text-anim,
+	.hero-text-anim {
+		opacity: 0;
+		&.start-anim {
+			opacity: 1;
+		}
 	}
 }
 .odometer.odometer-auto-theme {

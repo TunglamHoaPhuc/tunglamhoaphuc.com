@@ -1,0 +1,13 @@
+// Visitors who ask their OS to reduce motion get every CSS animation and transition
+// finished at once (marquees, pulses, hover effects). JS effects are switched off in
+// ClientWrapper (src/libs/motion.ts).
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
