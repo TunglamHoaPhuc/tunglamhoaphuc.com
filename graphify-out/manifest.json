@@ -1,0 +1,56 @@
+{
+  "design-system/tailwind.config.js": {
+    "mtime": 1793594039.2013798,
+    "seen": 1793605266.3053355,
+    "ast_hash": "46220fb2817e1f55d4e2b6b7cd6fdd7a",
+    "semantic_hash": "46220fb2817e1f55d4e2b6b7cd6fdd7a"
+  },
+  "dac-ta-ky-thuat-tunglamhoaphuc.md": {
+    "mtime": 1793589218.7490845,
+    "seen": 1793605266.3053355,
+    "ast_hash": "d0467254b45e77961c7d299efdb7ed16",
+    "semantic_hash": "d0467254b45e77961c7d299efdb7ed16"
+  },
+  "design-system/BRAND-GUIDELINES.md": {
+    "mtime": 1793594039.2902505,
+    "seen": 1793605266.3053355,
+    "ast_hash": "e7eba7f70a11dc8f09c621d106c6aa15",
+    "semantic_hash": "e7eba7f70a11dc8f09c621d106c6aa15"
+  },
+  "tunglamhoaphuc-cloudflare-migration.md": {
+    "mtime": 1793446276.8572223,
+    "seen": 1793605266.3053355,
+    "ast_hash": "6e365ba541f226d2b50d45ed4df75acd",
+    "semantic_hash": "6e365ba541f226d2b50d45ed4df75acd"
+  },
+  "graphify-out/memory/query_20261102_074623_39e0f727_why_does_phan_he_quan_tri_next_js___admin__bridge.md": {
+    "mtime": 1793605583.630432,
+    "seen": 1793608554.6770685,
+    "ast_hash": "ffb2d0d788cf0c2067b756923f0878ba",
+    "semantic_hash": "ffb2d0d788cf0c2067b756923f0878ba"
+  },
+  "graphify-out/memory/query_20261102_075706_b4774d38_why_does_mo_hinh_du_lieu_d1_de_xuat_bridge_the_d1.md": {
+    "mtime": 1793606226.6619272,
+    "seen": 1793608554.6770685,
+    "ast_hash": "faf0734ba886738ab78922ec637aca12",
+    "semantic_hash": "faf0734ba886738ab78922ec637aca12"
+  },
+  "graphify-out/memory/query_20261102_081904_f7be2c30_why_does_danh_gia_trai_nghiem__ux_review__bridge_t.md": {
+    "mtime": 1793607544.6977298,
+    "seen": 1793608554.6770685,
+    "ast_hash": "1f817633f1da0b50bfa0f920d6536c9a",
+    "semantic_hash": "1f817633f1da0b50bfa0f920d6536c9a"
+  },
+  "tasks/plan.md": {
+    "mtime": 1793606640.567564,
+    "seen": 1793608554.6770685,
+    "ast_hash": "cabca9e9e6be68ba2f352c4dca9e9be0",
+    "semantic_hash": "cabca9e9e6be68ba2f352c4dca9e9be0"
+  },
+  "tasks/todo.md": {
+    "mtime": 1793606640.43298,
+    "seen": 1793608554.6770685,
+    "ast_hash": "ed9243371ca1c26ba49c5148cd8610b2",
+    "semantic_hash": "ed9243371ca1c26ba49c5148cd8610b2"
+  }
+}

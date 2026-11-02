@@ -1,0 +1,340 @@
+/* ==========================================================================
+   TÙNG LÂM HÒA PHÚC — DESIGN TOKENS v1.0.0 (2026-11-02)
+   Tinh thần: Thanh tịnh · Trầm ấm · Khiêm nhường · Tĩnh tại
+   Khung bố cục tham chiếu: Bexon React Home-02 (tối giản, thoáng, section bo góc)
+   Nguồn yêu cầu: Bảng khảo sát "Khao_Sat_Yeu_Cau" (Q1, Q2, Q4, Q5, Q10–Q15)
+
+   Cách dùng (Next.js):
+     app/globals.css →  @import "../design-system/tokens.css";
+     Tailwind v3      →  tailwind.config.js (đọc biến ở file này)
+     Tailwind v4      →  @import "tailwindcss"; @config "../design-system/tailwind.config.js";
+   Chủ đề: :root = Ngà (mặc định) · [data-theme="sepia"] = Giấy dó (đọc kinh)
+           [data-theme="dark"] = Đêm thiền · .tlhp-dark = section tối cục bộ
+   Quy ước biến:
+     --tlhp-<bảng màu>-<cấp>   HEX, màu gốc (primitive)
+     --tlhp-c-<vai trò>        kênh RGB "r g b", dùng: rgb(var(--tlhp-c-fg) / 0.8)
+     --tlhp-h-<vai trò>        kênh HSL "h s% l%", dùng: hsl(var(--tlhp-h-fg))
+     --tlhp-<vai trò>          màu hoàn chỉnh, dùng thẳng: color: var(--tlhp-fg)
+   Ba file tokens.css · tailwind.config.js · brand-tokens.json được sinh cùng
+   một nguồn — sửa màu thì sửa đồng bộ cả ba.
+   QUY TẮC UX: KHÔNG popup, toast, banner nổi, modal tự bật. Mọi phản hồi là
+   khối tĩnh trong luồng trang hoặc trang xác nhận riêng.
+   ========================================================================== */
+
+:root {
+
+  /* ── 1. MÀU GỐC (PRIMITIVE) — HEX · RGB · HSL ────────────────────────── */
+  /* Mộc – nâu trầm thiền môn (vỏ cây → gỗ lim) */
+  --tlhp-moc-50: #FAF5EE; /* rgb(250, 245, 238) · hsl(35 54.5% 95.7%) */
+  --tlhp-moc-100: #F2E6D5; /* rgb(242, 230, 213) · hsl(35.2 52.7% 89.2%) */
+  --tlhp-moc-200: #E3CBA8; /* rgb(227, 203, 168) · hsl(35.6 51.3% 77.5%) */
+  --tlhp-moc-300: #CFA874; /* rgb(207, 168, 116) · hsl(34.3 48.7% 63.3%) */
+  --tlhp-moc-400: #B48446; /* rgb(180, 132, 70) · hsl(33.8 44% 49%) */
+  --tlhp-moc-500: #9A6A2A; /* rgb(154, 106, 42) · hsl(34.3 57.1% 38.4%) */
+  --tlhp-moc-600: #835414; /* rgb(131, 84, 20) · hsl(34.6 73.5% 29.6%) — Neo đã chốt (bảng khảo sát Q1 – "Nâu trầm đất") */
+  --tlhp-moc-700: #6B4413; /* rgb(107, 68, 19) · hsl(33.4 69.8% 24.7%) */
+  --tlhp-moc-800: #523417; /* rgb(82, 52, 23) · hsl(29.5 56.2% 20.6%) */
+  --tlhp-moc-900: #2C1C11; /* rgb(44, 28, 17) · hsl(24.4 44.3% 12%) — Gỗ lim (nền tối site cũ) */
+  --tlhp-moc-950: #1A120B; /* rgb(26, 18, 11) · hsl(28 40.5% 7.3%) — Đen mun */
+  /* Hoại sắc – vàng đất cà sa / hổ phách */
+  --tlhp-hoaisac-50: #FDF8F1; /* rgb(253, 248, 241) · hsl(35 75% 96.9%) */
+  --tlhp-hoaisac-100: #F8ECDA; /* rgb(248, 236, 218) · hsl(36 68.2% 91.4%) */
+  --tlhp-hoaisac-200: #EFD8B9; /* rgb(239, 216, 185) · hsl(34.4 62.8% 83.1%) */
+  --tlhp-hoaisac-300: #E3BE93; /* rgb(227, 190, 147) · hsl(32.3 58.8% 73.3%) */
+  --tlhp-hoaisac-400: #D4A373; /* rgb(212, 163, 115) · hsl(29.7 53% 64.1%) — Neo đã chốt (bảng khảo sát Q1 – "Vàng hoại sắc") */
+  --tlhp-hoaisac-500: #C08752; /* rgb(192, 135, 82) · hsl(28.9 46.6% 53.7%) */
+  --tlhp-hoaisac-600: #A26C3B; /* rgb(162, 108, 59) · hsl(28.5 46.6% 43.3%) */
+  --tlhp-hoaisac-700: #7A4E28; /* rgb(122, 78, 40) · hsl(27.8 50.6% 31.8%) */
+  --tlhp-hoaisac-800: #5C3B20; /* rgb(92, 59, 32) · hsl(27 48.4% 24.3%) */
+  --tlhp-hoaisac-900: #402A18; /* rgb(64, 42, 24) · hsl(27 45.5% 17.3%) */
+  /* Chu sa – đỏ sơn son (lấy mẫu từ logo Mộc Ấn) */
+  --tlhp-chusa-50: #FBEEEB; /* rgb(251, 238, 235) · hsl(11.3 66.7% 95.3%) */
+  --tlhp-chusa-100: #F5D6CF; /* rgb(245, 214, 207) · hsl(11.1 65.5% 88.6%) */
+  --tlhp-chusa-200: #E9AA9D; /* rgb(233, 170, 157) · hsl(10.3 63.3% 76.5%) */
+  --tlhp-chusa-300: #D97A66; /* rgb(217, 122, 102) · hsl(10.4 60.2% 62.5%) */
+  --tlhp-chusa-400: #C2503A; /* rgb(194, 80, 58) · hsl(9.7 54% 49.4%) */
+  --tlhp-chusa-500: #A83420; /* rgb(168, 52, 32) · hsl(8.8 68% 39.2%) */
+  --tlhp-chusa-600: #942313; /* rgb(148, 35, 19) · hsl(7.4 77.2% 32.7%) — Màu nền khiên logo Mộc Ấn (đo trực tiếp trên file logo) */
+  --tlhp-chusa-700: #7A1C10; /* rgb(122, 28, 16) · hsl(6.8 76.8% 27.1%) */
+  --tlhp-chusa-800: #5E160D; /* rgb(94, 22, 13) · hsl(6.7 75.7% 21%) */
+  --tlhp-chusa-900: #3F0F09; /* rgb(63, 15, 9) · hsl(6.7 75% 14.1%) */
+  /* Đồng – ánh kim cho đường viền trang trọng (từ khung logo) */
+  --tlhp-dong-100: #F3E6CC; /* rgb(243, 230, 204) · hsl(40 61.9% 87.6%) */
+  --tlhp-dong-200: #E6CFA0; /* rgb(230, 207, 160) · hsl(40.3 58.3% 76.5%) */
+  --tlhp-dong-300: #D8B77E; /* rgb(216, 183, 126) · hsl(38 53.6% 67.1%) */
+  --tlhp-dong-400: #CCA36A; /* rgb(204, 163, 106) · hsl(34.9 49% 60.8%) — Viền vàng sáng khung logo */
+  --tlhp-dong-500: #B48B53; /* rgb(180, 139, 83) · hsl(34.6 39.3% 51.6%) — Viền vàng trầm khung logo */
+  --tlhp-dong-600: #946F3F; /* rgb(148, 111, 63) · hsl(33.9 40.3% 41.4%) */
+  --tlhp-dong-700: #73552F; /* rgb(115, 85, 47) · hsl(33.5 42% 31.8%) */
+  /* Đá – xám đá tự nhiên (ấm) */
+  --tlhp-da-50: #F7F6F2; /* rgb(247, 246, 242) · hsl(48 23.8% 95.9%) */
+  --tlhp-da-100: #EDEAE3; /* rgb(237, 234, 227) · hsl(42 21.7% 91%) */
+  --tlhp-da-200: #DDD8CD; /* rgb(221, 216, 205) · hsl(41.2 19% 83.5%) */
+  --tlhp-da-300: #C4BDAF; /* rgb(196, 189, 175) · hsl(40 15.1% 72.7%) */
+  --tlhp-da-400: #A39B8B; /* rgb(163, 155, 139) · hsl(40 11.5% 59.2%) */
+  --tlhp-da-500: #7F776A; /* rgb(127, 119, 106) · hsl(37.1 9% 45.7%) */
+  --tlhp-da-600: #635C51; /* rgb(99, 92, 81) · hsl(36.7 10% 35.3%) */
+  --tlhp-da-700: #4B453D; /* rgb(75, 69, 61) · hsl(34.3 10.3% 26.7%) */
+  --tlhp-da-800: #35302B; /* rgb(53, 48, 43) · hsl(30 10.4% 18.8%) */
+  --tlhp-da-900: #232122; /* rgb(35, 33, 34) · hsl(330 2.9% 13.3%) — Màu mực logo tròn */
+  /* Nền – giấy & ngọc */
+  --tlhp-nen-ngoc: #FFFEFA; /* rgb(255, 254, 250) · hsl(48 100% 99%) — Trắng ngọc – bề mặt thẻ */
+  --tlhp-nen-nga: #FAFAF5; /* rgb(250, 250, 245) · hsl(60 33.3% 97.1%) — Ngà giấy dó – nền trang (neo đã chốt Q1) */
+  --tlhp-nen-kem: #F4ECDD; /* rgb(244, 236, 221) · hsl(39.1 51.1% 91.2%) — Kem ấm – section xen kẽ */
+  --tlhp-nen-do: #EFE6D3; /* rgb(239, 230, 211) · hsl(40.7 46.7% 88.2%) — Giấy dó cổ – chế độ đọc kinh */
+  /* Trạng thái hệ thống (in-line): xem --tlhp-success-* · warning · error · info trong từng chủ đề bên dưới */
+
+  /* ── 2. KIỂU CHỮ ─────────────────────────────────────────────────────── */
+  --tlhp-font-serif: var(--font-noto-serif, "Noto Serif"), "Noto Serif Fallback", Georgia, "Times New Roman", serif;
+  --tlhp-font-sans: var(--font-be-vietnam-pro, "Be Vietnam Pro"), "Be Vietnam Pro Fallback", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --tlhp-font-mono: ui-monospace, SFMono-Regular, "Cascadia Mono", Consolas, monospace;
+  --tlhp-reading-scale: 1; /* Nút A-/A+ đặt 0.9 · 1 · 1.15 · 1.3 trên khung đọc */
+  --tlhp-text-display: clamp(2.75rem, 1.8571rem + 3.8095vw, 5rem); --tlhp-leading-display: 1.15; --tlhp-weight-display: 600; --tlhp-tracking-display: -0.01em; /* 44→80px · Hero trang chủ ("Nơi để trở về"), tên đại lễ */
+  --tlhp-text-h1: clamp(2.25rem, 1.6548rem + 2.5397vw, 3.75rem); --tlhp-leading-h1: 1.2; --tlhp-weight-h1: 600; --tlhp-tracking-h1: -0.005em; /* 36→60px · Tiêu đề trang, tên khóa tu lớn */
+  --tlhp-text-h2: clamp(1.875rem, 1.4286rem + 1.9048vw, 3rem); --tlhp-leading-h2: 1.25; --tlhp-weight-h2: 600; --tlhp-tracking-h2: 0; /* 30→48px · Tiêu đề phân mục, "Lịch tu học" */
+  --tlhp-text-h3: clamp(1.5rem, 1.3016rem + 0.8466vw, 2rem); --tlhp-leading-h3: 1.3; --tlhp-weight-h3: 600; --tlhp-tracking-h3: 0; /* 24→32px · Tiêu đề bài viết, khối nổi bật */
+  --tlhp-text-h4: clamp(1.25rem, 1.1508rem + 0.4233vw, 1.5rem); --tlhp-leading-h4: 1.4; --tlhp-weight-h4: 600; --tlhp-tracking-h4: 0; /* 20→24px · Tiêu đề thẻ khóa tu / bài viết */
+  --tlhp-text-title: clamp(1.125rem, 1.0754rem + 0.2116vw, 1.25rem); --tlhp-leading-title: 1.45; --tlhp-weight-title: 600; --tlhp-tracking-title: 0; /* 18→20px · Tiêu đề cột footer, nhãn khối, tiêu đề nhỏ giao diện */
+  --tlhp-text-scripture: clamp(1.1875rem, 1.1379rem + 0.2116vw, 1.3125rem); --tlhp-leading-scripture: 1.85; --tlhp-weight-scripture: 400; --tlhp-tracking-scripture: 0.005em; /* 19→21px · Kinh văn, câu kệ, lời Thầy dạy */
+  --tlhp-text-body-lg: clamp(1.125rem, 1.0754rem + 0.2116vw, 1.25rem); --tlhp-leading-body-lg: 1.8; --tlhp-weight-body-lg: 400; --tlhp-tracking-body-lg: 0; /* 18→20px · Bài pháp thoại, nội dung dài */
+  --tlhp-text-body: clamp(1.0625rem, 1.0377rem + 0.1058vw, 1.125rem); --tlhp-leading-body: 1.7; --tlhp-weight-body: 400; --tlhp-tracking-body: 0; /* 17→18px · Nội dung mặc định */
+  --tlhp-text-body-sm: 1rem; --tlhp-leading-body-sm: 1.6; --tlhp-weight-body-sm: 400; --tlhp-tracking-body-sm: 0; /* 16px · Mô tả thẻ, chữ phụ giao diện (mức nhỏ nhất cho đoạn văn) */
+  --tlhp-text-caption: 0.875rem; --tlhp-leading-caption: 1.5; --tlhp-weight-caption: 500; --tlhp-tracking-caption: 0.01em; /* 14px · Ngày đăng, lượt xem, chú thích ảnh (không dùng cho đoạn văn) */
+  --tlhp-text-overline: 0.875rem; --tlhp-leading-overline: 1; --tlhp-weight-overline: 600; --tlhp-tracking-overline: 0.08em; /* 14px · Kicker/chip trên tiêu đề section (kiểu sub-title Bexon) */
+  --tlhp-text-button: 1rem; --tlhp-leading-button: 1.25; --tlhp-weight-button: 600; --tlhp-tracking-button: 0.01em; /* 16px · Chữ nút, viết hoa đầu câu (không in hoa toàn bộ) */
+  --tlhp-text-nav: 1rem; --tlhp-leading-nav: 1.5; --tlhp-weight-nav: 500; --tlhp-tracking-nav: 0; /* 16px · Mục menu chính */
+  --tlhp-text-label: 1rem; --tlhp-leading-label: 1.4; --tlhp-weight-label: 600; --tlhp-tracking-label: 0; /* 16px · Nhãn trường biểu mẫu (luôn hiển thị) */
+
+  /* ── 3. KHOẢNG CÁCH & BỐ CỤC (khung Bexon Home-02) ───────────────────── */
+  --tlhp-container: 1320px;       /* Bexon .container 1320px */
+  --tlhp-reading-width: 720px;    /* ~68 ký tự/dòng cho bài pháp thoại */
+  --tlhp-gutter: 16px;             /* md: 24px · lg: 32px (xem media query cuối file) */
+  --tlhp-section-y: clamp(4rem, 2.6111rem + 5.9259vw, 7.5rem); /* 64→120px, Bexon section-gap 120px */
+  --tlhp-section-inset: clamp(0.5rem, 0.3016rem + 0.8466vw, 1rem); /* 8→16px, Bexon section-gap-x 15px */
+  --tlhp-card-pad: clamp(1.5rem, 1.3016rem + 0.8466vw, 2rem); /* 24→32px */
+  --tlhp-card-pad-lg: clamp(2rem, 1.4048rem + 2.5397vw, 3.5rem); /* 32→56px */
+  --tlhp-grid-gap: clamp(1rem, 0.6528rem + 1.4815vw, 1.875rem); /* 16→30px */
+  --tlhp-header-h: 64px;          /* desktop 80px */
+  --tlhp-announcement-h: 48px;
+  --tlhp-logo-h: 40px;            /* desktop 48px */
+  --tlhp-touch-target: 48px;      /* Q10: vùng chạm tối thiểu 48×48px */
+
+  /* ── 4. BO GÓC · ĐỔ BÓNG · CHUYỂN ĐỘNG · LỚP ─────────────────────────── */
+  --tlhp-radius-none: 0; /* Ảnh tràn viền */
+  --tlhp-radius-xs: 4px; /* Chip kicker, tag, badge (Bexon sub-title) */
+  --tlhp-radius-sm: 6px; /* Checkbox, ô lịch */
+  --tlhp-radius-md: 10px; /* Input, select, thẻ nhỏ */
+  --tlhp-radius-lg: 12px; /* Thẻ khóa tu/bài viết (Bexon card) */
+  --tlhp-radius-xl: 16px; /* Section inset, hero, footer (Bexon slider) */
+  --tlhp-radius-pill: 9999px; /* Nút bấm, pill lọc (Bexon button) */
+  --tlhp-shadow-none: none; /* Mặc định cho thẻ (phẳng, dùng viền 1px) */
+  --tlhp-shadow-xs: 0 1px 2px 0 rgb(44 28 17 / 0.06); /* Input, thẻ tĩnh khi cần tách nền */
+  --tlhp-shadow-sm: 0 2px 6px -1px rgb(44 28 17 / 0.08); /* Thẻ khi hover */
+  --tlhp-shadow-md: 0 10px 30px -12px rgb(44 28 17 / 0.18); /* Header dính khi cuộn */
+  --tlhp-shadow-lg: 0 24px 48px -20px rgb(44 28 17 / 0.22); /* Ảnh lightbox (do người dùng mở) */
+  --tlhp-shadow-focus: 0 0 0 2px rgb(var(--tlhp-c-bg)), 0 0 0 4px rgb(var(--tlhp-c-ring)); /* Vòng focus kép – hiện trên mọi nền */
+  --tlhp-duration-instant: 100ms;
+  --tlhp-duration-fast: 150ms;
+  --tlhp-duration-base: 250ms;
+  --tlhp-duration-slow: 300ms;
+  --tlhp-ease-calm: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --tlhp-ease-out: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --tlhp-ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
+  --tlhp-z-base: 0;
+  --tlhp-z-raised: 10;
+  --tlhp-z-sticky: 40;
+  --tlhp-z-dropdown: 50;
+  --tlhp-z-lightbox: 60;
+  /* Không có z-index cho toast/popup: thành phần đó không tồn tại trong hệ thống này. */
+}
+
+/* ── Chủ đề: Ngà (mặc định) ──────────────────────────────────────────── */
+:root, [data-theme="light"] {
+  color-scheme: light;
+  --tlhp-c-bg: 250 250 245; --tlhp-h-bg: 60 33.3% 97.1%; --tlhp-bg: #FAFAF5;
+  --tlhp-c-bg-alt: 244 236 221; --tlhp-h-bg-alt: 39.1 51.1% 91.2%; --tlhp-bg-alt: #F4ECDD;
+  --tlhp-c-surface: 255 254 250; --tlhp-h-surface: 48 100% 99%; --tlhp-surface: #FFFEFA;
+  --tlhp-c-fg: 53 48 43; --tlhp-h-fg: 30 10.4% 18.8%; --tlhp-fg: #35302B;
+  --tlhp-c-heading: 44 28 17; --tlhp-h-heading: 24.4 44.3% 12%; --tlhp-heading: #2C1C11;
+  --tlhp-c-muted: 99 92 81; --tlhp-h-muted: 36.7 10% 35.3%; --tlhp-muted: #635C51;
+  --tlhp-c-primary: 131 84 20; --tlhp-h-primary: 34.6 73.5% 29.6%; --tlhp-primary: #835414;
+  --tlhp-c-primary-hover: 107 68 19; --tlhp-h-primary-hover: 33.4 69.8% 24.7%; --tlhp-primary-hover: #6B4413;
+  --tlhp-c-primary-fg: 250 250 245; --tlhp-h-primary-fg: 60 33.3% 97.1%; --tlhp-primary-fg: #FAFAF5;
+  --tlhp-c-accent: 212 163 115; --tlhp-h-accent: 29.7 53% 64.1%; --tlhp-accent: #D4A373;
+  --tlhp-c-accent-fg: 26 18 11; --tlhp-h-accent-fg: 28 40.5% 7.3%; --tlhp-accent-fg: #1A120B;
+  --tlhp-c-accent-text: 122 78 40; --tlhp-h-accent-text: 27.8 50.6% 31.8%; --tlhp-accent-text: #7A4E28;
+  --tlhp-c-accent-soft: 253 248 241; --tlhp-h-accent-soft: 35 75% 96.9%; --tlhp-accent-soft: #FDF8F1;
+  --tlhp-c-ceremonial: 148 35 19; --tlhp-h-ceremonial: 7.4 77.2% 32.7%; --tlhp-ceremonial: #942313;
+  --tlhp-c-ceremonial-fg: 250 250 245; --tlhp-h-ceremonial-fg: 60 33.3% 97.1%; --tlhp-ceremonial-fg: #FAFAF5;
+  --tlhp-c-link: 107 68 19; --tlhp-h-link: 33.4 69.8% 24.7%; --tlhp-link: #6B4413;
+  --tlhp-c-link-hover: 148 35 19; --tlhp-h-link-hover: 7.4 77.2% 32.7%; --tlhp-link-hover: #942313;
+  --tlhp-c-border: 221 216 205; --tlhp-h-border: 41.2 19% 83.5%; --tlhp-border: #DDD8CD;
+  --tlhp-c-border-strong: 127 119 106; --tlhp-h-border-strong: 37.1 9% 45.7%; --tlhp-border-strong: #7F776A;
+  --tlhp-c-ornament: 180 139 83; --tlhp-h-ornament: 34.6 39.3% 51.6%; --tlhp-ornament: #B48B53;
+  --tlhp-c-ring: 131 84 20; --tlhp-h-ring: 34.6 73.5% 29.6%; --tlhp-ring: #835414;
+  --tlhp-c-scrim: 26 18 11; --tlhp-h-scrim: 28 40.5% 7.3%; --tlhp-scrim: #1A120B;
+  --tlhp-c-success-fg: 63 90 36; --tlhp-h-success-fg: 90 42.9% 24.7%; --tlhp-success-fg: #3F5A24;
+  --tlhp-c-success-bg: 238 242 227; --tlhp-h-success-bg: 76 36.6% 92%; --tlhp-success-bg: #EEF2E3;
+  --tlhp-c-success-border: 169 188 134; --tlhp-h-success-border: 81.1 28.7% 63.1%; --tlhp-success-border: #A9BC86;
+  --tlhp-c-success-solid: 91 122 53; --tlhp-h-success-solid: 87 39.4% 34.3%; --tlhp-success-solid: #5B7A35;
+  --tlhp-c-warning-fg: 122 79 0; --tlhp-h-warning-fg: 38.9 100% 23.9%; --tlhp-warning-fg: #7A4F00;
+  --tlhp-c-warning-bg: 251 241 216; --tlhp-h-warning-bg: 42.9 81.4% 91.6%; --tlhp-warning-bg: #FBF1D8;
+  --tlhp-c-warning-border: 221 182 90; --tlhp-h-warning-border: 42.1 65.8% 61%; --tlhp-warning-border: #DDB65A;
+  --tlhp-c-warning-solid: 154 106 6; --tlhp-h-warning-solid: 40.5 92.5% 31.4%; --tlhp-warning-solid: #9A6A06;
+  --tlhp-c-error-fg: 142 42 34; --tlhp-h-error-fg: 4.4 61.4% 34.5%; --tlhp-error-fg: #8E2A22;
+  --tlhp-c-error-bg: 249 234 230; --tlhp-h-error-bg: 12.6 61.3% 93.9%; --tlhp-error-bg: #F9EAE6;
+  --tlhp-c-error-border: 220 158 146; --tlhp-h-error-border: 9.7 51.4% 71.8%; --tlhp-error-border: #DC9E92;
+  --tlhp-c-error-solid: 166 58 46; --tlhp-h-error-solid: 6 56.6% 41.6%; --tlhp-error-solid: #A63A2E;
+  --tlhp-c-info-fg: 45 88 114; --tlhp-h-info-fg: 202.6 43.4% 31.2%; --tlhp-info-fg: #2D5872;
+  --tlhp-c-info-bg: 232 240 244; --tlhp-h-info-bg: 200 35.3% 93.3%; --tlhp-info-bg: #E8F0F4;
+  --tlhp-c-info-border: 157 187 204; --tlhp-h-info-border: 201.7 31.5% 70.8%; --tlhp-info-border: #9DBBCC;
+  --tlhp-c-info-solid: 63 115 146; --tlhp-h-info-solid: 202.4 39.7% 41%; --tlhp-info-solid: #3F7392;
+}
+
+/* ── Chủ đề: Giấy dó (chế độ đọc kinh) ───────────────────────────────── */
+[data-theme="sepia"] {
+  color-scheme: light;
+  --tlhp-c-bg: 239 230 211; --tlhp-h-bg: 40.7 46.7% 88.2%; --tlhp-bg: #EFE6D3;
+  --tlhp-c-bg-alt: 232 220 196; --tlhp-h-bg-alt: 40 43.9% 83.9%; --tlhp-bg-alt: #E8DCC4;
+  --tlhp-c-surface: 246 239 226; --tlhp-h-surface: 39 52.6% 92.5%; --tlhp-surface: #F6EFE2;
+  --tlhp-c-fg: 44 28 17; --tlhp-h-fg: 24.4 44.3% 12%; --tlhp-fg: #2C1C11;
+  --tlhp-c-heading: 26 18 11; --tlhp-h-heading: 28 40.5% 7.3%; --tlhp-heading: #1A120B;
+  --tlhp-c-muted: 75 69 61; --tlhp-h-muted: 34.3 10.3% 26.7%; --tlhp-muted: #4B453D;
+  --tlhp-c-primary: 107 68 19; --tlhp-h-primary: 33.4 69.8% 24.7%; --tlhp-primary: #6B4413;
+  --tlhp-c-primary-hover: 82 52 23; --tlhp-h-primary-hover: 29.5 56.2% 20.6%; --tlhp-primary-hover: #523417;
+  --tlhp-c-primary-fg: 250 250 245; --tlhp-h-primary-fg: 60 33.3% 97.1%; --tlhp-primary-fg: #FAFAF5;
+  --tlhp-c-accent: 212 163 115; --tlhp-h-accent: 29.7 53% 64.1%; --tlhp-accent: #D4A373;
+  --tlhp-c-accent-fg: 26 18 11; --tlhp-h-accent-fg: 28 40.5% 7.3%; --tlhp-accent-fg: #1A120B;
+  --tlhp-c-accent-text: 92 59 32; --tlhp-h-accent-text: 27 48.4% 24.3%; --tlhp-accent-text: #5C3B20;
+  --tlhp-c-accent-soft: 248 236 218; --tlhp-h-accent-soft: 36 68.2% 91.4%; --tlhp-accent-soft: #F8ECDA;
+  --tlhp-c-ceremonial: 148 35 19; --tlhp-h-ceremonial: 7.4 77.2% 32.7%; --tlhp-ceremonial: #942313;
+  --tlhp-c-ceremonial-fg: 250 250 245; --tlhp-h-ceremonial-fg: 60 33.3% 97.1%; --tlhp-ceremonial-fg: #FAFAF5;
+  --tlhp-c-link: 107 68 19; --tlhp-h-link: 33.4 69.8% 24.7%; --tlhp-link: #6B4413;
+  --tlhp-c-link-hover: 122 28 16; --tlhp-h-link-hover: 6.8 76.8% 27.1%; --tlhp-link-hover: #7A1C10;
+  --tlhp-c-border: 214 200 174; --tlhp-h-border: 39 32.8% 76.1%; --tlhp-border: #D6C8AE;
+  --tlhp-c-border-strong: 99 92 81; --tlhp-h-border-strong: 36.7 10% 35.3%; --tlhp-border-strong: #635C51;
+  --tlhp-c-ornament: 148 111 63; --tlhp-h-ornament: 33.9 40.3% 41.4%; --tlhp-ornament: #946F3F;
+  --tlhp-c-ring: 107 68 19; --tlhp-h-ring: 33.4 69.8% 24.7%; --tlhp-ring: #6B4413;
+  --tlhp-c-scrim: 26 18 11; --tlhp-h-scrim: 28 40.5% 7.3%; --tlhp-scrim: #1A120B;
+  --tlhp-c-success-fg: 63 90 36; --tlhp-h-success-fg: 90 42.9% 24.7%; --tlhp-success-fg: #3F5A24;
+  --tlhp-c-success-bg: 238 242 227; --tlhp-h-success-bg: 76 36.6% 92%; --tlhp-success-bg: #EEF2E3;
+  --tlhp-c-success-border: 169 188 134; --tlhp-h-success-border: 81.1 28.7% 63.1%; --tlhp-success-border: #A9BC86;
+  --tlhp-c-success-solid: 91 122 53; --tlhp-h-success-solid: 87 39.4% 34.3%; --tlhp-success-solid: #5B7A35;
+  --tlhp-c-warning-fg: 122 79 0; --tlhp-h-warning-fg: 38.9 100% 23.9%; --tlhp-warning-fg: #7A4F00;
+  --tlhp-c-warning-bg: 251 241 216; --tlhp-h-warning-bg: 42.9 81.4% 91.6%; --tlhp-warning-bg: #FBF1D8;
+  --tlhp-c-warning-border: 221 182 90; --tlhp-h-warning-border: 42.1 65.8% 61%; --tlhp-warning-border: #DDB65A;
+  --tlhp-c-warning-solid: 154 106 6; --tlhp-h-warning-solid: 40.5 92.5% 31.4%; --tlhp-warning-solid: #9A6A06;
+  --tlhp-c-error-fg: 142 42 34; --tlhp-h-error-fg: 4.4 61.4% 34.5%; --tlhp-error-fg: #8E2A22;
+  --tlhp-c-error-bg: 249 234 230; --tlhp-h-error-bg: 12.6 61.3% 93.9%; --tlhp-error-bg: #F9EAE6;
+  --tlhp-c-error-border: 220 158 146; --tlhp-h-error-border: 9.7 51.4% 71.8%; --tlhp-error-border: #DC9E92;
+  --tlhp-c-error-solid: 166 58 46; --tlhp-h-error-solid: 6 56.6% 41.6%; --tlhp-error-solid: #A63A2E;
+  --tlhp-c-info-fg: 45 88 114; --tlhp-h-info-fg: 202.6 43.4% 31.2%; --tlhp-info-fg: #2D5872;
+  --tlhp-c-info-bg: 232 240 244; --tlhp-h-info-bg: 200 35.3% 93.3%; --tlhp-info-bg: #E8F0F4;
+  --tlhp-c-info-border: 157 187 204; --tlhp-h-info-border: 201.7 31.5% 70.8%; --tlhp-info-border: #9DBBCC;
+  --tlhp-c-info-solid: 63 115 146; --tlhp-h-info-solid: 202.4 39.7% 41%; --tlhp-info-solid: #3F7392;
+}
+
+/* ── Chủ đề: Đêm thiền (nền nâu mun – section tối & chế độ đêm) ──────── */
+[data-theme="dark"], .tlhp-dark {
+  color-scheme: dark;
+  --tlhp-c-bg: 26 18 11; --tlhp-h-bg: 28 40.5% 7.3%; --tlhp-bg: #1A120B;
+  --tlhp-c-bg-alt: 44 28 17; --tlhp-h-bg-alt: 24.4 44.3% 12%; --tlhp-bg-alt: #2C1C11;
+  --tlhp-c-surface: 36 24 16; --tlhp-h-surface: 24 38.5% 10.2%; --tlhp-surface: #241810;
+  --tlhp-c-fg: 242 230 213; --tlhp-h-fg: 35.2 52.7% 89.2%; --tlhp-fg: #F2E6D5;
+  --tlhp-c-heading: 239 216 185; --tlhp-h-heading: 34.4 62.8% 83.1%; --tlhp-heading: #EFD8B9;
+  --tlhp-c-muted: 196 189 175; --tlhp-h-muted: 40 15.1% 72.7%; --tlhp-muted: #C4BDAF;
+  --tlhp-c-primary: 212 163 115; --tlhp-h-primary: 29.7 53% 64.1%; --tlhp-primary: #D4A373;
+  --tlhp-c-primary-hover: 227 190 147; --tlhp-h-primary-hover: 32.3 58.8% 73.3%; --tlhp-primary-hover: #E3BE93;
+  --tlhp-c-primary-fg: 26 18 11; --tlhp-h-primary-fg: 28 40.5% 7.3%; --tlhp-primary-fg: #1A120B;
+  --tlhp-c-accent: 212 163 115; --tlhp-h-accent: 29.7 53% 64.1%; --tlhp-accent: #D4A373;
+  --tlhp-c-accent-fg: 26 18 11; --tlhp-h-accent-fg: 28 40.5% 7.3%; --tlhp-accent-fg: #1A120B;
+  --tlhp-c-accent-text: 227 190 147; --tlhp-h-accent-text: 32.3 58.8% 73.3%; --tlhp-accent-text: #E3BE93;
+  --tlhp-c-accent-soft: 46 33 22; --tlhp-h-accent-soft: 27.5 35.3% 13.3%; --tlhp-accent-soft: #2E2116;
+  --tlhp-c-ceremonial: 148 35 19; --tlhp-h-ceremonial: 7.4 77.2% 32.7%; --tlhp-ceremonial: #942313;
+  --tlhp-c-ceremonial-fg: 250 250 245; --tlhp-h-ceremonial-fg: 60 33.3% 97.1%; --tlhp-ceremonial-fg: #FAFAF5;
+  --tlhp-c-link: 227 190 147; --tlhp-h-link: 32.3 58.8% 73.3%; --tlhp-link: #E3BE93;
+  --tlhp-c-link-hover: 248 236 218; --tlhp-h-link-hover: 36 68.2% 91.4%; --tlhp-link-hover: #F8ECDA;
+  --tlhp-c-border: 61 44 31; --tlhp-h-border: 26 32.6% 18%; --tlhp-border: #3D2C1F;
+  --tlhp-c-border-strong: 127 119 106; --tlhp-h-border-strong: 37.1 9% 45.7%; --tlhp-border-strong: #7F776A;
+  --tlhp-c-ornament: 204 163 106; --tlhp-h-ornament: 34.9 49% 60.8%; --tlhp-ornament: #CCA36A;
+  --tlhp-c-ring: 227 190 147; --tlhp-h-ring: 32.3 58.8% 73.3%; --tlhp-ring: #E3BE93;
+  --tlhp-c-scrim: 0 0 0; --tlhp-h-scrim: 0 0% 0%; --tlhp-scrim: #000000;
+  --tlhp-c-success-fg: 181 204 142; --tlhp-h-success-fg: 82.3 37.8% 67.8%; --tlhp-success-fg: #B5CC8E;
+  --tlhp-c-success-bg: 30 38 22; --tlhp-h-success-bg: 90 26.7% 11.8%; --tlhp-success-bg: #1E2616;
+  --tlhp-c-success-border: 74 94 51; --tlhp-h-success-border: 87.9 29.7% 28.4%; --tlhp-success-border: #4A5E33;
+  --tlhp-c-success-solid: 181 204 142; --tlhp-h-success-solid: 82.3 37.8% 67.8%; --tlhp-success-solid: #B5CC8E;
+  --tlhp-c-warning-fg: 240 200 102; --tlhp-h-warning-fg: 42.6 82.1% 67.1%; --tlhp-warning-fg: #F0C866;
+  --tlhp-c-warning-bg: 43 32 16; --tlhp-h-warning-bg: 35.6 45.8% 11.6%; --tlhp-warning-bg: #2B2010;
+  --tlhp-c-warning-border: 107 84 32; --tlhp-h-warning-border: 41.6 54% 27.3%; --tlhp-warning-border: #6B5420;
+  --tlhp-c-warning-solid: 240 200 102; --tlhp-h-warning-solid: 42.6 82.1% 67.1%; --tlhp-warning-solid: #F0C866;
+  --tlhp-c-error-fg: 242 161 147; --tlhp-h-error-fg: 8.8 78.5% 76.3%; --tlhp-error-fg: #F2A193;
+  --tlhp-c-error-bg: 46 20 16; --tlhp-h-error-bg: 8 48.4% 12.2%; --tlhp-error-bg: #2E1410;
+  --tlhp-c-error-border: 110 51 41; --tlhp-h-error-border: 8.7 45.7% 29.6%; --tlhp-error-border: #6E3329;
+  --tlhp-c-error-solid: 242 161 147; --tlhp-h-error-solid: 8.8 78.5% 76.3%; --tlhp-error-solid: #F2A193;
+  --tlhp-c-info-fg: 156 195 218; --tlhp-h-info-fg: 202.3 45.6% 73.3%; --tlhp-info-fg: #9CC3DA;
+  --tlhp-c-info-bg: 20 37 48; --tlhp-h-info-bg: 203.6 41.2% 13.3%; --tlhp-info-bg: #142530;
+  --tlhp-c-info-border: 47 77 96; --tlhp-h-info-border: 203.3 34.3% 28%; --tlhp-info-border: #2F4D60;
+  --tlhp-c-info-solid: 156 195 218; --tlhp-h-info-solid: 202.3 45.6% 73.3%; --tlhp-info-solid: #9CC3DA;
+}
+
+/* ── Kích thước theo điểm ngắt ─────────────────────────────────────── */
+@media (min-width: 768px) {
+  :root { --tlhp-gutter: 24px; }
+}
+@media (min-width: 1280px) {
+  :root { --tlhp-gutter: 32px; --tlhp-header-h: 80px; --tlhp-logo-h: 48px; }
+}
+
+/* ── Giảm chuyển động theo cài đặt hệ điều hành ─────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  :root { --tlhp-duration-fast: 0ms; --tlhp-duration-base: 0ms; --tlhp-duration-slow: 0ms; }
+}
+
+/* ── Nền tảng tối thiểu (body luôn có font & màu — tránh rơi về Times New Roman).
+   Đặt trong @layer base để utility Tailwind (text-*, bg-*) luôn thắng, kể cả ở v4. */
+@layer base {
+  html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+  body {
+    background-color: var(--tlhp-bg);
+    color: var(--tlhp-fg);
+    font-family: var(--tlhp-font-sans);
+    font-size: var(--tlhp-text-body);
+    line-height: var(--tlhp-leading-body);
+    font-feature-settings: "kern", "liga";
+    text-rendering: optimizeLegibility;
+  }
+  :where(h1, h2, h3, h4) { font-family: var(--tlhp-font-serif); color: var(--tlhp-heading); text-wrap: balance; }
+  :where(a) { color: var(--tlhp-link); text-underline-offset: 0.2em; transition: color var(--tlhp-duration-fast) var(--tlhp-ease-calm); }
+  :where(a:hover) { color: var(--tlhp-link-hover); }
+  :where(:focus-visible) { outline: 2px solid var(--tlhp-ring); outline-offset: 2px; }
+  ::selection { background: var(--tlhp-hoaisac-200); color: var(--tlhp-moc-950); }
+}
+
+/* ── Khung đọc kinh / pháp thoại (Q14): A-/A+ đổi --tlhp-reading-scale, màu nền đổi bằng data-theme */
+@layer components {
+  .tlhp-reading {
+    max-width: var(--tlhp-reading-width);
+    font-size: calc(var(--tlhp-text-body-lg) * var(--tlhp-reading-scale));
+    line-height: var(--tlhp-leading-body-lg);
+  }
+  .tlhp-reading :where(blockquote, .kinh-van) {
+    font-family: var(--tlhp-font-serif);
+    font-size: calc(var(--tlhp-text-scripture) * var(--tlhp-reading-scale));
+    line-height: var(--tlhp-leading-scripture);
+    color: var(--tlhp-heading);
+  }
+}
+
+/* ── Cầu nối shadcn/ui (tùy chọn — bộ token mặc định của site cũ chưa khớp thương hiệu) */
+:root, [data-theme], .tlhp-dark {
+  --background: var(--tlhp-bg);           --foreground: var(--tlhp-fg);
+  --card: var(--tlhp-surface);            --card-foreground: var(--tlhp-fg);
+  --popover: var(--tlhp-surface);         --popover-foreground: var(--tlhp-fg);
+  --primary: var(--tlhp-primary);         --primary-foreground: var(--tlhp-primary-fg);
+  --secondary: var(--tlhp-bg-alt);        --secondary-foreground: var(--tlhp-heading);
+  --muted: var(--tlhp-bg-alt);            --muted-foreground: var(--tlhp-muted);
+  --accent: var(--tlhp-accent-soft);      --accent-foreground: var(--tlhp-heading);
+  --destructive: var(--tlhp-error-solid); --border: var(--tlhp-border);
+  --input: var(--tlhp-border-strong);     --ring: var(--tlhp-ring);
+  --radius: var(--tlhp-radius-md);
+}
