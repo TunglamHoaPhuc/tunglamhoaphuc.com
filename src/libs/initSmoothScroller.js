@@ -17,24 +17,17 @@ const initSmoothScroller = contanerRef => {
 		});
 
 		// Find in page, Tab focus and anchor jumps reveal off-screen targets by scrolling
-		// the overflow-hidden wrapper, which ScrollSmoother does not track. Jump the smoother
-		// (no easing) to the revealed spot so the target is in view at once and the next
-		// scroll continues from there instead of jumping back.
+		// the overflow-hidden wrapper, which ScrollSmoother does not track. Move the smoother
+		// to the revealed spot the way it handles focus itself (a short glide), so the next
+		// scroll continues from there instead of jumping back. Pausing the easing with
+		// smooth(0) for an instant jump only worked on pages busy with other ScrollTriggers;
+		// on quiet pages the content never moved.
 		const wrapper = smoother.wrapper();
-		const root = document.documentElement;
 		wrapper.addEventListener("scroll", () => {
 			const offset = wrapper.scrollTop;
 			if (!offset) return;
 			wrapper.scrollTop = 0;
-			// Bootstrap sets `scroll-behavior: smooth`, and the smoother eases its content;
-			// both would turn this jump into a slow glide past the target.
-			const behavior = root.style.scrollBehavior;
-			const smoothness = smoother.smooth();
-			root.style.scrollBehavior = "auto";
-			smoother.smooth(0);
 			smoother.scrollTo(smoother.scrollTop() + offset, false);
-			root.style.scrollBehavior = behavior;
-			requestAnimationFrame(() => smoother.smooth(smoothness));
 		});
 	}
 };
