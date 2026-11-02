@@ -14,6 +14,10 @@ const initSmoothScroller = contanerRef => {
 			effects: true,
 			smoothTouch: 0.1,
 			ignoreMobileResize: true,
+			// ScrollSmoother scrolls a focused element into view. Headers, the search popup
+			// and the offcanvas sit outside the smoothed content, so leave their focus alone;
+			// otherwise opening search jumps the page and swaps in the sticky header.
+			onFocusIn: (self, event) => (self.content().contains(event.target) ? undefined : false),
 		});
 
 		// Find in page, Tab focus and anchor jumps reveal off-screen targets by scrolling

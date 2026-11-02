@@ -208,15 +208,30 @@ h3,
 h4,
 h5,
 h6 {
-	@include transition(all 0.3s ease-in-out 0s);
+	// `all` would also ease the visibility these elements inherit from a panel that opens
+	// (menu, search, offcanvas), leaving its links hidden and unfocusable for 0.3 s.
+	// The later `visibility 0s` entry wins for that one property.
+	transition:
+		all 0.3s ease-in-out 0s,
+		visibility 0s;
 }
 
 a:focus,
-button:focus,
-button:focus-visible {
+button:focus {
 	text-decoration: none;
+}
+// Bexon removed every focus outline. Keep it off for mouse clicks only, and show the
+// TLHP ring to keyboard users; components with their own ring (buttons) override this.
+a:focus:not(:focus-visible),
+button:focus:not(:focus-visible) {
 	outline: none;
-	box-shadow: 0 0 0;
+	box-shadow: none;
+}
+// Double ring (page colour inside, mộc outside) so it shows on light and dark grounds alike.
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+	outline: 2px solid var(--tlhp-ring);
+	outline-offset: 2px;
+	box-shadow: 0 0 0 2px rgb(var(--tlhp-c-bg));
 }
 
 a:focus,

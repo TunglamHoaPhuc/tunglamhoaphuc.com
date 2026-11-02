@@ -71,6 +71,23 @@ test.describe("desktop menu", () => {
 		}
 		for (const name of [...MENU, "Gọi điện 0979.345.373", "Chỉ đường đến chùa (mở Google Maps)"]) expect(reached).toContain(name);
 	});
+
+	// Bexon removed every focus outline; keyboard users must see where they are.
+	test("a focused menu link shows a focus ring", async ({ page }) => {
+		await open(page, 1440);
+		await page.locator("body").press("Tab");
+		for (let i = 0; i < 12; i++) {
+			if ((await page.evaluate(() => document.activeElement?.textContent?.trim())) === "Lịch tu học") break;
+			await page.keyboard.press("Tab");
+		}
+		const ring = await page.evaluate(() => {
+			const style = getComputedStyle(document.activeElement!);
+			return { text: document.activeElement!.textContent!.trim(), outline: style.outlineStyle, width: parseFloat(style.outlineWidth) };
+		});
+		expect(ring.text).toBe("Lịch tu học");
+		expect(ring.outline).toBe("solid");
+		expect(ring.width).toBeGreaterThanOrEqual(2);
+	});
 });
 
 test.describe("one header at a time", () => {
@@ -105,6 +122,8 @@ test.describe("mobile menu", () => {
 		const dialog = page.locator('[role="dialog"][aria-label="Menu"]:not([inert])');
 		await expect(dialog).toBeVisible();
 		await expect(toggle).toHaveAttribute("aria-expanded", "true");
+		// Focus moves into the panel by itself once it has slid in.
+		await expect.poll(() => dialog.evaluate((el) => el.contains(document.activeElement))).toBe(true);
 
 		for (let i = 0; i < 25; i++) {
 			await page.keyboard.press("Tab");

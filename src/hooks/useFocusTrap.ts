@@ -21,7 +21,18 @@ export function useFocusTrap(container: RefObject<HTMLElement | null>, active: b
 
 		const focusables = () =>
 			[...root.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((el) => el.getClientRects().length > 0);
-		focusables()[0]?.focus();
+
+		// A panel that shows by transitioning `visibility` is still hidden on the first frame,
+		// and focus() on it is silently ignored. Retry for a few frames until it lands.
+		let frame = 0;
+		let attempts = 0;
+		const focusFirst = () => {
+			const first = focusables()[0];
+			if (!first || root.contains(document.activeElement)) return;
+			first.focus();
+			if (document.activeElement !== first && attempts++ < 30) frame = requestAnimationFrame(focusFirst);
+		};
+		focusFirst();
 
 		const onKeyDown = (event: KeyboardEvent) => {
 			if (event.key === "Escape") {
@@ -43,6 +54,9 @@ export function useFocusTrap(container: RefObject<HTMLElement | null>, active: b
 			}
 		};
 		document.addEventListener("keydown", onKeyDown);
-		return () => document.removeEventListener("keydown", onKeyDown);
+		return () => {
+			cancelAnimationFrame(frame);
+			document.removeEventListener("keydown", onKeyDown);
+		};
 	}, [container, active]);
 }
