@@ -215,7 +215,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 ### Giai đoạn 1 – Nền móng
 - [x] T1: Chạy nguyên trạng Bexon trên Cloudflare Workers (`v2.`)
 - [ ] T1b: Kho mã GitHub riêng tư và CI
-- [ ] T2: Gỡ trang, thư viện thừa và thêm công tắc giảm chuyển động
+- [x] T2: Gỡ trang, thư viện thừa và thêm công tắc giảm chuyển động
 - [ ] T3a: Cầu nối theme TLHP: màu, font, cỡ chữ
 - [ ] T3b: Quét màu viết cứng, chỉnh chữ tiếng Việt và trang styleguide
 - [ ] T4: Lớp nội dung: snapshot JSON → repository (lát Dòng Chảy)

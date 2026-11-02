@@ -64,18 +64,32 @@
 
 **File Bexon:** `src/app/home-02/page.js`, `src/components/shared/wrappers/ClientWrapper.js`, `src/libs/initSmoothScroller.js`, `src/libs/preloaderController.js`, `src/hooks/useSweetAlert.js`, `src/app/layout.js`, `src/app/globals.scss`
 
+**Kết quả 02/11/2026:** xong, đã deploy `v2.`.
+- **Đã xóa:**
+  - 25 route và 241 file mã không còn được import (đồ thị import tính từ các trang giữ lại).
+  - 97 partial SCSS, 9 file dữ liệu mẫu, 88 ảnh/video không ai dùng, `src/css/globals.css` (976 KB, file chết).
+  - Có kiểm bằng so bộ chọn CSS khớp trên 13 trang trước/sau: **0 bộ chọn bị mất**. Phép so bắt được `_faq.scss` vẫn được `/services/1` dùng và đã giữ lại.
+- **Dung lượng phía trình duyệt:** CSS 1.441 → 1.003 KB, JS 1.457 → 1.126 KB (110 → 49 file).
+- **Giữ khác dự kiến:**
+  - `ReactNiceSelect` là component do Bexon tự viết, không dùng gói `nice-select2`; giữ cho tới khi form được dựng lại ở T18/T22. Gói npm `nice-select2` đã gỡ.
+  - Home-02 không có preloader và con trỏ hiệu ứng (hai thứ này chỉ có ở home khác), nên không có gì để tắt.
+- **Sửa thêm 2 file Bexon:**
+  - `_theme.scss`: tiêu đề `.title-anim` chỉ bị ẩn chờ GSAP khi cho phép chuyển động. Nếu không sửa, chế độ giảm chuyển động sẽ làm tiêu đề vô hình.
+  - `initSmoothScroller.js`: Ctrl+F, `scrollIntoView` và liên kết neo cuộn khung `#smooth-wrapper` mà ScrollSmoother không theo dõi. Kết quả là trang không tới chỗ tìm thấy, rồi lần cuộn sau giật về chỗ cũ. Nay chuyển khoảng cuộn sang ScrollSmoother và nhảy tức thì; test đỏ trước khi sửa, xanh sau khi sửa. Phím Tab do ScrollSmoother tự trôi mượt tới phần tử (~1,5 giây).
+- **Kiểm tra "slider tự chạy có nút dừng"** chuyển sang T10, khi các slider được dựng lại; ở T2 chỉ kiểm slider dừng hẳn khi giảm chuyển động.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Bật giảm chuyển động (Playwright `reducedMotion: 'reduce'`): không có transform cuộn mượt, không slider tự chuyển, không preloader, mọi nội dung hiện ngay
-- [ ] Khi cuộn mượt đang bật: cuộn bằng phím (Space, PageDown, mũi tên), liên kết neo và Ctrl+F vẫn hoạt động
-- [ ] `package.json` không còn `sweetalert2`, `isotope-layout`, `nice-select2`, `react-range-slider-input`; build xanh; test canh gác xanh trên `/`
+- [x] Bật giảm chuyển động (Playwright `reducedMotion: 'reduce'`): không có transform cuộn mượt, không slider tự chuyển, mọi tiêu đề và khối `wow` hiện ngay (6 trang)
+- [x] Khi cuộn mượt đang bật: cuộn bằng phím, nút về đầu trang, `scrollIntoView` (cơ chế của Ctrl+F và liên kết neo) và focus bằng phím đều đưa đúng tới đích. Ctrl+F thật trong Chrome nên được thử tay trên `v2.`
+- [x] `package.json` không còn `sweetalert2`, `isotope-layout`, `nice-select2`, `react-range-slider-input`, `imagesloaded`; ESLint chặn import lại; build xanh; test canh gác xanh
 
 **Kiểm chứng:**
-- [ ] `npm run build` và ghi dung lượng CSS/JS trước–sau làm mốc
-- [ ] `npm run test:e2e` (chạy cả 2 chế độ chuyển động)
+- [x] `npm run build` và ghi dung lượng CSS/JS trước–sau làm mốc
+- [x] `npm run test:e2e` cục bộ và với `BASE_URL=https://v2.tunglamhoaphuc.com`: 33 xanh, 5 bỏ qua (test bàn phím chỉ chạy ở desktop)
 
 **Phụ thuộc:** T1
 
-**File dự kiến:** `src/app/page.js`, `src/components/shared/wrappers/ClientWrapper.js`, `src/libs/motion.ts` (đọc `prefers-reduced-motion`), `eslint.config.mjs`, `tests/e2e/motion-guard.spec.ts` (cộng các file bị xóa)
+**File:** `src/app/page.js` (từ `home-02`), `src/components/shared/wrappers/ClientWrapper.js`, `src/libs/motion.ts`, `src/libs/initSmoothScroller.js`, `src/app/assets/sass/components/_theme.scss`, `src/app/assets/sass/components/_reduced-motion.scss`, `src/app/globals.scss`, `src/app/layout.js`, `eslint.config.mjs`, `tests/e2e/motion-guard.spec.ts` (cộng các file bị xóa)
 
 **Quy mô:** M (phần lớn là xóa file)
 
@@ -174,7 +188,7 @@
 
 **Mô tả:** Giữ popup tìm kiếm của Bexon: mở khi bấm, Esc đóng, bẫy focus, gửi `GET /tim-kiem?q=`. Nút tìm kiếm ẩn bằng cờ cấu hình cho tới khi T18 dựng xong trang `/tim-kiem`. Dải thông báo 48px trong luồng phía trên header, nội dung lấy từ `site.ts`, có nút Đóng, nhớ trong phiên.
 
-**File Bexon:** `components/layout/header/HeaderSearchForm.js`, `assets/sass/components/_search.scss`
+**File Bexon:** `components/layout/header/Header.js` (popup tìm kiếm viết thẳng trong file này; `HeaderSearchForm.js` không được dùng và đã xóa ở T2), `assets/sass/components/_search.scss`
 
 **Tiêu chí nghiệm thu:**
 - [ ] Popup tìm kiếm: Esc đóng và trả focus về nút mở; focus không thoát ra ngoài khi đang mở
@@ -186,7 +200,7 @@
 
 **Phụ thuộc:** T5a
 
-**File dự kiến:** `src/components/layout/header/HeaderSearchForm.js`, `src/components/layout/AnnouncementBar.tsx`, `src/config/site.ts`, `tests/e2e/header-extras.spec.ts`
+**File dự kiến:** `src/components/layout/header/Header.js`, `src/components/layout/AnnouncementBar.tsx`, `src/config/site.ts`, `tests/e2e/header-extras.spec.ts`
 
 **Quy mô:** M
 
@@ -228,7 +242,7 @@
 
 **Mô tả:** Route `/dong-chay-hoang-phap`, trang server lấy dữ liệu từ repository rồi truyền props. `HeroInner` làm banner trang trong + breadcrumb. Bộ lọc 4 danh mục dạng pill + sắp xếp (Mới nhất · Cũ nhất · A→Z · Z→A, `<select>` gốc theo kiểu Bexon) + phân trang 12 bài/trang, trạng thái trên URL (`?danh-muc=&sap-xep=&trang=`), xử lý phía server. Thẻ bài dùng một biến thể `BlogCard` với ảnh 4:3: chip chuyên mục → tiêu đề (≤ 3 dòng) → mô tả (≤ 3 dòng) → ngày đăng.
 
-**File Bexon:** `sections/hero/HeroInner.js`, `layout/main/BlogMain.js`, `shared/cards/BlogCard*.js`, `shared/others/Paginations.js`, `shared/others/NoItems.js`
+**File Bexon:** `sections/hero/HeroInner.js`, `layout/main/BlogMain.js`, `shared/cards/BlogCard2.js` (biến thể duy nhất còn lại sau T2), `shared/others/Paginations.js`, `shared/others/NoItems.js`
 
 **Tiêu chí nghiệm thu:**
 - [ ] HTML trang đầu chỉ chứa ≤ 12 thẻ bài (site cũ: 472 thẻ, 3 MB); đổi bộ lọc giữ trạng thái trên URL, nút Back hoạt động
@@ -241,7 +255,7 @@
 
 **Phụ thuộc:** T4, T6
 
-**File dự kiến:** `src/app/(site)/dong-chay-hoang-phap/page.js`, `src/components/sections/hero/HeroInner.js`, `src/components/layout/main/BlogMain.js`, `src/components/shared/cards/BlogCard1.js`, `tests/e2e/dong-chay.spec.ts`
+**File dự kiến:** `src/app/(site)/dong-chay-hoang-phap/page.js`, `src/components/sections/hero/HeroInner.js`, `src/components/layout/main/BlogMain.js`, `src/components/shared/cards/BlogCard2.js`, `tests/e2e/dong-chay.spec.ts`
 
 **Quy mô:** M
 
@@ -327,7 +341,7 @@
 
 **Mô tả:** Adapter `schedule` (customEvents, featuredPrograms, monthThemes, quoteGallery). Tiện ích âm lịch theo thuật toán Hồ Ngọc Đức (múi giờ +7). Trang `/lich-tu-hoc` (banner `HeroInner`): lưới tháng T2 → CN (ngày dương + âm, dựng bằng lưới Bootstrap), danh sách thẻ sự kiện 16:9 có chip trạng thái ("Đang mở đăng ký" / "Đã đủ số lượng" / "Đã kết thúc"), chọn tháng và loại qua URL, sự kiện nhiều ngày, chủ đề tháng (poster + câu kệ chữ `scripture`). Mục `#khoa-tu` ghi cách đăng ký qua điện thoại cho tới khi có `/dang-ky`.
 
-**File Bexon:** `sections/hero/HeroInner.js`, `shared/cards/BlogCard*.js` (khuôn thẻ sự kiện)
+**File Bexon:** `sections/hero/HeroInner.js`, `shared/cards/BlogCard2.js` (khuôn thẻ sự kiện)
 
 **Tiêu chí nghiệm thu:**
 - [ ] Âm lịch đúng cho bộ ngày kiểm thử: Tết, Rằm tháng Giêng, Phật đản 15/4 ÂL, Vu Lan 15/7 ÂL các năm 2025–2027
@@ -447,7 +461,7 @@
 
 **Mô tả:** Adapter `vu-tru` (lọc tự viện Tùng Lâm Hòa Phúc, chỉ khu vực đang hiển thị → 12). `/vu-tru-phat-giao`: ảnh bản đồ + ghim đặt theo `mapPos` % (nút có nhãn) + danh sách khu vực tương đương. `/vu-tru-phat-giao/[slug]` theo khuôn `PortfolioDetailsMain`: giới thiệu, bảo tượng trong khu vực, câu chuyện, không gian (album), khu vực khác; Giảng đường có Pháp thoại nổi bật (video T9). Trang chủ: `Portfolios2` thành "Khu vực nổi bật", slider tự chạy.
 
-**File Bexon:** `sections/portfolios/Portfolios2.js`, `layout/main/PortfolioDetailsMain.js`, `shared/cards/PortfolioCard*.js`
+**File Bexon:** `sections/portfolios/Portfolios2.js`, `layout/main/PortfolioDetailsMain.js`, `shared/cards/PortfolioCard2.js` / `PortfolioCard3.js`
 
 **Tiêu chí nghiệm thu:**
 - [ ] Ghim bản đồ dùng được bằng bàn phím, vùng chạm ≥ 48px, giữ đúng vị trí từ 375 đến 1440px
@@ -513,7 +527,7 @@
 
 **Mô tả:** `/lien-he` theo khuôn `ContactTop` + `Contact3` (bỏ form, chưa có nơi nhận): danh bạ (liên kết `tel:` ≥ 48px), giờ mở cửa, địa chỉ, ảnh bản đồ tĩnh + nút "Mở Google Maps", mạng xã hội, đọc từ cấu hình site. `/tim-kiem?q=`: tìm không phân biệt dấu trên tiêu đề + tóm tắt của mọi chuyên mục, nhóm theo chuyên mục, phân trang; nhận truy vấn từ popup tìm kiếm ở header và bật cờ hiện nút tìm kiếm (T5b).
 
-**File Bexon:** `sections/contacts/ContactTop.js`, `sections/contacts/Contact3.js`, `layout/header/HeaderSearchForm.js`
+**File Bexon:** `sections/contacts/ContactTop.js`, `sections/contacts/Contact3.js`, `layout/header/Header.js` (popup tìm kiếm)
 
 **Tiêu chí nghiệm thu:**
 - [ ] "niem phat" và "niệm Phật" cho cùng kết quả
