@@ -1,0 +1,21 @@
+{
+  "name": "tlhp-admin-guard",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "deploy": "cf deploy"
+  },
+  "dependencies": {
+    "jose": "^6.2.15"
+  },
+  "devDependencies": {
+    "@cloudflare/vite-plugin": "^2.0.0-beta.v.9",
+    "@cloudflare/workers-types": "^5.20261102.1",
+    "cf": "^1.0.0-beta.26",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  }
+}
