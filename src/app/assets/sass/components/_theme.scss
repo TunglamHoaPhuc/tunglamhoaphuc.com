@@ -477,8 +477,12 @@ img {
 		--bs-gutter-x: 0;
 	}
 }
-.wow {
-	visibility: hidden;
+// Hidden until wow.js reveals them. wow.js does not run under reduced motion,
+// so only hide them when motion is allowed.
+@media (prefers-reduced-motion: no-preference) {
+	.wow {
+		visibility: hidden;
+	}
 }
 .container-end-align {
 	margin-inline-start: calc((100% - 1320px) / 2);

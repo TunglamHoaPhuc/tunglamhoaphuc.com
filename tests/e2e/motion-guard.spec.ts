@@ -37,7 +37,7 @@ test.describe("reduced motion turns every effect off", () => {
 					(el) => getComputedStyle(el).opacity !== "1",
 				).length;
 				const hiddenWow = [...document.querySelectorAll<HTMLElement>(".wow")].filter(
-					(el) => el.style.visibility === "hidden",
+					(el) => getComputedStyle(el).visibility === "hidden",
 				).length;
 				const runningSliders = [...document.querySelectorAll<SliderElement>(".swiper")].filter(
 					(el) => el.swiper?.autoplay?.running,
