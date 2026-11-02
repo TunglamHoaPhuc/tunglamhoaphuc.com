@@ -101,18 +101,30 @@
 
 **File Bexon:** `src/app/layout.js`, `assets/sass/utilities/_colors.scss`, `_typography.scss`, `_root.scss`
 
+**Kết quả 02/11/2026:** xong, đã deploy `v2.`.
+- **Font:** vinext tự host Noto Serif và Be Vietnam Pro (có bộ chữ tiếng Việt), không tải từ Google. Biến font đặt trên `<html>`, vì cầu nối đọc chúng ở `:root`.
+- **Cầu nối:** `_tlhp-bridge.scss` gán toàn bộ biến màu Bexon, kể cả biến chưa dùng. Màu trong suốt dựng bằng `color-mix` từ token, không viết cứng mã màu.
+- **Sửa thêm 3 chỗ để đạt tương phản:**
+  - Chữ nhấn cuối tiêu đề section sáng: dùng `--tlhp-accent-text`. Bexon dùng chung một màu xám cho cả nền sáng và nền tối.
+  - Tiêu đề trên nền tối (`text-white`) giữ màu đá sáng.
+  - Chip "Our Solutions" trong section tối: dùng `--tlhp-hoaisac-300`.
+- **Phát hiện và sửa lỗi của T2:** `.wow { visibility: hidden }` trong `_theme.scss` làm ẩn mọi khối có lớp `wow` (chip, nút, thẻ bảng giá, ảnh dự án) ở chế độ giảm chuyển động. Test T2 khi đó chỉ kiểm thuộc tính viết trực tiếp, nay đã kiểm `getComputedStyle` (đỏ trước khi sửa, xanh sau khi sửa).
+- **Worker:** 488 KB nén (T1: 623 KB).
+- **Còn lại cho T3b:** logo Bexon màu teal, quầng sáng teal cuối section dịch vụ, line-height và giãn chữ của tiêu đề.
+- **Còn lại cho T13b:** số đếm odometer hiện 0 cho tới khi cuộn tới.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Nền trang, nền section xen kẽ, tiêu đề, thân bài, nút chính trên Home-02 lấy đúng màu TLHP (test đọc computed style của từng phần tử mẫu)
-- [ ] Chữ có dấu chồng (Ẫ, Ộ, Ữ, Ỹ) hiển thị bằng đúng 2 font mới, không rơi về font dự phòng (`document.fonts.check`)
-- [ ] Section tối của Bexon (`Services2`, `Footer2`) dùng đen mun và chữ kem; axe 0 lỗi tương phản trên Home-02
+- [x] Nền trang, nền section xen kẽ, tiêu đề, thân bài, nút chính trên Home-02 lấy đúng màu TLHP (test đọc computed style của từng phần tử mẫu)
+- [x] Chữ có dấu chồng (Ẫ, Ộ, Ữ, Ỹ) hiển thị bằng đúng 2 font mới: test tải bộ chữ tiếng Việt (`unicode-range` có U+1EA0) rồi `document.fonts.check`
+- [x] Section tối của Bexon (`Services2`, `Footer2`) dùng đen mun và chữ kem; axe 0 lỗi tương phản trên Home-02 (1440px và 375px)
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- theme`
-- [ ] Ảnh chụp Home-02 trước–sau ở 375px và 1440px
+- [x] `npm run test:e2e -- theme` (6/6); toàn bộ e2e 39 xanh cục bộ và trên `v2.`
+- [x] Ảnh chụp Home-02 trước–sau ở 375px và 1440px: `docs/anh/t3a-truoc-sau-desktop.png`, `docs/anh/t3a-truoc-sau-mobile.png`
 
 **Phụ thuộc:** T2
 
-**File dự kiến:** `src/app/layout.js`, `src/app/assets/sass/utilities/_tlhp-bridge.scss`, `src/app/globals.scss`, `tests/e2e/theme.spec.ts`
+**File:** `src/app/layout.js`, `src/app/assets/sass/utilities/_tlhp-bridge.scss`, `src/app/globals.scss`, `src/app/assets/sass/layout/_heading.scss`, `src/app/assets/sass/layout/_services.scss`, `src/app/assets/sass/components/_theme.scss`, `tests/e2e/theme.spec.ts`, `tests/e2e/motion-guard.spec.ts`
 
 **Quy mô:** M
 
