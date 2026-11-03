@@ -89,6 +89,16 @@ test.describe("home page content", () => {
 		expect(html).not.toMatch(/Leading Future|Our Pricing|Hear from Our|Get to Know Us|happy customer|People Behind|Meet Our Team/);
 	});
 
+	// The countdowns follow the day: a copy kept from the first visit (vinext caches pages it
+	// takes for static) said "Còn 4 ngày" a day late.
+	test("is made afresh for each visit, never served from a page cache", async ({ request }) => {
+		for (let visit = 0; visit < 2; visit++) {
+			const response = await request.get("/");
+			expect(response.headers()["x-vinext-cache"] ?? "MISS").not.toBe("HIT");
+			expect(response.headers()["cache-control"]).toMatch(/no-store/);
+		}
+	});
+
 	test("has one h1 and names every block", async ({ page }) => {
 		await open(page);
 		await expect(page.getByRole("heading", { level: 1 })).toHaveText("Tùng Lâm Hòa Phúc – Nơi để trở về, chốn thiêng bình yên");

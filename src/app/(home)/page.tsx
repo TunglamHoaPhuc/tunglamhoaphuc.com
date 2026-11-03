@@ -16,6 +16,11 @@ export const metadata: Metadata = {
 	description: site.intro,
 };
 
+// The countdowns ("Còn 3 ngày"), the next retreat and the month's verse follow the day in
+// Vietnam, so the page is made for each visit. vinext would otherwise take it for static
+// (it reads no request data) and serve the first copy for a year.
+export const dynamic = "force-dynamic";
+
 type Block = { id: string; render: (data: HomeData) => ReactNode };
 
 // The home page blocks, top to bottom, in the order decided in plan.md ("ưu tiên nội dung
