@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dateBadge, formatDate, formatNumber } from "@/libs/format";
+import { dateBadge, formatDate, formatNumber, titleCase } from "@/libs/format";
 import { DEFAULT_SORT, listHref, pageWindow, readListState, sortOf } from "@/libs/postList";
 
 describe("readListState", () => {
@@ -48,5 +48,12 @@ describe("format", () => {
 		expect(formatDate("2026-10-07")).toBe("07/10/2026");
 		expect(dateBadge("2026-03-07")).toEqual({ day: "07", month: "Th3" });
 		expect(formatNumber(35404)).toBe("35.404");
+	});
+
+	it("turns all-capital titles into title case, and leaves others alone", () => {
+		expect(titleCase("TIỂU SỬ SA MÔN THÍCH TÂM HÒA")).toBe("Tiểu Sử Sa Môn Thích Tâm Hòa");
+		expect(titleCase("ĐÔI NÉT VỀ ĐẠI SƯ LIÊN ĐĂNG")).toBe("Đôi Nét Về Đại Sư Liên Đăng");
+		expect(titleCase("SƯ TỔ (1901 – 1988)")).toBe("Sư Tổ (1901 – 1988)");
+		expect(titleCase("Lễ Hằng Thuận tại Tùng lâm Hòa Phúc")).toBe("Lễ Hằng Thuận tại Tùng lâm Hòa Phúc");
 	});
 });

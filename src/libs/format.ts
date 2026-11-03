@@ -18,3 +18,12 @@ const NUMBER = new Intl.NumberFormat("vi-VN");
 export function formatNumber(value: number): string {
 	return NUMBER.format(value);
 }
+
+/**
+ * "TIỂU SỬ SA MÔN THÍCH TÂM HÒA" → "Tiểu Sử Sa Môn Thích Tâm Hòa", for <title> and search
+ * results, where all capitals read as shouting. Text that already has small letters stays.
+ */
+export function titleCase(text: string): string {
+	if (text !== text.toLocaleUpperCase("vi")) return text;
+	return text.toLocaleLowerCase("vi").replace(/(^|[\s(–-])(\p{L})/gu, (_, before: string, letter: string) => before + letter.toLocaleUpperCase("vi"));
+}

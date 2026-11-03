@@ -125,6 +125,32 @@ export type Schedule = {
 	quotes: QuoteImage[];
 };
 
+/** One step of a timeline: its label (a year, or a phase such as "Thời Cổ Tự"), title, text. */
+export type Milestone = { label: string; title: string; description: string };
+
+/** A topic of Giới thiệu: the temple's history, a teacher's life, the rules of the house. */
+export type AboutTopic = {
+	id: string;
+	slug: string;
+	title: string;
+	subtitle: string;
+	/** Small label above the title: "Trụ Trì Bổn Tự". */
+	tag: string;
+	/** "Lịch Sử Chùa", "Người Liên Quan", "Thanh Quy & Văn Hóa". */
+	group: Category;
+	banner: MediaImage | null;
+	/** Upright picture, 3:4. */
+	portrait: MediaImage | null;
+	overview: string;
+	quote: { title: string; lines: string[]; author: string } | null;
+	milestones: Milestone[];
+	/** Sanitised HTML, safe to render as is. */
+	contentHtml: string;
+	gallery: GalleryImage[];
+	/** A book of the person's, shown beside their life. */
+	book: { title: string; author: string; cover: string | null; description: string } | null;
+};
+
 /** Read-only access to the temple's content, whatever the source. */
 export interface ContentRepository {
 	listPosts(query?: PostQuery): Promise<Page<PostSummary>>;
@@ -132,6 +158,8 @@ export interface ContentRepository {
 	getPostBySlug(slug: string): Promise<Post | null>;
 	listCategories(section: string): Promise<CategoryCount[]>;
 	getSchedule(): Promise<Schedule>;
+	/** Giới thiệu, in the editors' order. */
+	listAboutTopics(): Promise<AboutTopic[]>;
 }
 
 /** Something wrong or odd in the source data, for `npm run snapshot:check`. */
@@ -149,7 +177,8 @@ export type ContentIssue = {
 		| "wordpress-image"
 		| "moved-link"
 		| "empty-summary"
-		| "other-bucket";
+		| "other-bucket"
+		| "about-mismatch";
 	id: string;
 	message: string;
 };

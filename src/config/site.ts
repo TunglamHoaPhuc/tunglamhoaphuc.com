@@ -124,9 +124,10 @@ export const site = {
 			label: "Giới thiệu",
 			href: "/gioi-thieu",
 			children: [
-				{ label: "Lịch sử Bổn tự", href: "/gioi-thieu/lich-su-bon-tu", image: "/brand/icons/icon-dau-an-hoang-phap.webp" },
-				{ label: "Chư Tôn Đức", href: "/gioi-thieu/chu-ton-duc", image: "/brand/icons/icon-quote-chu-de.webp" },
-				{ label: "Thanh quy", href: "/gioi-thieu/thanh-quy", image: "/brand/icons/icon-phap-am.webp" },
+				// Slugs of the Giới thiệu topics; Chư Tôn Đức is the group of the four teachers.
+				{ label: "Lịch sử Bổn tự", href: "/gioi-thieu/lich-su-tung-lam-hoa-phuc", image: "/brand/icons/icon-dau-an-hoang-phap.webp" },
+				{ label: "Chư Tôn Đức", href: "/gioi-thieu#nguoi-lien-quan", image: "/brand/icons/icon-quote-chu-de.webp" },
+				{ label: "Thanh quy", href: "/gioi-thieu/van-hoa-ung-xu", image: "/brand/icons/icon-phap-am.webp" },
 				{ label: "Vũ Trụ Phật Giáo", href: "/vu-tru-phat-giao", image: "/brand/icons/icon-cac-khu-vuc-noi-bat.webp" },
 				{ label: "Bảo Tượng Phật Giáo", href: "/bao-tuong-phat-giao", image: "/brand/icons/icon-cac-bao-tuong-noi-bat.webp" },
 			],

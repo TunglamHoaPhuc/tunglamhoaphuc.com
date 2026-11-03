@@ -1,6 +1,6 @@
 // The one door pages use to read content: `await getContentRepository()`. Filtering,
 // sorting and paging happen here on the server, so a list page sends 12 posts, not 472.
-import type { CategoryCount, ContentRepository, GalleryImage, Page, Post, PostSort, PostSummary, Schedule } from "./types";
+import type { AboutTopic, CategoryCount, ContentRepository, GalleryImage, Page, Post, PostSort, PostSummary, Schedule } from "./types";
 
 export const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 60;
@@ -34,16 +34,19 @@ export type MemoryRepositoryOptions = {
 	loadAlbums?: () => Promise<Map<string, GalleryImage[]>>;
 	/** The schedule, loaded the first time a page asks for it. */
 	loadSchedule?: () => Promise<Schedule>;
+	/** Giới thiệu, loaded the first time a page asks for it. */
+	loadAbout?: () => Promise<AboutTopic[]>;
 };
 
 const EMPTY_SCHEDULE: Schedule = { events: [], programs: [], themes: [], quotes: [] };
 
 /** A repository over posts already in memory (the snapshot today, B2 at launch). */
-export function createMemoryRepository(posts: Post[], { loadAlbums, loadSchedule }: MemoryRepositoryOptions = {}): ContentRepository {
+export function createMemoryRepository(posts: Post[], { loadAlbums, loadSchedule, loadAbout }: MemoryRepositoryOptions = {}): ContentRepository {
 	const bySlug = new Map(posts.map((post) => [slugKey(post.slug), post]));
 	const summaries = posts.map(toSummary);
 	let albums: Promise<Map<string, GalleryImage[]>> | undefined;
 	let schedule: Promise<Schedule> | undefined;
+	let about: Promise<AboutTopic[]> | undefined;
 
 	return {
 		async listPosts({ section, category, sort = "newest", page = 1, pageSize = DEFAULT_PAGE_SIZE } = {}): Promise<Page<PostSummary>> {
@@ -86,6 +89,11 @@ export function createMemoryRepository(posts: Post[], { loadAlbums, loadSchedule
 			schedule ??= loadSchedule ? loadSchedule() : Promise.resolve(EMPTY_SCHEDULE);
 			return schedule;
 		},
+
+		listAboutTopics() {
+			about ??= loadAbout ? loadAbout() : Promise.resolve([]);
+			return about;
+		},
 	};
 }
 
@@ -105,10 +113,11 @@ export function getContentRepository(): Promise<ContentRepository> {
 	repository ??= (async () => {
 		const source = contentSource();
 		if (source !== "snapshot") throw new Error(`Nguồn "${source}" chưa có (b2: T19, d1: chuyển hẳn).`);
-		const { loadSnapshotAlbums, loadSnapshotPosts, loadSnapshotSchedule } = await import("./sources/snapshot");
+		const { loadSnapshotAbout, loadSnapshotAlbums, loadSnapshotPosts, loadSnapshotSchedule } = await import("./sources/snapshot");
 		return createMemoryRepository((await loadSnapshotPosts()).posts, {
 			loadAlbums: loadSnapshotAlbums,
 			loadSchedule: async () => (await loadSnapshotSchedule()).schedule,
+			loadAbout: async () => (await loadSnapshotAbout()).topics,
 		});
 	})().catch((error) => {
 		// Try again on the next request rather than keep a failed load forever.

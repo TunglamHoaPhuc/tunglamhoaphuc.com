@@ -13,6 +13,8 @@ const PAGES = [
 	"/dong-chay-hoang-phap",
 	"/dong-chay-hoang-phap/phap-hoi-huyet-bon-trai",
 	"/lich-tu-hoc",
+	"/gioi-thieu",
+	"/gioi-thieu/tieu-su-su-to",
 ];
 
 type SliderElement = HTMLElement & { swiper?: { autoplay?: { running?: boolean } } };

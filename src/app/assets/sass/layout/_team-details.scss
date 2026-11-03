@@ -220,4 +220,171 @@ START: Team Details CSS
 		}
 	}
 }
+// TLHP Giới thiệu (T13a): the topic cards, the portrait and teaching on the topic page, the
+// timeline with phase names where Bexon had years, and the book.
+.tlhp-about-lead {
+	max-width: 720px;
+	margin: 0 0 48px;
+	font-size: var(--tlhp-text-body-lg);
+}
+.tlhp-about-group {
+	margin-bottom: 56px;
+	&:last-child {
+		margin-bottom: 0;
+	}
+	&:focus {
+		outline: none;
+	}
+	ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+}
+.team-item.tlhp-about-card {
+	margin-bottom: 0;
+	.team-img img {
+		display: block;
+		aspect-ratio: 3 / 4;
+		height: auto;
+		object-fit: cover;
+	}
+	.tlhp-post-card-noimage {
+		display: block;
+		aspect-ratio: 3 / 4;
+		background-color: var(--tj-color-theme-bg);
+	}
+	.tlhp-chip {
+		margin-bottom: 10px;
+	}
+	.title {
+		width: 100%;
+		font-size: var(--tlhp-text-title);
+		line-height: var(--tlhp-leading-title);
+	}
+	.designation {
+		display: block;
+		margin: 8px 0 0;
+		font-size: var(--tlhp-text-body-sm);
+		line-height: var(--tlhp-leading-body-sm);
+	}
+}
+
+.team-details.tlhp-about-overview {
+	padding: 40px 0 0;
+	&:focus {
+		outline: none;
+	}
+	.team-details__img img {
+		display: block;
+		aspect-ratio: 3 / 4;
+		height: auto;
+		object-fit: cover;
+	}
+	.team-details__desig {
+		margin-bottom: 14px;
+	}
+	.team-details__name {
+		margin-bottom: 16px;
+	}
+}
+// The teaching: Bexon's article blockquote frame kept, in the scripture style.
+.tlhp-about-quote {
+	margin: 32px 0 0;
+	.tlhp-about-quote-title {
+		margin-bottom: 0;
+		color: var(--tlhp-accent-text);
+		font-size: var(--tlhp-text-overline);
+		font-weight: var(--tlhp-weight-overline);
+		letter-spacing: var(--tlhp-tracking-overline);
+		text-transform: uppercase;
+	}
+	blockquote {
+		margin: 16px 0 0;
+		p {
+			margin-bottom: 8px !important;
+			font-size: var(--tlhp-text-scripture);
+			font-weight: var(--tj-fw-regular);
+			line-height: var(--tlhp-leading-scripture);
+		}
+	}
+	figcaption {
+		margin-top: 12px;
+		text-align: end;
+		color: var(--tj-color-text-body-3);
+	}
+}
+.tlhp-about-book {
+	display: flex;
+	gap: 20px;
+	align-items: flex-start;
+	margin-top: 32px;
+	padding: 20px;
+	border: 1px solid var(--tj-color-border-1);
+	border-radius: var(--tlhp-radius-lg);
+	background-color: var(--tj-color-common-white);
+	img {
+		flex: 0 0 auto;
+		width: 96px;
+		height: auto;
+		border-radius: var(--tlhp-radius-sm);
+	}
+	p {
+		margin: 0;
+	}
+}
+.tlhp-about-book-label {
+	color: var(--tlhp-accent-text);
+	font-size: var(--tlhp-text-overline);
+	font-weight: var(--tlhp-weight-overline);
+	letter-spacing: var(--tlhp-tracking-overline);
+	text-transform: uppercase;
+}
+.tlhp-about-book-title {
+	font-family: var(--tj-ff-heading);
+	font-size: var(--tlhp-text-title);
+	font-weight: var(--tj-fw-sbold);
+	color: var(--tj-color-heading-primary);
+}
+.tlhp-about-book-author {
+	margin-bottom: 8px !important;
+	color: var(--tj-color-text-body-3);
+}
+
+.tlhp-about-timeline {
+	margin-top: 64px;
+}
+// Phase names are longer than Bexon's years: smaller, and kept within their side.
+.tlhp-about-timeline .tlhp-milestones {
+	margin: 24px 0 0;
+	list-style: none;
+	.timeline-inner {
+		.date {
+			max-width: 170px;
+			font-family: var(--tj-ff-heading);
+			font-size: 22px;
+			line-height: 1.3;
+			letter-spacing: 0;
+			text-transform: none;
+			color: var(--tlhp-accent-text);
+		}
+		&:nth-child(odd) .date {
+			text-align: start;
+		}
+		&:nth-child(even) .date {
+			text-align: end;
+		}
+		.content .top .title {
+			margin-bottom: 8px;
+		}
+	}
+	@media (max-width: 767.98px) {
+		.timeline-inner .date,
+		.timeline-inner:nth-child(even) .date {
+			max-width: none;
+			font-size: 18px;
+			text-align: start;
+		}
+	}
+}
 /* !END: Team Details CSS */

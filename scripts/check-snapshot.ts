@@ -5,6 +5,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parsePosts } from "../src/libs/content/posts";
+import { parseAbout } from "../src/libs/content/about";
 import { parseSchedule } from "../src/libs/content/schedule";
 import { postsFileSchema } from "../src/libs/content/schema";
 import type { ContentIssue } from "../src/libs/content/types";
@@ -29,6 +30,7 @@ const ISSUE_TITLES: Record<ContentIssue["kind"], string> = {
 	"moved-link": "Liên kết tunglamhoaphuc.com/wp-content (chuyển sang admin.)",
 	"empty-summary": "Bài không có tóm tắt hoặc tóm tắt là chữ mẫu (tạm lấy đầu nội dung)",
 	"other-bucket": "Ảnh ở bucket B2 thứ hai (khi chép sang R2 phải chép cả bucket này)",
+	"about-mismatch": "Giới thiệu: tiêu đề và nội dung nói về hai người/việc khác nhau (Ban Biên Tập sửa trong admin cũ)",
 };
 const EXAMPLES = 5;
 
@@ -75,6 +77,19 @@ for (const [section, categories] of sections) {
 	const count = [...categories.values()].reduce((sum, n) => sum + n, 0);
 	console.log(`${SECTION_NAMES[section] ?? section}: ${stored.get(section) ?? 0} bản ghi, ${count} bài dùng được`);
 	for (const [label, n] of [...categories].sort((a, b) => b[1] - a[1])) console.log(`  ${String(n).padStart(4)}  ${label}`);
+}
+
+// Giới thiệu, from npm run snapshot:fetch.
+const aboutPath = resolve("data/snapshot/gioi-thieu.json");
+if (existsSync(aboutPath)) {
+	const { topics, issues: aboutIssues } = parseAbout(JSON.parse(readFileSync(aboutPath, "utf8")));
+	const groups = new Map<string, number>();
+	for (const topic of topics) groups.set(topic.group.name, (groups.get(topic.group.name) ?? 0) + 1);
+	const perGroup = [...groups].map(([name, n]) => `${name}: ${n}`).join(", ");
+	const mismatches = aboutIssues.filter((issue) => issue.kind === "about-mismatch").length;
+	console.log(`
+gioi-thieu.json: ${topics.length} chủ đề (${perGroup}); ${mismatches ? `${mismatches} chủ đề lệch nội dung` : "tiêu đề và nội dung khớp nhau"}`);
+	issues = [...issues, ...aboutIssues];
 }
 
 // The schedule (lịch tu học), from npm run snapshot:fetch.
