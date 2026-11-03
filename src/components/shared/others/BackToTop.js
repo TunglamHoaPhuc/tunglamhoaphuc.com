@@ -28,6 +28,8 @@ const BackToTop = () => {
 
 		window.addEventListener("scroll", handleScroll);
 		window.addEventListener("load", handleScroll);
+		// The page may have been scrolled, and loaded, before this ran.
+		handleScroll();
 
 		return () => {
 			window.removeEventListener("scroll", handleScroll);
