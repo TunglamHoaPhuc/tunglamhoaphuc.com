@@ -433,14 +433,47 @@
 
 **File Bexon:** `layout/main/BlogDetailsMain.js`, `assets/sass/layout/_blog-details.scss`
 
+**Kết quả 03/11/2026:** xong, đã deploy `v2.`.
+- **Trang `src/app/(site)/dong-chay-hoang-phap/[slug]/page.tsx`** (server):
+  - Có `generateMetadata` riêng từng bài.
+  - Banner `HeroInner` là tiêu đề bài (cỡ h2, không dùng cỡ 70px của Bexon), breadcrumb Trang chủ › Dòng Chảy Hoằng Pháp › chuyên mục.
+  - Có liên kết "Quay lại Dòng Chảy Hoằng Pháp".
+  - Bỏ sidebar widget và bình luận của Bexon.
+  - Slug không có, hoặc bài của Trí Tuệ đặt dưới đường dẫn này → `notFound()`, trả HTTP 404.
+- **Các phần của bài** (tab neo `AnchorTabs`, chỉ hiện phần có dữ liệu):
+  - Tổng quan: chip, ngày, tác giả, lượt xem, ảnh banner, và lời dẫn nếu tóm tắt không chép lại đầu bài.
+  - Nội dung chính.
+  - Video: link YouTube trong bài, mở trên YouTube, không nhúng iframe.
+  - Album ảnh: 12 ảnh, "Xem thêm N ảnh" đưa focus tới ảnh mới; bấm ảnh mở lightbox GLightbox của Bexon.
+  - Tìm hiểu thêm: 3 bài cùng chuyên mục.
+  - Bấm tab thì lướt tới phần đó (qua ScrollSmoother), đưa focus vào, ghi `#` lên địa chỉ; tab của phần đang đọc được đánh dấu.
+  - "Các kỳ trước" và "Sắp diễn ra": cả 632 bài đều để trống hai trường này nên chưa dựng.
+- **Khung đọc `ReadingFrame`:**
+  - A− / A+ có 4 mức (90 · 100 · 115 · 130%), tên nút chứa đúng chữ hiển thị.
+  - Ngà / Giấy dó / Đêm thiền đặt `data-theme` trên khung đọc, không đặt trên `<html>`.
+  - Lựa chọn lưu ở `localStorage`. Một script nhỏ áp dụng trước khi vẽ để không nháy nền.
+- **Album:**
+  - `npm run snapshot:fetch -- --albums` gọi API chi tiết công khai (3 lượt song song, có nghỉ) cho 447 bài mà danh sách để trống album; lưu `data/snapshot/post-albums.json`, được 441 album, 15.466 ảnh.
+  - Repository chỉ nạp file này khi mở trang chi tiết, nên trang danh sách không chậm thêm.
+- **Lớp nội dung:**
+  - Thêm `intro`, `videos`.
+  - Slug so ở dạng đã giải mã: 11 bài có slug lưu sẵn dạng mã hóa (emoji). API site cũ trả 404 cho cả 11; site mới mở được.
+  - Báo cáo `snapshot:check` tính cả album lấy riêng; còn 6 bài thiếu album, đều là bài slug mã hóa.
+- **Sửa trong lúc làm:**
+  - Script trước khi vẽ đọc `+null` thành mức 0, nên ai chưa chọn gì cũng bị cỡ chữ 90%; test bắt được.
+  - Nút Về đầu trang có `aria-label` khác chữ hiển thị (phần trăm), axe báo khi nút hiện ra. Nay con số do CSS vẽ (`::after`), không còn là chữ của nút, nên tên "Về đầu trang" luôn đúng kể cả lúc nút đang ẩn hay hiện.
+  - Menu gắn `aria-current="page"` cho mục cha khi đang ở trang con; nay trang con dùng `"true"`.
+- **Ghi chú tiêu chí 404:** `le-hang-thuan-tai-tung-lam-hoa-phuc` nay là bài có thật (17/10/2026), mở được với đủ 62 ảnh. Site cũ hiện "Bài viết không còn tồn tại" trong lúc chờ tải rồi mới hiện bài: đó là kiểu 200 giả mà tiêu chí muốn bỏ. 404 thật được kiểm bằng slug không có và bằng bài khác chuyên mục.
+
 **Tiêu chí nghiệm thu:**
-- [ ] HTML ban đầu có đủ nội dung bài (không có trạng thái "Đang tải dữ liệu…")
-- [ ] `/dong-chay-hoang-phap/le-hang-thuan-tai-tung-lam-hoa-phuc` (bài không còn) trả 404 thật thay vì 200
-- [ ] A− / A+ đổi cỡ chữ khung đọc; Giấy dó và Đêm thiền chỉ đổi khung đọc, giữ nguyên khi tải lại
+- [x] HTML ban đầu có đủ nội dung bài (không có trạng thái "Đang tải dữ liệu…")
+- [x] Bài không có trả 404 thật thay vì 200 (bài `le-hang-thuan-…` nay có trong dữ liệu, xem ghi chú)
+- [x] A− / A+ đổi cỡ chữ khung đọc; Giấy dó và Đêm thiền chỉ đổi khung đọc, giữ nguyên khi tải lại
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- article`
-- [ ] `curl` trang chi tiết, kiểm có đoạn thân bài trong HTML
+- [x] `npm run test:e2e -- article` (24 test, có axe trên cả nền Đêm thiền); toàn bộ e2e 245 xanh cục bộ và trên `v2.`; unit 70 xanh
+- [x] `curl` trang chi tiết, kiểm có đoạn thân bài trong HTML
+- [x] Ảnh: `docs/anh/t8-bai-chi-tiet.png`
 
 **Phụ thuộc:** T7
 
