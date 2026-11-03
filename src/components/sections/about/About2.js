@@ -55,7 +55,8 @@ const About2 = () => {
 									<Link
 										className="video-btn video-popup glightbox"
 										aria-label="Xem video"
-										href="https://www.youtube.com/watch?v=MLpWrANjFbI&amp;ab_channel=eidelchteinadvogados"
+										href="https://www.youtube-nocookie.com/embed/MLpWrANjFbI?rel=0"
+										data-type="external"
 									>
 										<span>
 											<i className="tji-play" aria-hidden="true"></i>

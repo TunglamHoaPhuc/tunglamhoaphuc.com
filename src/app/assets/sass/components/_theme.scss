@@ -581,6 +581,17 @@ img {
 		background: color-mix(in srgb, var(--tj-color-theme-dark) 95%, transparent);
 	}
 }
+// "3/79" in the lightbox (hooks/useLightbox.ts).
+.tlhp-lightbox-count {
+	position: absolute;
+	top: 22px;
+	inset-inline-start: 24px;
+	z-index: 9999;
+	margin: 0;
+	color: var(--tj-color-common-white);
+	font-weight: var(--tj-fw-sbold);
+	font-variant-numeric: tabular-nums;
+}
 .gslide video,
 .gslide iframe,
 .plyr__poster {

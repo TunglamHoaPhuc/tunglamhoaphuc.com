@@ -1,14 +1,9 @@
 "use client";
+import { useLightbox } from "@/hooks/useLightbox";
 
-import { useEffect } from "react";
+// Bexon's lightbox for the ".glightbox" links inside, with TLHP's labels and focus handling.
 const PopupVideo = ({ children }) => {
-	useEffect(() => {
-		import("glightbox").then(({ default: GLightbox }) => {
-			const lightbox = GLightbox({
-				selector: ".glightbox",
-			});
-		});
-	}, []);
+	useLightbox(".glightbox");
 	return children;
 };
 

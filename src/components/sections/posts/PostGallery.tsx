@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useLightbox } from "@/hooks/useLightbox";
 import type { GalleryImage } from "@/libs/content/types";
 
 const FIRST = 12;
@@ -7,7 +8,7 @@ const FIRST = 12;
 type Props = { images: GalleryImage[]; title: string; albumId: string };
 
 // The album: the first 12 photos, the rest behind "Xem thêm". A photo opens in Bexon's
-// lightbox (GLightbox), which steps through the whole album, shown or not.
+// lightbox (useLightbox), which steps through the whole album, shown or not.
 export default function PostGallery({ images, title, albumId }: Props) {
 	const [showAll, setShowAll] = useState(false);
 	const list = useRef<HTMLUListElement>(null);
@@ -17,17 +18,7 @@ export default function PostGallery({ images, title, albumId }: Props) {
 		if (showAll) list.current?.querySelectorAll<HTMLAnchorElement>("a")[FIRST]?.focus();
 	}, [showAll]);
 
-	useEffect(() => {
-		let lightbox: { destroy(): void } | undefined;
-		let cancelled = false;
-		import("glightbox").then(({ default: GLightbox }) => {
-			if (!cancelled) lightbox = GLightbox({ selector: `[data-gallery="${albumId}"]` });
-		});
-		return () => {
-			cancelled = true;
-			lightbox?.destroy();
-		};
-	}, [albumId]);
+	useLightbox(`[data-gallery="${albumId}"]`);
 
 	return (
 		<>
@@ -39,6 +30,7 @@ export default function PostGallery({ images, title, albumId }: Props) {
 							className="tlhp-gallery-item"
 							data-gallery={albumId}
 							data-title={image.caption || image.title || title}
+							data-alt={`${image.caption || image.title || title} – ảnh ${index + 1}`}
 						>
 							<img
 								src={image.src}

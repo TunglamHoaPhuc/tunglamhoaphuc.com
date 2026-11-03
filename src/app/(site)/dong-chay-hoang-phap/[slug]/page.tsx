@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AnchorTabs, { type AnchorTab } from "@/components/sections/posts/AnchorTabs";
 import PostGallery from "@/components/sections/posts/PostGallery";
+import PostVideos from "@/components/sections/posts/PostVideos";
 import ReadingFrame from "@/components/sections/posts/ReadingFrame";
 import Cta from "@/components/sections/cta/Cta";
 import HeroInner from "@/components/sections/hero/HeroInner";
@@ -137,19 +138,7 @@ export default async function DongChayArticle({ params }: Props) {
 									<h2 id="video-tieu-de" className="tlhp-article-heading">
 										Video
 									</h2>
-									<ul className="tlhp-videos">
-										{post.videos.map((video) => (
-											<li key={video.id}>
-												<a className="tlhp-video" href={video.url} target="_blank" rel="noopener noreferrer">
-													<img src={`https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`} alt="" width={480} height={360} loading="lazy" />
-													<span className="tlhp-video-play" aria-hidden="true">
-														<i className="tji-play"></i>
-													</span>
-													<span className="visually-hidden">Xem video trên YouTube (mở trong thẻ mới)</span>
-												</a>
-											</li>
-										))}
-									</ul>
+									<PostVideos videos={post.videos} title={post.title} poster={post.banner} />
 								</section>
 							) : null}
 

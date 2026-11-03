@@ -1372,3 +1372,8 @@ TLHP article page (T8)
 
 
 /* !END: Blog Details CSS */
+.tlhp-video-noposter {
+	display: block;
+	aspect-ratio: 16 / 9;
+	background-color: var(--tj-color-theme-dark);
+}

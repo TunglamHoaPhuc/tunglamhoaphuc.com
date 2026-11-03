@@ -56,7 +56,7 @@ test.describe("article page", () => {
 		]);
 		await open(page, WITH_VIDEO);
 		await expect(page.getByRole("navigation", { name: "Các phần của bài" }).getByRole("link", { name: "Video" })).toBeVisible();
-		await expect(page.locator("#video .tlhp-video")).toHaveAttribute("href", /^https:\/\/www\.youtube\.com\/watch\?v=/);
+		await expect(page.locator("#video .tlhp-video")).toHaveAttribute("href", /^https:\/\/www\.youtube-nocookie\.com\/embed\//);
 	});
 
 	test("lists three other posts of the same category", async ({ page }) => {
