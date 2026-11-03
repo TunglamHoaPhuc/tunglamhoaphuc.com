@@ -7,6 +7,7 @@ import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import BlogCard2 from "@/components/shared/cards/BlogCard2";
 import ServiceCard2 from "@/components/shared/cards/ServiceCard2";
 import TeamCard from "@/components/shared/cards/TeamCard";
+import type { PostSummary } from "@/libs/content/types";
 import { isPublicHost } from "@/libs/hosts";
 
 export const metadata: Metadata = {
@@ -46,14 +47,20 @@ const SAMPLE_ANNOUNCEMENT = {
 };
 
 // Sample content in the shape the Bexon cards read; real data arrives with T4.
-const SAMPLE_POST = {
-	id: 1,
+const SAMPLE_POST: PostSummary = {
+	id: "mau",
+	slug: "y-nghia-ngay-ram-thang-bay",
 	title: "Ý nghĩa ngày rằm tháng Bảy – Vu Lan báo hiếu",
-	desc: "Mùa Vu Lan nhắc người con Phật nhớ ơn cha mẹ, ông bà và tổ tiên.",
-	img1: "/images/blog/blog-4.webp",
-	category: "Pháp thoại",
-	day: 15,
-	month: "Th8",
+	subtitle: "",
+	section: "dong-chay-hoang-phap",
+	category: { slug: "dai-le-su-kien", name: "Đại Lễ Sự Kiện" },
+	author: "",
+	publishedDate: "2026-08-15",
+	views: 1280,
+	thumbnail: { src: "/images/blog/blog-4.webp", position: "center 50%" },
+	banner: null,
+	summary: "Mùa Vu Lan nhắc người con Phật nhớ ơn cha mẹ, ông bà và tổ tiên.",
+	galleryCount: 0,
 };
 const SAMPLE_MEMBER = { id: 1, name: "Thầy Thích Ấn Định", desig: "Trụ trì", img: "/images/team/team-1.webp" };
 const SAMPLE_SERVICE = { id: 1, title: "Khóa tu một ngày an lạc", iconName: "tji-service-1" };
@@ -148,7 +155,7 @@ export default async function StyleguidePage() {
 					<h2>Thẻ</h2>
 					<div className="row g-4 mt-2">
 						<div className="col-md-6 col-lg-4">
-							<BlogCard2 blog={SAMPLE_POST} idx={0} />
+							<BlogCard2 post={SAMPLE_POST} />
 						</div>
 						<div className="col-md-6 col-lg-4">
 							<TeamCard teamMember={SAMPLE_MEMBER} />

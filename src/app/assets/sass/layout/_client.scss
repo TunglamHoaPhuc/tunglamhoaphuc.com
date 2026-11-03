@@ -229,4 +229,102 @@ START: Client CSS
 	}
 }
 
+// TLHP: the six ways in (Brands2). Bexon's logo boxes become links: gold icon on its dark
+// chip, then the section name.
+.tlhp-entrances {
+	.client-content.style-2 {
+		max-width: 540px;
+	}
+	// Bexon's fades covered a third of the row; links under them could not be clicked.
+	.client-slider-1 {
+		&::before,
+		&::after {
+			width: 120px;
+			pointer-events: none;
+			@media #{$sm, $xs} {
+				width: 32px;
+			}
+		}
+	}
+	// Still, as a grid of cards that all show (reduced motion).
+	@media (prefers-reduced-motion: reduce) {
+		.client-slider-1 {
+			&::before,
+			&::after {
+				display: none;
+			}
+		}
+		.tlhp-marquee-track {
+			width: auto;
+		}
+		.tlhp-marquee-list {
+			flex-wrap: wrap;
+			justify-content: center;
+			gap: 20px;
+			width: 100%;
+			min-width: 0;
+			padding: 0 15px;
+			&[aria-hidden="true"] {
+				display: none;
+			}
+		}
+		.client-item {
+			padding-inline-end: 0;
+		}
+	}
+}
+.client-logo.tlhp-entry {
+	justify-content: flex-start;
+	gap: 16px;
+	padding: 0 24px;
+	color: var(--tj-color-heading-primary);
+	font-family: var(--tj-ff-heading);
+	font-size: 20px;
+	font-weight: var(--tj-fw-sbold);
+	line-height: 1.35;
+	transition:
+		box-shadow 0.3s ease-in-out,
+		color 0.3s ease-in-out;
+	&:hover {
+		color: var(--tj-color-theme-primary);
+		box-shadow: var(--tlhp-shadow-sm);
+	}
+	@media #{$lg, $md} {
+		font-size: 18px;
+		padding: 0 18px;
+		gap: 12px;
+	}
+	@media #{$sm, $xs} {
+		width: 220px;
+		height: 76px;
+		padding: 0 14px;
+		gap: 12px;
+		font-size: 16px;
+	}
+}
+.tlhp-entry-icon {
+	width: 64px;
+	height: 64px;
+	img {
+		width: 42px;
+		height: 42px;
+	}
+	@media #{$lg, $md} {
+		width: 54px;
+		height: 54px;
+		img {
+			width: 36px;
+			height: 36px;
+		}
+	}
+	@media #{$sm, $xs} {
+		width: 44px;
+		height: 44px;
+		img {
+			width: 30px;
+			height: 30px;
+		}
+	}
+}
+
 /* !END: Client CSS */

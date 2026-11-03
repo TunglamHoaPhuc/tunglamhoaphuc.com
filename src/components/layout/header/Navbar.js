@@ -85,7 +85,7 @@ const Navbar = () => {
 													aria-current={ariaCurrent(pathname, child)}
 												>
 													<span className="mega-menu-service-icon tlhp-brand-icon" aria-hidden="true">
-														{child.image ? <img src={child.image} alt="" width={128} height={128} /> : null}
+														{child.image ? <img src={child.image} alt="" width={128} height={128} loading="lazy" /> : null}
 													</span>
 													<span className="mega-menu-service-title">{child.label}</span>
 													<span className="mega-menu-service-nav" aria-hidden="true">

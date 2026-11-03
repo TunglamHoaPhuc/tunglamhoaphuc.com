@@ -98,13 +98,14 @@ test.describe("footer", () => {
 
 	test("the slogan line is decoration and stands still with reduced motion", async ({ page }) => {
 		await open(page, "/");
-		const marquee = footer(page).locator(".footer-marquee");
-		await expect(marquee).toHaveAttribute("aria-hidden", "true");
-		await expect(marquee).toContainText("Chốn thiêng bình yên");
-		const wrapper = marquee.locator(".swiper-wrapper");
-		const before = await wrapper.evaluate((el) => getComputedStyle(el).transform);
+		const track = footer(page).locator(".footer-marquee .tlhp-marquee-track");
+		await expect(track).toHaveAttribute("aria-hidden", "true");
+		await expect(track).toContainText("Chốn thiêng bình yên");
+		const before = await track.evaluate((el) => getComputedStyle(el).transform);
 		await page.waitForTimeout(1500);
-		expect(await wrapper.evaluate((el) => getComputedStyle(el).transform)).toBe(before);
+		expect(await track.evaluate((el) => getComputedStyle(el).transform)).toBe(before);
+		// Nothing moves, so there is nothing to pause.
+		await expect(footer(page).locator(".tlhp-pause")).toBeHidden();
 	});
 
 	test("its own Về đầu trang link goes back up and takes focus to the logo", async ({ page }) => {
@@ -134,13 +135,24 @@ test.describe("footer with motion", () => {
 		expect(unfocusable).toEqual([]);
 	});
 
-	test("the slogan line runs when motion is allowed", async ({ page, isMobile }) => {
+	test("the slogan line runs when motion is allowed, and its button stops it", async ({ page, isMobile }) => {
 		test.skip(isMobile, "one check is enough");
 		await open(page, "/");
-		const wrapper = footer(page).locator(".footer-marquee .swiper-wrapper");
-		const before = await wrapper.evaluate((el) => getComputedStyle(el).transform);
+		const track = footer(page).locator(".footer-marquee .tlhp-marquee-track");
+		const transform = () => track.evaluate((el) => getComputedStyle(el).transform);
+		const before = await transform();
 		await page.waitForTimeout(1500);
-		expect(await wrapper.evaluate((el) => getComputedStyle(el).transform)).not.toBe(before);
+		expect(await transform()).not.toBe(before);
+
+		const pause = footer(page).getByRole("button", { name: "Tạm dừng chữ chạy cuối trang" });
+		await pause.focus();
+		await page.keyboard.press("Enter");
+		await expect(footer(page).getByRole("button", { name: "Chạy tiếp chữ chạy cuối trang" })).toBeFocused();
+		// The animation runs off the main thread; its stop shows a frame later.
+		await page.waitForTimeout(150);
+		const stopped = await transform();
+		await page.waitForTimeout(1000);
+		expect(await transform()).toBe(stopped);
 	});
 });
 

@@ -5,11 +5,8 @@ import Link from "next/link";
 import { Fragment } from "react";
 import ScrollTopLink from "./ScrollTopLink";
 
-// "Nơi để trở về", seal, "Chốn thiêng bình yên", seal… three times over, enough to fill
-// the widest screen for Swiper's loop.
-const MARQUEE_ITEMS = Array.from({ length: 3 }, () =>
-	site.slogan.split(" – ").map((title) => ({ title, img: site.sealLight.src })),
-).flat();
+// "Nơi để trở về", seal, "Chốn thiêng bình yên", seal; the marquee repeats it.
+const MARQUEE_ITEMS = site.slogan.split(" – ").map((title) => ({ title, img: site.sealLight.src }));
 
 // "Thôn Hòa Trúc – Xã Phú Cát – TP Hà Nội", breaking only between its parts.
 const ADDRESS = site.address.split(" – ").map((part, idx) => (
@@ -46,6 +43,7 @@ const Footer2 = () => {
 											alt={`${site.name} – về trang chủ`}
 											width={site.sealLight.width}
 											height={site.sealLight.height}
+											loading="lazy"
 										/>
 									</Link>
 								</div>
@@ -126,7 +124,7 @@ const Footer2 = () => {
 				</div>
 			</div>
 			{/* Decoration only: the slogan is also written out in the strip below. */}
-			<div className="footer-marquee" aria-hidden="true">
+			<div className="footer-marquee">
 				<MarqueeSlider1 items={MARQUEE_ITEMS} />
 			</div>
 			<div className="tj-copyright-area-2 tlhp-footer-end">
@@ -145,10 +143,10 @@ const Footer2 = () => {
 				</div>
 			</div>
 			<div className="bg-shape-1">
-				<img src="/images/shape/pattern-2.svg" alt="" />
+				<img src="/images/shape/pattern-2.svg" alt="" loading="lazy" decoding="async" />
 			</div>
 			<div className="bg-shape-2">
-				<img src="/images/shape/pattern-3.svg" alt="" />
+				<img src="/images/shape/pattern-3.svg" alt="" loading="lazy" decoding="async" />
 			</div>
 		</footer>
 	);

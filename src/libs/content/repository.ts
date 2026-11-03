@@ -12,11 +12,12 @@ const compare: Record<PostSort, (a: PostSummary, b: PostSummary) => number> = {
 	oldest: (a, b) => a.publishedDate.localeCompare(b.publishedDate) || collator.compare(a.title, b.title),
 	az: (a, b) => collator.compare(a.title, b.title) || b.publishedDate.localeCompare(a.publishedDate),
 	za: (a, b) => collator.compare(b.title, a.title) || b.publishedDate.localeCompare(a.publishedDate),
+	views: (a, b) => b.views - a.views || b.publishedDate.localeCompare(a.publishedDate),
 };
 
 function toSummary(post: Post): PostSummary {
-	const { id, slug, title, subtitle, section, category, author, publishedDate, views, thumbnail, summary, galleryCount } = post;
-	return { id, slug, title, subtitle, section, category, author, publishedDate, views, thumbnail, summary, galleryCount };
+	const { id, slug, title, subtitle, section, category, author, publishedDate, views, thumbnail, banner, summary, galleryCount } = post;
+	return { id, slug, title, subtitle, section, category, author, publishedDate, views, thumbnail, banner, summary, galleryCount };
 }
 
 /** Slugs arrive decoded from the URL; a few are stored percent-encoded (emoji). Compare both decoded. */
@@ -42,8 +43,9 @@ export function createMemoryRepository(posts: Post[], { loadAlbums }: MemoryRepo
 	return {
 		async listPosts({ section, category, sort = "newest", page = 1, pageSize = DEFAULT_PAGE_SIZE } = {}): Promise<Page<PostSummary>> {
 			const size = Math.min(Math.max(Math.trunc(pageSize) || DEFAULT_PAGE_SIZE, 1), MAX_PAGE_SIZE);
+			const sections = section === undefined ? null : [section].flat();
 			const matching = summaries
-				.filter((post) => (!section || post.section === section) && (!category || post.category.slug === category))
+				.filter((post) => (!sections || sections.includes(post.section)) && (!category || post.category.slug === category))
 				.sort(compare[sort] ?? compare.newest);
 			const pageCount = Math.max(1, Math.ceil(matching.length / size));
 			const current = Math.max(1, Math.trunc(page) || 1);

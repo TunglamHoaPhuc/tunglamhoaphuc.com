@@ -31,12 +31,13 @@ export type PostSummary = {
 	publishedDate: string;
 	views: number;
 	thumbnail: MediaImage | null;
+	/** The wide picture at the top of the post (and of the home hero). */
+	banner: MediaImage | null;
 	summary: string;
 	galleryCount: number;
 };
 
 export type Post = PostSummary & {
-	banner: MediaImage | null;
 	/** The summary when it says something of its own; empty when it only repeats the opening lines. */
 	intro: string;
 	/** Sanitised HTML, safe to render as is. */
@@ -46,10 +47,12 @@ export type Post = PostSummary & {
 	videos: Video[];
 };
 
-export type PostSort = "newest" | "oldest" | "az" | "za";
+/** "views": most read first (the home page's Dấu ấn hoằng pháp). */
+export type PostSort = "newest" | "oldest" | "az" | "za" | "views";
 
 export type PostQuery = {
-	section?: string;
+	/** One section, or several (the home page lists every section that has its pages). */
+	section?: string | string[];
 	category?: string;
 	sort?: PostSort;
 	/** 1-based. */

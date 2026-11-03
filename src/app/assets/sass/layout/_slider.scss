@@ -374,4 +374,181 @@ START: Theme Slider CSS
 	}
 }
 
+// TLHP hero (Hero2): pictures as <img>, a darker veil, the overline and subtitle lines,
+// long post titles, the thumbnail row with the pause button, and the ring of words in SVG.
+.tlhp-hero {
+	.slider-bg-image {
+		inset: 0;
+		display: block;
+		img {
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+	}
+	// At least 55% đen mun everywhere, darkest behind the text (BRAND-GUIDELINES 5.6).
+	.tj-slider-item::after {
+		background: linear-gradient(
+			90deg,
+			color-mix(in srgb, var(--tj-color-theme-dark) 88%, transparent) 0%,
+			color-mix(in srgb, var(--tj-color-theme-dark) 72%, transparent) 50%,
+			color-mix(in srgb, var(--tj-color-theme-dark) 55%, transparent) 100%
+		);
+		// The text spans the screen on smaller screens.
+		@media #{$md, $sm, $xs} {
+			background: linear-gradient(
+				180deg,
+				color-mix(in srgb, var(--tj-color-theme-dark) 72%, transparent) 0%,
+				color-mix(in srgb, var(--tj-color-theme-dark) 72%, transparent) 55%,
+				color-mix(in srgb, var(--tj-color-theme-dark) 88%, transparent) 100%
+			);
+		}
+	}
+	.tlhp-hero-overline {
+		margin-bottom: 18px;
+		color: var(--tlhp-accent);
+		font-size: var(--tlhp-text-overline);
+		font-weight: var(--tlhp-weight-overline);
+		line-height: 1.4;
+		letter-spacing: var(--tlhp-tracking-overline);
+		text-transform: uppercase;
+	}
+	.slider-content .slider-title .tlhp-hero-subtitle {
+		display: block;
+		margin-top: 16px;
+		color: var(--tlhp-accent);
+		font-size: 0.34em;
+		line-height: 1.4;
+		letter-spacing: 0.24em;
+		text-transform: uppercase;
+	}
+	// Post titles run long; three lines at most.
+	.slider-content .slider-title.tlhp-hero-post-title {
+		font-size: 60px;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		@media #{$xl, $lg} {
+			font-size: 52px;
+		}
+		@media #{$md} {
+			font-size: 46px;
+		}
+		@media #{$sm, $xs} {
+			font-size: 34px;
+		}
+	}
+	.slider-content .slider-desc {
+		display: -webkit-box;
+		-webkit-line-clamp: 4;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+	}
+	.swiper-slide .slider-content .tlhp-hero-overline {
+		opacity: 0;
+		visibility: hidden;
+		transform: translateY(20px);
+		transition-duration: 0.8s;
+	}
+	.swiper-slide.swiper-slide-active .slider-content .tlhp-hero-overline {
+		opacity: 1;
+		visibility: visible;
+		transform: translateY(0);
+		transition-delay: 0.8s;
+	}
+
+	// Bexon placed only the thumbnails here; the pause button joins them.
+	.tlhp-hero-bar {
+		--tlhp-thumb: 80px;
+		position: absolute;
+		z-index: 5;
+		inset-inline-start: 50%;
+		bottom: 60px;
+		transform: translateX(-50%);
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		width: 100%;
+		max-width: 1320px;
+		padding: 0 10px;
+		.hero-thumb {
+			position: static;
+			transform: none;
+			flex: 0 0 auto;
+			width: calc(var(--tlhp-thumbs) * var(--tlhp-thumb) + (var(--tlhp-thumbs) - 1) * 15px);
+			max-width: none;
+			margin: 0;
+			padding: 0;
+			.swiper-wrapper {
+				max-width: none;
+			}
+			// The gap Swiper puts in when it starts, there from the first paint (no shift).
+			.thumb-item {
+				margin-inline-end: 15px;
+			}
+		}
+		@media #{$xxl} {
+			padding-inline-start: 60px;
+		}
+		@media #{$xl} {
+			max-width: 1140px;
+			bottom: 100px;
+		}
+		@media #{$xl, $lg} {
+			--tlhp-thumb: 70px;
+		}
+		@media #{$lg} {
+			max-width: 960px;
+			bottom: 110px;
+		}
+		@media #{$md} {
+			max-width: 720px;
+		}
+		@media #{$md, $sm, $xs} {
+			--tlhp-thumb: 65px;
+		}
+		@media #{$sm} {
+			max-width: 540px;
+			bottom: 270px;
+		}
+		@media #{$xs} {
+			bottom: 270px;
+			padding: 0 15px;
+		}
+	}
+
+	.tlhp-circle-text {
+		width: 160px;
+		height: 160px;
+		overflow: visible;
+		text {
+			fill: var(--tj-color-common-white);
+			font-family: var(--tj-ff-heading);
+			font-size: 12px;
+			font-weight: var(--tj-fw-sbold);
+			letter-spacing: 0.06em;
+		}
+		@media #{$lg, $md, $sm, $xs} {
+			width: 130px;
+			height: 130px;
+		}
+	}
+}
+
+// The pause button on the dark hero and footer: a dark glass pill, readable over any picture.
+.tlhp-hero .tlhp-pause,
+.footer-marquee .tlhp-pause {
+	border-color: var(--tj-color-border-4);
+	background-color: color-mix(in srgb, var(--tj-color-theme-dark) 75%, transparent);
+	color: var(--tj-color-common-white);
+	backdrop-filter: blur(10px);
+	&:hover {
+		border-color: var(--tj-color-common-white);
+		background-color: var(--tj-color-common-white);
+		color: var(--tj-color-theme-dark);
+	}
+}
+
 /* !END: Slider CSS */

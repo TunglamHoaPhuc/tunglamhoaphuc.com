@@ -79,4 +79,65 @@ START: Theme Marquee CSS
 	}
 }
 
+// TLHP: Marquee.tsx, Bexon's sliding rows in CSS. The track holds the list twice and slides
+// by one copy, so the loop has no seam; it stops on the spot on hover, while focus is in
+// the row, or when paused.
+.tlhp-marquee {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	.tlhp-marquee-pause {
+		margin-top: 24px;
+	}
+}
+.tlhp-marquee-view {
+	align-self: stretch;
+	overflow: hidden;
+}
+.tlhp-marquee-track {
+	display: flex;
+	width: max-content;
+	animation: tlhp-marquee var(--tlhp-marquee-duration, 30s) linear infinite;
+}
+.tlhp-marquee-list {
+	display: flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: space-around;
+	// On very wide screens a copy shorter than the screen would leave a gap.
+	min-width: 100vw;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.tlhp-marquee-view:hover .tlhp-marquee-track,
+.tlhp-marquee-view:focus-within .tlhp-marquee-track,
+.tlhp-marquee.is-paused .tlhp-marquee-track {
+	animation-play-state: paused;
+}
+@keyframes tlhp-marquee {
+	to {
+		transform: translateX(-50%);
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.tlhp-marquee-track {
+		animation: none;
+	}
+}
+
+.footer-marquee {
+	position: relative;
+	.marquee-img {
+		display: block;
+	}
+	.tlhp-marquee-pause {
+		position: absolute;
+		inset-inline-end: 15px;
+		bottom: 12px;
+		margin: 0;
+	}
+}
+
 /* !END: Theme Marquee CSS */

@@ -1,37 +1,22 @@
-"use client";
-import { Autoplay } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/react";
+import Marquee from "./Marquee";
 
 /**
- * Bexon's endless line of large outlined words, each followed by a small picture.
+ * Bexon's endless line of large outlined words, each followed by a small picture. Pure
+ * decoration: screen readers skip it, the pause button stays reachable.
  * @param {{ items: { title: string, img: string }[] }} props
  */
 const MarqueeSlider1 = ({ items }) => {
 	return (
-		<Swiper
-			slidesPerView="auto"
-			spaceBetween={0}
-			freeMode={true}
-			centeredSlides={true}
-			loop={true}
-			speed={7000}
-			allowTouchMove={false}
-			autoplay={{
-				delay: 0,
-				disableOnInteraction: false,
-			}}
-			className="marquee-slider"
-			modules={[Autoplay]}
-		>
+		<Marquee what="chữ chạy cuối trang" seconds={16} viewClassName="marquee-slider" className="tlhp-marquee-slogan" decorative>
 			{items.map(({ img, title }, idx) => (
-				<SwiperSlide key={idx} className="marquee-item">
-					<h4 className="marquee-text">{title}</h4>
-					<div className="marquee-img">
-						<img src={img} alt="" />
-					</div>
-				</SwiperSlide>
+				<li key={idx} className="marquee-item">
+					<span className="marquee-text">{title}</span>
+					<span className="marquee-img">
+						<img src={img} alt="" loading="lazy" />
+					</span>
+				</li>
 			))}
-		</Swiper>
+		</Marquee>
 	);
 };
 

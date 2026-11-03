@@ -1,6 +1,6 @@
 // The query string of the public post lists (?danh-muc=&sap-xep=&trang=), read and written
 // in one place so links, the sort form and the page agree on it.
-import type { PostSort } from "@/libs/content/types";
+import type { PostSort, PostSummary } from "@/libs/content/types";
 
 export const SORTS: { param: string; sort: PostSort; label: string }[] = [
 	{ param: "moi-nhat", sort: "newest", label: "Mới nhất" },
@@ -48,6 +48,16 @@ export function listHref(path: string, state: ListState): string {
 	if (state.page > 1) query.set("trang", String(state.page));
 	const text = query.toString();
 	return text ? `${path}?${text}` : path;
+}
+
+/** A post's own page: /<section>/<slug>. */
+export function postHref(post: Pick<PostSummary, "section" | "slug">): string {
+	return `/${post.section}/${post.slug}`;
+}
+
+/** The list of a post's section filtered to its category, for the category chip. */
+export function categoryHref(post: Pick<PostSummary, "section" | "category">): string {
+	return listHref(`/${post.section}`, { category: post.category.slug, sort: DEFAULT_SORT, page: 1 });
 }
 
 /**

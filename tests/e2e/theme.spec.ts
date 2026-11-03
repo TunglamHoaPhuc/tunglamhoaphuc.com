@@ -15,13 +15,21 @@ test("Bexon surfaces and text use the TLHP palette", async ({ page }) => {
 			const el = document.querySelector(selector);
 			return el ? getComputedStyle(el)[prop] : `missing ${selector}`;
 		};
+		// A Bexon colour no home block uses since T10, read through a probe.
+		const variable = (name: string) => {
+			const probe = document.body.appendChild(document.createElement("div"));
+			probe.style.backgroundColor = `var(${name})`;
+			const value = getComputedStyle(probe).backgroundColor;
+			probe.remove();
+			return value;
+		};
 		return {
 			pageBackground: style("body", "backgroundColor"),
 			bodyText: style("body", "color"),
-			sectionTitle: style(".tj-pricing-section .sec-title", "color"),
-			alternateSection: style(".tj-pricing-section", "backgroundColor"),
+			sectionTitle: style(".tlhp-news .sec-title", "color"),
+			alternateSection: variable("--tj-color-theme-bg"),
 			primaryButton: style("header .header-button .tj-primary-btn", "backgroundColor"),
-			darkSection: style(".tj-service-section", "backgroundColor"),
+			darkSection: style(".tj-slider-item", "backgroundColor"),
 			footer: style("footer", "backgroundColor"),
 		};
 	});

@@ -590,4 +590,93 @@ TLHP post lists (T7, BRAND-GUIDELINES 5.2)
 	margin-bottom: 24px;
 }
 
+// TLHP home news (Blogs2): the two tabs and the pause button between the heading and the
+// slider, Bexon's wide cards with the TLHP text order, and a link to the whole list.
+.tlhp-news-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 30px;
+}
+.tlhp-news-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+.tlhp-news-tab {
+	display: inline-flex;
+	align-items: center;
+	gap: 10px;
+	min-height: 50px;
+	padding: 5px 22px 5px 6px;
+	border: 1px solid var(--tj-color-border-1);
+	border-radius: var(--tlhp-radius-pill);
+	background-color: var(--tj-color-common-white);
+	color: var(--tj-color-heading-primary);
+	font-weight: var(--tj-fw-sbold);
+	transition:
+		background-color 0.3s ease-in-out,
+		border-color 0.3s ease-in-out,
+		color 0.3s ease-in-out;
+	.tlhp-brand-icon {
+		width: 38px;
+		height: 38px;
+		img {
+			width: 26px;
+			height: 26px;
+		}
+	}
+	&:hover {
+		border-color: var(--tj-color-theme-primary);
+		color: var(--tj-color-theme-primary);
+	}
+	&[aria-selected="true"] {
+		border-color: var(--tj-color-theme-primary);
+		background-color: var(--tj-color-theme-primary);
+		color: var(--tlhp-primary-fg);
+	}
+}
+.tlhp-news-more {
+	margin-top: 40px;
+	text-align: center;
+}
+.blog-item.style-2.tlhp-news-card {
+	.blog-thumb > a {
+		display: block;
+		height: 100%;
+	}
+	.tlhp-post-card-noimage {
+		display: block;
+		height: 100%;
+		min-height: 240px;
+		background-color: var(--tj-color-theme-bg);
+	}
+	.blog-content {
+		gap: 16px;
+		.title {
+			margin-top: 14px;
+			font-size: var(--tlhp-text-h4);
+			line-height: var(--tlhp-leading-h4);
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 4;
+			line-clamp: 4;
+			overflow: hidden;
+		}
+		.text-btn {
+			margin-top: 0;
+		}
+	}
+	.tlhp-post-card-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px 16px;
+		margin: auto 0 0;
+		font-size: var(--tlhp-text-caption);
+		color: var(--tj-color-text-body-3);
+	}
+}
+
 /* !END: Blog CSS */

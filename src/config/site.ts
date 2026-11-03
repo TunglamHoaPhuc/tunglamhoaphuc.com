@@ -92,6 +92,33 @@ export const site = {
 	// Points to the registration notes on the schedule page until /dang-ky exists (T39).
 	register: { label: "Đăng ký khóa tu", href: "/lich-tu-hoc#khoa-tu" },
 
+	// Frame 1 of the home hero. The picture is "toàn cảnh chùa" from the Vũ Trụ Phật Giáo
+	// album (B2 04-vu-tru-phat-giao), resized into public/images/hero: 1920 and 1280 wide,
+	// an upright crop for phones and a small square for the thumbnail row.
+	hero: {
+		title: "Nơi để trở về",
+		accent: "trở về",
+		subtitle: "Chốn thiêng bình yên",
+		link: { label: "Tìm hiểu Bổn tự", href: "/gioi-thieu" },
+		image: {
+			src: "/images/hero/toan-canh-chua-1920.webp",
+			srcSet: "/images/hero/toan-canh-chua-1280.webp 1280w, /images/hero/toan-canh-chua-1920.webp 1920w",
+			portrait: "/images/hero/toan-canh-chua-doc-760.webp",
+			thumb: "/images/hero/toan-canh-chua-nho.webp",
+			position: "center 60%",
+		},
+	},
+
+	// The six ways in under the home hero, as on the old site's home page.
+	entrances: [
+		{ label: "Giới thiệu", href: "/gioi-thieu", image: "/brand/logo-tung-lam-hoa-phuc-tron-nga.webp" },
+		{ label: "Tông Chỉ Tu Học", href: "/tong-chi-tu-hoc", image: "/brand/icons/icon-tong-chi-tu-hoc.webp" },
+		{ label: "Dòng Chảy Hoằng Pháp", href: "/dong-chay-hoang-phap", image: "/brand/icons/icon-dong-chay-hoang-phap.webp" },
+		{ label: "Vũ Trụ Phật Giáo", href: "/vu-tru-phat-giao", image: "/brand/icons/icon-cac-khu-vuc-noi-bat.webp" },
+		{ label: "Bảo Tượng Phật Giáo", href: "/bao-tuong-phat-giao", image: "/brand/icons/icon-cac-bao-tuong-noi-bat.webp" },
+		{ label: "Trí Tuệ Phật Pháp", href: "/tri-tue-phat-phap", image: "/brand/icons/icon-tri-tue-phat-phap.webp" },
+	] as NavLink[],
+
 	nav: [
 		{
 			label: "Giới thiệu",

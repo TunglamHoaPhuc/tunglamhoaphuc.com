@@ -622,3 +622,18 @@ img {
 		}
 	}
 }
+
+// The temple's gold icons (public/brand/icons) sit on a round đen mun chip wherever they
+// appear: menu, ways in, tabs.
+.tlhp-brand-icon {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	background-color: var(--tj-color-theme-dark);
+	overflow: hidden;
+	img {
+		object-fit: contain;
+	}
+}

@@ -75,6 +75,29 @@ test.describe("reduced motion turns every effect off", () => {
 	});
 });
 
+// WCAG 2.2.2: whatever moves by itself has a pause button in its block. The Bexon sample
+// pages are left out until their tasks replace them.
+test.describe("self-moving content can be paused", () => {
+	for (const path of ["/", "/dong-chay-hoang-phap", "/dong-chay-hoang-phap/phap-hoi-huyet-bon-trai", "/khong-co-trang-nay"]) {
+		test(`${path} has a pause button by each slider and sliding row`, async ({ page }) => {
+			await settle(page, path);
+			const unpausable = await page.evaluate(() => {
+				const moving = [
+					...[...document.querySelectorAll<SliderElement>(".swiper")].filter((el) => el.swiper?.autoplay?.running),
+					...document.querySelectorAll<HTMLElement>(".tlhp-marquee-track"),
+				];
+				return moving
+					.filter((el) => {
+						const button = el.closest("section, .footer-marquee")?.querySelector(".tlhp-pause");
+						return !button || !button.getClientRects().length;
+					})
+					.map((el) => el.className);
+			});
+			expect(unpausable).toEqual([]);
+		});
+	}
+});
+
 test.describe("smooth scrolling keeps the page usable", () => {
 	test.skip(({ isMobile }) => isMobile, "keyboard and find-in-page are desktop interactions");
 
@@ -144,7 +167,8 @@ test.describe("smooth scrolling keeps the page usable", () => {
 
 	test("back-to-top returns to the top", async ({ page }) => {
 		await settle(page, "/");
-		await page.mouse.wheel(0, 3000);
+		// Short of the footer, where the button steps aside.
+		await page.mouse.wheel(0, 1500);
 		await page.waitForTimeout(1200);
 		await page.locator("#tj-back-to-top").click();
 		await page.waitForTimeout(2500);

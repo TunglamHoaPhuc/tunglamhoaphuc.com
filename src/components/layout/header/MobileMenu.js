@@ -44,7 +44,11 @@ const MobileMenu = ({ id, isOpen, onClose, showSearch = false }) => {
 							</div>
 							<div className="hamburger_close">
 								<button type="button" className="hamburger_close_btn" aria-label="Đóng menu" onClick={onClose}>
-									<i className="fa-thin fa-times" aria-hidden="true"></i>
+									{/* Drawn here: Font Awesome's thin × cost phones a 456 KB font at top priority. */}
+									<svg width="1em" height="1em" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+										<path d="M17 1L1 17" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+										<path d="M1 1L17 17" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+									</svg>
 								</button>
 							</div>
 						</div>
