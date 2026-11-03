@@ -151,6 +151,39 @@ export type AboutTopic = {
 	book: { title: string; author: string; cover: string | null; description: string } | null;
 };
 
+/** An article of Tông Chỉ Tu Học as lists show it: one teaching or practice of the temple. */
+export type TongChiSummary = {
+	id: string;
+	slug: string;
+	/** "Niệm Phật" (the editors write titles in capitals). */
+	title: string;
+	/** The title, with the subtitle where articles share it: "Lộ Trình Tu Học: Dành cho người trẻ". */
+	name: string;
+	subtitle: string;
+	/** One of the five groups, in the editors' order: "Phương Pháp Hành Trì". */
+	group: Category;
+	banner: MediaImage | null;
+	excerpt: string;
+};
+
+export type TongChiArticle = TongChiSummary & {
+	author: string;
+	/** The author's page on this site, when the editors linked one. */
+	authorHref: string | null;
+	/** YYYY-MM-DD. */
+	publishedDate: string;
+	views: number;
+	/** Sanitised HTML, safe to render as is. */
+	contentHtml: string;
+	video: (Video & { title: string; description: string }) | null;
+	/** An article the editors point to beside this one (on Trí Tuệ Phật Pháp). */
+	featured: { label: string; title: string; author: string; href: string | null } | null;
+	gallery: GalleryImage[];
+	/** The book the teaching comes from. */
+	book: { title: string; author: string; cover: string | null; description: string; href: string | null } | null;
+	keywords: Keyword[];
+};
+
 /** Read-only access to the temple's content, whatever the source. */
 export interface ContentRepository {
 	listPosts(query?: PostQuery): Promise<Page<PostSummary>>;
@@ -160,6 +193,10 @@ export interface ContentRepository {
 	getSchedule(): Promise<Schedule>;
 	/** Giới thiệu, in the editors' order. */
 	listAboutTopics(): Promise<AboutTopic[]>;
+	/** Tông Chỉ Tu Học, group by group in the editors' order. */
+	listTongChi(): Promise<TongChiSummary[]>;
+	/** `null` when no published article has this slug. */
+	getTongChi(slug: string): Promise<TongChiArticle | null>;
 }
 
 /** Something wrong or odd in the source data, for `npm run snapshot:check`. */
@@ -178,7 +215,9 @@ export type ContentIssue = {
 		| "moved-link"
 		| "empty-summary"
 		| "other-bucket"
-		| "about-mismatch";
+		| "about-mismatch"
+		| "tong-chi-draft"
+		| "unsaved-image";
 	id: string;
 	message: string;
 };

@@ -7,6 +7,7 @@ import { resolve } from "node:path";
 import { parsePosts } from "../src/libs/content/posts";
 import { parseAbout } from "../src/libs/content/about";
 import { parseSchedule } from "../src/libs/content/schedule";
+import { parseTongChi, tongChiArticle } from "../src/libs/content/tongChi";
 import { postsFileSchema } from "../src/libs/content/schema";
 import type { ContentIssue } from "../src/libs/content/types";
 
@@ -31,6 +32,8 @@ const ISSUE_TITLES: Record<ContentIssue["kind"], string> = {
 	"empty-summary": "Bài không có tóm tắt hoặc tóm tắt là chữ mẫu (tạm lấy đầu nội dung)",
 	"other-bucket": "Ảnh ở bucket B2 thứ hai (khi chép sang R2 phải chép cả bucket này)",
 	"about-mismatch": "Giới thiệu: tiêu đề và nội dung nói về hai người/việc khác nhau (Ban Biên Tập sửa trong admin cũ)",
+	"tong-chi-draft": "Tông Chỉ: nội dung còn là bản dặn dàn trang (đã bỏ các dòng ghi chú; Ban Biên Tập nên viết lại)",
+	"unsaved-image": "Ảnh WordPress chưa từng tải lên (đường dẫn soạn sẵn, trả 404; trang hiện như không có ảnh)",
 };
 const EXAMPLES = 5;
 
@@ -90,6 +93,24 @@ if (existsSync(aboutPath)) {
 	console.log(`
 gioi-thieu.json: ${topics.length} chủ đề (${perGroup}); ${mismatches ? `${mismatches} chủ đề lệch nội dung` : "tiêu đề và nội dung khớp nhau"}`);
 	issues = [...issues, ...aboutIssues];
+}
+
+// Tông Chỉ Tu Học, from npm run snapshot:fetch. Each body is converted as its page would
+// be, to report the designer's notes it still holds.
+const tongChiPath = resolve("data/snapshot/tong-chi.json");
+if (existsSync(tongChiPath)) {
+	const { entries, issues: tongChiIssues } = parseTongChi(JSON.parse(readFileSync(tongChiPath, "utf8")));
+	const groups = new Map<string, number>();
+	for (const entry of entries) groups.set(entry.group.name, (groups.get(entry.group.name) ?? 0) + 1);
+	const drafts: ContentIssue[] = [];
+	for (const entry of entries) {
+		const notes: string[] = [];
+		tongChiArticle(entry, entries, notes);
+		if (notes.length) drafts.push({ kind: "tong-chi-draft", id: entry.slug, message: `bỏ ${notes.length} dòng, vd "${notes.slice(0, 2).join('", "').slice(0, 90)}"` });
+	}
+	console.log(`
+tong-chi.json: ${entries.length} bài (${[...groups].map(([name, n]) => `${name}: ${n}`).join(", ")})`);
+	issues = [...issues, ...tongChiIssues, ...drafts];
 }
 
 // The schedule (lịch tu học), from npm run snapshot:fetch.

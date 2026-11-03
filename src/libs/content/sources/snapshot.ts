@@ -4,6 +4,7 @@
 import { type ParsedAbout, parseAbout } from "../about";
 import { type ParsedPosts, parsePosts, toGallery } from "../posts";
 import { type ParsedSchedule, parseSchedule } from "../schedule";
+import { type ParsedTongChi, parseTongChi } from "../tongChi";
 import { rawPostSchema } from "../schema";
 import type { GalleryImage } from "../types";
 
@@ -42,6 +43,11 @@ export async function loadSnapshotAlbums(): Promise<Map<string, GalleryImage[]>>
 /** gioi-thieu.json (Giới thiệu); no topics when the file is not there. */
 export async function loadSnapshotAbout(): Promise<ParsedAbout> {
 	return parseAbout((await readSnapshotFile("gioi-thieu")) ?? []);
+}
+
+/** tong-chi.json (Tông Chỉ Tu Học); no articles when the file is not there. */
+export async function loadSnapshotTongChi(): Promise<ParsedTongChi> {
+	return parseTongChi((await readSnapshotFile("tong-chi")) ?? []);
 }
 
 /** schedule.json (lịch tu học); an empty schedule when the file is not there. */

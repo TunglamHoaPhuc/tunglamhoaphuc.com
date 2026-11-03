@@ -77,3 +77,13 @@ export function isEmojiImage(url: string | null | undefined): boolean {
 export function isWordPressMedia(url: string | null | undefined): boolean {
 	return parse(mediaUrl(url))?.host === WORDPRESS_HOST;
 }
+
+/**
+ * WordPress uploads always sit in a year/month folder (…/uploads/2026/07/x.jpg). The Tông Chỉ
+ * editors typed addresses without one (…/uploads/niem-phat.jpg) for pictures still to come;
+ * none of those exist (22 of 22 answered 404 on 03/11/2026), so they count as no picture.
+ */
+export function isUnsavedUpload(url: string | null | undefined): boolean {
+	const parsed = parse(mediaUrl(url));
+	return !!parsed && parsed.host === WORDPRESS_HOST && /^\/wp-content\/uploads\/[^/]+$/.test(parsed.pathname);
+}
