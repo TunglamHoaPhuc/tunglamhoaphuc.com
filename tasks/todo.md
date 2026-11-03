@@ -713,14 +713,40 @@
 
 **File Bexon:** `sections/teams/TeamDetails1.js`, `sections/history/*`
 
+**Kết quả 03/11/2026:** xong, đã deploy `v2.`.
+- **Dữ liệu:**
+  - `npm run snapshot:fetch` lấy thêm `data/snapshot/gioi-thieu.json` từ `GET /api/admin/gioi-thieu`, API công khai mà site cũ đang gọi.
+  - Adapter `src/libs/content/about.ts` đọc 6 chủ đề trong 3 nhóm: Lịch Sử Chùa (1), Người Liên Quan (4), Thanh Quy & Văn Hóa (1). Repository có thêm `listAboutTopics()`.
+  - Mốc niên biểu lưu dạng chuỗi JSON ở 5 chủ đề, dạng mảng ở 1 chủ đề; JSON hỏng thì coi như không có mốc. Nội dung Markdown đi qua `renderContent` của T4. Ảnh trên domain `b1.congngheviet` gom về địa chỉ B2 như bài viết.
+- **Kiểm lệch nội dung:**
+  - `snapshot:check` so tên chủ thể trong tiêu đề (hai chữ cuối, bỏ dấu khi so) với 600 chữ đầu của tổng quan và nội dung. Nếu thiếu, báo rõ là nội dung đang nói về chủ đề nào khác.
+  - Unit test dựng lại đúng trường hợp cũ (tiêu đề Thích Tâm Hòa, nội dung Đại sư Liên Đăng) và bắt được.
+  - Dữ liệu hiện tại thì khớp: Ban Biên Tập đã sửa `su-phu-tru-tri`. Báo cáo ghi "tiêu đề và nội dung khớp nhau", và một unit test giữ điều đó trên dữ liệu thật.
+- **Trang `/gioi-thieu`** (server): lời dẫn của site cũ, rồi 3 nhóm, mỗi nhóm có tiêu đề làm neo (`#lich-su-chua`, `#nguoi-lien-quan`, `#thanh-quy-van-hoa`).
+  - Mỗi chủ đề là thẻ thành viên của Bexon: ảnh 3:4 có lớp phủ khi rê chuột, nhãn, tiêu đề, phụ đề.
+- **Trang `/gioi-thieu/[slug]`** (server, khuôn `TeamDetails1`, dựng thành phần TLHP mới nên trang mẫu `/team/[id]` của Bexon giữ nguyên):
+  - Chân dung 3:4, nhãn, phụ đề, tổng quan.
+  - Lời dạy (câu kệ, chữ `scripture`, tác giả) và tác phẩm (với Thầy Trụ trì: "Đi Qua Khổ Vui Cuộc Đời").
+  - Mốc niên biểu dùng dòng thời gian của Bexon nhưng là `<ol>`; số lớn chỉ để nhìn (`aria-hidden`). Nhãn mốc là tên giai đoạn ("Pháp Danh & Bổn Nguyện") thay cho năm, nên chữ nhỏ hơn và giữ trong phần của mình.
+  - Nội dung trong khung đọc của T8 (A−/A+, Giấy dó, Đêm thiền), album mở bằng lightbox của T9, các chủ đề cùng nhóm, tab neo như trang bài.
+  - `<title>` viết hoa đầu từ ("Tiểu Sử Sa Môn Thích Tâm Hòa – Giới thiệu – Tùng Lâm Hòa Phúc") vì tiêu đề trong dữ liệu viết hoa toàn bộ. Mô tả lấy phụ đề.
+  - Slug không có trả 404.
+- **Sửa menu:** ba mục con của Giới thiệu trỏ tới slug không có (`/gioi-thieu/lich-su-bon-tu`, `/chu-ton-duc`, `/thanh-quy`; site cũ cũng 404). Nay là `/gioi-thieu/lich-su-tung-lam-hoa-phuc`, `/gioi-thieu#nguoi-lien-quan` và `/gioi-thieu/van-hoa-ung-xu`.
+- **Chờ Ban Biên Tập** (ảnh trả 404 ngay trên B2, site cũ cũng vỡ): chân dung Sư Tổ (`tieu-su-hoa-thuong-ngo-chan-tu-1.jpg`, cũng là ảnh đầu của album) và ảnh thứ tư trong album của Sư ông Thanh Lương (`su-thanh-luong-8.jpg`). Nhóm "Người Liên Quan" có thể đổi tên thành "Chư Tôn Đức" cho khớp menu.
+
 **Tiêu chí nghiệm thu:**
-- [ ] 6 trang render phía server, mỗi trang có `<title>` và mô tả riêng
-- [ ] Báo cáo snapshot nêu rõ lệch nội dung `/gioi-thieu/su-phu-tru-tri` (tiêu đề Thích Tâm Hòa, nội dung Đại sư Liên Đăng) để Ban Biên Tập sửa trong admin cũ
-- [ ] Mốc niên biểu là danh sách có thứ tự (`<ol>`), đọc đúng bằng trình đọc màn hình
+- [x] 6 trang render phía server, mỗi trang có `<title>` và mô tả riêng
+- [x] Báo cáo snapshot nêu rõ lệch nội dung `/gioi-thieu/su-phu-tru-tri` (tiêu đề Thích Tâm Hòa, nội dung Đại sư Liên Đăng) để Ban Biên Tập sửa trong admin cũ: phép kiểm có, bắt được trường hợp này trong unit test; dữ liệu hiện tại đã được sửa nên báo cáo không còn nêu
+- [x] Mốc niên biểu là danh sách có thứ tự (`<ol>`), đọc đúng bằng trình đọc màn hình
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- gioi-thieu`
-- [ ] `npm run snapshot:check`
+- [x] `npm run test:e2e -- gioi-thieu` (8 test × 2 cỡ màn hình, có axe); hai trang được thêm vào test canh gác
+- [x] `npm run snapshot:check` (dòng `gioi-thieu.json: 6 chủ đề …; tiêu đề và nội dung khớp nhau`); unit 117 xanh
+- [x] Toàn bộ e2e (374 test, 24 bỏ qua theo thiết kế):
+  - Cục bộ 348/350, kèm 1 test chập chờn: test dịch bố cục của T10 (font chữ thay vào sau lần vẽ đầu khi máy chạy nặng; đã qua ở lần chạy lại).
+  - Test menu điện thoại của T5 hỏng ở cả lượt cục bộ này lẫn lượt trên `v2.` của T12. Nguyên nhân: test bấm nút trước khi trang chạy JavaScript. Test nay bấm lại nếu menu chưa mở.
+  - Trên `v2.` 349/350; test hỏng là `ERR_TIMED_OUT` khi mở `/blogs` (mạng), chạy lại xanh.
+- [x] Ảnh: `docs/anh/t13a-gioi-thieu.png`
 
 **Phụ thuộc:** T9
 

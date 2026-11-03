@@ -232,7 +232,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [ ] **Checkpoint B** – lát cắt đầu-cuối
 - [x] T11: Lịch tu học – dữ liệu, âm lịch, trang `/lich-tu-hoc`
 - [x] T12: Trang chủ – khóa tu sắp tới, Lời Thầy dạy và đếm ngày trên hero
-- [ ] T13a: Giới thiệu – trang chủ đề
+- [x] T13a: Giới thiệu – trang chủ đề
 - [ ] T13b: Trang chủ – Lời chào và Chư Tôn Đức
 - [ ] T14: Tông Chỉ Tu Học
 - [ ] **Checkpoint C** – trang chủ đủ khối chính
