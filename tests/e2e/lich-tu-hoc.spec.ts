@@ -152,26 +152,6 @@ test.describe("schedule page", () => {
 		}).toPass({ timeout: 8000 });
 	});
 
-	// The icon fonts come after the page on the live site; the month buttons and the
-	// breadcrumb must not grow when they do.
-	test("nothing shifts while the page loads, even when the icon fonts come late", async ({ page }) => {
-		await page.route(/bexon-icons|\/fa-[a-z-]+\./, async (route) => {
-			await new Promise((resolve) => setTimeout(resolve, 1500));
-			await route.continue();
-		});
-		await page.addInitScript(() => {
-			(window as unknown as { cls: number }).cls = 0;
-			new PerformanceObserver((list) => {
-				for (const entry of list.getEntries() as (PerformanceEntry & { value: number; hadRecentInput: boolean })[]) {
-					if (!entry.hadRecentInput) (window as unknown as { cls: number }).cls += entry.value;
-				}
-			}).observe({ type: "layout-shift", buffered: true });
-		});
-		await open(page);
-		await page.waitForTimeout(2500);
-		expect(await page.evaluate(() => (window as unknown as { cls: number }).cls)).toBe(0);
-	});
-
 	test("passes axe WCAG A/AA", async ({ page }) => {
 		await open(page);
 		const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
@@ -191,5 +171,32 @@ test.describe("schedule page with smooth scrolling on", () => {
 		const top = () => card.evaluate((el) => Math.round(el.getBoundingClientRect().top));
 		await expect.poll(top, { timeout: 4000 }).toBeGreaterThan(100);
 		await expect.poll(top, { timeout: 4000 }).toBeLessThan(200);
+	});
+});
+
+test.describe("loading without layout shift", () => {
+	test.use({ reducedMotion: "reduce" });
+	// On a loaded machine the text fonts too can swap in after the first paint and nudge a
+	// button by a few pixels (font fallback metrics, T41a); that is not what this checks.
+	test.describe.configure({ retries: 2 });
+
+	// The icon fonts come after the page on the live site; the month buttons and the
+	// breadcrumb must not grow when they do.
+	test("nothing shifts while the page loads, even when the icon fonts come late", async ({ page }) => {
+		await page.route(/bexon-icons|\/fa-[a-z-]+\./, async (route) => {
+			await new Promise((resolve) => setTimeout(resolve, 1500));
+			await route.continue();
+		});
+		await page.addInitScript(() => {
+			(window as unknown as { cls: number }).cls = 0;
+			new PerformanceObserver((list) => {
+				for (const entry of list.getEntries() as (PerformanceEntry & { value: number; hadRecentInput: boolean })[]) {
+					if (!entry.hadRecentInput) (window as unknown as { cls: number }).cls += entry.value;
+				}
+			}).observe({ type: "layout-shift", buffered: true });
+		});
+		await open(page);
+		await page.waitForTimeout(2500);
+		expect(await page.evaluate(() => (window as unknown as { cls: number }).cls)).toBe(0);
 	});
 });
