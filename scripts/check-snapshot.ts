@@ -1,7 +1,7 @@
 // npm run snapshot:check: reads data/snapshot/posts.json the way the site does and prints
 // what it found: posts per section and category, records it had to skip, and data oddities
 // worth fixing in the old admin. Exits 1 only when the file is missing or unreadable.
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parsePosts } from "../src/libs/content/posts";
 import { postsFileSchema } from "../src/libs/content/schema";
@@ -17,6 +17,7 @@ const ISSUE_TITLES: Record<ContentIssue["kind"], string> = {
 	invalid: "Bản ghi bị bỏ qua (sai cấu trúc)",
 	"missing-title": "Bài không có tiêu đề (tạm lấy dòng đầu nội dung)",
 	"duplicate-slug": "Trùng slug (bài sau không mở được)",
+	"encoded-slug": "Slug lưu sẵn dạng mã hóa, site cũ không mở được (site mới mở được)",
 	"duplicate-title": "Trùng tiêu đề trong cùng chuyên mục (có thể là bài lưu hai lần)",
 	"category-name": "Một chuyên mục, nhiều tên",
 	"emoji-image": "Ảnh biểu tượng cảm xúc Facebook đã bỏ",
@@ -38,8 +39,20 @@ try {
 	process.exit(1);
 }
 
-const { posts, issues, total } = parsePosts(file);
-console.log(`posts.json: ${total} bản ghi, ${posts.length} bài dùng được\n`);
+const parsed = parsePosts(file);
+const { posts, total } = parsed;
+let { issues } = parsed;
+console.log(`posts.json: ${total} bản ghi, ${posts.length} bài dùng được`);
+
+// Albums fetched apart (npm run snapshot:fetch -- --albums) no longer count as missing.
+const albumsPath = resolve("data/snapshot/post-albums.json");
+if (existsSync(albumsPath)) {
+	const albums = JSON.parse(readFileSync(albumsPath, "utf8")) as Record<string, unknown[]>;
+	const filled = issues.filter((issue) => issue.kind === "missing-album" && albums[issue.id]?.length).length;
+	issues = issues.filter((issue) => issue.kind !== "missing-album" || !albums[issue.id]?.length);
+	console.log(`post-albums.json: ${Object.keys(albums).length} album lấy riêng, bù cho ${filled} bài album trống`);
+}
+console.log();
 
 // Records per section as stored, before anything is skipped.
 const stored = new Map<string, number>();

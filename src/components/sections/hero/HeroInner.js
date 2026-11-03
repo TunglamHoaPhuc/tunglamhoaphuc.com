@@ -1,10 +1,14 @@
 import sliceText from "@/libs/sliceText";
 import Link from "next/link";
 import React from "react";
-const HeroInner = ({ title, text, breadcrums = [] }) => {
+/**
+ * Bexon's inner page banner: title, then the breadcrumb (Trang chủ › … › text).
+ * @param {{ title: string, text: string, breadcrums?: { name: string, path?: string }[], className?: string }} props
+ */
+const HeroInner = ({ title, text, breadcrums = [], className = "" }) => {
 	return (
 		<section
-			className="tj-page-header section-gap-x"
+			className={`tj-page-header section-gap-x ${className}`}
 			style={{ backgroundImage: `url('/images/bg/pheader-bg.webp')` }}
 		>
 			<div className="container">

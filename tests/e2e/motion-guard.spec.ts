@@ -1,7 +1,18 @@
 import { expect, test, type Page } from "@playwright/test";
 
 // Pages kept from the Bexon template, the 404 page and the TLHP pages. Every new route should be added here.
-const PAGES = ["/", "/blogs", "/services", "/portfolios", "/team", "/contact", "/styleguide", "/khong-co-trang-nay", "/dong-chay-hoang-phap"];
+const PAGES = [
+	"/",
+	"/blogs",
+	"/services",
+	"/portfolios",
+	"/team",
+	"/contact",
+	"/styleguide",
+	"/khong-co-trang-nay",
+	"/dong-chay-hoang-phap",
+	"/dong-chay-hoang-phap/phap-hoi-huyet-bon-trai",
+];
 
 type SliderElement = HTMLElement & { swiper?: { autoplay?: { running?: boolean } } };
 

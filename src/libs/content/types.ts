@@ -6,6 +6,9 @@ export type MediaImage = { src: string; position: string };
 
 export type GalleryImage = { src: string; title: string; caption: string };
 
+/** A YouTube video linked from a post. */
+export type Video = { id: string; url: string };
+
 /** Glossary entry shown beside an article ("Địa Tạng Bồ Tát" → who that is). */
 export type Keyword = { keyword: string; title: string; description: string };
 
@@ -34,10 +37,13 @@ export type PostSummary = {
 
 export type Post = PostSummary & {
 	banner: MediaImage | null;
+	/** The summary when it says something of its own; empty when it only repeats the opening lines. */
+	intro: string;
 	/** Sanitised HTML, safe to render as is. */
 	contentHtml: string;
 	keywords: Keyword[];
 	gallery: GalleryImage[];
+	videos: Video[];
 };
 
 export type PostSort = "newest" | "oldest" | "az" | "za";
@@ -74,6 +80,7 @@ export type ContentIssue = {
 		| "missing-title"
 		| "duplicate-slug"
 		| "duplicate-title"
+		| "encoded-slug"
 		| "category-name"
 		| "emoji-image"
 		| "missing-album"

@@ -2,7 +2,7 @@
 import { isEmojiImage, isWordPressMedia, mediaUrl } from "./media";
 import { type ContentNote, cleanText, renderContent, toIsoDate } from "./normalize";
 import { postsFileSchema, type RawPost, rawPostSchema } from "./schema";
-import type { ContentIssue, GalleryImage, MediaImage, Post } from "./types";
+import type { ContentIssue, GalleryImage, MediaImage, Post, Video } from "./types";
 
 const DEFAULT_POSITION = "center 50%";
 
@@ -29,6 +29,15 @@ function titleFromText(raw: RawPost): string {
 	return `${sentence.slice(0, TITLE_MAX).replace(/\s+\S*$/, "")}…`;
 }
 
+// Letters and digits only, to compare texts whatever their quotes, marks and line breaks.
+const letters = (text: string) => cleanText(text).toLocaleLowerCase("vi").replace(/[^\p{L}\p{N}]+/gu, "");
+
+/** Most summaries are the first lines of the text again; an article page shows those once. */
+function repeatsOpening(summary: string, content: string): boolean {
+	const start = letters(summary.replace(/(\.{3}|…)\s*$/, "")).slice(0, 60);
+	return !!start && letters(content).startsWith(start);
+}
+
 const SUMMARY_MAX = 220;
 // What the old admin's form pre-fills, saved as is in a few posts.
 const PLACEHOLDER_SUMMARY = /^tóm tắt( nội dung)? bài viết\s*(\.{3}|…)?$/i;
@@ -49,17 +58,37 @@ function summaryFromText(raw: RawPost): string {
 	return `${text.slice(0, SUMMARY_MAX).replace(/\s+\S*$/, "")}…`;
 }
 
-function toPost(raw: RawPost, publishedDate: string, categoryName: string, issues: ContentIssue[]): Post {
-	const notes: ContentNote[] = [];
+type RawPhoto = RawPost["photoGallery"][number];
+
+/** An album from the old admin: Facebook emoji dropped, addresses through mediaUrl(). */
+export function toGallery(photos: RawPhoto[]): { gallery: GalleryImage[]; emoji: number } {
 	const gallery: GalleryImage[] = [];
 	let emoji = 0;
-	for (const photo of raw.photoGallery) {
+	for (const photo of photos) {
 		if (isEmojiImage(photo.imageUrl)) {
 			emoji++;
 			continue;
 		}
 		const src = mediaUrl(photo.imageUrl);
 		if (src) gallery.push({ src, title: plain(photo.title), caption: plain(photo.caption) });
+	}
+	return { gallery, emoji };
+}
+
+// youtu.be/ID, youtube.com/watch?v=ID, /embed/ID, /shorts/ID
+const YOUTUBE = /https?:\/\/(?:www\.|m\.)?(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:\S*&)?v=|embed\/|shorts\/))([\w-]{11})/g;
+
+function videosOf(content: string): Video[] {
+	const ids = [...new Set([...content.matchAll(YOUTUBE)].map((match) => match[1]))];
+	return ids.map((id) => ({ id, url: `https://www.youtube.com/watch?v=${id}` }));
+}
+
+function toPost(raw: RawPost, publishedDate: string, categoryName: string, issues: ContentIssue[]): Post {
+	const notes: ContentNote[] = [];
+	const { gallery, emoji: albumEmoji } = toGallery(raw.photoGallery);
+	let emoji = albumEmoji;
+	if (raw.slug.includes("%")) {
+		issues.push({ kind: "encoded-slug", id: raw.id, message: `slug lưu sẵn dạng mã hóa (biểu tượng cảm xúc), API site cũ không mở được: ${raw.slug.slice(0, 60)}` });
 	}
 
 	const contentHtml = renderContent(raw.content, notes);
@@ -77,9 +106,11 @@ function toPost(raw: RawPost, publishedDate: string, categoryName: string, issue
 		issues.push({ kind: "gallery-count", id: raw.id, message: `galleryCount ${raw.galleryCount}, album có ${raw.photoGallery.length} ảnh` });
 	}
 	let summary = plain(raw.summary);
+	let ownSummary = true;
 	if (!summary || PLACEHOLDER_SUMMARY.test(summary)) {
 		issues.push({ kind: "empty-summary", id: raw.id, message: summary ? `tóm tắt là chữ mẫu "${summary}"` : "không có tóm tắt" });
 		summary = summaryFromText(raw);
+		ownSummary = false;
 	}
 
 	return {
@@ -95,8 +126,11 @@ function toPost(raw: RawPost, publishedDate: string, categoryName: string, issue
 		thumbnail: image(raw.thumbnailUrl, raw.thumbnailPosition) ?? image(raw.bannerUrl, raw.bannerPosition),
 		banner: image(raw.bannerUrl, raw.bannerPosition) ?? image(raw.thumbnailUrl, raw.thumbnailPosition),
 		summary,
-		galleryCount: gallery.length,
+		intro: ownSummary && !repeatsOpening(summary, raw.content) ? summary : "",
+		// An album kept apart (post-albums.json) still counts, so lists can say it has photos.
+		galleryCount: gallery.length || (raw.galleryCount ?? 0),
 		contentHtml,
+		videos: videosOf(raw.content),
 		keywords: raw.keywords
 			.map((keyword) => ({ keyword: plain(keyword.keyword), title: plain(keyword.title), description: plain(keyword.description) }))
 			.filter((keyword) => keyword.keyword),
