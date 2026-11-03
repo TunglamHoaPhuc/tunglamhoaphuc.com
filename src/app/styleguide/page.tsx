@@ -63,7 +63,16 @@ const SAMPLE_POST: PostSummary = {
 	galleryCount: 0,
 };
 const SAMPLE_MEMBER = { id: 1, name: "Thầy Thích Ấn Định", desig: "Trụ trì", img: "/images/team/team-1.webp" };
-const SAMPLE_SERVICE = { id: 1, title: "Khóa tu một ngày an lạc", iconName: "tji-service-1" };
+const SAMPLE_GROUP = {
+	slug: "phuong-phap-hanh-tri",
+	name: "Phương Pháp Hành Trì",
+	line: "Lấy các pháp môn hành trì làm phương tiện chuyển hóa.",
+	icon: "tji-service-3",
+	articles: [
+		{ id: "1", slug: "niem-phat-phuong-phap-tro-hanh", title: "Niệm Phật", name: "Niệm Phật", subtitle: "Lục tự cứu cánh", group: { slug: "phuong-phap-hanh-tri", name: "Phương Pháp Hành Trì" }, banner: null, excerpt: "" },
+		{ id: "2", slug: "thien-tap-tinh-lang-tu-than", title: "Thiền Tập", name: "Thiền Tập", subtitle: "Thanh tịnh giải thoát", group: { slug: "phuong-phap-hanh-tri", name: "Phương Pháp Hành Trì" }, banner: null, excerpt: "" },
+	],
+};
 
 const swatchStyle = (variable: string): CSSProperties => ({
 	background: `var(${variable})`,
@@ -206,7 +215,7 @@ export default async function StyleguidePage() {
 					</div>
 					<div className="tj-service-section service-2 mt-5 p-0">
 						<div className="service-wrapper-2">
-							<ServiceCard2 service={SAMPLE_SERVICE} idx={0} lastItem={false} />
+							<ServiceCard2 group={SAMPLE_GROUP} />
 						</div>
 					</div>
 				</Block>

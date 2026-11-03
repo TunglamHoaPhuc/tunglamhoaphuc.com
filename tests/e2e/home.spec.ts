@@ -80,13 +80,15 @@ test.describe("home page content", () => {
 			'id="loi-vao"',
 			'class="tj-blog-section-2',
 			'aria-labelledby="loi-chao"',
+			'aria-labelledby="tong-chi-tieu-de"',
+			'aria-labelledby="lo-trinh-tieu-de"',
 			'id="loi-thay-day"',
 			'aria-labelledby="chu-ton-duc"',
 		].map((marker) => html.indexOf(marker));
 		expect(order.every((at) => at > 0)).toBe(true);
 		expect([...order].sort((a, b) => a - b)).toEqual(order);
-		// Bexon's sample blocks wait for their tasks (T14, T15); its texts are gone.
-		expect(html).not.toMatch(/Leading Future|Our Pricing|Hear from Our|Get to Know Us|happy customer|People Behind|Meet Our Team/);
+		// Bexon's sample blocks wait for their tasks (T15); its texts are gone.
+		expect(html).not.toMatch(/Leading Future|Our Pricing|Hear from Our|Get to Know Us|happy customer|People Behind|Meet Our Team|Our Solutions|Our Process|Seamless Process/);
 	});
 
 	// The countdowns follow the day: a copy kept from the first visit (vinext caches pages it
@@ -265,6 +267,18 @@ test.describe("home page content", () => {
 			expect((await request.get(`/gioi-thieu/${topic.slug}`)).status(), topic.slug).toBe(200);
 		}
 		await expect(block.getByRole("link", { name: "Xem thêm về Bổn tự" })).toHaveAttribute("href", "/gioi-thieu");
+	});
+
+	test("Tông Chỉ shows its five groups, and Lộ trình tu học its steps, each leading to its article", async ({ page }) => {
+		await open(page);
+		const groups = page.locator(".tlhp-tong-chi .service-wrapper-2 > li");
+		await expect(groups).toHaveCount(5);
+		await expect(page.locator(".tlhp-tong-chi .list-items a")).toHaveCount(25);
+		await expect(page.locator(".tlhp-tong-chi").getByRole("link", { name: "Xem Tông Chỉ Tu Học" })).toHaveAttribute("href", "/tong-chi-tu-hoc");
+		const steps = page.locator(".tlhp-paths ol > li");
+		await expect(steps).toHaveCount(4);
+		await expect(steps.locator("h3 a")).toHaveText(["Dành cho người mới bắt đầu", "Dành cho người trẻ", "Dành cho người bận rộn", "Dành cho người chuyên tu"]);
+		await expect(steps.first().locator("h3 a")).toHaveAttribute("href", "/tong-chi-tu-hoc/lo-trinh-tu-hoc-nguoi-moi-bat-dau");
 	});
 
 	test("passes axe WCAG A/AA on both tabs", async ({ page }) => {

@@ -232,3 +232,36 @@ START: Working process CSS
 }
 
 /* !END: Working process CSS */
+
+// TLHP Lộ trình tu học (T14): four steps, in a row from 1200px and one under another below,
+// where the arrow between them turns down as Bexon's does on tablets.
+.tlhp-paths {
+	.working-process-area {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	.process-item {
+		.title a {
+			color: inherit;
+			&:hover,
+			&:focus-visible {
+				color: var(--tj-color-theme-primary);
+			}
+		}
+		@media (min-width: 1200px) {
+			flex: 1 1 0;
+			max-width: none;
+		}
+		@media (max-width: 1199px) {
+			max-width: 100%;
+			&:not(:last-child)::after {
+				transform: translate(-50%, 0) rotate(90deg);
+				top: inherit;
+				inset-inline-end: inherit;
+				bottom: -40px;
+				inset-inline-start: 50%;
+			}
+		}
+	}
+}

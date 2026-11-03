@@ -5,6 +5,8 @@ import Blogs2 from "@/components/sections/blogs/Blogs2";
 import Brands2 from "@/components/sections/brands/Brands2";
 import Hero2 from "@/components/sections/hero/Hero2";
 import PricingPlan from "@/components/sections/pricing-plan/PricingPlan";
+import Process from "@/components/sections/process/Process";
+import Services2 from "@/components/sections/services/Services2";
 import Team1 from "@/components/sections/teams/Team1";
 import Testimonials2 from "@/components/sections/testimonials/Testimonials2";
 import { site } from "@/config/site";
@@ -31,7 +33,9 @@ const BLOCKS: Block[] = [
 	{ id: "khoa-tu", render: (data) => <PricingPlan events={data.upcoming} /> },
 	{ id: "tin-tuc", render: (data) => <Blogs2 latest={data.latest} popular={data.popular} /> },
 	{ id: "loi-chao", render: (data) => <About2 welcome={data.welcome} /> },
-	// T14: Tông Chỉ Tu Học (Services2) · T15: khu vực nổi bật (Portfolios2) · T14: lộ trình tu học (Process)
+	{ id: "tong-chi", render: (data) => <Services2 groups={data.tongChi} /> },
+	// T15: khu vực nổi bật (Portfolios2)
+	{ id: "lo-trinh", render: (data) => <Process group={data.paths ?? undefined} /> },
 	{ id: "loi-thay-day", render: (data) => <Testimonials2 verses={data.verses} /> },
 	{ id: "chu-ton-duc", render: (data) => <Team1 members={data.teachers} /> },
 ];

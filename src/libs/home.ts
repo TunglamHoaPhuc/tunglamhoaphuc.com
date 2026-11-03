@@ -1,12 +1,14 @@
 // What the home page shows, read from the content layer on the server and handed to the
 // Bexon sections as props.
 import { site } from "@/config/site";
+import { tongChi } from "@/config/tongChi";
 import { calendarHref, type EventStatus, eventStatus, lunarRange, solarRange, todayInVietnam } from "@/libs/calendar";
 import type { AboutTopic, ContentRepository, MediaImage, MonthTheme, PostSummary, ScheduleEvent } from "@/libs/content/types";
 import { countdownLabel, daysUntil } from "@/libs/countdown";
 import { formatDate } from "@/libs/format";
 import { buddhistYear } from "@/libs/lunar";
 import { postHref } from "@/libs/postList";
+import { groupTongChi, type TongChiGroup } from "@/libs/tongChiGroups";
 
 /** Sections whose post pages are built; home lists take posts from these only (T14, T17 add theirs). */
 export const LIVE_SECTIONS = ["dong-chay-hoang-phap"];
@@ -79,6 +81,10 @@ export type HomeData = {
 	welcome: Welcome | null;
 	/** Chư Tôn Đức: the teachers' topics of Giới thiệu. */
 	teachers: AboutTopic[];
+	/** Tông Chỉ Tu Học in its five groups. */
+	tongChi: TongChiGroup[];
+	/** Lộ trình tu học: the group of that name, shown again as steps. */
+	paths: TongChiGroup | null;
 };
 
 // Groups of Giới thiệu the home page draws on.
@@ -172,13 +178,14 @@ function welcomeFrom(topics: AboutTopic[], teachers: AboutTopic[], stats: HomeSt
 }
 
 export async function loadHomeData(repo: ContentRepository, now = new Date()): Promise<HomeData> {
-	const [newest, mostRead, schedule, topics, dongChay, triTue] = await Promise.all([
+	const [newest, mostRead, schedule, topics, dongChay, triTue, tongChiArticles] = await Promise.all([
 		repo.listPosts({ section: LIVE_SECTIONS, sort: "newest", pageSize: NEWS_COUNT * 2 }),
 		repo.listPosts({ section: LIVE_SECTIONS, sort: "views", pageSize: NEWS_COUNT * 4 }),
 		repo.getSchedule(),
 		repo.listAboutTopics(),
 		repo.listPosts({ section: "dong-chay-hoang-phap", pageSize: 1 }),
 		repo.listPosts({ section: "tri-tue-phat-phap", pageSize: 1 }),
+		repo.listTongChi(),
 	]);
 	const latest = uniqueTitles(newest.items).slice(0, NEWS_COUNT);
 	const read = mostRead.items.filter((post) => post.views > 0);
@@ -194,6 +201,7 @@ export async function loadHomeData(repo: ContentRepository, now = new Date()): P
 		(slide): slide is HeroSlide => slide !== null,
 	);
 	const teachers = topics.filter((topic) => topic.group.slug === TEACHERS_GROUP);
+	const groups = groupTongChi(tongChiArticles);
 	const stats: HomeStat[] = [
 		{ label: "Bài viết Dòng Chảy Hoằng Pháp", value: dongChay.total },
 		{ label: "Bài giảng, pháp âm, ấn phẩm Trí Tuệ Phật Pháp", value: triTue.total },
@@ -207,5 +215,7 @@ export async function loadHomeData(repo: ContentRepository, now = new Date()): P
 		verses: versesFrom(schedule.themes, Number(today.slice(5, 7))),
 		welcome: welcomeFrom(topics, teachers, stats),
 		teachers,
+		tongChi: groups,
+		paths: groups.find((group) => group.slug === tongChi.paths.group) ?? null,
 	};
 }

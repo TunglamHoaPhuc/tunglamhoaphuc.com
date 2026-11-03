@@ -1,46 +1,35 @@
-"use client";
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import ProcessCard from "@/components/shared/cards/ProcessCard";
+import { tongChi } from "@/config/tongChi";
+import { nameInGroup, tongChiHref } from "@/libs/tongChiGroups";
 
-const Process = () => {
-	const process = [
-		{
-			id: 1,
-			title: "Discovery & Planning",
-			desc: "The first step in our process is understanding your unique business needs,  objectives, and our cutomes challenges.",
-		},
-		{
-			id: 2,
-			title: "Execution & Delivery",
-			desc: "Once the plan is in place, our team moves forward with execution, turning strategies into actiony to deliver.",
-		},
-		{
-			id: 3,
-			title: "Review & Support",
-			desc: "After project completion, we conduct a thorough review to ensure everything aligns with your goals and requirements.",
-		},
-	];
+/**
+ * Bexon's process as Lộ trình tu học (plan.md, home block 8): the articles of the lộ trình
+ * group as numbered steps (người mới bắt đầu, người trẻ, người bận rộn, người chuyên tu).
+ * @param {{ group: import("@/libs/tongChiGroups").TongChiGroup | undefined }} props
+ */
+const Process = ({ group }) => {
+	if (!group?.articles.length) return null;
 	return (
-		<section className="tj-working-process section-gap section-gap-x">
+		<section className="tj-working-process section-gap section-gap-x tlhp-paths" aria-labelledby="lo-trinh-tieu-de">
 			<div className="container">
 				<div className="row">
 					<div className="col-12">
 						<div className="sec-heading-wrap">
 							<span className="sub-title wow fadeInUp" data-wow-delay=".3s">
-								Our Process
+								{group.name}
 							</span>
 							<div className="heading-wrap-content">
 								<div className="sec-heading style-2">
-									<h2 className="sec-title text-anim">
-										Seamless Process, Great <span>Results.</span>
+									<h2 id="lo-trinh-tieu-de" className="sec-title text-anim">
+										Lộ trình <span>tu học.</span>
 									</h2>
 								</div>
 								<p className="desc wow fadeInUp" data-wow-delay=".5s">
-									Developing personalized customer journeys to increase
-									satisfaction and loyalty.
+									{tongChi.paths.line}
 								</p>
 								<div className="btn-wrap wow fadeInUp" data-wow-delay=".6s">
-									<ButtonPrimary text={"Request a Call"} url={"/contact"} />
+									<ButtonPrimary text="Xem các lộ trình" url={`${tongChi.path}#${group.slug}`} />
 								</div>
 							</div>
 						</div>
@@ -48,25 +37,19 @@ const Process = () => {
 				</div>
 				<div className="row">
 					<div className="col-12">
-						<div className="working-process-area">
-							{process?.length
-								? process?.map((processSingle, idx) => (
-										<ProcessCard
-											key={idx}
-											processSingle={processSingle}
-											idx={idx}
-										/>
-								  ))
-								: ""}
-						</div>
+						<ol className="working-process-area">
+							{group.articles.map((article, idx) => (
+								<ProcessCard key={article.id} step={{ title: nameInGroup(article), desc: article.excerpt, href: tongChiHref(article.slug) }} idx={idx} />
+							))}
+						</ol>
 					</div>
 				</div>
 			</div>
-			<div className="bg-shape-1">
-				<img src="/images/shape/pattern-2.svg" alt="" />
+			<div className="bg-shape-1" aria-hidden="true">
+				<img src="/images/shape/pattern-2.svg" alt="" loading="lazy" />
 			</div>
-			<div className="bg-shape-2">
-				<img src="/images/shape/pattern-3.svg" alt="" />
+			<div className="bg-shape-2" aria-hidden="true">
+				<img src="/images/shape/pattern-3.svg" alt="" loading="lazy" />
 			</div>
 		</section>
 	);

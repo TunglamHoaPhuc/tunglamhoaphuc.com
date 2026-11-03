@@ -1,34 +1,32 @@
 import Link from "next/link";
+import { nameInGroup, tongChiHref } from "@/libs/tongChiGroups";
 
-const ServiceCard2 = ({ service, idx, lastItem }) => {
-	const { title, desc, id, totalProject, img, svg, iconName } = service || {};
-
+/**
+ * Bexon's dark service card as one group of Tông Chỉ Tu Học: its icon, name and line, and
+ * its articles as links. It slides in from the right while scrolled past
+ * (tj-fadein-right-on-scroll; off under reduced motion).
+ * @param {{ group: import("@/libs/tongChiGroups").TongChiGroup, headingLevel?: "h3" | "h2" }} props
+ */
+const ServiceCard2 = ({ group, headingLevel: Heading = "h3" }) => {
+	const { name, line, icon, articles } = group;
 	return (
 		<div className="service-item-wrapper tj-fadein-right-on-scroll">
-			<div className="service-item style-2 ">
+			<div className="service-item style-2">
 				<div className="title-area">
-					<div className="service-icon">
-						<i className={iconName ? iconName : "tji-service-1"}></i>
+					<div className="service-icon" aria-hidden="true">
+						<i className={icon}></i>
 					</div>
-					<h4 className="title">
-						<Link href={`/services/${id}`}>{title}</Link>
-					</h4>
+					<Heading className="title h4">{name}</Heading>
 				</div>
 				<div className="service-content">
-					<p className="desc">
-						Through a combination of data-driven insights and innovative
-						approaches, we work closely with you to develop customized.
-					</p>
+					{line ? <p className="desc">{line}</p> : null}
 					<ul className="list-items">
-						<li>
-							<i className="tji-list"></i>Expansion Strategies
-						</li>
-						<li>
-							<i className="tji-list"></i>Operational Efficiency
-						</li>
-						<li>
-							<i className="tji-list"></i>Competitive Edge
-						</li>
+						{articles.map((article) => (
+							<li key={article.id}>
+								<i className="tji-list" aria-hidden="true"></i>
+								<Link href={tongChiHref(article.slug)}>{nameInGroup(article)}</Link>
+							</li>
+						))}
 					</ul>
 				</div>
 			</div>
