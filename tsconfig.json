@@ -17,6 +17,6 @@
 			"@/*": ["./src/*"]
 		}
 	},
-	"include": ["src", "tests", "*.ts", ".cloudflare/types/**/*.ts"],
+	"include": ["src", "tests", "scripts", "*.ts", ".cloudflare/types/**/*.ts"],
 	"exclude": ["node_modules", "reference", "workers", "dist", ".cloudflare/output"]
 }

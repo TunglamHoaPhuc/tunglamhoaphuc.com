@@ -10,7 +10,9 @@
 		"lint": "eslint .",
 		"typecheck": "tsc --noEmit",
 		"test": "vitest run",
-		"test:e2e": "playwright test"
+		"test:e2e": "playwright test",
+		"snapshot:check": "tsx scripts/check-snapshot.ts",
+		"snapshot:fetch": "tsx scripts/fetch-snapshot.ts"
 	},
 	"browserslist": [
 		">0.3%",
@@ -33,7 +35,8 @@
 		"react-server-dom-webpack": "^19.3.1",
 		"swiper": "^11.2.10",
 		"vinext": "^1.4.1",
-		"wow.js": "^1.2.2"
+		"wow.js": "^1.2.2",
+		"zod": "^4.6.7"
 	},
 	"devDependencies": {
 		"@axe-core/playwright": "^4.14.0",
@@ -49,6 +52,7 @@
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"globals": "^17.14.0",
 		"sass": "^1.94.2",
+		"tsx": "^4.23.15",
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.72.1",
 		"vite": "^8.3.0",
