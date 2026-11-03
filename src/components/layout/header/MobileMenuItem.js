@@ -1,5 +1,5 @@
 "use client";
-import { isCurrentLink } from "@/libs/nav";
+import { ariaCurrent, isCurrentLink } from "@/libs/nav";
 import Link from "next/link";
 import { useId, useState } from "react";
 
@@ -25,7 +25,7 @@ const MobileMenuItem = ({ item, isCurrent, pathname }) => {
 			<ul id={panelId} className="sub-menu" hidden={!isOpen}>
 				{item.children.map((child) => (
 					<li key={child.href} className={isCurrentLink(pathname, child) ? "current-menu-item" : ""}>
-						<Link href={child.href} aria-current={isCurrentLink(pathname, child) ? "page" : undefined}>
+						<Link href={child.href} aria-current={ariaCurrent(pathname, child)}>
 							{child.label}
 						</Link>
 					</li>

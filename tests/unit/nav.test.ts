@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { formatPhone, site } from "@/config/site";
-import { isCurrentItem, isCurrentLink } from "@/libs/nav";
+import { ariaCurrent, isCurrentItem, isCurrentLink } from "@/libs/nav";
 
 describe("isCurrentLink", () => {
 	it("matches the page and the pages below it", () => {
@@ -42,5 +42,15 @@ describe("site config", () => {
 
 	it("formats numbers the way the temple writes them", () => {
 		expect(formatPhone("0979345373")).toBe("0979.345.373");
+	});
+});
+
+describe("ariaCurrent", () => {
+	const link = { label: "Dòng Chảy Hoằng Pháp", href: "/dong-chay-hoang-phap" };
+
+	it("says page on the page itself and true on a page below it", () => {
+		expect(ariaCurrent("/dong-chay-hoang-phap", link)).toBe("page");
+		expect(ariaCurrent("/dong-chay-hoang-phap/phap-hoi", link)).toBe("true");
+		expect(ariaCurrent("/lich-tu-hoc", link)).toBeUndefined();
 	});
 });

@@ -88,3 +88,7 @@ START: Back to top CSS
 	border: 0;
 	color: inherit;
 }
+// The scroll percentage, kept out of the button's text (BackToTop.js).
+#tj-back-to-top-percentage[data-value]::after {
+	content: attr(data-value);
+}

@@ -64,12 +64,14 @@ const BackToTop = () => {
 				background: `conic-gradient(var(--tj-color-theme-primary) ${scrollValue}%, var(--tj-color-common-white) ${scrollValue}%)`,
 			}}
 		>
-			<span id="tj-back-to-top-percentage" aria-hidden="true">
-				{scrollValue < 96 ? (
-					`${scrollValue}%`
-				) : (
-					<i className="tji-arrow-up-long"></i>
-				)}
+			{/* The percentage is drawn by CSS (data-value), not written as text: the button's
+			    name is "Về đầu trang", and visible text would have to be part of it. */}
+			<span
+				id="tj-back-to-top-percentage"
+				aria-hidden="true"
+				data-value={scrollValue < 96 ? `${scrollValue}%` : undefined}
+			>
+				{scrollValue < 96 ? null : <i className="tji-arrow-up-long"></i>}
 			</span>
 		</button>
 	);

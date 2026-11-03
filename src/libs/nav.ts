@@ -14,3 +14,9 @@ export function isCurrentLink(pathname: string, link: NavLink): boolean {
 export function isCurrentItem(pathname: string, item: NavItem): boolean {
 	return isCurrentLink(pathname, item) || (item.children ?? []).some((child) => isCurrentLink(pathname, child));
 }
+
+/** aria-current for a menu link: "page" on the page itself, "true" on a page below it. */
+export function ariaCurrent(pathname: string, link: NavLink): "page" | "true" | undefined {
+	if (!isCurrentLink(pathname, link)) return undefined;
+	return pathname === link.href ? "page" : "true";
+}

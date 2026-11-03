@@ -1,6 +1,6 @@
 "use client";
 import { site } from "@/config/site";
-import { isCurrentItem, isCurrentLink } from "@/libs/nav";
+import { ariaCurrent, isCurrentItem, isCurrentLink } from "@/libs/nav";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
@@ -40,7 +40,7 @@ const Navbar = () => {
 						if (!item.children) {
 							return (
 								<li key={item.href} className={isCurrent ? "current-menu-ancestor" : ""}>
-									<Link href={item.href} aria-current={isCurrent ? "page" : undefined}>
+									<Link href={item.href} aria-current={ariaCurrent(pathname, item)}>
 										{item.label}
 									</Link>
 								</li>
@@ -82,7 +82,7 @@ const Navbar = () => {
 												<Link
 													className="mega-menu-service-single"
 													href={child.href}
-													aria-current={isChildCurrent ? "page" : undefined}
+													aria-current={ariaCurrent(pathname, child)}
 												>
 													<span className="mega-menu-service-icon tlhp-brand-icon" aria-hidden="true">
 														{child.image ? <img src={child.image} alt="" width={128} height={128} /> : null}

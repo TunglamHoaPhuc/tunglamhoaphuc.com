@@ -1,6 +1,6 @@
 "use client";
 import { site } from "@/config/site";
-import { isCurrentItem, isCurrentLink } from "@/libs/nav";
+import { ariaCurrent, isCurrentItem, isCurrentLink } from "@/libs/nav";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import MobileMenuItem from "./MobileMenuItem";
@@ -18,7 +18,7 @@ const MobileNavbar = () => {
 									<MobileMenuItem key={item.href} item={item} isCurrent={isCurrentItem(pathname, item)} pathname={pathname} />
 								) : (
 									<li key={item.href} className={isCurrentLink(pathname, item) ? "current-menu-item" : ""}>
-										<Link href={item.href} aria-current={isCurrentLink(pathname, item) ? "page" : undefined}>
+										<Link href={item.href} aria-current={ariaCurrent(pathname, item)}>
 											{item.label}
 										</Link>
 									</li>
