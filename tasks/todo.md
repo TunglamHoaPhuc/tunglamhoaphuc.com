@@ -817,13 +817,64 @@
 
 **File Bexon:** `sections/services/Services2.js`, `layout/main/ServiceDetailsMain.js`, `sections/process/Process.js`
 
+**Kết quả 04/11/2026:** xong, đã deploy `v2.`.
+- **Dữ liệu:**
+  - `npm run snapshot:fetch` lấy thêm `data/snapshot/tong-chi.json` từ `GET /api/admin/tong-chi`, API công khai mà trang chi tiết của site cũ đang gọi.
+  - Adapter `src/libs/content/tongChi.ts` đọc 25 bài trong 5 nhóm: Tông Phong Truyền Thừa (3), Nền Tảng Tu Học (5), Phương Pháp Hành Trì (8), Lộ Trình Tu Học (4), Nếp Sống Thiền Gia (5).
+  - Tiêu đề trong dữ liệu viết hoa toàn bộ, nay viết hoa đầu từ ("Niệm Phật").
+  - Bài trùng tên thì ghép thêm phụ đề: 4 bài "Lộ Trình Tu Học: Dành cho người trẻ…" (trùng có chủ ý) và 2 bài "Tam Quy" (có báo cáo).
+  - Repository có thêm `listTongChi()` và `getTongChi(slug)`. Thân bài chỉ chuyển sang HTML khi có trang cần, mỗi bài một lần.
+- **Thân bài là bản dặn dàn trang** (`src/libs/content/tongChiBody.ts`):
+  - 17/25 bài lưu bản dặn cho người thiết kế: chữ của trang xen lẫn ghi chú như "Làm 3 card.", "Infographic:", "MỘT ẢNH LỚN, ĐẸP THẦY NGỒI THIỀN", "[POPUP: …]", tên file ảnh. Site cũ không hiện được thân bài của các bài này: dưới tiêu đề chỉ có dấu ")".
+  - 8 bài còn lại viết bằng Markdown, nhưng cũng còn ghi chú và sơ đồ vẽ bằng ký tự khung.
+  - Bộ chuyển đổi:
+    - Bỏ các dòng ghi chú, và trả danh sách dòng đã bỏ để báo cáo.
+    - Giữ chữ trong POPUP và NGHI THỨC.
+    - Biến câu dạy “…” kèm tác giả thành trích dẫn, dòng in hoa thành tiêu đề, các ô của một infographic thành danh sách.
+    - Biến "Tìm hiểu thêm về X ->" thành liên kết tới bài X. Nếu X là tên chung của nhiều bài thì dẫn tới nhóm của chúng.
+    - Bài Thập Thiện mất hết xuống dòng (cả bài nằm trên 3 dòng), nên được cắt lại theo câu dạy, tên tác giả và cụm chữ in hoa.
+  - Unit test và e2e soát cả 25 bài: không còn ghi chú nào trong chữ hiển thị.
+- **`snapshot:check`** báo thêm:
+  - 22 bài còn ghi chú dàn trang. Ban Biên Tập nên viết lại bằng Markdown trong admin; khi đó bộ chuyển đổi để nguyên.
+  - 51 ảnh trỏ tới WordPress mà không có thư mục năm/tháng: đường dẫn soạn sẵn cho ảnh chưa từng tải lên. Cả 22 địa chỉ khác nhau đều trả 404, nên trang coi như không có ảnh.
+  - Hai bài "Tam Quy" cùng nhóm.
+- **`/tong-chi-tu-hoc`** (server):
+  - Lời dẫn 4 đoạn của trang cũ, chép vào `src/config/tongChi.ts`.
+  - `Services2` của Bexon: section đen mun, tiêu đề dính khi cuộn (từ 992px). Năm thẻ nhóm trượt vào từ phải; mỗi thẻ có icon, tên nhóm, một dòng mô tả lấy từ lời dẫn, và danh sách bài.
+  - Cột tiêu đề có liên kết tới 5 nhóm (`#tong-phong-truyen-thua`…), đưa focus vào nhóm.
+- **`/tong-chi-tu-hoc/[slug]`** (server, khuôn `ServiceDetailsMain`):
+  - Nhãn nhóm, tác giả (liên kết tới trang Giới thiệu), lượt xem, phụ đề, banner, đoạn tóm tắt.
+  - Thân bài trong khung đọc của T8, kèm từ khóa.
+  - Video (lightbox youtube-nocookie), album, nguồn tham khảo (sách nguồn, bài nổi bật). Mỗi khối chỉ hiện khi có dữ liệu.
+  - Thanh tab neo, bài trước/bài sau, thanh bên với các bài cùng nhóm và các nhóm khác.
+  - Liên kết tới Trí Tuệ Phật Pháp chưa thành liên kết (trang đó làm ở T17). Slug không có trả 404.
+- **Trang chủ:**
+  - Thêm khối Tông Chỉ (`Services2`, nút "Xem Tông Chỉ Tu Học") ngay sau Lời chào.
+  - Thêm khối "Lộ trình tu học" (`Process`): 4 bước là 4 bài của nhóm Lộ Trình, xếp 4 cột từ 1200px và chồng dọc ở màn nhỏ hơn.
+  - Chỗ của khu vực nổi bật (T15) vẫn để trống giữa hai khối.
+- **Sửa lỗi trang chủ đứng ngày** (từ T12):
+  - vinext xếp trang chủ vào loại trang tĩnh, nên bản preview giữ bản dựng đầu tiên một năm. Lượt e2e chạy qua nửa đêm bắt được lỗi: ngày 04/11 trang vẫn ghi "Còn 4 ngày".
+  - Trên `v2.` trang chủ chưa bị giữ, nhưng sẽ bị ngay khi Worker có bộ nhớ đệm trang. Nay trang chủ khai báo `dynamic = "force-dynamic"`; test tái hiện đỏ trước khi sửa, xanh sau khi sửa.
+- **Chữ do tôi đặt, cần Ban Truyền Thông duyệt:** tiêu đề "Con đường tu học." và "Lộ trình tu học.", nút "Xem các lộ trình", và cách cắt lời dẫn thành 5 dòng mô tả nhóm.
+- **Gói Workers Free:**
+  - Trong lượt e2e trên `v2.` (khoảng 50 phút), nhật ký Worker ghi 250 yêu cầu bị ngắt vì vượt CPU, rải khắp các trang và cả file tĩnh.
+  - CPU trung vị của yêu cầu thành công: trang chủ 18 ms, `/tong-chi-tu-hoc` 220 ms, `/gioi-thieu` 136 ms. Hai trang sau tốn nhiều vì Worker mới khởi động phải đọc cả `posts.json` (632 bài), dù trang chỉ cần dữ liệu Tông Chỉ hoặc Giới thiệu.
+  - Câu hỏi mở #8 (Workers Paid) và việc tách nạp snapshot (T41a) cần làm trước khi ra mắt.
+
 **Tiêu chí nghiệm thu:**
-- [ ] `/tong-chi-tu-hoc/niem-phat-phuong-phap-tro-hanh` có nội dung trong HTML ban đầu (site cũ chỉ có "Đang tải…")
-- [ ] Khối phụ (video, sách nguồn, từ khóa) ẩn sạch khi không có dữ liệu
-- [ ] Section tối đạt axe 0 lỗi; thẻ xếp chồng không che nội dung ở 375px và trở về dạng danh sách khi giảm chuyển động
+- [x] `/tong-chi-tu-hoc/niem-phat-phuong-phap-tro-hanh` có nội dung trong HTML ban đầu (site cũ chỉ có "Đang tải…", và với bài này không hiện được thân bài)
+- [x] Khối phụ (video, sách nguồn, từ khóa) ẩn sạch khi không có dữ liệu
+- [x] Section tối đạt axe 0 lỗi; thẻ xếp chồng không che nội dung ở 375px và trở về dạng danh sách khi giảm chuyển động
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- tong-chi`
+- [x] `npm run test:e2e -- tong-chi`: 6 test × 2 cỡ màn hình, có axe trên trang danh sách và trang bài; cả 25 bài trả 200 và không còn ghi chú. Hai trang mới được thêm vào test canh gác.
+- [x] Trang chủ thêm 2 test: khối Tông Chỉ và Lộ trình; trang chủ không lấy từ bộ nhớ đệm.
+- [x] Unit 132 xanh (thêm 12 test cho bộ chuyển đổi và adapter); `tsc` và eslint sạch; `npm run snapshot:check` có dòng `tong-chi.json: 25 bài (…)`.
+- [x] Toàn bộ e2e (406 test, 24 bỏ qua theo thiết kế):
+  - Cục bộ: 381 qua.
+  - 1 test chập chờn: tab trượt của T8. Thêm một lần dải lối vào của T10 hỏng khi chạy riêng test trang chủ. Cả hai qua khi chạy lại 3 lần.
+  - Trên `v2.`: 362 qua, 19 hỏng ở lượt đầu, đều là 503 hoặc trang không tải xong (vượt CPU, xem trên). Chạy lại 19 test đó: 18 qua ngay, test còn lại (chữ tách hiệu ứng ở `/styleguide`) qua ở lần chạy riêng.
+- [x] Ảnh: `docs/anh/t14-tong-chi-tu-hoc.png`
 
 **Phụ thuộc:** T9, T10
 
