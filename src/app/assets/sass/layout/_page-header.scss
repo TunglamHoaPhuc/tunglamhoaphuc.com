@@ -55,6 +55,11 @@ START: Breadcrumb CSS
 				line-height: 1;
 				font-size: 16px;
 				color: var(--tj-color-theme-primary);
+				// The icon font arrives after the page; fixed widths keep the crumbs still.
+				width: 1em;
+				&.tji-home {
+					width: 1.13em;
+				}
 			}
 			&:not(:first-child) {
 				i {

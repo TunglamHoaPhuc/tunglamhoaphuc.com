@@ -174,7 +174,13 @@ test.describe("home hero picture", () => {
 		}
 	});
 
-	test("nothing shifts while the page loads", async ({ page }) => {
+	// On the live site the icon fonts arrive after the page (they are not preloaded); held
+	// back here, they once grew the hero's arrows from 22 to 28px.
+	test("nothing shifts while the page loads, even when the icon fonts come late", async ({ page }) => {
+		await page.route(/bexon-icons|\/fa-[a-z-]+\./, async (route) => {
+			await new Promise((resolve) => setTimeout(resolve, 1500));
+			await route.continue();
+		});
 		await page.addInitScript(() => {
 			(window as unknown as { cls: number }).cls = 0;
 			new PerformanceObserver((list) => {
@@ -184,7 +190,7 @@ test.describe("home hero picture", () => {
 			}).observe({ type: "layout-shift", buffered: true });
 		});
 		await open(page);
-		await page.waitForTimeout(1500);
+		await page.waitForTimeout(2500);
 		expect(await page.evaluate(() => (window as unknown as { cls: number }).cls)).toBe(0);
 	});
 });

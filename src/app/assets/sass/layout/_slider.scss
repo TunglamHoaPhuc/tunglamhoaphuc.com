@@ -537,6 +537,22 @@ START: Theme Slider CSS
 	}
 }
 
+// Bexon's arrow boxes are as wide as the icon font draws the arrow, so they grew from 22 to
+// 28px when the font arrived after the page (a layout shift on the live site). One em is
+// the arrow's own width.
+.slider-prev,
+.slider-next {
+	.anim-icon {
+		width: 1em;
+		height: 1em;
+		justify-content: center;
+		i {
+			display: inline-block;
+			width: 1em;
+		}
+	}
+}
+
 // The pause button on the dark hero and footer: a dark glass pill, readable over any picture.
 .tlhp-hero .tlhp-pause,
 .footer-marquee .tlhp-pause {
