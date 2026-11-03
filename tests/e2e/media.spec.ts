@@ -16,9 +16,12 @@ async function open(page: Page, path: string) {
 	await page.waitForTimeout(1500);
 }
 
-// Opened from the keyboard, as a keyboard user would.
+// Opened from the keyboard, as a keyboard user would. Before the lightbox has loaded, Enter
+// follows the link to the picture itself; come back and try again.
 async function openFrom(page: Page, link: ReturnType<Page["locator"]>) {
+	const start = page.url();
 	await expect(async () => {
+		if (page.url() !== start) await page.goBack();
 		await link.focus();
 		await page.keyboard.press("Enter");
 		await expect(lightbox(page)).toBeVisible({ timeout: 1500 });
