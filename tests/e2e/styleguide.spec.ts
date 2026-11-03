@@ -102,10 +102,12 @@ test.describe("with reduced motion", () => {
 	});
 
 	// Themes switch per block (plan decision 9): the page is light and holds one .tlhp-dark
-	// section, so one pass covers both. A whole-page data-theme is not a supported mode.
+	// section plus the dark footer, so one pass covers both. A whole-page data-theme is not
+	// a supported mode.
 	test("styleguide passes axe WCAG A/AA on the light page and the dark section", async ({ page }) => {
 		await open(page, "/styleguide");
-		await expect(page.locator(".tlhp-dark")).toHaveCount(1);
+		await expect(page.locator("main .tlhp-dark")).toHaveCount(1);
+		await expect(page.locator("footer.tlhp-dark")).toHaveCount(1);
 		const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
 		const failures = results.violations.flatMap((v) => v.nodes.map((n) => `${v.id}: ${n.target.join(" ")}`));
 		expect(failures).toEqual([]);

@@ -67,3 +67,11 @@ START: Error 404 CSS
 	}
 }
 /* !END: Error 404 CSS */
+
+// TLHP: home and schedule side by side (and "Thử lại" on the error page).
+.tlhp-error-actions {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 0 16px;
+}

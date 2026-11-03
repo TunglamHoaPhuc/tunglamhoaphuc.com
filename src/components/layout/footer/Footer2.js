@@ -1,206 +1,144 @@
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import MarqueeSlider1 from "@/components/shared/marquee/MarqueeSlider1";
+import { formatPhone, site } from "@/config/site";
 import Link from "next/link";
+import { Fragment } from "react";
+import ScrollTopLink from "./ScrollTopLink";
 
+// "Nơi để trở về", seal, "Chốn thiêng bình yên", seal… three times over, enough to fill
+// the widest screen for Swiper's loop.
+const MARQUEE_ITEMS = Array.from({ length: 3 }, () =>
+	site.slogan.split(" – ").map((title) => ({ title, img: site.sealLight.src })),
+).flat();
+
+// "Thôn Hòa Trúc – Xã Phú Cát – TP Hà Nội", breaking only between its parts.
+const ADDRESS = site.address.split(" – ").map((part, idx) => (
+	<Fragment key={part}>
+		{idx ? " – " : null}
+		<span className="text-nowrap">{part}</span>
+	</Fragment>
+));
+
+// Contacts grouped under their role, in the order the roles first appear.
+const CONTACT_GROUPS = site.contacts.reduce((groups, contact) => {
+	const group = groups.find(({ role }) => role === contact.role);
+	if (group) group.people.push(contact);
+	else groups.push({ role: contact.role, people: [contact] });
+	return groups;
+}, /** @type {{ role: string, people: import("@/config/site").Contact[] }[]} */ ([]));
+
+// Bexon's dark Footer2 with the TLHP columns (BRAND-GUIDELINES 5.4): Bổn tự, Thời khóa tu
+// học, Liên hệ, Bản đồ. One column on phones, two from md, four from xl. `.tlhp-dark` gives
+// links, icons and the focus ring their colours for a dark ground.
 const Footer2 = () => {
 	return (
-		<footer className="tj-footer-section footer-2 section-gap-x">
-			<div className="footer-top">
-				<div className="container">
-					<div className="row">
-						<div className="col-12">
-							<div
-								className="footer-subscribe wow fadeInUp"
-								data-wow-delay=".3s"
-							>
-								<div className="subscribe-logo">
-									<img src="/images/logos/logo-2.webp" alt="" />
-								</div>
-								<div className="subscribe-form">
-									<form action="#">
-										<input
-											type="email"
-											name="email"
-											placeholder="Enter email"
-										/>
-										<ButtonPrimary text={"Send Message"} type="submit" />
-									</form>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+		<footer className="tj-footer-section footer-2 section-gap-x tlhp-footer tlhp-dark">
 			<div className="footer-main-area">
 				<div className="container">
-					<div className="row justify-content-between">
-						<div className="col-xl-3 col-md-6">
-							<div
-								className="footer-widget footer-col-1 wow fadeInUp"
-								data-wow-delay=".1s"
-							>
-								<div className="footer-logo">
+					<div className="row gy-5">
+						<div className="col-12 col-md-6 col-xl-3">
+							<div className="footer-widget footer-col-1 wow fadeInUp" data-wow-delay=".1s">
+								<h2 className="visually-hidden">Bổn tự</h2>
+								<div className="footer-logo tlhp-footer-seal">
 									<Link href="/">
-										<img src="/images/logos/logo-2.webp" alt="Logos" />
+										<img
+											src={site.sealLight.src}
+											alt={`${site.name} – về trang chủ`}
+											width={site.sealLight.width}
+											height={site.sealLight.height}
+										/>
 									</Link>
 								</div>
 								<div className="footer-text">
-									<p>
-										Developing personalze our customer journeys to increase
-										satisfaction & loyalty of our expansion.
-									</p>
+									<p>{site.intro}</p>
 								</div>
-								<div className="award-logo-area">
-									<div className="award-logo">
-										<img src="/images/footer/award-logo-white-1.webp" alt="" />
+								<p className="tlhp-footer-address">
+									<i className="tji-location" aria-hidden="true"></i>
+									<span>{ADDRESS}</span>
+								</p>
+								{site.social.length ? (
+									<div className="social-links style-3">
+										<ul>
+											{site.social.map((link) => (
+												<li key={link.href}>
+													<a href={link.href} target="_blank" rel="noopener noreferrer" aria-label={link.label}>
+														<i className={link.icon} aria-hidden="true"></i>
+													</a>
+												</li>
+											))}
+										</ul>
 									</div>
-									<div className="award-logo">
-										<img src="/images/footer/award-logo-white-2.webp" alt="" />
-									</div>
-								</div>
+								) : null}
 							</div>
 						</div>
-						<div className="col-xl-3 col-md-6">
-							<div
-								className="footer-widget footer-col-2 widget-nav-menu wow fadeInUp"
-								data-wow-delay=".3s"
-							>
-								<h5 className="title">Services</h5>
-								<ul>
-									<li>
-										<Link href="/services/1">Customer Experience</Link>
-									</li>
-									<li>
-										<Link href="/services/2">Training Programs</Link>
-									</li>
-									<li>
-										<Link href="/services/3">Business Strategy</Link>
-									</li>
-									<li>
-										<Link href="/services/4">Training Program</Link>
-									</li>
-									<li>
-										<Link href="/services/5">ESG Consulting</Link>
-									</li>
-									<li>
-										<Link href="/services/6">Development Hub</Link>
-									</li>
-								</ul>
+						<div className="col-12 col-md-6 col-xl-3">
+							<div className="footer-widget tlhp-footer-col wow fadeInUp" data-wow-delay=".3s">
+								<h2 className="title">Thời khóa tu học</h2>
+								<p className="tlhp-footer-label">Giờ mở cửa</p>
+								<p className="tlhp-footer-value">{site.openingHours}</p>
+								{/* Regular cộng tu sessions join here once the schedule data arrives (T12). */}
+								<ButtonPrimary text="Xem lịch tu học" url="/lich-tu-hoc" isTextBtn className="tlhp-footer-more" />
 							</div>
 						</div>
-						<div className="col-xl-3 col-md-6">
-							<div
-								className="footer-widget footer-col-3 widget-nav-menu wow fadeInUp"
-								data-wow-delay=".5s"
-							>
-								<h5 className="title">Resources</h5>
-								<ul>
-									<li>
-										<Link href="/contact">Contact us</Link>
-									</li>
-									<li>
-										<Link href="/team">Team Member</Link>
-									</li>
-									<li>
-										<Link href="#">Recognitions</Link>
-									</li>
-									<li>
-										<Link href="/careers">
-											Careers <span className="badge">New</span>
-										</Link>
-									</li>
-									<li>
-										<Link href="/blogs">News</Link>
-									</li>
-									<li>
-										<Link href="#">Feedback</Link>
-									</li>
-								</ul>
+						<div className="col-12 col-md-6 col-xl-3">
+							<div className="footer-widget tlhp-footer-col wow fadeInUp" data-wow-delay=".5s">
+								<h2 className="title">Liên hệ</h2>
+								{CONTACT_GROUPS.map(({ role, people }) => (
+									<div key={role} className="tlhp-footer-contacts">
+										<p className="tlhp-footer-label">{role}</p>
+										<ul>
+											{people.map(({ name, phone }) => (
+												<li key={phone}>
+													<a className="tlhp-footer-phone" href={`tel:${phone}`}>
+														<span className="tlhp-footer-phone-name">{name}</span>
+														<span className="tlhp-footer-phone-number">{formatPhone(phone)}</span>
+													</a>
+												</li>
+											))}
+										</ul>
+									</div>
+								))}
 							</div>
 						</div>
-						<div className="col-xl-3 col-md-6">
-							<div
-								className="footer-widget widget-contact wow fadeInUp"
-								data-wow-delay=".7s"
-							>
-								<h5 className="title">Our Office</h5>
-								<div className="footer-contact-info">
-									<div className="contact-item">
-										<span>993 Renner Burg, West Rond, MT 94251-030, USA.</span>
+						<div className="col-12 col-md-6 col-xl-3">
+							<div className="footer-widget tlhp-footer-col wow fadeInUp" data-wow-delay=".7s">
+								<h2 className="title">Bản đồ chùa</h2>
+								{site.mapImage ? (
+									<img
+										className="tlhp-footer-map"
+										src={site.mapImage.src}
+										alt={`Bản đồ đường đến chùa: ${site.address}`}
+										width={site.mapImage.width}
+										height={site.mapImage.height}
+										loading="lazy"
+									/>
+								) : (
+									// Until the map picture exists (GD-06): the address in the map's place.
+									<div className="tlhp-footer-map tlhp-footer-map-empty">
+										<i className="tji-location" aria-hidden="true"></i>
+										<span>{ADDRESS}</span>
 									</div>
-									<div className="contact-item">
-										<Link href="tel:10095447818">P: +1 (009) 544-7818</Link>
-										<Link href="mailto:support@bexon.com">
-											M: support@bexon.com
-										</Link>
-									</div>
-									<div className="contact-item">
-										<span>
-											<i className="tji-clock"></i> Mon-Fri 10am-10pm
-										</span>
-									</div>
-								</div>
+								)}
+								<ButtonPrimary text="Mở Google Maps" url={site.mapsUrl} newTab className="tlhp-footer-map-btn" />
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			<div className="footer-marquee">
-				<MarqueeSlider1 />
+			{/* Decoration only: the slogan is also written out in the strip below. */}
+			<div className="footer-marquee" aria-hidden="true">
+				<MarqueeSlider1 items={MARQUEE_ITEMS} />
 			</div>
-			<div className="tj-copyright-area-2">
+			<div className="tj-copyright-area-2 tlhp-footer-end">
 				<div className="container">
 					<div className="row">
 						<div className="col-12">
 							<div className="copyright-content-area">
 								<div className="copyright-text">
-									<p>
-										&copy; 2025 
-										<Link
-											href="https://themeforest.net/user/theme-junction/portfolio"
-											target="_blank"
-										>
-											Bexon
-										</Link>{" "}
-										All right reserved
-									</p>
+									<p>{site.copyright}</p>
 								</div>
-								<div className="social-links style-3">
-									<ul>
-										<li>
-											<Link href="https://www.facebook.com/" target="_blank">
-												<i className="fa-brands fa-facebook-f"></i>
-											</Link>
-										</li>
-										<li>
-											<Link href="https://www.instagram.com/" target="_blank">
-												<i className="fa-brands fa-instagram"></i>
-											</Link>
-										</li>
-										<li>
-											<Link href="https://x.com/" target="_blank">
-												<i className="fa-brands fa-x-twitter"></i>
-											</Link>
-										</li>
-										<li>
-											<Link href="https://www.linkedin.com/" target="_blank">
-												<i className="fa-brands fa-linkedin-in"></i>
-											</Link>
-										</li>
-									</ul>
-								</div>
-								<div className="copyright-menu">
-									<ul>
-										<li>
-											<Link href="/contact">Privacy Policy</Link>
-										</li>
-										<li>
-											<Link href="/terms-and-conditions">
-												Terms & Condition
-											</Link>
-										</li>
-									</ul>
-								</div>
+								<p className="tlhp-footer-slogan">{site.slogan}</p>
+								<ScrollTopLink />
 							</div>
 						</div>
 					</div>

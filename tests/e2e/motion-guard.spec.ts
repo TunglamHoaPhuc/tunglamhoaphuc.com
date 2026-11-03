@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// Pages kept from the Bexon template. Every new route should be added here.
-const PAGES = ["/", "/blogs", "/services", "/portfolios", "/team", "/contact", "/styleguide"];
+// Pages kept from the Bexon template, plus the 404 page. Every new route should be added here.
+const PAGES = ["/", "/blogs", "/services", "/portfolios", "/team", "/contact", "/styleguide", "/khong-co-trang-nay"];
 
 type SliderElement = HTMLElement & { swiper?: { autoplay?: { running?: boolean } } };
 

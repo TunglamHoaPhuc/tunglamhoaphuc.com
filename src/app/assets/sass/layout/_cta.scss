@@ -75,3 +75,39 @@ START: CTA CSS
 }
 
 /* !END: CTA CSS */
+
+/**----------------------------------------
+TLHP closing block (T6)
+----------------------------------------*/
+// Bexon pulls the block 135–320px into its light footer; one overlap for every width here,
+// matched by the footer's padding (components/_footer.scss).
+.tj-cta-section.tlhp-cta {
+	margin-bottom: -120px;
+	// Without :has() the footer cannot make room, so the block sits above it instead.
+	@supports not selector(:has(*)) {
+		margin-bottom: 96px;
+	}
+	.tlhp-cta-text {
+		max-width: 34ch;
+		margin-bottom: 28px;
+		color: var(--tj-color-common-white);
+		font-size: var(--tlhp-text-body-lg);
+	}
+	.cta-area .tlhp-cta-art {
+		display: grid;
+		place-items: center;
+		min-height: 320px;
+		padding: 40px;
+		// A darker brown than the text half, so it does not melt into the footer below.
+		background-color: color-mix(in srgb, var(--tj-color-theme-primary) 45%, var(--tj-color-theme-dark));
+		img {
+			width: min(240px, 70%);
+			height: auto;
+			object-fit: contain;
+		}
+		// Decoration only; on narrow screens the text and button are enough.
+		@media #{$md, $sm, $xs} {
+			display: none;
+		}
+	}
+}

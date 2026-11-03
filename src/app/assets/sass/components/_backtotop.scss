@@ -81,3 +81,10 @@ START: Back to top CSS
 }
 
 /* !END: Back to top CSS */
+
+// TLHP: a real button now (Bexon used a clickable div), so reset the button look.
+#tj-back-to-top {
+	padding: 0;
+	border: 0;
+	color: inherit;
+}

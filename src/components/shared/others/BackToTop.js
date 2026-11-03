@@ -1,9 +1,18 @@
 "use client";
+import useIsSticky from "@/hooks/useIsSticky";
+import { scrollToPageTop } from "@/libs/scrollToTop";
 import { useEffect, useState } from "react";
 
+// Bexon's floating button with its scroll progress ring. It must not sit over what people
+// are reading (BRAND-GUIDELINES 5.6), so on phones, where it would cover the text column,
+// it only shows while the visitor scrolls back up, like the sticky header. It also steps
+// aside once the footer's own "Về đầu trang" link is on screen.
 const BackToTop = () => {
 	const [scrollValue, setScrollValue] = useState(0);
 	const [scrollTopPos, setScrollTopPos] = useState(0);
+	const [isFooterEndVisible, setIsFooterEndVisible] = useState(false);
+	const [isPhone, setIsPhone] = useState(false);
+	const isScrollingUp = useIsSticky(true);
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -12,7 +21,7 @@ const BackToTop = () => {
 			const calcHeight =
 				document.documentElement.scrollHeight -
 				document.documentElement.clientHeight;
-			const value = Math.round((scrollTopPos / calcHeight) * 100);
+			const value = calcHeight > 0 ? Math.round((scrollTopPos / calcHeight) * 100) : 0;
 			setScrollTopPos(scrollTopPos);
 			setScrollValue(value);
 		};
@@ -26,31 +35,43 @@ const BackToTop = () => {
 		};
 	}, []);
 
-	const scrollToTop = () => {
-		document.documentElement.scrollTo({
-			top: 0,
-			behavior: "smooth",
-		});
-	};
+	useEffect(() => {
+		const phone = window.matchMedia("(max-width: 767.98px)");
+		const update = () => setIsPhone(phone.matches);
+		update();
+		phone.addEventListener("change", update);
+		return () => phone.removeEventListener("change", update);
+	}, []);
+
+	useEffect(() => {
+		const footerEnd = document.querySelector(".tlhp-footer-end");
+		if (!footerEnd) return;
+		const observer = new IntersectionObserver(([entry]) => setIsFooterEndVisible(entry.isIntersecting));
+		observer.observe(footerEnd);
+		return () => observer.disconnect();
+	}, []);
+
+	const isShown = scrollTopPos > 100 && !isFooterEndVisible && (!isPhone || isScrollingUp);
 
 	return (
-		<div
+		<button
+			type="button"
 			id="tj-back-to-top"
-			onClick={scrollToTop}
-			className={scrollTopPos > 100 ? "active" : ""}
+			aria-label="Về đầu trang"
+			onClick={scrollToPageTop}
+			className={isShown ? "active" : ""}
 			style={{
 				background: `conic-gradient(var(--tj-color-theme-primary) ${scrollValue}%, var(--tj-color-common-white) ${scrollValue}%)`,
-				cursor: "pointer",
 			}}
 		>
-			<span id="tj-back-to-top-percentage">
+			<span id="tj-back-to-top-percentage" aria-hidden="true">
 				{scrollValue < 96 ? (
 					`${scrollValue}%`
 				) : (
 					<i className="tji-arrow-up-long"></i>
 				)}
 			</span>
-		</div>
+		</button>
 	);
 };
 

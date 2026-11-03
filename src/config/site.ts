@@ -1,4 +1,4 @@
-// Temple details and navigation shared by the header, mobile menu and (later) footer and
+// Temple details and navigation shared by the header, mobile menu, footer and (later) the
 // contact page. Change the menu or a phone number here only; T29 moves these values into
 // the admin "Cấu hình" module.
 
@@ -15,6 +15,9 @@ export type NavItem = NavLink & {
 };
 
 export type Contact = { role: string; name: string; phone: string };
+
+/** An official page of the temple; `icon` is a Font Awesome class such as "fa-brands fa-facebook-f". */
+export type SocialLink = { label: string; href: string; icon: string };
 
 /** Static notice above the header (UX-02). Visitors can close it for the session. */
 export type Announcement = {
@@ -36,12 +39,24 @@ export const site = {
 	slogan: "Nơi để trở về – Chốn thiêng bình yên",
 	address: "Thôn Hòa Trúc – Xã Phú Cát – TP Hà Nội",
 
+	// Draft for the footer, to be confirmed by Ban Truyền Thông.
+	intro: "Chốn tu học và lễ bái giữa đất trời Phú Cát, kính mời quý Phật tử gần xa về tham dự khóa tu, cộng tu và các đại lễ trong năm.",
+
 	// Mộc Ấn seal from the temple's brand kit (bo-nhan-dien/01_Logo_Chinh_Thuc).
 	logo: {
 		src: "/brand/logo-moc-an.webp",
 		width: 400,
 		height: 297,
 	},
+	// The round seal (bo-nhan-dien/09-icon-minh-hoa) redrawn in ivory for dark grounds.
+	sealLight: {
+		src: "/brand/logo-tung-lam-hoa-phuc-tron-nga.webp",
+		width: 320,
+		height: 320,
+	},
+
+	// Change once a year, on Phật đản (the Buddhist year turns over then, not on 1 January).
+	copyright: "© Phật lịch 2570 – 2026 Tùng Lâm Hòa Phúc",
 
 	// Main number behind the header "Gọi điện" button: Trưởng ban lãnh chúng.
 	phone: "0979345373",
@@ -58,9 +73,12 @@ export const site = {
 
 	// Search link until the temple sends its own Google Maps place link (GD-06).
 	mapsUrl: "https://www.google.com/maps/search/?api=1&query=Ch%C3%B9a+T%C3%B9ng+L%C3%A2m+H%C3%B2a+Ph%C3%BAc+H%C3%B2a+Tr%C3%BAc+Ph%C3%BA+C%C3%A1t+H%C3%A0+N%E1%BB%99i",
+	// Static map picture for the footer, made once the exact place is known (GD-06). A
+	// picture instead of an embedded Google map, which is heavy and sets cookies.
+	mapImage: null as { src: string; width: number; height: number } | null,
 
 	// Official page links are still pending (GD-06); empty entries are not rendered.
-	social: [] as NavLink[],
+	social: [] as SocialLink[],
 
 	// No notice for now; T29 moves this into the admin. Example:
 	// { id: "2026-12-vu-lan", text: "Khóa tu mùa đông mở đăng ký từ 01/12.", link: { label: "Xem lịch", href: "/lich-tu-hoc" }, expires: "2026-12-31" }

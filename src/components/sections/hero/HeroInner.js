@@ -12,15 +12,15 @@ const HeroInner = ({ title, text, breadcrums = [] }) => {
 					<div className="col-lg-12">
 						<div className="tj-page-header-content text-center">
 							<h1 className={`tj-page-title`}>{title}</h1>
-							<div className="tj-page-link">
+							<nav className="tj-page-link" aria-label="Đường dẫn">
 								<span>
-									<i className="tji-home"></i>
+									<i className="tji-home" aria-hidden="true"></i>
 								</span>
 								<span>
-									<Link href="/">Home</Link>
+									<Link href="/">Trang chủ</Link>
 								</span>
 								<span>
-									<i className="tji-arrow-right"></i>
+									<i className="tji-arrow-right" aria-hidden="true"></i>
 								</span>
 								{breadcrums?.length
 									? breadcrums?.map(({ name, path }, idx) => (
@@ -29,15 +29,15 @@ const HeroInner = ({ title, text, breadcrums = [] }) => {
 													<Link href={path ? path : "/"}>{name}</Link>
 												</span>
 												<span>
-													<i className="tji-arrow-right"></i>
+													<i className="tji-arrow-right" aria-hidden="true"></i>
 												</span>
 											</React.Fragment>
 									  ))
 									: ""}
 								<span>
-									<span>{sliceText(text, 28, true)}</span>
+									<span aria-current="page">{sliceText(text, 28, true)}</span>
 								</span>
-							</div>
+							</nav>
 						</div>
 					</div>
 				</div>

@@ -803,3 +803,146 @@ START: Theme Footer CSS
 }
 
 /* !END: Theme Footer CSS */
+
+/**----------------------------------------
+TLHP footer (T6, BRAND-GUIDELINES 5.4)
+----------------------------------------*/
+// Footer2 without its newsletter band: the columns start the footer.
+.tj-footer-section.footer-2.tlhp-footer {
+	padding-top: 0;
+	.footer-main-area {
+		padding: 96px 0 72px;
+		@media #{$md, $sm, $xs} {
+			padding: 64px 0 48px;
+		}
+	}
+	.footer-widget {
+		.title {
+			font-family: var(--tlhp-font-sans);
+			font-size: var(--tlhp-text-title);
+			line-height: var(--tlhp-leading-title);
+			font-weight: var(--tlhp-weight-title);
+			margin-bottom: 20px;
+		}
+		.footer-text p {
+			margin: 24px 0 16px;
+		}
+		// Beats Bexon's `.footer-widget ul li a` colours.
+		.tlhp-footer-phone {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			column-gap: 10px;
+			min-height: 48px;
+			padding-block: 4px;
+			color: var(--tj-color-text-body-2);
+			.tlhp-footer-phone-number {
+				color: var(--tj-color-common-white);
+				font-weight: var(--tj-fw-sbold);
+				font-variant-numeric: tabular-nums;
+				white-space: nowrap;
+			}
+			&:hover .tlhp-footer-phone-number {
+				color: var(--tj-color-theme-primary);
+			}
+		}
+	}
+}
+.tlhp-footer-seal {
+	max-width: 112px;
+	img {
+		width: 112px;
+		height: auto;
+	}
+}
+.tlhp-footer-address {
+	display: flex;
+	align-items: flex-start;
+	gap: 10px;
+	margin: 0;
+	color: var(--tj-color-text-body-2);
+	i {
+		margin-top: 5px;
+		color: var(--tj-color-theme-primary);
+	}
+}
+.tlhp-footer-label {
+	margin: 0 0 2px;
+	color: var(--tlhp-accent-text);
+	font-size: var(--tlhp-text-caption);
+	font-weight: var(--tlhp-weight-caption);
+	letter-spacing: var(--tlhp-tracking-caption);
+}
+.tlhp-footer-value {
+	color: var(--tj-color-text-body-2);
+	margin-bottom: 16px;
+}
+.tlhp-footer-contacts {
+	& + & {
+		margin-top: 12px;
+	}
+	ul {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+}
+.tlhp-footer-map {
+	display: block;
+	width: 100%;
+	height: auto;
+	margin-bottom: 24px;
+	border-radius: 12px;
+}
+.tlhp-footer-map-empty {
+	aspect-ratio: 16 / 10;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	padding: 24px;
+	text-align: center;
+	color: var(--tj-color-text-body-2);
+	background-color: color-mix(in srgb, var(--tj-color-common-white) 5%, transparent);
+	border: 1px solid var(--tj-color-border-2);
+	i {
+		font-size: 36px;
+		line-height: 1;
+		color: var(--tj-color-theme-primary);
+	}
+}
+.tlhp-footer-end {
+	.copyright-content-area {
+		gap: 8px 30px;
+		@media #{$sm, $xs} {
+			justify-content: center;
+			text-align: center;
+		}
+	}
+}
+.tlhp-footer-slogan {
+	margin: 0;
+	color: var(--tj-color-text-body-2);
+	font-family: var(--tj-ff-heading);
+	font-style: italic;
+}
+.tlhp-footer-top-link {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 48px;
+	padding: 0 4px;
+	background: none;
+	border: 0;
+	color: var(--tj-color-common-white);
+	font-weight: var(--tj-fw-sbold);
+	&:hover {
+		color: var(--tj-color-theme-primary);
+	}
+}
+
+// The closing block (Cta) at the end of <main> overlaps the footer's top by 120px.
+main:has(> .tlhp-cta:last-child) + .tlhp-footer.footer-2 {
+	padding-top: 120px;
+}
