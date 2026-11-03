@@ -1,9 +1,11 @@
-// npm run snapshot:check: reads data/snapshot/posts.json the way the site does and prints
-// what it found: posts per section and category, records it had to skip, and data oddities
-// worth fixing in the old admin. Exits 1 only when the file is missing or unreadable.
+// npm run snapshot:check: reads data/snapshot/posts.json (and schedule.json) the way the
+// site does and prints what it found: posts per section and category, events per month,
+// records it had to skip, and data oddities worth fixing in the old admin. Exits 1 only
+// when the posts file is missing or unreadable.
 import { existsSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { parsePosts } from "../src/libs/content/posts";
+import { parseSchedule } from "../src/libs/content/schedule";
 import { postsFileSchema } from "../src/libs/content/schema";
 import type { ContentIssue } from "../src/libs/content/types";
 
@@ -26,6 +28,7 @@ const ISSUE_TITLES: Record<ContentIssue["kind"], string> = {
 	"wordpress-image": "Bài còn ảnh trên WordPress (chưa có trên B2)",
 	"moved-link": "Liên kết tunglamhoaphuc.com/wp-content (chuyển sang admin.)",
 	"empty-summary": "Bài không có tóm tắt hoặc tóm tắt là chữ mẫu (tạm lấy đầu nội dung)",
+	"other-bucket": "Ảnh ở bucket B2 thứ hai (khi chép sang R2 phải chép cả bucket này)",
 };
 const EXAMPLES = 5;
 
@@ -72,6 +75,20 @@ for (const [section, categories] of sections) {
 	const count = [...categories.values()].reduce((sum, n) => sum + n, 0);
 	console.log(`${SECTION_NAMES[section] ?? section}: ${stored.get(section) ?? 0} bản ghi, ${count} bài dùng được`);
 	for (const [label, n] of [...categories].sort((a, b) => b[1] - a[1])) console.log(`  ${String(n).padStart(4)}  ${label}`);
+}
+
+// The schedule (lịch tu học), from npm run snapshot:fetch.
+const schedulePath = resolve("data/snapshot/schedule.json");
+if (existsSync(schedulePath)) {
+	const { schedule, issues: scheduleIssues } = parseSchedule(JSON.parse(readFileSync(schedulePath, "utf8")));
+	const months = new Map<string, number>();
+	for (const event of schedule.events) months.set(event.start.slice(0, 7), (months.get(event.start.slice(0, 7)) ?? 0) + 1);
+	const perMonth = [...months].map(([month, n]) => `${month}: ${n}`).join(", ");
+	console.log(
+		`\nschedule.json: ${schedule.events.length} sự kiện (${perMonth}), ${schedule.programs.length} khóa lễ thường kỳ, ` +
+			`${schedule.themes.length} chủ đề tháng, ${schedule.quotes.length} ảnh câu kệ`,
+	);
+	issues = [...issues, ...scheduleIssues];
 }
 
 console.log("\nBất thường dữ liệu");

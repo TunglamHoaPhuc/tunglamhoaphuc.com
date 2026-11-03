@@ -12,6 +12,7 @@ const PAGES = [
 	"/khong-co-trang-nay",
 	"/dong-chay-hoang-phap",
 	"/dong-chay-hoang-phap/phap-hoi-huyet-bon-trai",
+	"/lich-tu-hoc",
 ];
 
 type SliderElement = HTMLElement & { swiper?: { autoplay?: { running?: boolean } } };
@@ -78,7 +79,7 @@ test.describe("reduced motion turns every effect off", () => {
 // WCAG 2.2.2: whatever moves by itself has a pause button in its block. The Bexon sample
 // pages are left out until their tasks replace them.
 test.describe("self-moving content can be paused", () => {
-	for (const path of ["/", "/dong-chay-hoang-phap", "/dong-chay-hoang-phap/phap-hoi-huyet-bon-trai", "/khong-co-trang-nay"]) {
+	for (const path of ["/", "/dong-chay-hoang-phap", "/dong-chay-hoang-phap/phap-hoi-huyet-bon-trai", "/lich-tu-hoc", "/khong-co-trang-nay"]) {
 		test(`${path} has a pause button by each slider and sliding row`, async ({ page }) => {
 			await settle(page, path);
 			const unpausable = await page.evaluate(() => {

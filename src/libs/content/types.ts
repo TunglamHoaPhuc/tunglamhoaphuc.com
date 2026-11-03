@@ -68,12 +68,70 @@ export type Page<T> = {
 	pageCount: number;
 };
 
+/** One time in an event's programme: "Khai khóa" at "07h30". */
+export type EventTime = { label: string; time: string };
+
+/** A day, or a run of days, on the schedule (lịch tu học). */
+export type ScheduleEvent = {
+	id: string;
+	slug: string;
+	title: string;
+	subtitle: string;
+	/** "Cộng Tu", "Khóa Lễ Truyền Thống", "Đại Lễ Sự Kiện". */
+	category: Category;
+	/** YYYY-MM-DD; `end` is `start` for a one-day event. */
+	start: string;
+	end: string;
+	times: EventTime[];
+	location: string;
+	description: string;
+	notes: string;
+	image: MediaImage | null;
+	video: Video | null;
+};
+
+/** A ceremony held on fixed lunar days each month (Đại sám hối on the 14th and the last day). */
+export type RegularProgram = {
+	id: string;
+	title: string;
+	subtitle: string;
+	/** Says which lunar days, in the editors' words. */
+	summary: string;
+	time: string;
+	duration: string;
+	location: string;
+	image: MediaImage | null;
+};
+
+/** The theme of a calendar month: its poster and a verse. */
+export type MonthTheme = {
+	/** 1–12. */
+	month: number;
+	title: string;
+	poster: string | null;
+	/** Lines of the verse as HTML whose only tag is <b>. */
+	lines: string[];
+	author: string;
+};
+
+/** A picture of a verse (the old site's kho pháp ngữ), for Lời Thầy dạy (T12). */
+export type QuoteImage = { id: string; src: string; title: string };
+
+export type Schedule = {
+	/** In date order. */
+	events: ScheduleEvent[];
+	programs: RegularProgram[];
+	themes: MonthTheme[];
+	quotes: QuoteImage[];
+};
+
 /** Read-only access to the temple's content, whatever the source. */
 export interface ContentRepository {
 	listPosts(query?: PostQuery): Promise<Page<PostSummary>>;
 	/** `null` when no published post has this slug. */
 	getPostBySlug(slug: string): Promise<Post | null>;
 	listCategories(section: string): Promise<CategoryCount[]>;
+	getSchedule(): Promise<Schedule>;
 }
 
 /** Something wrong or odd in the source data, for `npm run snapshot:check`. */
@@ -90,7 +148,8 @@ export type ContentIssue = {
 		| "gallery-count"
 		| "wordpress-image"
 		| "moved-link"
-		| "empty-summary";
+		| "empty-summary"
+		| "other-bucket";
 	id: string;
 	message: string;
 };

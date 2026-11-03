@@ -2,6 +2,7 @@
 // Source "snapshot": the old admin's JSON files copied into data/snapshot/ (not in git).
 // Bundled at build time; a missing file just means no content, never a failed build.
 import { type ParsedPosts, parsePosts, toGallery } from "../posts";
+import { type ParsedSchedule, parseSchedule } from "../schedule";
 import { rawPostSchema } from "../schema";
 import type { GalleryImage } from "../types";
 
@@ -35,4 +36,9 @@ export async function loadSnapshotAlbums(): Promise<Map<string, GalleryImage[]>>
 		if (gallery.length) albums.set(id, gallery);
 	}
 	return albums;
+}
+
+/** schedule.json (lịch tu học); an empty schedule when the file is not there. */
+export async function loadSnapshotSchedule(): Promise<ParsedSchedule> {
+	return parseSchedule((await readSnapshotFile("schedule")) ?? {});
 }

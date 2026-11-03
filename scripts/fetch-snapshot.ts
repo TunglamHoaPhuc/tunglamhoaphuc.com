@@ -7,12 +7,16 @@
 //
 // With --albums it also asks the detail endpoint, a few at a time, for the albums the lists
 // still leave empty, and writes them to data/snapshot/post-albums.json ({ [post id]: photos }).
+//
+// The schedule (lịch tu học: events, regular ceremonies, month themes, quotes) comes from
+// the endpoint the old home page reads, into data/snapshot/schedule.json as the API sends it.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const ORIGIN = "https://www.tunglamhoaphuc.com";
 const SECTIONS = ["dong-chay-hoang-phap", "tri-tue-phat-phap", "vu-tru-phat-giao"];
 const OUT = "data/snapshot/posts.json";
 const ALBUMS_OUT = "data/snapshot/post-albums.json";
+const SCHEDULE_OUT = "data/snapshot/schedule.json";
 const AT_ONCE = 3;
 
 type RawPost = { id: string; slug: string; galleryCount?: number; photoGallery?: unknown[] };
@@ -68,5 +72,12 @@ async function fetchAlbums(posts: RawPost[]) {
 	console.log(`${ALBUMS_OUT}: album của ${Object.keys(albums).length}/${wanted.length} bài (${photos} ảnh), ${failed} lỗi`);
 }
 
+async function fetchSchedule() {
+	const file = await get<{ data?: { customEvents?: unknown[] } }>("/api/admin/schedule");
+	writeFileSync(SCHEDULE_OUT, JSON.stringify(file));
+	console.log(`${SCHEDULE_OUT}: ${file.data?.customEvents?.length ?? 0} sự kiện`);
+}
+
 const posts = await fetchPosts();
+await fetchSchedule();
 if (process.argv.includes("--albums")) await fetchAlbums(posts);

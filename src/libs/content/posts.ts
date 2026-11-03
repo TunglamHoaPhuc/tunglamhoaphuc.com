@@ -78,7 +78,7 @@ export function toGallery(photos: RawPhoto[]): { gallery: GalleryImage[]; emoji:
 // youtu.be/ID, youtube.com/watch?v=ID, /embed/ID, /shorts/ID
 const YOUTUBE = /https?:\/\/(?:www\.|m\.)?(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:\S*&)?v=|embed\/|shorts\/))([\w-]{11})/g;
 
-function videosOf(content: string): Video[] {
+export function videosOf(content: string): Video[] {
 	const ids = [...new Set([...content.matchAll(YOUTUBE)].map((match) => match[1]))];
 	return ids.map((id) => ({ id, url: `https://www.youtube.com/watch?v=${id}` }));
 }
