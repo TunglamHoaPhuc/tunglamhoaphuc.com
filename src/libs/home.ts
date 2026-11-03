@@ -2,9 +2,10 @@
 // Bexon sections as props.
 import { site } from "@/config/site";
 import { calendarHref, type EventStatus, eventStatus, lunarRange, solarRange, todayInVietnam } from "@/libs/calendar";
-import type { ContentRepository, MonthTheme, PostSummary, ScheduleEvent } from "@/libs/content/types";
+import type { AboutTopic, ContentRepository, MediaImage, MonthTheme, PostSummary, ScheduleEvent } from "@/libs/content/types";
 import { countdownLabel, daysUntil } from "@/libs/countdown";
 import { formatDate } from "@/libs/format";
+import { buddhistYear } from "@/libs/lunar";
 import { postHref } from "@/libs/postList";
 
 /** Sections whose post pages are built; home lists take posts from these only (T14, T17 add theirs). */
@@ -49,6 +50,22 @@ export type UpcomingEvent = {
 	countdown: string;
 };
 
+/** A figure of Lời chào, counted up by the odometer. */
+export type HomeStat = { label: string; value: number; /** A year: no thousands point. */ year?: boolean };
+
+/** Lời chào: the temple's greeting, from the history topic of Giới thiệu. */
+export type Welcome = {
+	/** The first line of the topic's teaching: "Lập chùa là tạo ra một cõi Tịnh độ giữa nhân gian." */
+	title: string;
+	author: string;
+	text: string;
+	href: string;
+	image: MediaImage | null;
+	/** The teachers' faces, beside "Chư Tôn Đức dẫn dắt đạo tràng". */
+	faces: MediaImage[];
+	stats: HomeStat[];
+};
+
 export type HomeData = {
 	hero: HeroSlide[];
 	/** Khóa tu sắp tới: the next events still running or to come. */
@@ -59,7 +76,15 @@ export type HomeData = {
 	popular: PostSummary[];
 	/** Lời Thầy dạy: the month themes' verses, from this month on. */
 	verses: MonthTheme[];
+	welcome: Welcome | null;
+	/** Chư Tôn Đức: the teachers' topics of Giới thiệu. */
+	teachers: AboutTopic[];
 };
+
+// Groups of Giới thiệu the home page draws on.
+const HISTORY_GROUP = "lich-su-chua";
+const TEACHERS_GROUP = "nguoi-lien-quan";
+const FACES = 3;
 
 const titleKey = (item: { title: string }) => item.title.toLocaleLowerCase("vi").replace(/\s+/g, " ").trim();
 
@@ -128,11 +153,32 @@ function versesFrom(themes: MonthTheme[], month: number): MonthTheme[] {
 	return [...withVerse.filter((theme) => theme.month >= month), ...withVerse.filter((theme) => theme.month < month)];
 }
 
+/** Tôn tượng and khu vực join the figures with their sections (T15, T16). */
+function welcomeFrom(topics: AboutTopic[], teachers: AboutTopic[], stats: HomeStat[]): Welcome | null {
+	const history = topics.find((topic) => topic.group.slug === HISTORY_GROUP);
+	if (!history) return null;
+	return {
+		title: history.quote?.lines[0] ?? history.subtitle,
+		author: history.quote?.author ?? "",
+		text: history.overview,
+		href: `/gioi-thieu/${history.slug}`,
+		image: history.portrait ?? history.banner,
+		faces: teachers
+			.map((topic) => topic.portrait ?? topic.banner)
+			.filter((face): face is MediaImage => face !== null)
+			.slice(0, FACES),
+		stats,
+	};
+}
+
 export async function loadHomeData(repo: ContentRepository, now = new Date()): Promise<HomeData> {
-	const [newest, mostRead, schedule] = await Promise.all([
+	const [newest, mostRead, schedule, topics, dongChay, triTue] = await Promise.all([
 		repo.listPosts({ section: LIVE_SECTIONS, sort: "newest", pageSize: NEWS_COUNT * 2 }),
 		repo.listPosts({ section: LIVE_SECTIONS, sort: "views", pageSize: NEWS_COUNT * 4 }),
 		repo.getSchedule(),
+		repo.listAboutTopics(),
+		repo.listPosts({ section: "dong-chay-hoang-phap", pageSize: 1 }),
+		repo.listPosts({ section: "tri-tue-phat-phap", pageSize: 1 }),
 	]);
 	const latest = uniqueTitles(newest.items).slice(0, NEWS_COUNT);
 	const read = mostRead.items.filter((post) => post.views > 0);
@@ -147,5 +193,19 @@ export async function loadHomeData(repo: ContentRepository, now = new Date()): P
 	const hero = [welcomeSlide(), next ? eventSlide(toUpcoming(next, now)) : null, latestSlide(newest.items)].filter(
 		(slide): slide is HeroSlide => slide !== null,
 	);
-	return { hero, upcoming, latest, popular, verses: versesFrom(schedule.themes, Number(today.slice(5, 7))) };
+	const teachers = topics.filter((topic) => topic.group.slug === TEACHERS_GROUP);
+	const stats: HomeStat[] = [
+		{ label: "Bài viết Dòng Chảy Hoằng Pháp", value: dongChay.total },
+		{ label: "Bài giảng, pháp âm, ấn phẩm Trí Tuệ Phật Pháp", value: triTue.total },
+		{ label: "Phật lịch", value: buddhistYear(today), year: true },
+	];
+	return {
+		hero,
+		upcoming,
+		latest,
+		popular,
+		verses: versesFrom(schedule.themes, Number(today.slice(5, 7))),
+		welcome: welcomeFrom(topics, teachers, stats),
+		teachers,
+	};
 }

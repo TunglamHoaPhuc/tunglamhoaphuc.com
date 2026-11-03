@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { site } from "@/config/site";
 import { createMemoryRepository } from "@/libs/content/repository";
-import type { MonthTheme, Post, Schedule, ScheduleEvent } from "@/libs/content/types";
+import type { AboutTopic, MonthTheme, Post, Schedule, ScheduleEvent } from "@/libs/content/types";
 import { loadHomeData } from "@/libs/home";
 
 function post(id: number, title: string, publishedDate: string, views: number, extra: Partial<Post> = {}): Post {
@@ -160,5 +160,67 @@ describe("home data from the schedule", async () => {
 		const after = await loadHomeData(createMemoryRepository(posts, { loadSchedule: async () => schedule }), new Date("2027-01-10T02:00:00Z"));
 		expect(after.upcoming).toEqual([]);
 		expect(after.hero.map((slide) => slide.id)).toEqual(["noi-de-tro-ve", "bai-p2"]);
+	});
+});
+
+const about = (id: string, group: string, extra: Partial<AboutTopic> = {}): AboutTopic => ({
+	id,
+	slug: `chu-de-${id}`,
+	title: `Chủ đề ${id}`,
+	subtitle: "",
+	tag: "",
+	group: { slug: group, name: group },
+	banner: null,
+	portrait: { src: `https://media.example/${id}.jpg`, position: "center 30%" },
+	overview: `Tổng quan ${id}`,
+	quote: null,
+	milestones: [],
+	contentHtml: "",
+	gallery: [],
+	book: null,
+	...extra,
+});
+
+const topics = [
+	about("lich-su", "lich-su-chua", {
+		slug: "lich-su-tung-lam-hoa-phuc",
+		quote: { title: "TINH THẦN", lines: ["Lập chùa là tạo ra một cõi Tịnh độ giữa nhân gian.", "Ở đó…"], author: "Thượng tọa Thích Tâm Hòa" },
+	}),
+	about("a", "nguoi-lien-quan"),
+	about("b", "nguoi-lien-quan", { portrait: null, banner: { src: "https://media.example/b-banner.jpg", position: "center 50%" } }),
+	about("c", "nguoi-lien-quan"),
+	about("d", "nguoi-lien-quan"),
+	about("quy", "thanh-quy-van-hoa"),
+];
+
+describe("home data from Giới thiệu", async () => {
+	const repo = createMemoryRepository(posts, { loadAbout: async () => topics });
+	const data = await loadHomeData(repo, NOW);
+
+	it("Chư Tôn Đức: the teachers of Giới thiệu, in the editors' order", () => {
+		expect(data.teachers.map((topic) => topic.id)).toEqual(["a", "b", "c", "d"]);
+	});
+
+	it("Lời chào: the history topic's teaching, overview and link, the teachers' faces and the figures", () => {
+		expect(data.welcome).toMatchObject({
+			title: "Lập chùa là tạo ra một cõi Tịnh độ giữa nhân gian.",
+			author: "Thượng tọa Thích Tâm Hòa",
+			text: "Tổng quan lich-su",
+			href: "/gioi-thieu/lich-su-tung-lam-hoa-phuc",
+			image: { src: "https://media.example/lich-su.jpg" },
+		});
+		expect(data.welcome?.faces.map((face) => face.src)).toEqual(["https://media.example/a.jpg", "https://media.example/b-banner.jpg", "https://media.example/c.jpg"]);
+		// 10 Dòng Chảy posts and 1 Trí Tuệ post in the fixture; 3 November 2026 is after Phật đản.
+		expect(data.welcome?.stats).toEqual([
+			{ label: "Bài viết Dòng Chảy Hoằng Pháp", value: 10 },
+			{ label: "Bài giảng, pháp âm, ấn phẩm Trí Tuệ Phật Pháp", value: 1 },
+			{ label: "Phật lịch", value: 2570, year: true },
+		]);
+	});
+
+	it("leaves both blocks out without Giới thiệu", async () => {
+		const bare = await loadHomeData(createMemoryRepository(posts), NOW);
+		expect(bare.welcome).toBeNull();
+		expect(bare.teachers).toEqual([]);
 	});
 });

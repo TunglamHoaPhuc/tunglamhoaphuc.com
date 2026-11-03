@@ -1,6 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
+import { buddhistYear } from "../../src/libs/lunar";
 
 // T10, T12: the home page, rendered on the server from the content layer (data/snapshot/).
 type SwiperElement = HTMLElement & {
@@ -26,6 +27,21 @@ const countdown = (event: { start: string }) => {
 	const days = daysLeft(event.start);
 	return days < 0 ? "Đang diễn ra" : days === 0 ? "Diễn ra hôm nay" : `Còn ${days} ngày`;
 };
+
+// T13b: what Lời chào counts and who Chư Tôn Đức shows, from posts.json and gioi-thieu.json.
+// A slug two posts share opens only the first, so it counts once.
+type RawPost = { slug: string; status: string; mainCategory: string };
+const POSTS = (JSON.parse(readFileSync("data/snapshot/posts.json", "utf8")) as { posts: RawPost[] }).posts.filter((post) => post.status === "published");
+const postsIn = (section: string) => new Set(POSTS.filter((post) => post.mainCategory.trim() === section).map((post) => post.slug.trim())).size;
+type RawTopic = { slug: string; status: string; groupCategory: string; orderIndex: number };
+const TEACHERS = (JSON.parse(readFileSync("data/snapshot/gioi-thieu.json", "utf8")) as { topics: RawTopic[] }).topics
+	.filter((topic) => topic.status === "published" && topic.groupCategory === "nguoi-lien-quan")
+	.sort((a, b) => a.orderIndex - b.orderIndex);
+const STATS = [
+	["Bài viết Dòng Chảy Hoằng Pháp", postsIn("dong-chay-hoang-phap").toLocaleString("vi-VN")],
+	["Bài giảng, pháp âm, ấn phẩm Trí Tuệ Phật Pháp", postsIn("tri-tue-phat-phap").toLocaleString("vi-VN")],
+	["Phật lịch", String(buddhistYear(TODAY))],
+];
 
 const ENTRANCES = [
 	["Giới thiệu", "/gioi-thieu"],
@@ -59,11 +75,18 @@ test.describe("home page content", () => {
 		expect(html).toContain("<title>Tùng Lâm Hòa Phúc – Nơi để trở về – Chốn thiêng bình yên</title>");
 		expect(html).toContain("Pháp sự mới nhất · 17/10/2026");
 		expect(html).toContain('href="/dong-chay-hoang-phap/le-hang-thuan-tai-tung-lam-hoa-phuc"');
-		const order = ['class="tj-slider-section tlhp-hero"', 'id="loi-vao"', 'class="tj-blog-section-2'].map((marker) => html.indexOf(marker));
+		const order = [
+			'class="tj-slider-section tlhp-hero"',
+			'id="loi-vao"',
+			'class="tj-blog-section-2',
+			'aria-labelledby="loi-chao"',
+			'id="loi-thay-day"',
+			'aria-labelledby="chu-ton-duc"',
+		].map((marker) => html.indexOf(marker));
 		expect(order.every((at) => at > 0)).toBe(true);
 		expect([...order].sort((a, b) => a - b)).toEqual(order);
-		// Bexon's sample blocks wait for their tasks (T13b–T15); its texts are gone.
-		expect(html).not.toMatch(/tj-team-section|Leading Future|Our Pricing|Hear from Our/);
+		// Bexon's sample blocks wait for their tasks (T14, T15); its texts are gone.
+		expect(html).not.toMatch(/Leading Future|Our Pricing|Hear from Our|Get to Know Us|happy customer|People Behind|Meet Our Team/);
 	});
 
 	test("has one h1 and names every block", async ({ page }) => {
@@ -193,6 +216,47 @@ test.describe("home page content", () => {
 		await expect(news(page).getByRole("link", { name: "Xem tất cả bài viết" })).toHaveAttribute("href", "/dong-chay-hoang-phap");
 	});
 
+	test("Lời chào sends its real figures in the first HTML, read as numbers", async ({ request }) => {
+		const html = await (await request.get("/")).text();
+		for (const [label, value] of STATS) {
+			expect(html).toContain(`<span class="count-text">${label}</span>`);
+			expect(html).toContain(`<span class="visually-hidden">${value}</span>`);
+		}
+	});
+
+	test("Lời chào shows the figures still under reduced motion, and opens the temple's video", async ({ page }) => {
+		await open(page);
+		const block = page.locator(".tlhp-welcome");
+		await expect(block.getByText("Lời chào", { exact: true })).toBeVisible();
+		await expect(block.getByRole("heading", { level: 2 })).not.toBeEmpty();
+		await expect(block.getByRole("link", { name: "Tìm hiểu Bổn tự" })).toHaveAttribute("href", /^\/gioi-thieu\/[a-z0-9-]+$/);
+		await expect(block.locator(".countup-item")).toHaveCount(STATS.length);
+		for (const [idx, [label, value]] of STATS.entries()) {
+			const item = block.locator(".countup-item").nth(idx);
+			await item.scrollIntoViewIfNeeded();
+			await expect(item.locator(".count-text")).toHaveText(label);
+			// No odometer under reduced motion: the number stands as it came.
+			await expect(item.locator(".odometer")).toHaveText(value);
+			await expect(item.locator(".odometer-digit")).toHaveCount(0);
+		}
+		const video = block.getByRole("link", { name: "Xem video: Chốn thiêng bình yên – Tùng Lâm Hòa Phúc" });
+		await expect(video).toHaveAttribute("href", "https://www.youtube-nocookie.com/embed/HE2MnR8Hl5c?rel=0");
+	});
+
+	test("Chư Tôn Đức shows the four teachers, each card leading to their page", async ({ page, request }) => {
+		await open(page);
+		const block = page.locator(".tlhp-teachers");
+		await expect(block.getByRole("heading", { level: 2, name: "Chư Tôn Đức." })).toBeVisible();
+		const links = block.locator(".team-content a");
+		await expect(links).toHaveCount(TEACHERS.length);
+		expect(TEACHERS.length).toBe(4);
+		for (const [idx, topic] of TEACHERS.entries()) {
+			await expect(links.nth(idx)).toHaveAttribute("href", `/gioi-thieu/${topic.slug}`);
+			expect((await request.get(`/gioi-thieu/${topic.slug}`)).status(), topic.slug).toBe(200);
+		}
+		await expect(block.getByRole("link", { name: "Xem thêm về Bổn tự" })).toHaveAttribute("href", "/gioi-thieu");
+	});
+
 	test("passes axe WCAG A/AA on both tabs", async ({ page }) => {
 		await open(page);
 		const check = async () => {
@@ -244,6 +308,24 @@ test.describe("home hero picture", () => {
 });
 
 test.describe("home sliders with motion allowed", () => {
+	test("Lời chào counts up to the real figures when scrolled to", async ({ page }) => {
+		await open(page);
+		const block = page.locator(".tlhp-welcome");
+		// Once the script runs, the figures drop to 0 and wait out of view.
+		await expect(block.locator(".odometer-digit").first()).toBeAttached();
+		await block.locator(".countup-item").last().scrollIntoViewIfNeeded();
+		// The digits the odometer settles on (each digit also holds a hidden "8" for its width).
+		const shown = (idx: number) =>
+			block
+				.locator(".countup-item")
+				.nth(idx)
+				.locator(".odometer")
+				.evaluate((el) => (el.classList.contains("odometer-animating") ? "" : [...el.querySelectorAll(".odometer-value, .odometer-formatting-mark")].map((part) => part.textContent).join("")));
+		for (const [idx, [, value]] of STATS.entries()) {
+			await expect.poll(() => shown(idx), { timeout: 8000 }).toBe(value);
+		}
+	});
+
 	test("every self-moving slider waits 7 seconds a frame", async ({ page }) => {
 		await open(page);
 		for (const selector of [".tlhp-hero .hero-slider", ".tlhp-news .blog-slider", ".tlhp-verses .testimonial-slider-2"]) {

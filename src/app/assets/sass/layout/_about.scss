@@ -456,3 +456,27 @@ START: About CSS
 }
 
 /* !END: About CSS */
+
+// TLHP Lời chào (T13b): the history topic's teaching as the heading, who said it, and its
+// overview under it.
+.tlhp-welcome {
+	.sec-heading {
+		margin-bottom: 20px;
+	}
+	.tlhp-welcome-author {
+		margin: 14px 0 0;
+		font-size: var(--tlhp-text-body-sm);
+		line-height: var(--tlhp-leading-body-sm);
+	}
+	.tlhp-welcome-text {
+		max-width: 560px;
+		margin-bottom: 24px;
+	}
+	.video-img img,
+	.customers-bg img {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}

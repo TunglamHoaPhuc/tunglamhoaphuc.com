@@ -109,6 +109,10 @@ export const site = {
 		},
 	},
 
+	// "CHỐN THIÊNG BÌNH YÊN – TÙNG LÂM HÒA PHÚC" on the temple's YouTube channel, the old home
+	// page's background video; Lời chào opens it in the lightbox.
+	introVideo: { id: "HE2MnR8Hl5c", title: "Chốn thiêng bình yên – Tùng Lâm Hòa Phúc" },
+
 	// The six ways in under the home hero, as on the old site's home page.
 	entrances: [
 		{ label: "Giới thiệu", href: "/gioi-thieu", image: "/brand/logo-tung-lam-hoa-phuc-tron-nga.webp" },

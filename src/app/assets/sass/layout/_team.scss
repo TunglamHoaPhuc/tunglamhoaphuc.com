@@ -361,3 +361,10 @@ START: Team CSS
 }
 
 /* !END: Team CSS */
+
+// TLHP Chư Tôn Đức (T13b): the teachers' cards are a list.
+.tlhp-teachers ul.leftSwipeWrap {
+	margin-bottom: 0;
+	padding: 0;
+	list-style: none;
+}
