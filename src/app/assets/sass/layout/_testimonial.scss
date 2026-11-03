@@ -646,4 +646,81 @@ START: Testimonial CSS
 	}
 }
 
+// TLHP: Lời Thầy dạy (Testimonials2). The verse in the scripture style, the month's
+// poster beside it, and the pause button under the slider.
+.tlhp-verses {
+	.testimonial-img-area {
+		height: 100%;
+	}
+	.testimonial-img {
+		min-height: 420px;
+		background-color: var(--tj-color-theme-dark);
+		// Bexon's light veil left the heading hard to read on a bright poster.
+		&::after {
+			opacity: 1;
+			background: linear-gradient(
+				180deg,
+				color-mix(in srgb, var(--tj-color-theme-dark) 85%, transparent) 0%,
+				color-mix(in srgb, var(--tj-color-theme-dark) 30%, transparent) 45%,
+				transparent 70%
+			);
+		}
+		.sec-heading .sec-title span {
+			color: var(--tlhp-accent);
+		}
+	}
+	.tlhp-verses-noimage {
+		display: block;
+		height: 100%;
+	}
+	.rating-box .title {
+		margin-bottom: 24px;
+		@media #{$sm, $xs} {
+			margin-bottom: 12px;
+		}
+	}
+	.tlhp-verses-pause {
+		margin-top: 20px;
+	}
+	// Twelve months of dots wrap; Bexon's line-height 0 laid the two rows on each other.
+	.tlhp-verses-pagination {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 10px 0;
+	}
+}
+.testimonial-slider-2 .testimonial-item.tlhp-verse-card {
+	margin: 0;
+	// Bexon's article blockquote (frame, ground, its own quote mark) stays out: the card
+	// already has its quote mark.
+	.tlhp-verse-text {
+		margin: 0;
+		padding: 30px 0 15px;
+		border: 0;
+		border-radius: 0;
+		background: none;
+		font-family: var(--tj-ff-heading);
+		font-size: var(--tlhp-text-scripture);
+		line-height: var(--tlhp-leading-scripture);
+		color: var(--tj-color-heading-primary);
+		&::before {
+			content: none;
+		}
+		p {
+			margin-bottom: 0 !important;
+			font-size: inherit;
+			font-weight: var(--tj-fw-regular);
+			line-height: inherit;
+		}
+		b {
+			font-weight: var(--tj-fw-sbold);
+			color: var(--tlhp-accent-text);
+		}
+	}
+	.title {
+		margin: 0 0 4px;
+	}
+}
+
 /* !END: Testimonial CSS */

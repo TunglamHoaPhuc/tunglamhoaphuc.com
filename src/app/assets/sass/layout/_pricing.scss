@@ -111,4 +111,55 @@ START: Pricing CSS
 	}
 }
 
+// TLHP: Khóa tu sắp tới (PricingPlan). The plan boxes hold events; the nearest is the
+// highlighted box. The day takes the price's place, smaller than Bexon's 64px figures.
+.tlhp-upcoming {
+	.sec-heading {
+		margin-inline: auto;
+	}
+}
+.pricing-box.tlhp-upcoming-card {
+	height: 100%;
+	.package-name {
+		font-size: var(--tlhp-text-h4);
+		line-height: var(--tlhp-leading-h4);
+	}
+	.package-price {
+		align-items: baseline;
+		gap: 12px;
+		font-size: 52px;
+		line-height: 1;
+		margin: 24px 0 28px;
+		@media #{$sm, $xs} {
+			font-size: 44px;
+		}
+	}
+	.package-period {
+		margin-top: 0;
+	}
+	.list-items ul {
+		margin: 0;
+		padding: 0;
+	}
+}
+.tlhp-upcoming-countdown {
+	display: inline-block;
+	margin-bottom: 16px;
+	padding: 6px 12px;
+	border: 1px solid var(--tlhp-accent-text);
+	border-radius: var(--tlhp-radius-pill);
+	font-size: var(--tlhp-text-caption);
+	font-weight: var(--tj-fw-sbold);
+	line-height: 1.2;
+	color: var(--tlhp-accent-text);
+	.pricing-box.active & {
+		border-color: var(--tj-color-common-white);
+		color: var(--tj-color-common-white);
+	}
+}
+.tlhp-upcoming-more {
+	margin-top: 40px;
+	text-align: center;
+}
+
 /* !END: Pricing CSS */

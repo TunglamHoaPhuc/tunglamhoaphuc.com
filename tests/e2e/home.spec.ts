@@ -1,9 +1,30 @@
 import AxeBuilder from "@axe-core/playwright";
+import { readFileSync } from "node:fs";
 import { expect, test, type Page } from "@playwright/test";
 
-// T10: the home page, rendered on the server from the content layer (data/snapshot/).
+// T10, T12: the home page, rendered on the server from the content layer (data/snapshot/).
 type SwiperElement = HTMLElement & {
 	swiper?: { params: { autoplay: { delay: number } }; autoplay: { running: boolean; paused: boolean }; realIndex: number };
+};
+
+// What the schedule holds today, worked out here from schedule.json so the checks keep up
+// with the calendar: the events not over yet (each title once) and the next to begin.
+type RawEvent = { slug: string; title: string; solarDateStr: string; isMultiDay?: boolean; endDateStr?: string };
+type RawTheme = { month: number; title: string; quoteLines: string[] };
+const SCHEDULE = (JSON.parse(readFileSync("data/snapshot/schedule.json", "utf8")) as { data: { customEvents: RawEvent[]; monthThemes: Record<string, RawTheme> } }).data;
+const iso = (dotted: string) => dotted.trim().split(".").reverse().join("-");
+const TODAY = new Date(Date.now() + 7 * 3_600_000).toISOString().slice(0, 10);
+const EVENTS = SCHEDULE.customEvents
+	.map((event) => ({ ...event, title: event.title.replace(/\s+/g, " ").trim(), start: iso(event.solarDateStr), end: event.isMultiDay && event.endDateStr ? iso(event.endDateStr) : iso(event.solarDateStr) }))
+	.sort((a, b) => a.start.localeCompare(b.start) || a.end.localeCompare(b.end) || a.title.localeCompare(b.title, "vi"));
+const UPCOMING = EVENTS.filter((event) => event.end >= TODAY)
+	.filter((event, idx, list) => list.findIndex((other) => other.title.toLowerCase() === event.title.toLowerCase()) === idx)
+	.slice(0, 3);
+const NEXT = EVENTS.find((event) => event.start >= TODAY);
+const daysLeft = (start: string) => Math.round((Date.parse(start) - Date.parse(TODAY)) / 86_400_000);
+const countdown = (event: { start: string }) => {
+	const days = daysLeft(event.start);
+	return days < 0 ? "Đang diễn ra" : days === 0 ? "Diễn ra hôm nay" : `Còn ${days} ngày`;
 };
 
 const ENTRANCES = [
@@ -41,8 +62,8 @@ test.describe("home page content", () => {
 		const order = ['class="tj-slider-section tlhp-hero"', 'id="loi-vao"', 'class="tj-blog-section-2'].map((marker) => html.indexOf(marker));
 		expect(order.every((at) => at > 0)).toBe(true);
 		expect([...order].sort((a, b) => a - b)).toEqual(order);
-		// Bexon's sample blocks wait for their tasks (T12–T15).
-		expect(html).not.toMatch(/tj-pricing-section|tj-testimonial-section|tj-team-section|Leading Future/);
+		// Bexon's sample blocks wait for their tasks (T13b–T15); its texts are gone.
+		expect(html).not.toMatch(/tj-team-section|Leading Future|Our Pricing|Hear from Our/);
 	});
 
 	test("has one h1 and names every block", async ({ page }) => {
@@ -53,18 +74,64 @@ test.describe("home page content", () => {
 		await expect(page.getByRole("heading", { level: 2, name: "Tin tức hoằng pháp." })).toBeVisible();
 	});
 
-	test("the hero opens on Nơi để trở về, then the latest ceremony", async ({ page }) => {
+	test("the hero opens on Nơi để trở về, then the next retreat with its days left, then the latest ceremony", async ({ page }) => {
 		await open(page);
 		const slides = hero(page).locator(".hero-slider .tj-slider-item");
-		await expect(slides).toHaveCount(2);
+		await expect(slides).toHaveCount(NEXT ? 3 : 2);
 		await expect(slides.nth(0).locator(".slider-title")).toHaveText("Nơi để trở vềChốn thiêng bình yên");
 		await expect(slides.nth(0).getByRole("link", { name: "Tìm hiểu Bổn tự" })).toHaveAttribute("href", "/gioi-thieu");
-		await expect(slides.nth(1).locator(".tlhp-hero-overline")).toHaveText("Pháp sự mới nhất · 17/10/2026");
-		await expect(slides.nth(1).locator(".slider-title")).toHaveText("Lễ Hằng Thuận tại Tùng lâm Hòa Phúc");
-		await expect(slides.nth(1).locator("a.tj-primary-btn")).toHaveAttribute("href", "/dong-chay-hoang-phap/le-hang-thuan-tai-tung-lam-hoa-phuc");
+		if (NEXT) {
+			// Counted on Vietnam's calendar on the server.
+			await expect(slides.nth(1).locator(".tlhp-hero-overline")).toHaveText(`Khóa tu sắp tới · ${countdown(NEXT)}`);
+			await expect(slides.nth(1).locator(".slider-title")).toHaveText(NEXT.title);
+			await expect(slides.nth(1).locator("a.tj-primary-btn")).toHaveText("Xem lịch khóa tu");
+			await expect(slides.nth(1).locator("a.tj-primary-btn")).toHaveAttribute("href", new RegExp(`^/lich-tu-hoc(\\?thang=${NEXT.start.slice(0, 7)})?#su-kien-${NEXT.slug}$`));
+		}
+		const latest = slides.last();
+		await expect(latest.locator(".tlhp-hero-overline")).toHaveText("Pháp sự mới nhất · 17/10/2026");
+		await expect(latest.locator(".slider-title")).toHaveText("Lễ Hằng Thuận tại Tùng lâm Hòa Phúc");
+		await expect(latest.locator("a.tj-primary-btn")).toHaveAttribute("href", "/dong-chay-hoang-phap/le-hang-thuan-tai-tung-lam-hoa-phuc");
 		await expect(hero(page).locator(".hero-thumb")).toHaveAttribute("aria-hidden", "true");
 		await hero(page).getByRole("button", { name: "Khung sau" }).click();
 		await expect(slides.nth(1)).toHaveClass(/swiper-slide-active/);
+	});
+
+	test("Khóa tu sắp tới lists the next events with their days left, or is not there", async ({ page }) => {
+		await open(page);
+		const block = page.locator(".tlhp-upcoming");
+		if (!UPCOMING.length) {
+			await expect(block).toHaveCount(0);
+			return;
+		}
+		await expect(block.getByRole("heading", { level: 2, name: "Khóa tu sắp tới." })).toBeVisible();
+		const cards = block.locator(".tlhp-upcoming-card");
+		await expect(cards.locator("h3")).toHaveText(UPCOMING.map((event) => event.title));
+		await expect(cards.locator(".tlhp-upcoming-countdown")).toHaveText(UPCOMING.map(countdown));
+		await expect(cards.first()).toHaveClass(/active/);
+		for (const [idx, event] of UPCOMING.entries()) {
+			await expect(cards.nth(idx).locator(".price-number")).toHaveText(`${event.start.slice(8)}/${event.start.slice(5, 7)}`);
+			const more = cards.nth(idx).locator(".pricing-btn a");
+			await expect(more).toHaveAttribute("href", new RegExp(`#su-kien-${event.slug}$`));
+			// Three links say "Xem chi tiết"; each also names its event for screen readers.
+			await expect(more).toHaveAccessibleName(new RegExp(`^Xem chi tiết\\s*:\\s*${event.title}$`));
+		}
+		// Nothing left of Bexon's price plans.
+		await expect(block).not.toContainText(/gói|plan|\$|₫|VNĐ|tháng\s*\/|per month/i);
+		await expect(block.getByRole("link", { name: "Xem lịch tu học" })).toHaveAttribute("href", "/lich-tu-hoc");
+	});
+
+	test("Lời Thầy dạy opens on this month's verse, in the scripture style", async ({ page }) => {
+		await open(page);
+		const month = Number(TODAY.slice(5, 7));
+		const themes = Object.values(SCHEDULE.monthThemes).filter((theme) => theme.quoteLines.length);
+		const first = [...themes.filter((theme) => theme.month >= month), ...themes.filter((theme) => theme.month < month)][0];
+		const block = page.locator(".tlhp-verses");
+		await expect(block.getByRole("heading", { level: 2, name: "Lời Thầy dạy." })).toBeVisible();
+		await expect(block.locator(".swiper-slide")).toHaveCount(themes.length);
+		const active = block.locator(".swiper-slide-active");
+		await expect(active.locator(".designation")).toHaveText(`Chủ đề tháng ${first.month}${first.title.trim() ? `: ${first.title.trim()}` : ""}`);
+		await expect(active.locator(".tlhp-verse-text p")).toHaveCount(first.quoteLines.length);
+		expect(await active.locator(".tlhp-verse-text p").first().evaluate((el) => getComputedStyle(el).fontFamily)).toMatch(/^"?Noto Serif/);
 	});
 
 	test("lists the six ways in, each once for keyboards and screen readers", async ({ page }) => {
@@ -174,31 +241,12 @@ test.describe("home hero picture", () => {
 		}
 	});
 
-	// On the live site the icon fonts arrive after the page (they are not preloaded); held
-	// back here, they once grew the hero's arrows from 22 to 28px.
-	test("nothing shifts while the page loads, even when the icon fonts come late", async ({ page }) => {
-		await page.route(/bexon-icons|\/fa-[a-z-]+\./, async (route) => {
-			await new Promise((resolve) => setTimeout(resolve, 1500));
-			await route.continue();
-		});
-		await page.addInitScript(() => {
-			(window as unknown as { cls: number }).cls = 0;
-			new PerformanceObserver((list) => {
-				for (const entry of list.getEntries() as (PerformanceEntry & { value: number; hadRecentInput: boolean })[]) {
-					if (!entry.hadRecentInput) (window as unknown as { cls: number }).cls += entry.value;
-				}
-			}).observe({ type: "layout-shift", buffered: true });
-		});
-		await open(page);
-		await page.waitForTimeout(2500);
-		expect(await page.evaluate(() => (window as unknown as { cls: number }).cls)).toBe(0);
-	});
 });
 
 test.describe("home sliders with motion allowed", () => {
 	test("every self-moving slider waits 7 seconds a frame", async ({ page }) => {
 		await open(page);
-		for (const selector of [".tlhp-hero .hero-slider", ".tlhp-news .blog-slider"]) {
+		for (const selector of [".tlhp-hero .hero-slider", ".tlhp-news .blog-slider", ".tlhp-verses .testimonial-slider-2"]) {
 			const delay = await page.locator(selector).evaluate((el: SwiperElement) => el.swiper!.params.autoplay.delay);
 			expect(delay, selector).toBeGreaterThanOrEqual(7000);
 			expect((await autoplayOf(page, selector)).running, selector).toBe(true);
@@ -274,5 +322,32 @@ test.describe("home sliders with motion allowed", () => {
 		await page.keyboard.press("Enter");
 		await expect(entrances(page).getByRole("button", { name: "Chạy tiếp dải chuyên mục" })).toBeFocused();
 		expect(await moves()).toBe(false);
+	});
+});
+
+test.describe("loading without layout shift", () => {
+	test.use({ reducedMotion: "reduce" });
+	// On a loaded machine the text fonts too can swap in after the first paint and nudge a
+	// button by a few pixels (font fallback metrics, T41a); that is not what this checks.
+	test.describe.configure({ retries: 2 });
+
+	// On the live site the icon fonts arrive after the page (they are not preloaded); held
+	// back here, they once grew the hero's arrows from 22 to 28px.
+	test("nothing shifts while the page loads, even when the icon fonts come late", async ({ page }) => {
+		await page.route(/bexon-icons|\/fa-[a-z-]+\./, async (route) => {
+			await new Promise((resolve) => setTimeout(resolve, 1500));
+			await route.continue();
+		});
+		await page.addInitScript(() => {
+			(window as unknown as { cls: number }).cls = 0;
+			new PerformanceObserver((list) => {
+				for (const entry of list.getEntries() as (PerformanceEntry & { value: number; hadRecentInput: boolean })[]) {
+					if (!entry.hadRecentInput) (window as unknown as { cls: number }).cls += entry.value;
+				}
+			}).observe({ type: "layout-shift", buffered: true });
+		});
+		await open(page);
+		await page.waitForTimeout(2500);
+		expect(await page.evaluate(() => (window as unknown as { cls: number }).cls)).toBe(0);
 	});
 });

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { site } from "@/config/site";
 import { createMemoryRepository } from "@/libs/content/repository";
-import type { Post } from "@/libs/content/types";
+import type { MonthTheme, Post, Schedule, ScheduleEvent } from "@/libs/content/types";
 import { loadHomeData } from "@/libs/home";
 
 function post(id: number, title: string, publishedDate: string, views: number, extra: Partial<Post> = {}): Post {
@@ -84,5 +84,81 @@ describe("repository lists for the home page", () => {
 	it("gives lists the banner too, for the hero", async () => {
 		const [first] = (await repo.listPosts({ section: "dong-chay-hoang-phap", pageSize: 2 })).items;
 		expect(first).toHaveProperty("banner", null);
+	});
+});
+
+function event(id: string, title: string, start: string, end = start, extra: Partial<ScheduleEvent> = {}): ScheduleEvent {
+	return {
+		id,
+		slug: `su-kien-${id}`,
+		title,
+		subtitle: "",
+		category: { slug: "cong-tu", name: "Cộng Tu" },
+		start,
+		end,
+		times: [{ label: "Khai khóa", time: "07h30" }],
+		location: "Tùng lâm Hòa Phúc",
+		description: `Mô tả ${id}`,
+		notes: "",
+		image: { src: `https://media.example/${id}.webp`, position: "center 30%" },
+		video: null,
+		...extra,
+	};
+}
+
+const theme = (month: number, lines: string[]): MonthTheme => ({ month, title: `Chủ đề ${month}`, poster: null, lines, author: "Vô Trí - Tâm Hòa" });
+
+const schedule: Schedule = {
+	events: [
+		event("a", "PHÁP HỘI NIỆM PHẬT", "2026-10-03"),
+		event("b", "LƯƠNG HOÀNG SÁM", "2026-11-01", "2026-11-05"),
+		event("c", "PHÁP HỘI NIỆM PHẬT", "2026-11-07"),
+		event("d", "Pháp hội niệm Phật", "2026-11-08"),
+		event("e", "LỄ TIÊN THƯỜNG", "2026-11-19"),
+		event("f", "LÃO TỔ SƯ", "2026-11-20"),
+	],
+	programs: [],
+	themes: [theme(1, ["Câu tháng Giêng"]), theme(8, []), theme(10, ["Câu tháng Mười"]), theme(11, ["<b>Hoằng Pháp</b> mãi nhớ Thầy", "Hải Phòng vẫn còn đây"])],
+	quotes: [],
+};
+
+// 3 November 2026, 9:00 in Vietnam.
+const NOW = new Date("2026-11-03T02:00:00Z");
+
+describe("home data from the schedule", async () => {
+	const data = await loadHomeData(createMemoryRepository(posts, { loadSchedule: async () => schedule }), NOW);
+
+	it("Khóa tu sắp tới: the next three events still running or to come, each title once", () => {
+		expect(data.upcoming.map((item) => item.event.id)).toEqual(["b", "c", "e"]);
+		expect(data.upcoming[0]).toMatchObject({ status: { label: "Đang diễn ra" }, countdown: "Đang diễn ra" });
+		expect(data.upcoming[1]).toMatchObject({ countdown: "Còn 4 ngày", href: "/lich-tu-hoc#su-kien-su-kien-c" });
+		expect(data.upcoming[2].href).toBe("/lich-tu-hoc#su-kien-su-kien-e");
+	});
+
+	it("hero frame 2 is the next event to begin, with its countdown, between the welcome and the latest post", () => {
+		expect(data.hero.map((slide) => slide.id)).toEqual(["noi-de-tro-ve", "khoa-tu-c", "bai-p2"]);
+		expect(data.hero[1]).toMatchObject({
+			overline: "Khóa tu sắp tới · Còn 4 ngày",
+			title: "PHÁP HỘI NIỆM PHẬT",
+			text: "Thứ Bảy, 07/11/2026 · Âm lịch 29/9 Bính Ngọ · Khai khóa 07h30 · Tùng lâm Hòa Phúc",
+			link: { label: "Xem lịch khóa tu", href: "/lich-tu-hoc#su-kien-su-kien-c" },
+			image: { src: "https://media.example/c.webp", thumb: "https://media.example/c.webp", position: "center 30%" },
+		});
+	});
+
+	it("links an event of another month by its month", async () => {
+		const later = await loadHomeData(createMemoryRepository(posts, { loadSchedule: async () => schedule }), new Date("2026-10-20T02:00:00Z"));
+		expect(later.upcoming[0]).toMatchObject({ countdown: "Còn 12 ngày", href: "/lich-tu-hoc?thang=2026-11#su-kien-su-kien-b" });
+	});
+
+	it("Lời Thầy dạy: verses from this month's theme on, skipping themes without one", () => {
+		expect(data.verses.map((verse) => verse.month)).toEqual([11, 1, 10]);
+		expect(data.verses[0]).toMatchObject({ title: "Chủ đề 11", lines: ["<b>Hoằng Pháp</b> mãi nhớ Thầy", "Hải Phòng vẫn còn đây"] });
+	});
+
+	it("drops frame 2 and the block when nothing is left on the schedule", async () => {
+		const after = await loadHomeData(createMemoryRepository(posts, { loadSchedule: async () => schedule }), new Date("2027-01-10T02:00:00Z"));
+		expect(after.upcoming).toEqual([]);
+		expect(after.hero.map((slide) => slide.id)).toEqual(["noi-de-tro-ve", "bai-p2"]);
 	});
 });

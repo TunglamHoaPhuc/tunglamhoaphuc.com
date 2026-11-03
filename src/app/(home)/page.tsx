@@ -3,6 +3,8 @@ import { Fragment, type ReactNode } from "react";
 import Blogs2 from "@/components/sections/blogs/Blogs2";
 import Brands2 from "@/components/sections/brands/Brands2";
 import Hero2 from "@/components/sections/hero/Hero2";
+import PricingPlan from "@/components/sections/pricing-plan/PricingPlan";
+import Testimonials2 from "@/components/sections/testimonials/Testimonials2";
 import { site } from "@/config/site";
 import { getContentRepository } from "@/libs/content/repository";
 import { type HomeData, loadHomeData } from "@/libs/home";
@@ -19,10 +21,12 @@ type Block = { id: string; render: (data: HomeData) => ReactNode };
 const BLOCKS: Block[] = [
 	{ id: "hero", render: (data) => <Hero2 slides={data.hero} /> },
 	{ id: "loi-vao", render: () => <Brands2 /> },
-	// T12: khóa tu sắp tới (PricingPlan)
+	{ id: "khoa-tu", render: (data) => <PricingPlan events={data.upcoming} /> },
 	{ id: "tin-tuc", render: (data) => <Blogs2 latest={data.latest} popular={data.popular} /> },
 	// T13b: lời chào (About2) · T14: Tông Chỉ Tu Học (Services2) · T15: khu vực nổi bật (Portfolios2)
-	// T14: lộ trình tu học (Process) · T12: Lời Thầy dạy (Testimonials2) · T13b: Chư Tôn Đức (Team1)
+	// T14: lộ trình tu học (Process)
+	{ id: "loi-thay-day", render: (data) => <Testimonials2 verses={data.verses} /> },
+	// T13b: Chư Tôn Đức (Team1)
 ];
 
 export default async function Home() {

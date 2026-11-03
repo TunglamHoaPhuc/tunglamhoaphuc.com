@@ -56,8 +56,8 @@ const HeroPicture = ({ image, first }) => (
 );
 
 /**
- * Bexon's home slider with the temple's frames (plan.md, home block 1): "Nơi để trở về"
- * and the latest ceremony; the next retreat joins in T12. Each frame stays 7 seconds, with
+ * Bexon's home slider with the temple's frames (plan.md, home block 1): "Nơi để trở về",
+ * the next retreat with the days left, and the latest ceremony. Each frame stays 7 seconds, with
  * a pause button; the slider also stops when focus moves into it and holds under the
  * pointer.
  * @param {{ slides: import("@/libs/home").HeroSlide[] }} props
