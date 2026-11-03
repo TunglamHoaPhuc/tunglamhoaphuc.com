@@ -377,14 +377,47 @@
 
 **File Bexon:** `sections/hero/HeroInner.js`, `layout/main/BlogMain.js`, `shared/cards/BlogCard2.js` (biến thể duy nhất còn lại sau T2), `shared/others/Paginations.js`, `shared/others/NoItems.js`
 
+**Kết quả 03/11/2026:** xong, đã deploy `v2.`.
+- **Trang `src/app/(site)/dong-chay-hoang-phap/page.tsx`** (server):
+  - Đọc `getContentRepository()`; lọc, sắp xếp, phân trang 12 bài ở server.
+  - Tham số URL đọc/ghi một chỗ (`src/libs/postList.ts`): `?danh-muc=&sap-xep=moi-nhat|cu-nhat|a-z|z-a&trang=`, bỏ giá trị mặc định nên danh sách gốc giữ địa chỉ trần.
+  - Giá trị lạ (sắp xếp sai, `trang=abc`) quay về mặc định.
+- **Thanh công cụ:**
+  - 5 nút lọc dạng pill có số bài, là liên kết thật với `aria-current`. Trên điện thoại gộp một hàng vuốt ngang.
+  - `<select>` sắp xếp gốc (`SortSelect`), chờ 300 ms sau mỗi lần đổi vì phím mũi tên trên ô chọn đóng phát `change` từng lần. Không có JavaScript thì có nút "Áp dụng".
+  - Dòng trạng thái `role="status"`, ví dụ "189 bài trong “Cộng Tu Định Kỳ” · trang 1/16".
+- **Thẻ bài `PostCard`** (dựa trên `.blog-item` của Bexon; `BlogCard2` để nguyên cho trang chủ T10):
+  - Ảnh 4:3 có kích thước cố định, nhãn ngày Bexon trên ảnh.
+  - Chip chuyên mục → tiêu đề h3 (tối đa 3 dòng) → tóm tắt (3 dòng) → ngày đăng · lượt xem.
+  - 3 ảnh đầu tải ngay, các ảnh sau tải lười.
+- **Phân trang `PageLinks`:** liên kết thật ở server theo kiểu `.tj-pagination` (1 … 4 5 6 … 40). Sang trang khác thì lướt về đầu danh sách và đưa focus vào tiêu đề danh sách.
+- **Trạng thái rỗng:** `NoItems` viết lại, bỏ markup WooCommerce. Chuyên mục không có, chuyên mục rỗng, hay trang vượt giới hạn đều có nút quay lại.
+- **Đo được:**
+  - HTML 158–162 KB với 12 thẻ (site cũ 472 thẻ, khoảng 3 MB).
+  - CLS = 0 ở 1440 và 375px, bật hay tắt hiệu ứng.
+  - Bấm lọc giữ nguyên focus ở nút vừa bấm.
+  - ScrollSmoother tự cập nhật chiều cao khi danh sách đổi.
+  - Back trả về đúng chỗ.
+  - vinext không dựng lại trang khi chỉ đổi tham số URL.
+- **Sửa trong lúc làm:**
+  - `focus()` một phần tử trong nội dung làm ScrollSmoother đưa phần tử đó ra giữa màn hình, đè lên lệnh cuộn của trang. Nay phần tử `tabindex="-1"` (do script focus) không bị ScrollSmoother tự cuộn.
+  - Khi cuộn mượt đang chạy, `scrollIntoView` nhắm sai vì nội dung đang lướt dở; nay nhờ `ScrollSmoother.scrollTo` cuộn.
+- **Lớp nội dung (T4) bổ sung:**
+  - 12 bài không có tóm tắt hoặc tóm tắt là chữ mẫu "Tóm tắt nội dung bài viết…": tạm lấy đầu nội dung.
+  - Báo cáo thêm 9 nhóm bài trùng tiêu đề trong cùng chuyên mục (dư 10 bài, nhiều bài giống hệt nhau). Các bài vẫn hiển thị, để Ban Biên Tập gộp.
+- **Còn lại cho sau:**
+  - **Ảnh gốc quá nặng:** thẻ 480px đang tải ảnh gốc 2.048–6.048px. Thu nhỏ là việc của T41b (Image Transformations), nên làm sớm trước ra mắt.
+  - **Trang chi tiết:** liên kết chi tiết `/dong-chay-hoang-phap/<slug>` hiện vào trang 404 cho tới T8.
+
 **Tiêu chí nghiệm thu:**
-- [ ] HTML trang đầu chỉ chứa ≤ 12 thẻ bài (site cũ: 472 thẻ, 3 MB); đổi bộ lọc giữ trạng thái trên URL, nút Back hoạt động
-- [ ] Danh mục rỗng hoặc số trang vượt giới hạn hiện trạng thái rỗng có lối quay lại
-- [ ] Ảnh thẻ có kích thước cố định (CLS = 0), ảnh ngoài màn hình đầu tải lười
+- [x] HTML trang đầu chỉ chứa ≤ 12 thẻ bài (site cũ: 472 thẻ, 3 MB); đổi bộ lọc giữ trạng thái trên URL, nút Back hoạt động
+- [x] Danh mục rỗng hoặc số trang vượt giới hạn hiện trạng thái rỗng có lối quay lại
+- [x] Ảnh thẻ có kích thước cố định (CLS = 0), ảnh ngoài màn hình đầu tải lười
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- dong-chay`
-- [ ] Đo kích thước HTML trang danh sách trên `npm run preview`
+- [x] `npm run test:e2e -- dong-chay` (24 test, chạy lặp 2 lần vẫn xanh, có thêm axe và bản không JavaScript); toàn bộ e2e 216 xanh cục bộ và trên `v2.`; unit 63 xanh
+- [x] Đo kích thước HTML trang danh sách trên `npm run preview`: 158 KB
+- [x] Ảnh: `docs/anh/t7-dong-chay-hoang-phap.png`
 
 **Phụ thuộc:** T4, T6
 
