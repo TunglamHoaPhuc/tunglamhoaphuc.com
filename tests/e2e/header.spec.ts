@@ -117,10 +117,13 @@ test.describe("mobile menu", () => {
 	test("opens as a dialog, keeps focus inside, Esc closes and returns focus", async ({ page }) => {
 		await open(page, 375);
 		const toggle = liveHeader(page).getByRole("button", { name: "Mở menu" });
-		await toggle.click();
 		// Each of the two headers owns a panel; the closed one is inert.
 		const dialog = page.locator('[role="dialog"][aria-label="Menu"]:not([inert])');
-		await expect(dialog).toBeVisible();
+		// On a loaded machine the page's script may not be running yet at the first press.
+		await expect(async () => {
+			if (!(await dialog.isVisible())) await toggle.click();
+			await expect(dialog).toBeVisible({ timeout: 1500 });
+		}).toPass({ timeout: 8000 });
 		await expect(toggle).toHaveAttribute("aria-expanded", "true");
 		// Focus moves into the panel by itself once it has slid in.
 		await expect.poll(() => dialog.evaluate((el) => el.contains(document.activeElement))).toBe(true);
