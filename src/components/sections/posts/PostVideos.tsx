@@ -1,5 +1,6 @@
 "use client";
-import { useLightbox, youtubeEmbed } from "@/hooks/useLightbox";
+import { useLightbox } from "@/hooks/useLightbox";
+import { youtubeEmbed } from "@/libs/video";
 import type { MediaImage, Video } from "@/libs/content/types";
 
 type Props = { videos: Video[]; title: string; poster: MediaImage | null };

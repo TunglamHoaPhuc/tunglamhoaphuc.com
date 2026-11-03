@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { ScrollSmoother } from "@/libs/gsap.config";
+import { revealTarget } from "@/libs/reveal";
 
 export type AnchorTab = { id: string; label: string };
 
@@ -41,10 +41,7 @@ export default function AnchorTabs({ tabs, path }: Props) {
 		const target = document.getElementById(id);
 		if (!target) return;
 		event.preventDefault();
-		target.focus({ preventScroll: true });
-		const smoother = ScrollSmoother.get();
-		if (smoother) smoother.scrollTo(target, true, `top ${HEADER_ROOM}px`);
-		else target.scrollIntoView({ block: "start" });
+		revealTarget(target);
 		history.replaceState(history.state, "", `#${id}`);
 		setActive(id);
 	};
