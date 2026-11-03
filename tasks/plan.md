@@ -230,7 +230,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [x] T9: Video, album ảnh, lightbox
 - [x] T10: Trang chủ – hero, lối vào chuyên mục, tin mới nhất
 - [ ] **Checkpoint B** – lát cắt đầu-cuối
-- [ ] T11: Lịch tu học – dữ liệu, âm lịch, trang `/lich-tu-hoc`
+- [x] T11: Lịch tu học – dữ liệu, âm lịch, trang `/lich-tu-hoc`
 - [ ] T12: Trang chủ – khóa tu sắp tới, Lời Thầy dạy và đếm ngày trên hero
 - [ ] T13a: Giới thiệu – trang chủ đề
 - [ ] T13b: Trang chủ – Lời chào và Chư Tôn Đức

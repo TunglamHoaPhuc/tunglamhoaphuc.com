@@ -608,14 +608,47 @@
 
 **File Bexon:** `sections/hero/HeroInner.js`, `shared/cards/BlogCard2.js` (khuôn thẻ sự kiện)
 
+**Kết quả 03/11/2026:** xong, đã deploy `v2.`.
+- **Dữ liệu:**
+  - `npm run snapshot:fetch` lấy thêm `data/snapshot/schedule.json` từ `GET /api/admin/schedule`, cũng là API mà trang chủ site cũ đang gọi. Site cũ không có trang `/lich-tu-hoc` riêng.
+  - Adapter `src/libs/content/schedule.ts` (zod, dễ dãi như bài viết) đọc 15 sự kiện, 3 khóa lễ thường kỳ, 12 chủ đề tháng và 12 ảnh câu kệ. Repository có thêm `getSchedule()`; `snapshot:check` báo số sự kiện theo tháng.
+  - Loại sự kiện dùng slug giống chuyên mục bài viết (`cong-tu`, `khoa-le-truyen-thong`, `dai-le-su-kien`).
+  - Câu kệ chỉ giữ thẻ `<b>`, mọi thứ khác bị escape.
+  - **Bucket B2 thứ hai:** admin cũ nay tải ảnh lên bucket `media-tunglamhoaphuc`. Cả 30 ảnh của lịch nằm ở đó, và 3 ảnh mới chỉ có ở đó (không có bản ở `s2-cnv03`). Khi chép B2 sang R2 (chuẩn bị #1) phải chép cả bucket này; `snapshot:check` liệt kê đủ.
+- **Âm lịch** `src/libs/lunar.ts` theo thuật toán Hồ Ngọc Đức, múi giờ +7: ngày âm, tháng nhuận, tên năm Can Chi, Phật lịch (sang năm vào ngày Phật đản 15/4 ÂL).
+  - Đúng cả 12 ngày lễ kiểm thử 2025–2027 và tháng 6 nhuận năm 2025.
+  - Đối chiếu từng ngày 2020–2030 với lịch Trung Quốc của ICU: chỉ lệch ở 2 tháng có trăng mới sát nửa đêm (14/12/2020 do chênh múi giờ; Tết 6/2/2027, nơi lịch Việt đã công bố khớp thuật toán). Hai chỗ lệch này được ghi rõ trong test.
+- **Trang `/lich-tu-hoc`** (server, `?thang=YYYY-MM&loai=`):
+  - Mặc định là tháng hiện tại theo giờ Việt Nam; giá trị lạ thì quay về mặc định.
+  - Đầu trang ghi "Tháng 11/2026 · tháng Chín – tháng Mười âm lịch năm Bính Ngọ · Phật lịch 2570", có nút tháng trước / tháng này / tháng sau và nút lọc theo loại. Một dòng `role="status"` đọc lên khi đổi tháng hay đổi loại.
+  - Lưới tháng là `<table>` từ T2 tới CN, chủ nhật màu chu sa. Mỗi ô có ngày dương và ngày âm; ngày mùng 1 ghi "1/10", ngày rằm ghi "Rằm"; hôm nay có `aria-current="date"`.
+  - Ngày có sự kiện là một link lớn dẫn tới thẻ sự kiện đầu tiên của ngày đó, lướt tới bằng ScrollSmoother và đưa focus vào thẻ. Trình đọc màn hình nghe "Thứ Bảy, ngày 7 âm lịch ngày 29 tháng Chín: PHÁP HỘI NIỆM PHẬT". Trên màn hẹp, tên sự kiện vẽ thành chấm tròn.
+  - Danh sách thẻ sự kiện ngay dưới lưới là bản tương đương cho trình đọc màn hình. Mỗi thẻ: ảnh 16:9, chip trạng thái và loại, ngày dương + âm (kể cả sự kiện nhiều ngày), giờ, nơi, mô tả, lưu ý, video mở bằng lightbox nocookie của T9.
+  - Bên cạnh lưới là chủ đề tháng: tranh, câu kệ chữ `scripture`, tác giả.
+  - Mục "Khóa lễ thường kỳ" (3 khóa lễ), và mục `#khoa-tu` ghi cách đăng ký qua điện thoại: 7 số của Ban lãnh chúng, giờ đón Phật tử.
+  - Tháng không có sự kiện thì chỉ sang tháng gần nhất có lịch.
+- **Khác với mô tả:** chip "Đang mở đăng ký" / "Đã đủ số lượng" chưa làm được vì dữ liệu cũ không có trạng thái đăng ký. Tạm dùng "Sắp diễn ra" / "Đang diễn ra" / "Đã kết thúc", tính theo ngày Việt Nam; khi có đăng ký (T39) sẽ thêm hai chip kia.
+- **Để lại cho T12:** ảnh câu kệ (`quoteGallery`) đang trỏ vào `/images/lich-tu-hoc/quotes/…` của site cũ (Vercel). Khi `www.` chuyển sang site mới các đường dẫn này sẽ hỏng, nên phải chép ảnh sang B2/R2 trước khi T12 dùng.
+- **Sửa thêm:**
+  - `youtubeEmbed` chuyển sang `src/libs/video.ts` để trang server gọi được.
+  - Hàm lướt tới một mục trong trang tách thành `src/libs/reveal.ts`, dùng chung cho `AnchorTabs` (T8) và lưới tháng.
+  - Test mở lightbox của T9 quay lại trang và thử lại khi Enter mở thẳng file ảnh lúc lightbox chưa tải xong (gặp khi máy chạy nặng).
+  - **Dịch bố cục trên `v2.`** (test CLS = 0 của T10 hỏng ở đó, cục bộ không thấy): font icon của Bexon về sau trang, nên mũi tên của slider nở từ 22 lên 28px. Icon ngôi nhà ở đường dẫn và mũi tên điều hướng tháng cũng vậy. Nay các ô icon này có độ rộng cố định bằng đúng độ rộng của icon. Đã kiểm bằng cách làm chậm font icon 2 giây: trang chủ, `/lich-tu-hoc` và `/dong-chay-hoang-phap` đều dịch 0.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Âm lịch đúng cho bộ ngày kiểm thử: Tết, Rằm tháng Giêng, Phật đản 15/4 ÂL, Vu Lan 15/7 ÂL các năm 2025–2027
-- [ ] Lưới tháng dùng được bằng bàn phím và có bản danh sách tương đương cho trình đọc màn hình
-- [ ] 15 sự kiện trong snapshot hiển thị đúng ngày dương và âm
+- [x] Âm lịch đúng cho bộ ngày kiểm thử: Tết, Rằm tháng Giêng, Phật đản 15/4 ÂL, Vu Lan 15/7 ÂL các năm 2025–2027
+- [x] Lưới tháng dùng được bằng bàn phím và có bản danh sách tương đương cho trình đọc màn hình
+- [x] 15 sự kiện trong snapshot hiển thị đúng ngày dương và âm (e2e so với lịch ICU, độc lập với `lunar.ts`)
 
 **Kiểm chứng:**
-- [ ] `npm test -- lunar`
-- [ ] `npm run test:e2e -- lich-tu-hoc`
+- [x] `npm test -- lunar` (17 test) và `calendar` (11 test); unit tổng 104 xanh
+- [x] `npm run test:e2e -- lich-tu-hoc` (12 test × 2 cỡ màn hình, có axe và test dịch bố cục khi font icon về muộn); trang được thêm vào test canh gác
+- [x] Toàn bộ e2e (344 test, 24 bỏ qua theo thiết kế) trên bản cuối:
+  - Cục bộ 315/320. Trên `v2.` 294/320.
+  - Mọi test hỏng đều là `page.goto` chờ sự kiện `load` quá 30 giây. Sự kiện này chờ ảnh ngoài (B2, WordPress), và mạng ra hai nơi đó chậm hẳn trong buổi chiều đo (lượt chạy dài 13–14 phút thay vì 5–7). Telemetry của Worker không có lỗi nào ngoài yêu cầu bị huỷ.
+  - Chạy lại riêng các test hỏng (1–2 luồng) đều xanh. Lượt trước đó trên `v2.` (cùng mã, trước bản sửa CSS) chỉ hỏng test dịch bố cục đã sửa ở trên.
+  - Đây là thêm một lý do để làm T41b sớm: trang chờ các ảnh gốc nặng hàng MB.
+- [x] Ảnh: `docs/anh/t11-lich-tu-hoc.png`
 
 **Phụ thuộc:** T4, T6
 
