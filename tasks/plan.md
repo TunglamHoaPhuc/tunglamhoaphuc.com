@@ -221,7 +221,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [ ] T4: Lớp nội dung: snapshot JSON → repository (lát Dòng Chảy)
 - [x] T5a: Header và menu
 - [x] T5b: Popup tìm kiếm và dải thông báo
-- [ ] T6: Footer, khối kết trang, nút lên đầu trang và trang 404
+- [x] T6: Footer, khối kết trang, nút lên đầu trang và trang 404
 - [ ] **Checkpoint A** – duyệt giao diện nền trên `v2.` với Ban Truyền Thông
 
 ### Giai đoạn 2 – Site công khai (đọc snapshot)

@@ -264,14 +264,51 @@
 
 **File Bexon:** `components/layout/footer/Footer2.js`, `sections/cta/Cta.js`, `sections/error/ErrorPrimary.js`, `shared/others/BackToTop.js`, `assets/sass/components/_footer.scss`
 
+**Kết quả 03/11/2026:** xong, đã deploy `v2.`.
+- **Khung chung `SiteShell`** (`src/components/layout/SiteShell.tsx`): header nổi + header dính, dải thông báo, trang, footer, nút lên đầu trang, hiệu ứng. Hai nhóm route dùng nó:
+  - `(home)/layout.tsx`: trang chủ, header trong suốt (`header-2`).
+  - `(site)/layout.tsx`: trang trong, header nền sáng.
+  - `/styleguide` (ngoài nhóm) gọi `SiteShell` với tìm kiếm và thông báo mẫu.
+  - Các trang chỉ còn `<main>`; dòng `AnnouncementBar` thêm ở T5b đã bỏ khỏi từng trang.
+- **Hiệu ứng khi chuyển trang:** khung không còn dựng lại mỗi trang như Bexon, nên `PageEffects` khởi động lại `ClientWrapper` theo đường dẫn (ScrollSmoother, wow.js, tách chữ). Test kiểm trang mới bắt đầu ở đầu trang và cuộn mượt chạy lại.
+- **Footer2** (nền `.tlhp-dark`):
+  - 4 cột Bổn tự · Thời khóa tu học · Liên hệ · Bản đồ chùa, 1 → 2 → 4 cột.
+  - Ấn tròn bản ngà mới: `public/brand/logo-tung-lam-hoa-phuc-tron-nga.webp`, dựng từ bản đen.
+  - 7 số điện thoại nhóm theo vai trò, mỗi số là liên kết `tel:` cao 48px.
+  - Chữ chạy "Nơi để trở về · Chốn thiêng bình yên" có ấn tròn xen giữa, `aria-hidden` vì khẩu hiệu đã có ở dải cuối.
+  - Dải cuối: "© Phật lịch 2570 – 2026 Tùng Lâm Hòa Phúc" · khẩu hiệu · nút "Về đầu trang".
+  - Bỏ ô đăng ký email, logo giải thưởng, mạng xã hội mẫu.
+- **Khối kết trang (Cta):** "Về chùa tu học" + nút "Xem lịch tu học", phủ lên đầu footer 120px như Bexon (dùng `:has()`; trình duyệt cũ thì xếp trên footer). Nửa ảnh tạm là ấn tròn trên nền nâu sẫm, chờ ảnh chùa.
+- **BackToTop:** nay là `<button aria-label="Về đầu trang">` (Bexon dùng `div` bấm chuột), cỡ 60/50px.
+  - Tự ẩn khi dải cuối footer hiện ra.
+  - Trên điện thoại chỉ hiện khi cuộn ngược lên, để không che cột chữ khi đọc.
+  - Bấm nút này hoặc nút ở footer thì cuộn lên và đưa focus về logo.
+- **Trang 404** (`ErrorPrimary` giọng kính ngữ, banner "Không tìm thấy trang", breadcrumb tiếng Việt):
+  - Trả HTTP 404, có `noindex`.
+  - Route `(site)/[...missing]` bắt mọi đường dẫn lạ. Lý do: vinext render `app/not-found.js` bên trong layout `(home)`, Next.js thì render trần; cả hai đều làm khung lồng đôi hoặc mất khung.
+  - Bỏ `app/loading.js` rỗng của Bexon: nó bọc trang trong Suspense nên `notFound()` trả 200 (`/blogs/9999`). `BlogMain` cần Suspense riêng cho `useSearchParams()`.
+  - `error.js` chuyển vào nhóm route, có nút "Thử lại".
+- **Sửa lỗi gốc của Bexon phát hiện trong lúc làm:**
+  - wow.js ẩn khối chưa cuộn tới bằng `visibility`, nên Tab bỏ qua mọi liên kết trong đó (cả 4 cột footer) cho tới khi người dùng tự cuộn. Nay ẩn bằng `opacity`, khối hiện ngay khi nhận focus.
+  - Giảm chuyển động chỉ rút thời lượng chuyển cảnh, còn độ trễ thì giữ: chữ slider hero vẫn chờ tới 1,4 giây, axe trên `v2.` bắt được lúc nút chưa có tên. Nay bỏ cả độ trễ.
+  - axe trên `/`: mũi tên slider là `div role="button"` không tên, không dùng được bằng phím; nay là `<button>` "Trang trước/Trang sau". Hai liên kết chỉ có icon có thêm nhãn.
+- **Ảnh tạm thay ảnh giữ chỗ:** nền banner trang trong (`pheader-bg.webp` có chữ "890X42", lớp phủ xanh két) đổi sang nền gỗ mộc ấm cho tới khi T7 có ảnh.
+- **Chờ nhà chùa:**
+  - Ảnh bản đồ tĩnh (`site.mapImage`, dựng khi có link Google Maps của chùa, GD-06); tạm hiện khung địa chỉ.
+  - Mạng xã hội (GD-06).
+  - Lịch cộng tu định kỳ cho cột Thời khóa (lấy từ dữ liệu lịch ở T12).
+  - Duyệt đoạn giới thiệu nháp `site.intro`.
+- **Lưu ý:** tiêu đề trang 404 lấy từ `metadata` của `[...missing]/page.js` (vinext bỏ qua `metadata` của `not-found.js`); vinext chèn hai thẻ `robots noindex`, vô hại.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Footer 1 → 2 → 4 cột theo điểm ngắt; mỗi số điện thoại là liên kết `tel:` cao ≥ 48px; chữ chạy dừng ở chế độ giảm chuyển động
-- [ ] URL không tồn tại trả HTTP 404 với trang tùy biến
-- [ ] Test canh gác và axe xanh trên `/` và trang 404
+- [x] Footer 1 → 2 → 4 cột theo điểm ngắt; mỗi số điện thoại là liên kết `tel:` cao ≥ 48px; chữ chạy dừng ở chế độ giảm chuyển động
+- [x] URL không tồn tại trả HTTP 404 với trang tùy biến
+- [x] Test canh gác và axe xanh trên `/` và trang 404
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e`
-- [ ] `curl -I` một URL sai trên `npm run preview` trả 404
+- [x] `npm run test:e2e`: `footer.spec.ts` 56 test; toàn bộ e2e 185 xanh cục bộ và trên `v2.` (footer + canh gác chạy lặp 2 lần vẫn xanh); unit 24 xanh
+- [x] `curl -I` một URL sai trên `npm run preview` trả 404 (cả `/a/b/c` và `/blogs/9999`)
+- [x] Ảnh: `docs/anh/t6-footer-va-404.png`
 
 **Phụ thuộc:** T5b
 
