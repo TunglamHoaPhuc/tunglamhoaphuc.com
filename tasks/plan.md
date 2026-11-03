@@ -227,7 +227,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 ### Giai đoạn 2 – Site công khai (đọc snapshot)
 - [x] T7: Dòng Chảy Hoằng Pháp – trang danh sách
 - [x] T8: Trang chi tiết bài viết và chế độ đọc
-- [ ] T9: Video, album ảnh, lightbox
+- [x] T9: Video, album ảnh, lightbox
 - [ ] T10: Trang chủ – hero, lối vào chuyên mục, tin mới nhất
 - [ ] **Checkpoint B** – lát cắt đầu-cuối
 - [ ] T11: Lịch tu học – dữ liệu, âm lịch, trang `/lich-tu-hoc`

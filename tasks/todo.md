@@ -489,13 +489,27 @@
 
 **File Bexon:** `sections/our-gallery/OurGalleryPrimary.js`, `shared/popup-video/PopupVideo.js`
 
+**Kết quả 03/11/2026:** xong, đã deploy `v2.`. Album 4:3 và GLightbox đã gắn từ T8; T9 làm phần còn lại.
+- **Hook dùng chung `src/hooks/useLightbox.ts`** (thay cho `useLightboxFocus` dự kiến), bọc GLightbox của Bexon. Dùng cho album (`PostGallery`), video bài (`PostVideos`) và `PopupVideo` của Bexon (trang chủ, trang `our-gallery`).
+  - Khung có `role="dialog" aria-modal="true"`, nút tiếng Việt (Đóng · Ảnh trước · Ảnh sau).
+  - Bộ đếm "3/30" là vùng `aria-live`, đọc lên mỗi lần chuyển ảnh.
+  - Khi mở: phần trang phía sau `inert`, focus vào nút Đóng, Tab chỉ vòng qua các nút đang hiện. Bẫy Tab của GLightbox đưa focus vào nút "Ảnh trước" đang ẩn ở ảnh đầu, làm focus rơi ra ngoài; nay thay bằng bẫy riêng.
+  - Đóng (Esc, nút Đóng) trả focus về đúng ảnh hoặc video đã bấm. GLightbox không tự làm việc này.
+  - Ảnh trong lightbox có `alt` riêng (`data-alt`); iframe video có `title`.
+  - Giảm chuyển động thì tắt hiệu ứng zoom/slide của lightbox.
+- **Video `PostVideos`:**
+  - Ảnh đại diện là banner của bài, không lấy ảnh của YouTube, nên không có request nào tới YouTube trước khi bấm.
+  - Bấm phát thì mở `youtube-nocookie.com/embed/…` dạng iframe (`data-type="external"`). Trình phát Plyr mặc định của GLightbox tải từ `youtube.com` và `cdn.plyr.io`, nên không dùng.
+  - Video mẫu trên trang chủ (`About2`) cũng chuyển sang cách này.
+- **Album:** 12 ảnh đầu tải lười; ảnh sau "Xem thêm" chưa vẽ nên chưa tải. Test album 170 ảnh: lúc đầu tải ≤ 12 ảnh, sau "Xem thêm" chỉ tải những ảnh gần khung nhìn.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Không có request nào tới YouTube trước khi người dùng bấm phát
-- [ ] Lightbox: Esc, bẫy focus, trả focus; axe 0 lỗi khi đang mở
-- [ ] Album 79 ảnh chỉ tải ảnh thu nhỏ đang trong khung nhìn
+- [x] Không có request nào tới YouTube trước khi người dùng bấm phát (sau khi bấm chỉ có `youtube-nocookie.com` và những gì khung nhúng đó tự tải)
+- [x] Lightbox: Esc, bẫy focus, trả focus; axe 0 lỗi khi đang mở
+- [x] Album 79 ảnh chỉ tải ảnh thu nhỏ đang trong khung nhìn (kiểm trên album 170 ảnh)
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- media` (theo dõi network request)
+- [x] `npm run test:e2e -- media` (theo dõi network request, 6 test × 2 cỡ màn hình); toàn bộ e2e 255 xanh cục bộ và trên `v2.`; unit 70 xanh
 
 **Phụ thuộc:** T8
 
