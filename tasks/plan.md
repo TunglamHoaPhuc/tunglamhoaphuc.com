@@ -62,7 +62,7 @@ Lộ trình có 3 mốc:
 
 | # | Việc | Ai | Cần trước |
 |---|---|---|---|
-| 1 | Sao chép 13 file JSON trong thư mục `database/` của Ổ Z: (B2) vào `data/snapshot/` | Chủ site | T4 |
+| 1 | Sao chép 13 file JSON trong thư mục `database/` của Ổ Z: (B2) vào `data/snapshot/`. Tạm thời (03/11) `npm run snapshot:fetch` lấy riêng file bài viết qua API danh sách công khai của site cũ, thiếu album của 447 bài | Chủ site | T4 (tạm), T8 |
 | 2 | ~~Sao chép thư mục `09-icon-minh-hoa/` (logo Mộc Ấn, logo tròn, icon minh họa) vào `public/brand/`~~ – **xong 02/11**: bộ nhận diện gốc ở `bo-nhan-dien/` (logo, favicon, 20 icon chuyên mục, font UTM, bảng màu; không đưa vào git). Bản dùng cho web chép sang `public/brand/`: 2 logo, 6 favicon, 14 icon thu về 128px (112 KB). Font UTM không dùng (đã chốt Noto Serif + Be Vietnam Pro) | Chủ site | T5a |
 | 3 | Node.js 20 LTS trở lên. Cloudflare **đã có**: tài khoản sở hữu zone (id `b91a395bd9b7ab86ef4cba41d1d828ae`), `cf` profile `tlhp`, Worker `tlhp-web` gắn `v2.tunglamhoaphuc.com`. Khi chạy lệnh đặt `CLOUDFLARE_ACCOUNT_ID` | Đội kỹ thuật | T1 |
 | 4 | Xác định bucket B2 chứa 13 file JSON mà admin cũ đang ghi; tạo **khóa ứng dụng B2 chỉ đọc** cho đúng bucket đó | Chủ site | T19 |
@@ -218,7 +218,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [x] T2: Gỡ trang, thư viện thừa và thêm công tắc giảm chuyển động
 - [x] T3a: Cầu nối theme TLHP: màu, font, cỡ chữ
 - [x] T3b: Quét màu viết cứng, chỉnh chữ tiếng Việt và trang styleguide
-- [ ] T4: Lớp nội dung: snapshot JSON → repository (lát Dòng Chảy)
+- [x] T4: Lớp nội dung: snapshot JSON → repository (lát Dòng Chảy)
 - [x] T5a: Header và menu
 - [x] T5b: Popup tìm kiếm và dải thông báo
 - [x] T6: Footer, khối kết trang, nút lên đầu trang và trang 404
@@ -311,6 +311,8 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 | Hai nguồn dữ liệu lệch nhau lúc chuyển hẳn (admin cũ vẫn ghi JSON sau khi nhập D1) | TB | T39 đóng băng admin cũ trước, nhập lần cuối, rồi mới chuyển nguồn |
 | Màu viết cứng trong SCSS; chữ tiếng Việt chạm dòng do giãn chữ âm | TB | T3b quét và thay; styleguide có dòng "Ẫ Ộ Ữ Ỹ" ở mọi cấp tiêu đề; test không còn màu teal |
 | Snapshot JSON khác cấu trúc ghi trong đặc tả 3.1b | TB | Schema zod khoan dung, báo cáo `snapshot:check`; phát hiện ngay ở T4 |
+| Tài khoản đang ở gói Workers **Free** (10 ms CPU mỗi lượt). Đo trên `v2.` ngày 03/11: trang Bexon trung vị 14 ms, p90 126 ms; lần đầu đọc snapshot bài viết 154–557 ms. Cloudflare vẫn trả "ok" nhưng có thể báo lỗi 1102 khi lượt truy cập tăng | **Cao** | Câu hỏi mở #8: bật Workers Paid (5 USD/tháng, 30 s CPU) trước khi ra mắt `www`; T19 dù sao cũng chuẩn hóa sẵn dữ liệu (theo lịch hoặc khi làm mới) để mỗi lượt chỉ đọc phần cần |
+| API danh sách của admin cũ để trống album của 447 bài (`galleryCount` > 0, `photoGallery` rỗng); chỉ API chi tiết từng bài có ảnh | TB | Chuẩn bị #1: xem file gốc trên B2 có đủ album không; nếu không, T8/T19 phải tìm nguồn album (file khác trên B2 hay WordPress) |
 | vinext chưa phủ 100% Next.js; thư viện chạy việc lúc nạp module (như GSAP) bị Workers chặn; kích thước Worker khi thêm TipTap | TB | T1 đã chạy thật trên `v2.` (95% tương thích, sửa GSAP); mỗi task chạy e2e trên bản build workerd; đo bundle ở Checkpoint G; tách code admin |
 | Âm lịch tính sai | TB | Thuật toán Hồ Ngọc Đức (múi giờ +7), bộ test ngày lễ đã biết 2025–2027 |
 | Trộn JavaScript (Bexon) và TypeScript (mã mới) | Thấp | File Bexon giữ `.js`, file mới `.ts/.tsx`; `allowJs` |
@@ -326,6 +328,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 5. **Danh Tăng & Tổ Sư (91 vị):** có công khai trên site không? Kế hoạch hiện chỉ dựng module admin (T35).
 6. **Preloader và LCP:** nếu đo ở Checkpoint B thấy preloader làm trượt mục tiêu LCP < 2,0 s, ưu tiên giữ preloader hay giữ mục tiêu?
 7. **Kho mã GitHub riêng tư (HT-02):** tạo bằng tài khoản của chùa khi nào? (T1b cần)
+8. **Gói Workers:** bật Workers Paid (5 USD/tháng) cho tài khoản sở hữu zone trước khi ra mắt `www`? Gói Free cho 10 ms CPU mỗi lượt, trang hiện đã vượt (xem bảng rủi ro). Chủ tài khoản quyết và tự bật; T19 cần biết trước khi chọn cách nạp dữ liệu.
 
 ## Định nghĩa "Hoàn thành" cho mọi task
 

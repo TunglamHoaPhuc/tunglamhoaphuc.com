@@ -167,14 +167,58 @@
 
 **Mô tả:** Interface `ContentRepository` (chỉ đọc), kiểu miền `Post`, `Category`. Schema zod cho `posts` theo đặc tả 3.1b. Bộ chuẩn hóa dùng chung: ngày (`publishedDate`, `publishedAt`, `solarDateStr "dd.mm.yyyy"`) về ISO; `mediaUrl()` gom 3 host ảnh cũ; nội dung Markdown nhẹ / HTML → HTML đã làm sạch. Nguồn `snapshot` đọc `data/snapshot/*.json`; chọn nguồn bằng `CONTENT_SOURCE`. Script `npm run snapshot:check` in báo cáo bản ghi lỗi và bất thường dữ liệu.
 
+**Kết quả 03/11/2026:** xong (chưa có trang nào dùng; T7 là trang đầu tiên).
+- **Mã ở `src/libs/content/`** (theo nếp `src/libs` đang có, thay cho `src/lib/content` dự kiến):
+  - `types.ts`: kiểu miền và `ContentRepository`.
+  - `schema.ts`: zod, nới lỏng.
+  - `media.ts`: `mediaUrl()`, `mediaKey()`.
+  - `normalize.ts`: ngày, chữ, Markdown nhẹ → HTML.
+  - `posts.ts`: bản ghi thô → `Post` kèm báo cáo.
+  - `repository.ts`: lọc, sắp xếp, phân trang trong bộ nhớ; `getContentRepository()` chọn nguồn theo `CONTENT_SOURCE`.
+  - `sources/snapshot.ts`: nạp `data/snapshot/*.json` qua `import.meta.glob`; thiếu file thì không có nội dung, build không hỏng.
+- **Snapshot tạm** (chuẩn bị #1 chưa làm, máy này không có ổ Z:): `npm run snapshot:fetch` gọi đúng các lệnh GET danh sách mà trình duyệt người đọc site cũ vẫn gọi, mỗi chuyên mục một lần.
+  - Danh sách không lọc để trống album của khoảng 500 bài, nên phải gọi theo chuyên mục.
+  - Chỉ đọc, không ghi gì lên site cũ. `data/snapshot/` nằm ngoài git.
+  - Khi có bản chép từ B2 thì dùng bản đó.
+- **`mediaUrl()`:**
+  - Gom hai địa chỉ của cùng bucket B2 `s2-cnv03` (`…s3.us-east-005.backblazeb2.com/<key>` và `b1.congngheviet.com.vn/file/s2-cnv03/<key>`, tên miền của bên cung cấp) về `MEDIA_BASE`, là chỗ duy nhất phải đổi khi chuyển R2.
+  - Ảnh WordPress chưa có bản sao trên B2, nên giữ ở `admin.`.
+  - Liên kết `tunglamhoaphuc.com/wp-content/…` (33 bài, file mp3) chuyển sang `admin.`, vì `www` sẽ thuộc site mới.
+- **Nội dung bài:**
+  - Đã khảo sát cả 632 bài: chỉ có chữ thường với tiêu đề `#`, trích dẫn `>`, danh sách, đường kẻ, link trần, `&nbsp;`; không có HTML.
+  - Bộ chuyển tự viết escape mọi chữ trước, chỉ sinh đúng các thẻ đó, nên không thẻ nào từ nguồn lọt ra trang. Link chỉ nhận http(s)/mailto/tel.
+  - API chi tiết có thêm `contentHtml` lấy từ WordPress, nhưng chỉ gồm cùng các đoạn văn đó cộng album, nên không cần.
+- **Quy tắc dữ liệu:**
+  - Hai bài trùng slug: bài đứng trước giữ slug, đúng như site cũ trả.
+  - Bài không có tiêu đề: tạm lấy câu đầu nội dung, để đường dẫn cũ vẫn mở được.
+  - Mỗi chuyên mục dùng một tên (tên nhiều bài dùng nhất).
+  - Bỏ ảnh biểu tượng cảm xúc của Facebook lẫn trong album.
+  - Bỏ nửa ký tự emoji bị cắt dở. Vite từ chối file vì ký tự này, nên snapshot nạp dạng văn bản rồi `JSON.parse`.
+- **`npm run snapshot:check`:** 632 bản ghi; Dòng Chảy 472 (471 dùng được), Trí Tuệ 158, Vũ Trụ Phật Giáo 2. Bất thường để Ban Biên Tập xem:
+  - 2 bài không tiêu đề;
+  - 1 slug trùng (`phap-hoi-huyet-bon-trai`);
+  - "Ấn Phẩm & Sách"/"Ấn Phẩm Sách";
+  - 11 bài còn ảnh trên WordPress;
+  - 20 bài có emoji Facebook;
+  - 3 bài không tóm tắt;
+  - **447 bài album trống trong danh sách** (xem rủi ro bên dưới).
+- **Chạy thử trong Worker** bằng một route tạm (đã gỡ):
+  - Cục bộ và trên `v2.` đều trả đúng.
+  - Snapshot nằm trong gói Worker, không nằm trong tài nguyên công khai. Gói Worker nén 722 KB khi có snapshot (hiện 496 KB).
+- **Rủi ro mới, đã ghi vào plan (bảng rủi ro, câu hỏi mở #8):**
+  - **Gói Workers Free.** Tài khoản đang ở gói này, 10 ms CPU mỗi lượt. Lần đầu đọc snapshot tốn 154–557 ms CPU; ngay trang Bexon hiện tại cũng trung vị 14 ms, p90 126 ms. Cloudflare vẫn trả "ok" nhưng đã vượt hạn mức. Cần chủ tài khoản quyết bật Workers Paid trước khi ra mắt; T19 dù sao cũng nên chuẩn hóa sẵn dữ liệu.
+  - **Album trống.** API danh sách để trống album của 447 bài; chỉ API chi tiết có ảnh. Cần xem file gốc trên B2 (chuẩn bị #1) trước T8.
+- **Gói mới:** `zod` (chạy cả ở Worker), `tsx` (chạy script). `tsconfig` kiểm cả `scripts/`.
+- **Để sau:** làm sạch HTML cho nguồn có HTML thật (`mainContentHtml` của Giới thiệu, `fullHistoryHtml` của Bảo tượng) làm ở T13a/T16, khi có dữ liệu để thử.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Parse 632 bản ghi posts thật; bản ghi sai cấu trúc được liệt kê trong báo cáo, không làm hỏng build
-- [ ] `listPosts({ category, sort, page, pageSize })` và `getPostBySlug(slug)` trả đúng; slug không tồn tại trả `null`
-- [ ] HTML đầu ra không còn `<script>`, thuộc tính `on*`, `javascript:`; mọi URL ảnh đi qua `mediaUrl()`
+- [x] Parse 632 bản ghi posts thật; bản ghi sai cấu trúc được liệt kê trong báo cáo, không làm hỏng build
+- [x] `listPosts({ category, sort, page, pageSize })` và `getPostBySlug(slug)` trả đúng; slug không tồn tại trả `null`
+- [x] HTML đầu ra không còn `<script>`, thuộc tính `on*`, `javascript:`; mọi URL ảnh đi qua `mediaUrl()`
 
 **Kiểm chứng:**
-- [ ] `npm test` (fixture rút gọn + 1 test trên snapshot thật, tự bỏ qua khi chưa có snapshot)
-- [ ] `npm run snapshot:check` in số bản ghi theo chuyên mục (Dòng Chảy 472, Trí Tuệ 158…)
+- [x] `npm test`: 55 test. Fixture rút gọn (`tests/unit/content/`) và 2 test trên snapshot thật, tự bỏ qua khi chưa có snapshot. Test thật kiểm 632 bản ghi, số theo chuyên mục, không còn script/on*/`javascript:`, ảnh chỉ còn ở B2 và `admin.`
+- [x] `npm run snapshot:check` in số bản ghi theo chuyên mục (Dòng Chảy 472, Trí Tuệ 158…)
 
 **Phụ thuộc:** T1; chuẩn bị #1. Song song được với T2–T6.
 
