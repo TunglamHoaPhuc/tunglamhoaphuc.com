@@ -1,25 +1,15 @@
 import ButtonPrimary from "../buttons/ButtonPrimary";
 
-const NoItems = ({
-	text = "Empty!",
-	navUrl = "/",
-	navText = "Return to home",
-}) => {
+/**
+ * An empty list, with the way back. Bexon's version borrowed WooCommerce's cart markup.
+ * @param {{ title: string, text?: string, navUrl?: string, navText?: string }} props
+ */
+const NoItems = ({ title, text, navUrl = "/", navText = "Về trang chủ" }) => {
 	return (
-		<div className="tj-entry__content">
-			<div className="woocommerce">
-				<div className="woocommerce-notices-wrapper">
-					<div className="cart-empty woocommerce-info">{text}</div>
-				</div>
-				<div className="wc-empty-cart-message"></div>{" "}
-				<p className="return-to-shop text-center">
-					<ButtonPrimary
-						text={navText}
-						url={navUrl}
-						className={"wc-backward"}
-					/>
-				</p>
-			</div>
+		<div className="tlhp-empty">
+			<p className="tlhp-empty-title">{title}</p>
+			{text ? <p className="tlhp-empty-text">{text}</p> : null}
+			<ButtonPrimary text={navText} url={navUrl} />
 		</div>
 	);
 };

@@ -1,0 +1,119 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import ListStatus from "@/components/sections/posts/ListStatus";
+import SortSelect from "@/components/sections/posts/SortSelect";
+import Cta from "@/components/sections/cta/Cta";
+import HeroInner from "@/components/sections/hero/HeroInner";
+import PostCard from "@/components/shared/cards/PostCard";
+import HeaderSpace from "@/components/shared/others/HeaderSpace";
+import NoItems from "@/components/shared/others/NoItems";
+import PageLinks from "@/components/shared/others/PageLinks";
+import { getContentRepository } from "@/libs/content/repository";
+import { formatNumber } from "@/libs/format";
+import { type ListState, listHref, readListState, SORTS, sortOf } from "@/libs/postList";
+
+const SECTION = "dong-chay-hoang-phap";
+const PATH = `/${SECTION}`;
+const TITLE = "Dòng Chảy Hoằng Pháp";
+const HEADING_ID = "danh-sach-bai";
+
+export const metadata: Metadata = {
+	title: `${TITLE} – Tùng Lâm Hòa Phúc`,
+	description: "Tin hoạt động, khóa lễ, cộng tu và đại lễ tại Tùng Lâm Hòa Phúc.",
+};
+
+type Props = { searchParams: Promise<Record<string, string | string[] | undefined>> };
+
+// The list is filtered, sorted and paged on the server: the page sends 12 cards, not 472.
+export default async function DongChayHoangPhap({ searchParams }: Props) {
+	const state = readListState(await searchParams);
+	const repo = await getContentRepository();
+	const categories = await repo.listCategories(SECTION);
+	const category = categories.find((item) => item.slug === state.category);
+	const unknownCategory = !!state.category && !category;
+	const result = unknownCategory
+		? null
+		: await repo.listPosts({ section: SECTION, category: state.category || undefined, sort: sortOf(state), page: state.page });
+	const href = (change: Partial<ListState>) => listHref(PATH, { ...state, ...change });
+
+	const allCount = categories.reduce((sum, item) => sum + item.count, 0);
+	const status = result
+		? `${formatNumber(result.total)} bài${category ? ` trong “${category.name}”` : ""}${result.pageCount > 1 && state.page <= result.pageCount ? ` · trang ${state.page}/${result.pageCount}` : ""}`
+		: "Không có chuyên mục này";
+
+	let empty: { title: string; text?: string; navText: string; navUrl: string } | null = null;
+	if (unknownCategory) {
+		empty = { title: "Không có chuyên mục này", text: "Kính mời quý vị xem tất cả bài của Dòng Chảy Hoằng Pháp.", navText: "Xem tất cả bài", navUrl: PATH };
+	} else if (result && !result.total) {
+		empty = { title: "Chưa có bài trong mục này", navText: "Xem tất cả bài", navUrl: PATH };
+	} else if (result && state.page > result.pageCount) {
+		empty = {
+			title: `Không có trang ${state.page}`,
+			text: `Danh sách này có ${result.pageCount} trang.`,
+			navText: "Về trang đầu",
+			navUrl: href({ page: 1 }),
+		};
+	}
+
+	return (
+		<main>
+			<HeaderSpace />
+			<HeroInner title={TITLE} text={TITLE} />
+			<section className="tj-blog-section section-gap tlhp-post-list" aria-labelledby={HEADING_ID}>
+				<div className="container">
+					<h2 id={HEADING_ID} className="visually-hidden" tabIndex={-1}>
+						Danh sách bài viết
+					</h2>
+					<nav aria-label="Chuyên mục">
+						<ul className="tlhp-pills">
+							<li>
+								<Link href={href({ category: "", page: 1 })} scroll={false} aria-current={!state.category ? "page" : undefined}>
+									Tất cả <span className="tlhp-pill-count">{formatNumber(allCount)}</span>
+								</Link>
+							</li>
+							{categories.map((item) => (
+								<li key={item.slug}>
+									<Link
+										href={href({ category: item.slug, page: 1 })}
+										scroll={false}
+										aria-current={item.slug === state.category ? "page" : undefined}
+									>
+										{item.name} <span className="tlhp-pill-count">{formatNumber(item.count)}</span>
+									</Link>
+								</li>
+							))}
+						</ul>
+					</nav>
+					<div className="tlhp-list-bar">
+						<ListStatus text={status} page={state.page} headingId={HEADING_ID} />
+						<SortSelect
+							value={state.sort}
+							action={PATH}
+							category={category ? state.category : ""}
+							options={SORTS.map((option) => ({ param: option.param, label: option.label, href: href({ sort: option.param, page: 1 }) }))}
+						/>
+					</div>
+
+					{empty ? (
+						<NoItems {...empty} />
+					) : (
+						<ul className="row row-gap-4 tlhp-post-grid">
+							{result!.items.map((post, index) => (
+								<li key={post.id} className="col-12 col-md-6 col-xl-4">
+									<PostCard
+										post={post}
+										href={`${PATH}/${post.slug}`}
+										categoryHref={href({ category: post.category.slug, page: 1 })}
+										eager={index < 3}
+									/>
+								</li>
+							))}
+						</ul>
+					)}
+					{result && !empty ? <PageLinks page={state.page} pageCount={result.pageCount} hrefFor={(page) => href({ page })} /> : null}
+				</div>
+			</section>
+			<Cta />
+		</main>
+	);
+}

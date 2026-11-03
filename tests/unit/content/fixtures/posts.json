@@ -1,6 +1,6 @@
 {
 	"success": true,
-	"total": 11,
+	"total": 12,
 	"posts": [
 		{
 			"id": "post-101",
@@ -21,12 +21,29 @@
 			"bannerPosition": "",
 			"summary": "Buổi cộng tu&nbsp;tháng 10.",
 			"content": "Đoạn đầu.\nDòng thứ hai.\n\n## Chương trình\n\n* Tụng kinh\n* Thiền hành\n\nNghe lại: https://tunglamhoaphuc.com/wp-content/uploads/2026/10/bai-giang.mp3\n\n![](https://static.xx.fbcdn.net/images/emoji.php/v9/tde/1/16/1f4f8.png)\n\n### Bộ Sưu Tập Ảnh Tư Liệu",
-			"keywords": [{ "keyword": "Tam Bảo", "title": "Tam Bảo", "description": "Phật, Pháp, Tăng." }],
+			"keywords": [
+				{
+					"keyword": "Tam Bảo",
+					"title": "Tam Bảo",
+					"description": "Phật, Pháp, Tăng."
+				}
+			],
 			"galleryCount": 9,
 			"photoGallery": [
-				{ "imageUrl": "https://b1.congngheviet.com.vn/file/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2026/10/1.jpg", "title": "Ảnh #1", "caption": "Chư Tăng", "isInline": false },
-				{ "imageUrl": "https://static.xx.fbcdn.net/images/emoji.php/v9/tde/1/16/1f4f8.png", "title": "" },
-				{ "imageUrl": "https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/10/2.jfif", "title": "Ảnh #2" }
+				{
+					"imageUrl": "https://b1.congngheviet.com.vn/file/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2026/10/1.jpg",
+					"title": "Ảnh #1",
+					"caption": "Chư Tăng",
+					"isInline": false
+				},
+				{
+					"imageUrl": "https://static.xx.fbcdn.net/images/emoji.php/v9/tde/1/16/1f4f8.png",
+					"title": ""
+				},
+				{
+					"imageUrl": "https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/10/2.jfif",
+					"title": "Ảnh #2"
+				}
 			]
 		},
 		{
@@ -45,8 +62,8 @@
 			"bannerUrl": "",
 			"thumbnailPosition": "",
 			"bannerPosition": "",
-			"summary": "Khóa lễ rằm.",
-			"content": "Nội dung.",
+			"summary": "Tóm tắt nội dung bài viết…",
+			"content": "## Mở đầu\n\nNội dung [xem ảnh](https://example.org/a) **chính** của khóa lễ.",
 			"keywords": [],
 			"photoGallery": []
 		},
@@ -157,6 +174,17 @@
 			"subCategory": "an-pham-sach",
 			"categoryName": "Ấn Phẩm & Sách",
 			"publishedDate": "2024-04-01",
+			"status": "published"
+		},
+		{
+			"id": "post-112",
+			"slug": "an-tru-ban-hai",
+			"title": "An trú trong hiện tại",
+			"mainCategory": "tri-tue-phat-phap",
+			"subCategory": "bai-viet",
+			"categoryName": "Bài Viết",
+			"summary": "Bản lưu lần hai.",
+			"publishedDate": "2025-01-04",
 			"status": "published"
 		}
 	]

@@ -45,7 +45,7 @@ test.describe("with reduced motion", () => {
 	}
 
 	// Kept Bexon pages plus one detail page of each kind.
-	for (const path of ["/", "/styleguide", "/blogs", "/blogs/1", "/services", "/services/1", "/portfolios", "/portfolios/1", "/team", "/team/1", "/contact"]) {
+	for (const path of ["/", "/styleguide", "/blogs", "/blogs/1", "/services", "/services/1", "/portfolios", "/portfolios/1", "/team", "/team/1", "/contact", "/dong-chay-hoang-phap"]) {
 		test(`${path} headings leave room for Vietnamese marks`, async ({ page }) => {
 			await open(page, path);
 			const tight = await page.evaluate(() =>

@@ -73,6 +73,7 @@ export type ContentIssue = {
 		| "invalid"
 		| "missing-title"
 		| "duplicate-slug"
+		| "duplicate-title"
 		| "category-name"
 		| "emoji-image"
 		| "missing-album"

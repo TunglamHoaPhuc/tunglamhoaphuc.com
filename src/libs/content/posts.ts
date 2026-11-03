@@ -29,6 +29,26 @@ function titleFromText(raw: RawPost): string {
 	return `${sentence.slice(0, TITLE_MAX).replace(/\s+\S*$/, "")}…`;
 }
 
+const SUMMARY_MAX = 220;
+// What the old admin's form pre-fills, saved as is in a few posts.
+const PLACEHOLDER_SUMMARY = /^tóm tắt( nội dung)? bài viết\s*(\.{3}|…)?$/i;
+
+/** For posts without a real summary: the start of the text, markup removed. */
+function summaryFromText(raw: RawPost): string {
+	const text = plain(
+		cleanText(raw.content)
+			.split("\n")
+			.map((line) => line.replace(/^(#{1,6}|>|[-*•]|\d+[.)])\s+/, ""))
+			.filter((line) => !/^!\[/.test(line.trim()) && !/^(-{3,}|\*{3,}|_{3,})$/.test(line.trim()))
+			.join(" ")
+			.replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+			.replace(/https?:\/\/\S+/g, "")
+			.replace(/\*\*/g, ""),
+	);
+	if (text.length <= SUMMARY_MAX) return text;
+	return `${text.slice(0, SUMMARY_MAX).replace(/\s+\S*$/, "")}…`;
+}
+
 function toPost(raw: RawPost, publishedDate: string, categoryName: string, issues: ContentIssue[]): Post {
 	const notes: ContentNote[] = [];
 	const gallery: GalleryImage[] = [];
@@ -56,7 +76,11 @@ function toPost(raw: RawPost, publishedDate: string, categoryName: string, issue
 	} else if (raw.galleryCount !== undefined && raw.galleryCount !== raw.photoGallery.length) {
 		issues.push({ kind: "gallery-count", id: raw.id, message: `galleryCount ${raw.galleryCount}, album có ${raw.photoGallery.length} ảnh` });
 	}
-	if (!raw.summary.trim()) issues.push({ kind: "empty-summary", id: raw.id, message: "không có tóm tắt" });
+	let summary = plain(raw.summary);
+	if (!summary || PLACEHOLDER_SUMMARY.test(summary)) {
+		issues.push({ kind: "empty-summary", id: raw.id, message: summary ? `tóm tắt là chữ mẫu "${summary}"` : "không có tóm tắt" });
+		summary = summaryFromText(raw);
+	}
 
 	return {
 		id: raw.id,
@@ -70,7 +94,7 @@ function toPost(raw: RawPost, publishedDate: string, categoryName: string, issue
 		views: raw.viewsCount,
 		thumbnail: image(raw.thumbnailUrl, raw.thumbnailPosition) ?? image(raw.bannerUrl, raw.bannerPosition),
 		banner: image(raw.bannerUrl, raw.bannerPosition) ?? image(raw.thumbnailUrl, raw.thumbnailPosition),
-		summary: plain(raw.summary),
+		summary,
 		galleryCount: gallery.length,
 		contentHtml,
 		keywords: raw.keywords
@@ -145,6 +169,7 @@ export function parsePosts(file: unknown): ParsedPosts {
 		issues,
 	);
 	const bySlug = new Map<string, string>();
+	const byTitle = new Map<string, string>();
 	const posts: Post[] = [];
 	for (const { raw, date } of records) {
 		if (raw.status !== "published") continue;
@@ -155,7 +180,13 @@ export function parsePosts(file: unknown): ParsedPosts {
 			continue;
 		}
 		bySlug.set(slug, raw.id);
-		posts.push(toPost(raw, date, names.get(`${raw.mainCategory}/${raw.subCategory}`) ?? "", issues));
+		const post = toPost(raw, date, names.get(`${raw.mainCategory}/${raw.subCategory}`) ?? "", issues);
+		// Same section, same title: usually a post saved twice. Both stay listed.
+		const titleKey = `${post.section}|${post.title.toLocaleLowerCase("vi")}`;
+		const twin = byTitle.get(titleKey);
+		if (twin) issues.push({ kind: "duplicate-title", id: raw.id, message: `cùng tiêu đề với ${twin}: "${post.title}"` });
+		else byTitle.set(titleKey, raw.id);
+		posts.push(post);
 	}
 	return { posts, issues, total: root.data.length };
 }

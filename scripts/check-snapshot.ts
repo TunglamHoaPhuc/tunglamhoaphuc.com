@@ -17,13 +17,14 @@ const ISSUE_TITLES: Record<ContentIssue["kind"], string> = {
 	invalid: "Bản ghi bị bỏ qua (sai cấu trúc)",
 	"missing-title": "Bài không có tiêu đề (tạm lấy dòng đầu nội dung)",
 	"duplicate-slug": "Trùng slug (bài sau không mở được)",
+	"duplicate-title": "Trùng tiêu đề trong cùng chuyên mục (có thể là bài lưu hai lần)",
 	"category-name": "Một chuyên mục, nhiều tên",
 	"emoji-image": "Ảnh biểu tượng cảm xúc Facebook đã bỏ",
 	"missing-album": "Album trống dù galleryCount > 0 (API chi tiết của site cũ có ảnh)",
 	"gallery-count": "galleryCount khác số ảnh trong album",
 	"wordpress-image": "Bài còn ảnh trên WordPress (chưa có trên B2)",
 	"moved-link": "Liên kết tunglamhoaphuc.com/wp-content (chuyển sang admin.)",
-	"empty-summary": "Bài không có tóm tắt",
+	"empty-summary": "Bài không có tóm tắt hoặc tóm tắt là chữ mẫu (tạm lấy đầu nội dung)",
 };
 const EXAMPLES = 5;
 

@@ -384,4 +384,210 @@ START: Blog CSS
 		margin-bottom: 30px;
 	}
 }
+/**----------------------------------------
+TLHP post lists (T7, BRAND-GUIDELINES 5.2)
+----------------------------------------*/
+.tlhp-post-list {
+	// Paging scrolls back to this heading; leave room for the sticky header.
+	#danh-sach-bai {
+		scroll-margin-top: 130px;
+	}
+}
+.tlhp-list-bar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px 24px;
+	margin: 20px 0 28px;
+}
+.tlhp-pills {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	// One row that swipes sideways on phones, instead of four rows above the list.
+	@media #{$xs} {
+		flex-wrap: nowrap;
+		overflow-x: auto;
+		// Room inside the scroller for the 4px focus ring, which it would clip.
+		margin: -6px -12px 0;
+		padding: 6px 12px 10px;
+		li {
+			flex-shrink: 0;
+		}
+	}
+	a {
+		white-space: nowrap;
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+		min-height: 48px;
+		padding: 0 20px;
+		border: 1px solid var(--tj-color-border-1);
+		border-radius: var(--tlhp-radius-pill);
+		background-color: var(--tj-color-common-white);
+		color: var(--tj-color-heading-primary);
+		font-weight: var(--tj-fw-medium);
+		&:hover {
+			border-color: var(--tj-color-theme-primary);
+			color: var(--tj-color-theme-primary);
+		}
+		&[aria-current="page"] {
+			background-color: var(--tj-color-theme-primary);
+			border-color: var(--tj-color-theme-primary);
+			color: var(--tlhp-primary-fg);
+		}
+	}
+}
+.tlhp-pill-count {
+	font-size: var(--tlhp-text-caption);
+	opacity: 0.8;
+}
+.tlhp-sort {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	label {
+		font-weight: var(--tj-fw-medium);
+		color: var(--tj-color-heading-primary);
+		white-space: nowrap;
+	}
+	select {
+		width: auto;
+		min-width: 170px;
+		min-height: 48px;
+		padding: 0 40px 0 18px;
+		border-radius: var(--tlhp-radius-pill);
+		cursor: pointer;
+		appearance: none;
+		background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+		background-position: calc(100% - 22px) 50%, calc(100% - 16px) 50%;
+		background-size: 6px 6px;
+		background-repeat: no-repeat;
+	}
+}
+.tlhp-sort-submit {
+	min-height: 48px;
+	padding: 0 20px;
+	border: 0;
+	border-radius: var(--tlhp-radius-pill);
+	background-color: var(--tj-color-theme-primary);
+	color: var(--tlhp-primary-fg);
+}
+.tlhp-list-status {
+	margin: 0;
+	color: var(--tj-color-text-body-3);
+	font-size: var(--tlhp-text-body-sm);
+}
+.tlhp-post-grid {
+	margin-bottom: 0;
+	padding: 0;
+	list-style: none;
+}
+// Bexon's vertical card, with a 4:3 picture of fixed shape (no layout shift) and the text
+// in the order of the brand guide.
+.blog-item.tlhp-post-card {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid var(--tj-color-border-1);
+	border-radius: var(--tlhp-radius-lg);
+	background-color: var(--tj-color-common-white);
+	transition: box-shadow var(--tlhp-duration-fast) var(--tlhp-ease-calm);
+	&:hover {
+		box-shadow: var(--tlhp-shadow-sm);
+	}
+	.blog-thumb {
+		min-height: 0;
+		aspect-ratio: 4 / 3;
+		> a {
+			display: block;
+			height: 100%;
+		}
+		img {
+			min-height: 0;
+			height: 100%;
+			aspect-ratio: 4 / 3;
+		}
+	}
+	.tlhp-post-card-noimage {
+		display: block;
+		height: 100%;
+		background-color: var(--tj-color-theme-bg);
+	}
+	.blog-content {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		padding: 24px 28px 28px;
+		.title {
+			margin-top: 14px;
+			font-size: var(--tlhp-text-h4);
+			line-height: var(--tlhp-leading-h4);
+		}
+		.title,
+		.desc {
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 3;
+			line-clamp: 3;
+			overflow: hidden;
+		}
+		.desc {
+			margin: 12px 0 0;
+			font-size: var(--tlhp-text-body-sm);
+			color: var(--tj-color-text-body-3);
+		}
+	}
+	.tlhp-post-card-meta {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 4px 16px;
+		margin: auto 0 0;
+		padding-top: 16px;
+		font-size: var(--tlhp-text-caption);
+		color: var(--tj-color-text-body-3);
+	}
+}
+.tlhp-chip {
+	display: inline-block;
+	padding: 7px 10px;
+	border-radius: var(--tlhp-radius-xs);
+	background-color: var(--tlhp-accent-soft);
+	color: var(--tlhp-accent-text);
+	font-size: var(--tlhp-text-overline);
+	font-weight: var(--tlhp-weight-overline);
+	line-height: var(--tlhp-leading-overline);
+	letter-spacing: var(--tlhp-tracking-overline);
+	text-transform: uppercase;
+	&:hover {
+		color: var(--tlhp-accent-text);
+		text-decoration: underline;
+	}
+}
+.tj-pagination .page-numbers.dots {
+	border-color: transparent;
+}
+.tlhp-empty {
+	max-width: 560px;
+	margin: 24px auto 0;
+	padding: 48px 24px;
+	text-align: center;
+	border: 1px solid var(--tj-color-border-1);
+	border-radius: var(--tlhp-radius-lg);
+	background-color: var(--tj-color-common-white);
+}
+.tlhp-empty-title {
+	margin-bottom: 8px;
+	font-family: var(--tj-ff-heading);
+	font-size: var(--tlhp-text-h4);
+	color: var(--tj-color-heading-primary);
+}
+.tlhp-empty-text {
+	margin-bottom: 24px;
+}
+
 /* !END: Blog CSS */

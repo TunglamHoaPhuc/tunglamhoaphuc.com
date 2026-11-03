@@ -95,7 +95,7 @@ test.describe("search popup", () => {
 		});
 	}
 
-	for (const path of ["/", "/blogs", "/contact"]) {
+	for (const path of ["/", "/blogs", "/contact", "/dong-chay-hoang-phap"]) {
 		test(`with the flag off, ${path} has no way to /tim-kiem`, async ({ page }) => {
 			await open(page, path);
 			await expect(page.locator('a[href*="/tim-kiem"], form[action*="/tim-kiem"]')).toHaveCount(0);

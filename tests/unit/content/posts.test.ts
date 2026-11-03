@@ -13,8 +13,8 @@ const bySlug = (slug: string) => parsed.posts.find((post) => post.slug === slug)
 
 describe("parsePosts", () => {
 	it("keeps the usable published posts and reports the rest without failing", () => {
-		expect(parsed.total).toBe(11);
-		expect(parsed.posts.map((post) => post.id)).toEqual(["post-101", "post-102", "post-103", "post-104", "post-106", "post-110", "111"]);
+		expect(parsed.total).toBe(12);
+		expect(parsed.posts.map((post) => post.id)).toEqual(["post-101", "post-102", "post-103", "post-104", "post-106", "post-110", "111", "post-112"]);
 		expect(kinds("invalid")).toEqual(["post-107", "post-108"]);
 		expect(parsed.issues.find((issue) => issue.id === "post-108")?.message).toContain("2026-02-30");
 	});
@@ -22,6 +22,11 @@ describe("parsePosts", () => {
 	it("leaves a shared slug to the first post, as the old site does", () => {
 		expect(bySlug("cong-tu-thang-10").id).toBe("post-101");
 		expect(kinds("duplicate-slug")).toEqual(["post-105"]);
+	});
+
+	it("reports a title used twice in a section, and keeps both", () => {
+		expect(kinds("duplicate-title")).toEqual(["post-112"]);
+		expect(bySlug("an-tru-ban-hai").title).toBe("An trú trong hiện tại");
 	});
 
 	it("titles an untitled post with the first sentence of its text", () => {
@@ -52,6 +57,12 @@ describe("parsePosts", () => {
 			position: "center 45%",
 		});
 		expect(bySlug("an-pham-sach-1").thumbnail).toBeNull();
+	});
+
+	it("replaces a missing or placeholder summary with the start of the text", () => {
+		expect(bySlug("khoa-le-ram-thang-7").summary).toBe("Mở đầu Nội dung xem ảnh chính của khóa lễ.");
+		expect(bySlug("an-lac-moi-ngay").summary).toBe("Thứ nhất Thứ hai Sau danh sách.");
+		expect(kinds("empty-summary")).toEqual(["post-102", "post-103", "post-106", "post-110", "111"]);
 	});
 
 	it("drops emoji from the album and counts what is left", () => {
@@ -101,7 +112,7 @@ describe("memory repository", () => {
 
 	it("pages through results and clamps odd page values", async () => {
 		const second = await repo.listPosts({ pageSize: 3, page: 2 });
-		expect(second).toMatchObject({ total: 7, page: 2, pageSize: 3, pageCount: 3 });
+		expect(second).toMatchObject({ total: 8, page: 2, pageSize: 3, pageCount: 3 });
 		expect(second.items).toHaveLength(3);
 		expect((await repo.listPosts({ pageSize: 3, page: 9 })).items).toEqual([]);
 		expect(await repo.listPosts({ page: -2, pageSize: 0 })).toMatchObject({ page: 1, pageSize: 12 });
