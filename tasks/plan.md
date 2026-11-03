@@ -228,7 +228,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [x] T7: Dòng Chảy Hoằng Pháp – trang danh sách
 - [x] T8: Trang chi tiết bài viết và chế độ đọc
 - [x] T9: Video, album ảnh, lightbox
-- [ ] T10: Trang chủ – hero, lối vào chuyên mục, tin mới nhất
+- [x] T10: Trang chủ – hero, lối vào chuyên mục, tin mới nhất
 - [ ] **Checkpoint B** – lát cắt đầu-cuối
 - [ ] T11: Lịch tu học – dữ liệu, âm lịch, trang `/lich-tu-hoc`
 - [ ] T12: Trang chủ – khóa tu sắp tới, Lời Thầy dạy và đếm ngày trên hero

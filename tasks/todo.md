@@ -525,14 +525,66 @@
 
 **File Bexon:** `sections/hero/Hero2.js`, `sections/brands/Brands2.js`, `sections/blogs/Blogs2.js`
 
+**Kết quả 03/11/2026:** xong, đã deploy `v2.`.
+- **Trang chủ** `src/app/(home)/page.tsx` (server) đọc dữ liệu qua `src/libs/home.ts` rồi truyền props.
+  - Thứ tự khối nằm trong mảng `BLOCKS`. Các khối mẫu của Bexon (PricingPlan, About2, Services2, Portfolios2, Process, Testimonials2, Team1) đã rút khỏi trang; mỗi khối có dòng chú thích ghi task sẽ bật lại.
+  - Tiêu đề trang chủ trước đây là của Bexon, nay là "Tùng Lâm Hòa Phúc – Nơi để trở về – Chốn thiêng bình yên".
+- **Hero `Hero2`:**
+  - Khung 1 "Nơi để trở về / Chốn thiêng bình yên" dùng ảnh "toàn cảnh chùa" trong album Vũ Trụ Phật Giáo. Ảnh được làm sẵn 4 cỡ trong `public/images/hero`: rộng 1920, rộng 1280, bản dọc 760 cho điện thoại cầm đứng, và ảnh nhỏ.
+  - Ảnh là `<img>` trong `<picture>`, gọi từ `<head>` bằng preload `fetchpriority="high"`. Mỗi màn hình chỉ tải một bản.
+  - Khung 3 là bài mới nhất có ảnh của Dòng Chảy Hoằng Pháp, hiện là "Lễ Hằng Thuận tại Tùng lâm Hòa Phúc".
+  - Mỗi khung 7 giây. Lớp phủ đen mun ≥ 55%: màn rộng 88 → 72 → 55% từ trái sang phải; màn hẹp 72–88% vì chữ phủ ngang màn.
+  - Trang có một `<h1>` ẩn; tiêu đề các khung là `<h2>`.
+  - Vòng chữ "NƠI ĐỂ TRỞ VỀ • CHỐN THIÊNG BÌNH YÊN" vẽ bằng SVG, thay ảnh chữ "Explore More" của Bexon. Mũi tên xuống dẫn tới `#loi-vao`.
+- **Nút tạm dừng dùng chung** (`PauseButton`, hook `useAutoplay`):
+  - Nút ghi chữ "Tạm dừng" / "Chạy tiếp"; trình đọc màn hình nghe thêm tên khối.
+  - Focus đi vào slider thì dừng hẳn, đến khi bấm "Chạy tiếp" (theo mẫu carousel của WAI). Di chuột lên chỉ giữ tạm.
+  - Ở chế độ giảm chuyển động, slider không chạy và nút ẩn.
+- **Dải lối vào `Brands2`:**
+  - 6 mục như menu site cũ: Giới thiệu, Tông Chỉ Tu Học, Dòng Chảy Hoằng Pháp, Vũ Trụ Phật Giáo, Bảo Tượng Phật Giáo, Trí Tuệ Phật Pháp. Icon vàng đặt trên nền đen mun; Giới thiệu dùng ấn tròn.
+  - Dải trượt làm lại bằng CSS (`Marquee.tsx`): Swiper chỉ dừng được sau khi trượt hết ô đang chạy (tới 5 giây). Bản CSS dừng ngay khi di chuột, khi focus vào ô và khi bấm nút.
+  - Bản sao thứ hai của dải có `aria-hidden` và `inert`.
+  - Ở chế độ giảm chuyển động, dải thành lưới đứng yên; trên màn 375px vẫn thấy đủ 6 ô.
+  - Viền mờ hai bên của Bexon thu từ 448px xuống 120px và không còn chặn bấm.
+- **Chữ chạy ở footer (T6)** chuyển sang `Marquee` và có nút tạm dừng, để "mọi slider có nút tạm dừng" đúng trên mọi trang.
+- **Khối tin `Blogs2`:**
+  - Hai tab theo mẫu tabs của WAI (mũi tên, Home, End). "Tin mới nhất": 6 bài mới nhất. "Dấu ấn hoằng pháp": xem nhiều nhất.
+  - Dấu ấn hoằng pháp bỏ những bài đã có ở Tin mới nhất. Lượt xem hiện còn thấp, nên 6 bài mới nhất cũng chính là 6 bài xem nhiều nhất; không bỏ thì hai tab giống hệt nhau. Bài nhập hai lần (cùng tiêu đề) chỉ hiện một lần.
+  - Chỉ lấy bài từ chuyên mục đã có trang (`LIVE_SECTIONS`, hiện là Dòng Chảy Hoằng Pháp); T14 và T17 thêm chuyên mục của mình.
+  - `BlogCard2` nhận `PostSummary`.
+  - Nút điều hướng có class riêng: Bexon dùng chung `.slider-next`, nên bấm nút ở hero cũng đẩy slider tin.
+- **Lớp nội dung:** `PostSummary` có thêm `banner`; thêm cách sắp xếp `views`; `section` nhận được một mảng; thêm `postHref` và `categoryHref`.
+- **Sửa trong lúc làm** (đều làm chậm ảnh hero):
+  - React tự chèn preload cho mọi ảnh không lazy, gồm 2 hình nền SVG của footer (548 KB mỗi hình, bên trong là PNG nhúng), ấn tròn và icon menu. Các ảnh này nay tải lười.
+  - Nút đóng menu điện thoại dùng icon Font Awesome Thin, kéo theo một font 456 KB ở mức ưu tiên cao nhất. Nay nút này và nút tạm dừng dùng SVG.
+  - Ảnh nhỏ thứ hai dưới hero dịch 15px khi Swiper khởi động (CLS 0,00006). Khoảng cách nay có sẵn trong CSS.
+  - Nút Về đầu trang (T6) chỉ biết vị trí cuộn từ lần cuộn sau khi trang chạy xong JS. Ai cuộn sớm hơn thì nút không hiện; test hỏng khi máy tải nặng (3/60 lượt). Nay nút đọc vị trí cuộn ngay khi gắn vào trang.
+- **Đo Lighthouse 12.6** (mỗi lần 2–3 lượt). Home-02 không có preloader nên chỉ có một bộ số.
+  - Cục bộ (`npm run preview`, không nén): màn rộng LCP 3,6–3,7 s, CLS 0. CSS 1.056 KB, JS 814 KB.
+  - `v2.`, màn rộng: LCP 1,7 s (1,6–2,2 s), CLS 0, FCP 1,1 s. CSS 194 KB, JS 289 KB (đã nén), font 715 KB.
+  - `v2.`, điện thoại (giả lập 4G chậm): LCP 8–14 s, FCP 4,7–5,8 s, CLS 0. Chặn riêng ảnh 7,9 MB thì LCP ổn định ở 8,3 s.
+  - Nguyên nhân chính trên điện thoại:
+    - Ảnh thẻ bài "CỘNG TU PHÁP HỘI NIỆM PHẬT" là ảnh gốc WordPress 7,9 MB. Tổng ảnh của trang là 10,4 MB.
+    - Hai file Noto Serif nặng 415 KB.
+    - CSS chưa nén nặng 1 MB.
+  - Hướng xử lý: T41b (Image Transformations; zone chưa bật, `/cdn-cgi/image` trả 404) và T41a (cắt Bootstrap và font).
+  - CPU của Worker cho trang chủ: khi đã nóng 5–13 ms (trung vị 6 ms); lần đầu đọc snapshot 376–508 ms (Câu hỏi mở #8).
+  - **Lần đầu thấy lỗi thật do gói Workers Free:** trong lượt e2e cuối trên `v2.`, 3 yêu cầu bị Cloudflare ngắt (`exceededCpu`, khách thấy trang lỗi 503 của Cloudflare). Một yêu cầu tốn 736 ms CPU khi Worker còn nguội phải đọc snapshot. Đây không phải lỗi mới của T10, nhưng nay đã thành lỗi khách gặp được, nên Câu hỏi mở #8 cần chủ dự án quyết trước khi ra mắt.
+- **Chờ chùa duyệt:** ảnh khung 1, đoạn chữ của hero (đang dùng `site.intro`), tiêu đề khối "Tin tức hoằng pháp".
+
 **Tiêu chí nghiệm thu:**
-- [ ] Mọi slider có nút tạm dừng dùng được bằng bàn phím và dừng khi di chuột/focus; không tự chạy ở chế độ giảm chuyển động
-- [ ] Ảnh khung hero đầu tiên nạp ưu tiên, đúng kích thước; CLS = 0
-- [ ] Bật lại một khối chỉ cần thêm 1 dòng vào mảng khối
+- [x] Mọi slider có nút tạm dừng dùng được bằng bàn phím và dừng khi di chuột/focus; không tự chạy ở chế độ giảm chuyển động (kể cả chữ chạy ở footer)
+- [x] Ảnh khung hero đầu tiên nạp ưu tiên, đúng kích thước; CLS = 0
+- [x] Bật lại một khối chỉ cần thêm 1 dòng vào mảng khối (`BLOCKS` trong `page.tsx`)
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- home`
-- [ ] Lighthouse cục bộ trên `npm run preview` (ghi LCP, CLS, dung lượng CSS/JS làm mốc, có và không có preloader)
+- [x] `npm run test:e2e -- home` (15 test × 2 cỡ màn hình); test canh gác mới "mọi thứ tự chạy có nút tạm dừng"; unit 76 xanh
+- [x] Toàn bộ e2e (316 test, 23 bỏ qua theo thiết kế) trên bản cuối:
+  - Cục bộ 292/293. Test hỏng gặp lỗi `ERR_CONNECTION_REFUSED` vì máy preview rớt giữa chừng; chạy lại `dong-chay` 23/23 xanh.
+  - Trên `v2.` 291/293. Hai test hỏng là trang 503 của Cloudflare do vượt CPU (xem trên); chạy lại `article` 25/25 xanh.
+  - Lượt trước bản cuối: 293/293 xanh ở cả hai nơi.
+- [x] Lighthouse cục bộ trên `npm run preview` và trên `v2.` (số đo ở trên; Home-02 không có preloader)
+- [x] Ảnh: `docs/anh/t10-trang-chu.png`
 
 **Phụ thuộc:** T6, T7
 
