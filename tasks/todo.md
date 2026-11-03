@@ -664,14 +664,40 @@
 
 **File Bexon:** `sections/pricing-plan/PricingPlan.js`, `shared/pricing-plan/PricingPlanItems.js`, `sections/testimonials/Testimonials2.js`, `sections/hero/Hero2.js`
 
+**Kết quả 03/11/2026:** xong, đã deploy `v2.`.
+- **Đếm ngày** `src/libs/countdown.ts`: số ngày tính theo lịch Việt Nam, sang ngày mới lúc nửa đêm giờ Việt Nam bất kể đồng hồ của server. Nhãn là "Còn N ngày" hoặc "Diễn ra hôm nay". Trang render phía server mỗi lần có yêu cầu.
+- **Dữ liệu trang chủ** (`loadHomeData` nhận thêm `now` để test): `upcoming`, khung hero 2 và `verses`, đều lấy từ lịch của T11.
+- **Hero khung 2** (giữa "Nơi để trở về" và "Pháp sự mới nhất"): sự kiện kế tiếp bắt đầu từ hôm nay trở đi.
+  - Dòng trên tiêu đề ghi "Khóa tu sắp tới · Còn 4 ngày". Dưới tiêu đề là ngày dương, âm lịch, giờ và nơi.
+  - Nút "Xem lịch khóa tu" dẫn tới thẻ của sự kiện trên `/lich-tu-hoc`.
+  - Không còn sự kiện nào thì khung này không có.
+- **Khóa tu sắp tới** (`PricingPlan`): 3 sự kiện chưa kết thúc, mỗi tiêu đề một lần (pháp hội hai ngày chỉ hiện ngày đầu).
+  - Mỗi thẻ: đếm ngày, tên và loại, ngày dương thay chỗ giá tiền, nút "Xem chi tiết" (trình đọc màn hình nghe kèm tên sự kiện), rồi âm lịch, giờ, nơi thay chỗ danh sách tính năng.
+  - Thẻ gần nhất được tô màu như gói nổi bật của Bexon.
+  - Không còn chữ "gói", giá tiền hay ký hiệu tiền tệ. Không còn sự kiện thì khối không render (`/services` của Bexon cũng hết bảng giá).
+- **Lời Thầy dạy** (`Testimonials2`): slider câu kệ của các chủ đề tháng, bắt đầu từ tháng này, chữ `scripture`, tự chạy 9 giây mỗi câu, có nút tạm dừng.
+  - Bên trái là tranh chủ đề tháng có tiêu đề đè lên; lớp phủ đậm hơn của Bexon để chữ dễ đọc.
+  - Ô điểm đánh giá của Bexon thành ô "Chủ đề tháng 11".
+  - Khung `blockquote` chung của Bexon không áp vào câu kệ.
+- **Khác với mô tả:**
+  - Bảng ánh xạ ghi khối Khóa tu lấy `featuredPrograms`, nhưng đó là 3 khóa lễ thường kỳ, lúc nào cũng có, nên không thể "ẩn khi không còn khóa tu" như tiêu chí. Khối nay lấy sự kiện sắp tới trên lịch; 3 khóa lễ thường kỳ vẫn ở `/lich-tu-hoc`. Nếu chủ dự án muốn khối này là khóa lễ thường kỳ thì chỉ cần đổi nguồn dữ liệu.
+  - Kho ảnh câu kệ (`quoteGallery`) chưa dùng vì ảnh nằm trên site cũ (xem T11). Slider dùng câu kệ dạng chữ của chủ đề tháng.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Số ngày đúng theo `Asia/Ho_Chi_Minh`, kể cả quanh nửa đêm (unit test)
-- [ ] Không còn chữ "gói", giá tiền hay ký hiệu tiền tệ nào từ khuôn Pricing
-- [ ] Khi không còn khóa tu sắp tới, hero bỏ khung (2) và khối Khóa tu ẩn, không lỗi
+- [x] Số ngày đúng theo `Asia/Ho_Chi_Minh`, kể cả quanh nửa đêm (unit test)
+- [x] Không còn chữ "gói", giá tiền hay ký hiệu tiền tệ nào từ khuôn Pricing
+- [x] Khi không còn khóa tu sắp tới, hero bỏ khung (2) và khối Khóa tu ẩn, không lỗi (unit test với ngày sau sự kiện cuối)
 
 **Kiểm chứng:**
-- [ ] `npm test -- countdown`
-- [ ] `npm run test:e2e -- home`
+- [x] `npm test -- countdown` (3 test); `home` thêm 5 test cho lịch; unit tổng 112 xanh
+- [x] `npm run test:e2e -- home`: kỳ vọng tính từ `schedule.json` và ngày hôm nay nên không lỗi thời theo lịch; slider Lời Thầy dạy nằm trong test 7 giây và test canh gác nút tạm dừng
+- [x] Toàn bộ e2e (350 test, 24 bỏ qua theo thiết kế):
+  - Cục bộ 325/326. Test hỏng là test dịch bố cục khi máy tải nặng: font chữ thay vào sau lần vẽ đầu làm nút hero lệch vài pixel (thuộc T41a). Hai test dịch bố cục nay nằm trong nhóm riêng, được chạy lại tối đa 2 lần, có ghi lý do.
+  - Trên `v2.` 324/326 (3 luồng): 1 test dịch bố cục qua ở lần chạy lại; 1 test menu điện thoại hỏng một lần. Chạy lại test menu và test hộp tìm kiếm trên `v2.` 30 lượt đều xanh.
+- **Gói Workers Free:** trong lượt chạy trên `v2.` có 5 yêu cầu bị ngắt vì vượt CPU (`exceededCpu`), kể cả file tĩnh `pattern-2.svg`.
+  - File tĩnh trả về có header `X-Robots-Tag` do Worker thêm vào, tức là ảnh và JS cũng đi qua Worker và tốn CPU. Một file JS bị ngắt thì trang không chạy được JavaScript; điều này giải thích các test menu và tìm kiếm thỉnh thoảng hỏng trên `v2.`.
+  - Nên xem lại cách phục vụ file tĩnh cùng lúc với Câu hỏi mở #8.
+- [x] Ảnh: `docs/anh/t12-trang-chu-lich.png`
 
 **Phụ thuộc:** T10, T11
 
