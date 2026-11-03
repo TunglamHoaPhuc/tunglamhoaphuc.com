@@ -233,7 +233,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [x] T11: Lịch tu học – dữ liệu, âm lịch, trang `/lich-tu-hoc`
 - [x] T12: Trang chủ – khóa tu sắp tới, Lời Thầy dạy và đếm ngày trên hero
 - [x] T13a: Giới thiệu – trang chủ đề
-- [ ] T13b: Trang chủ – Lời chào và Chư Tôn Đức
+- [x] T13b: Trang chủ – Lời chào và Chư Tôn Đức
 - [ ] T14: Tông Chỉ Tu Học
 - [ ] **Checkpoint C** – trang chủ đủ khối chính
 - [ ] T15: Vũ Trụ Phật Giáo – bản đồ 2D và trang khu vực

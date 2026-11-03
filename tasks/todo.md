@@ -111,7 +111,7 @@
 - **Phát hiện và sửa lỗi của T2:** `.wow { visibility: hidden }` trong `_theme.scss` làm ẩn mọi khối có lớp `wow` (chip, nút, thẻ bảng giá, ảnh dự án) ở chế độ giảm chuyển động. Test T2 khi đó chỉ kiểm thuộc tính viết trực tiếp, nay đã kiểm `getComputedStyle` (đỏ trước khi sửa, xanh sau khi sửa).
 - **Worker:** 488 KB nén (T1: 623 KB).
 - **Còn lại cho T3b:** logo Bexon màu teal, quầng sáng teal cuối section dịch vụ, line-height và giãn chữ của tiêu đề.
-- **Còn lại cho T13b:** số đếm odometer hiện 0 cho tới khi cuộn tới.
+- **Còn lại cho T13b:** số đếm odometer hiện 0 cho tới khi cuộn tới. (Đã xong ở T13b: HTML có số thật.)
 
 **Tiêu chí nghiệm thu:**
 - [x] Nền trang, nền section xen kẽ, tiêu đề, thân bài, nút chính trên Home-02 lấy đúng màu TLHP (test đọc computed style của từng phần tử mẫu)
@@ -762,13 +762,46 @@
 
 **File Bexon:** `sections/about/About2.js`, `sections/teams/Team1.js`
 
+**Kết quả 03/11/2026:** xong, đã deploy `v2.`.
+- **Thứ tự trên trang chủ:** hero → 6 lối vào → Khóa tu sắp tới → Tin tức → **Lời chào** → Lời Thầy dạy → **Chư Tôn Đức**. Chỗ của Tông Chỉ Tu Học, khu vực nổi bật và lộ trình tu học (T14, T15) vẫn để trống.
+- **Lời chào** (`About2`, bố cục Bexon giữ nguyên):
+  - Tiêu đề là câu dạy của chủ đề Lịch sử: "Lập chùa là tạo ra một cõi Tịnh độ giữa nhân gian", kèm tên Thượng tọa Thích Tâm Hòa. Dưới đó là đoạn tổng quan và nút "Tìm hiểu Bổn tự" dẫn tới trang lịch sử.
+  - Nút phát mở video "Chốn thiêng bình yên – Tùng Lâm Hòa Phúc" (`HE2MnR8Hl5c`). Đây là video nền trang chủ site cũ, trên kênh YouTube của chùa, mở trong lightbox qua youtube-nocookie.
+  - Khung Bexon có 3 gương mặt khách hàng, nay là chân dung 3 vị Chư Tôn Đức.
+  - Ảnh nền khung này là ảnh toàn cảnh chùa bản dọc 760px, dùng thẻ `<img>` tải chậm thay cho ảnh nền CSS. Lý do: ảnh nền CSS tải ngay khi mở trang, làm máy tính tải thêm ảnh 1280px (test ảnh hero bắt được). Điện thoại đã có sẵn bản 760 từ hero.
+- **Số liệu odometer:**
+  - Ba số: 471 bài Dòng Chảy Hoằng Pháp, 158 bài Trí Tuệ Phật Pháp và Phật lịch 2570. Phật lịch tính theo ngày, sang năm mới vào rằm tháng Tư âm lịch, viết liền không có dấu chấm ngăn nghìn.
+  - Snapshot có 472 bài Dòng Chảy, nhưng hai bài trùng slug nên chỉ đếm một (đúng như trang danh sách hiện "471 bài").
+  - Số tôn tượng và số khu vực chờ T15, T16. Site cũ nạp dữ liệu đó không qua API công khai.
+  - HTML gửi về đã có số thật. Trình đọc màn hình đọc một chuỗi số ẩn, phần chữ số lăn được đánh `aria-hidden`.
+  - Ở chế độ giảm chuyển động thì không tải odometer, số đứng yên.
+  - Khi cho phép chuyển động: sau khi script chạy, số về 0 rồi đếm lên khi cuộn tới (hết mục "Còn lại cho T13b" của T3a).
+- **Chư Tôn Đức** (`Team1`): 4 thẻ của nhóm "Người Liên Quan", xếp theo thứ tự trong admin.
+  - Dùng chung thẻ `AboutCard` của T13a, thêm lớp `left-swipe` để giữ hiệu ứng lật vào từ trái của Bexon (tắt khi giảm chuyển động).
+  - Danh sách là `<ul>`, bỏ phân trang. Nút "Xem thêm về Bổn tự" dẫn tới `/gioi-thieu`.
+  - Trang mẫu `/team` của Bexon không còn lưới thành viên; trang này sẽ bị xóa theo kế hoạch.
+- **Bexon About2 không có parallax ảnh**, nên không có hiệu ứng nào bị bỏ.
+- **Chờ Ban Biên Tập:** chân dung Sư Tổ vẫn trả 404 (đã ghi ở T13a), nên thẻ thứ tư hiện khung trống.
+
+
 **Tiêu chí nghiệm thu:**
-- [ ] Số liệu odometer có giá trị cuối đúng trong HTML (trình đọc màn hình và chế độ giảm chuyển động thấy số thật)
-- [ ] 4 thẻ Chư Tôn Đức dẫn đúng trang giới thiệu, không có liên kết hỏng
-- [ ] Hai khối nằm đúng thứ tự đã chốt trên trang chủ
+- [x] Số liệu odometer có giá trị cuối đúng trong HTML (trình đọc màn hình và chế độ giảm chuyển động thấy số thật)
+- [x] 4 thẻ Chư Tôn Đức dẫn đúng trang giới thiệu, không có liên kết hỏng (test mở cả 4 trang, đều trả 200)
+- [x] Hai khối nằm đúng thứ tự đã chốt trên trang chủ
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- home`
+- [x] `npm run test:e2e -- home` (21 test × 2 cỡ màn hình, có axe). Thêm 4 test mới:
+  - Số thật trong HTML đầu.
+  - Số đứng yên khi giảm chuyển động, và nút video.
+  - Bốn thẻ Chư Tôn Đức dẫn đúng trang.
+  - Số đếm lên đúng giá trị khi cuộn tới.
+  Test thứ tự khối nay kiểm cả Lời chào, Lời Thầy dạy và Chư Tôn Đức.
+- [x] Unit 120 xanh: thêm test `welcome`, `teachers`, số liệu (kể cả trường hợp không có chủ đề Lịch sử); `tsc` sạch
+- [x] Toàn bộ e2e (382 test, 24 bỏ qua theo thiết kế):
+  - Cục bộ: 358/358.
+  - Trên `v2.`: 348 qua, 1 chập chờn, 9 hỏng ở lượt đầu. Lỗi là 503 và quá thời gian tải trên các trang Bexon, Dòng Chảy và lịch, cùng kiểu với lỗi vượt CPU của gói Workers Free đã ghi từ T10 (lượt này chưa đối chiếu nhật ký Worker).
+  - Chạy lại 9 test đó: 9/9 xanh.
+- [x] Ảnh: `docs/anh/t13b-loi-chao-chu-ton-duc.png`
 
 **Phụ thuộc:** T10, T13a
 
