@@ -495,9 +495,17 @@ img {
 }
 // Hidden until wow.js reveals them. wow.js does not run under reduced motion,
 // so only hide them when motion is allowed.
+// Bexon hid them with `visibility`, as wow.js does inline, which also takes every link
+// inside out of the Tab order until the visitor scrolls there (the footer columns, for
+// one). Fade them out instead, and show a box at once when keyboard focus lands in it.
+// wow.js writes `visibility: visible` inline once it reveals a box.
 @media (prefers-reduced-motion: no-preference) {
-	.wow {
-		visibility: hidden;
+	.wow:not([style*="visibility: visible"]) {
+		visibility: visible !important;
+		opacity: 0;
+		&:focus-within {
+			opacity: 1;
+		}
 	}
 }
 .container-end-align {
@@ -564,6 +572,8 @@ img {
 .slider-prev,
 .slider-next {
 	cursor: pointer;
+	// They are <button>s now (Bexon used divs); keep the icon centred.
+	padding: 0;
 }
 .goverlay {
 	background: color-mix(in srgb, var(--tj-color-theme-dark) 95%, transparent);

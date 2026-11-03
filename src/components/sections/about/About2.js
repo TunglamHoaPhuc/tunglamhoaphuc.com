@@ -54,10 +54,11 @@ const About2 = () => {
 								<PopupVideo>
 									<Link
 										className="video-btn video-popup glightbox"
+										aria-label="Xem video"
 										href="https://www.youtube.com/watch?v=MLpWrANjFbI&amp;ab_channel=eidelchteinadvogados"
 									>
 										<span>
-											<i className="tji-play"></i>
+											<i className="tji-play" aria-hidden="true"></i>
 										</span>
 									</Link>
 								</PopupVideo>

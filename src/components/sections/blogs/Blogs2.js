@@ -30,18 +30,18 @@ const Blogs2 = () => {
 									className="slider-navigation d-none d-md-inline-flex wow fadeInUp"
 									data-wow-delay=".7s"
 								>
-									<div className="slider-prev" role="button">
-										<span className="anim-icon">
+									<button type="button" className="slider-prev" aria-label="Trang trước">
+										<span className="anim-icon" aria-hidden="true">
 											<i className="tji-arrow-left"></i>
 											<i className="tji-arrow-left"></i>
 										</span>
-									</div>
-									<div className="slider-next" role="button">
-										<span className="anim-icon">
+									</button>
+									<button type="button" className="slider-next" aria-label="Trang sau">
+										<span className="anim-icon" aria-hidden="true">
 											<i className="tji-arrow-right"></i>
 											<i className="tji-arrow-right"></i>
 										</span>
-									</div>
+									</button>
 								</div>
 							</div>
 						</div>

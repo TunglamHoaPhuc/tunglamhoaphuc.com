@@ -53,6 +53,15 @@ test.describe("reduced motion turns every effect off", () => {
 			expect(state).toEqual({ smoothTransform: "none", hiddenTitles: 0, hiddenWow: 0, runningSliders: 0 });
 		});
 	}
+
+	// The hero slider delays its title, text and button by 1–1.4 s; finishing a transition
+	// at once is not enough if it still waits to start.
+	test("the hero slide text shows without waiting", async ({ page }) => {
+		await page.goto("/");
+		const button = page.locator(".tj-slider-item.swiper-slide-active .slider-btn");
+		await button.waitFor({ state: "attached" });
+		await expect(button).toBeVisible({ timeout: 300 });
+	});
 });
 
 test.describe("smooth scrolling keeps the page usable", () => {

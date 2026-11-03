@@ -89,18 +89,18 @@ const Hero2 = () => {
 					className="hero-navigation d-inline-flex wow fadeIn"
 					data-wow-delay="1.5s"
 				>
-					<div className="slider-prev" role="button">
-						<span className="anim-icon">
+					<button type="button" className="slider-prev" aria-label="Trang trước">
+						<span className="anim-icon" aria-hidden="true">
 							<i className="tji-arrow-left"></i>
 							<i className="tji-arrow-left"></i>
 						</span>
-					</div>
-					<div className="slider-next" role="button">
-						<span className="anim-icon">
+					</button>
+					<button type="button" className="slider-next" aria-label="Trang sau">
+						<span className="anim-icon" aria-hidden="true">
 							<i className="tji-arrow-right"></i>
 							<i className="tji-arrow-right"></i>
 						</span>
-					</div>
+					</button>
 				</div>
 			</Swiper>
 			<Swiper
@@ -134,8 +134,8 @@ const Hero2 = () => {
 					className="circle-text"
 					style={{ backgroundImage: "url('/images/hero/circle-text.webp')" }}
 				></span>
-				<Link className="circle-icon" href="/services">
-					<i className="tji-arrow-down-big"></i>
+				<Link className="circle-icon" href="/services" aria-label="Xem tiếp">
+					<i className="tji-arrow-down-big" aria-hidden="true"></i>
 				</Link>
 			</div>
 		</section>
