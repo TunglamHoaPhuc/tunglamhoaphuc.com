@@ -68,7 +68,7 @@ Lộ trình có 3 mốc:
 | 4 | Xác định bucket B2 chứa 13 file JSON mà admin cũ đang ghi; tạo **khóa ứng dụng B2 chỉ đọc** cho đúng bucket đó | Chủ site | T19 |
 | 5 | Quyền vào project Vercel của site cũ (gắn tên miền `quantri.`, bật Deployment Protection) | Chủ site | T21 |
 | 5b | ~~Bật Cloudflare Zero Trust (Access)~~ – **đã bật 02/11**, nhóm `lingering-heart-cb52`, gói Free. Chi tiết ở [docs/van-hanh/admin-cu.md](../docs/van-hanh/admin-cu.md) | Chủ tài khoản | T21 |
-| 7 | Đồng ý tạo bucket R2 `tlhp-media` và gắn tên miền `media.tunglamhoaphuc.com` cho bucket (tài khoản sở hữu zone đã có R2 Paid). Tùy chọn: bật Image Transformations của zone cho ảnh mới chưa có bản thu nhỏ | Chủ tài khoản | T41d |
+| 7 | ~~Bucket R2 `tlhp-media` và tên miền `media.tunglamhoaphuc.com`~~ – **không cần nữa** (chủ dự án chọn ngày 04/11 xử lý ảnh bằng Cloudflare). Thay vào đó đã **bật Image Transformations cho zone ngày 04/11**: dashboard → Images → Transformations, gói Free (5.000 lần biến đổi khác nhau mỗi tháng, vượt không tính tiền), nguồn ảnh "This zone only". Theo dõi mức dùng ở trang Usage của mục đó | Chủ tài khoản | T41d |
 | 6 | Cập nhật bảng khảo sát theo quyết định 02/11: UX-01, UX-03, GD-02 (giữ hiệu ứng), GD-01 (menu), TH-06 (khẩu hiệu), QT-03 (soạn thảo); báo Ban Trị Sự và Trưởng nhóm kỹ thuật | Chủ dự án | Checkpoint A |
 
 ## Quyết định kiến trúc
@@ -77,7 +77,7 @@ Lộ trình có 3 mốc:
    - `vinext check` cho 95% tương thích, 0 lỗi.
    - Chỉ phải sửa cách import GSAP để chạy được trên Workers.
    - Worker 623 KB nén.
-   Giới hạn cần nhớ: `next/image` của vinext chỉ tối ưu ảnh nằm trong app, không tối ưu ảnh ở B2/R2, nên ảnh nội dung dùng bản thu nhỏ tạo sẵn (quyết định 8); bộ đệm dữ liệu cho ISR dùng KV (T19 bật).
+   Giới hạn cần nhớ: `next/image` của vinext chỉ tối ưu ảnh nằm trong app, không tối ưu ảnh ở B2/R2, nên ảnh nội dung đi qua Image Transformations của zone (quyết định 8); bộ đệm dữ liệu cho ISR dùng KV (T19 bật).
 2. **Đổi theme qua cầu nối biến, không sửa từng component.** `layout.js` import `design-system/tokens.css` trước `globals.scss`. Partial mới `utilities/_tlhp-bridge.scss` (nạp cuối) gán biến Bexon bằng token vai trò TLHP, khai báo trên `:root, [data-theme], .tlhp-dark` để đổi chủ đề theo từng phần tử. Chỉ sửa SCSS ở chỗ Bexon viết cứng mã màu (18 chỗ teal, 157 mã màu, phần lớn ở partial sẽ xóa) hoặc giãn chữ âm (34 chỗ). Bảng ánh xạ chính:
 
    | Biến Bexon (giá trị gốc) | Vai trò trong Bexon | Gán bằng token TLHP |
@@ -103,12 +103,15 @@ Lộ trình có 3 mốc:
    Cả ba dùng chung bộ chuẩn hóa (zod, ngày, URL ảnh, Markdown/HTML → HTML đã làm sạch); script nhập D1 cũng dùng bộ này.
 6. **Giữ nguyên URL công khai** (`/dong-chay-hoang-phap/{slug}`, `/bao-tuong/{slug}_{mã}`…). Chỉ redirect 301 URL WordPress cũ (ở bước chuyển hẳn).
 7. **Danh sách lọc, sắp xếp, phân trang phía server** qua query string (12 bài/trang công khai, 20 dòng/trang admin), thay cho tải 472 thẻ một lần.
-8. **Ảnh đi qua `mediaUrl()` và `imageSet()`, dùng bản thu nhỏ tạo sẵn** (chốt 04/11, sau review tốc độ tải trang).
-   - Mỗi ảnh có các bản WebP 480 / 960 / 1600 / 2400, đã bỏ EXIF, lưu trên R2 sau `media.tunglamhoaphuc.com` (bộ đệm 1 năm).
-   - Kho ảnh cũ: script `scripts/media-variants.ts` tạo các bản này (T41d).
-   - Ảnh mới ở admin mới: trình duyệt tạo khi tải lên (T30).
-   - Không dùng Image Transformations hay `next/image` cho cả kho. Khoảng 6.000 ảnh × 4 cỡ nhiều khả năng vượt hạn mức miễn phí, và cách tạo sẵn không tốn CPU Worker trên gói Free.
-   - Ảnh chưa có bản thu nhỏ dùng ảnh gốc, tải lười, không bao giờ preload.
+8. **Ảnh đi qua `mediaUrl()` và `imageAt()`, thu nhỏ bằng Image Transformations của zone** (chốt 04/11, chủ dự án chọn xử lý bằng Cloudflare, không cần R2 hay tên miền `media.`; thay cho phương án bản thu nhỏ tạo sẵn trên R2 chốt cùng ngày).
+   - `imageAt(src, width)` trả `/cdn-cgi/image/width=…,quality=75,format=auto,onerror=redirect/<nguồn>`; trình duyệt nhận AVIF hoặc WebP.
+   - Ba cỡ, ít có chủ đích vì mỗi cỡ của mỗi ảnh tính một lần vào hạn mức: 640 (thẻ, ảnh nhỏ), 1280 (ảnh bìa, chân dung), 1920 (khung hero, lightbox).
+   - Zone chỉ nhận ảnh nguồn của chính nó ("This zone only"), nên người ngoài không dùng được hạn mức. Ảnh WordPress (`admin.`) đã ở trong zone; ảnh B2 đi qua `/anh-goc/<bucket>/<key>` của site (chỉ hai bucket của admin cũ, bộ đệm 7 ngày).
+   - Vượt 5.000 lần biến đổi trong tháng: ảnh đã biến đổi vẫn phục vụ từ bộ đệm; ảnh mới chuyển về ảnh gốc nhờ `onerror=redirect` (chỉ chạy khi nguồn cùng tên miền, nên B2 phải qua `/anh-goc/`).
+   - Album chỉ biến đổi ảnh WordPress (`albumImageAt`), vì ảnh B2 trong album đã nhỏ (trung vị 92 KB) và album lớn sẽ tiêu hạn mức.
+   - Ảnh đã biến đổi vẫn tải ưu tiên thấp, không preload: quá hạn mức thì nó là ảnh gốc 7–9 MB.
+   - Cục bộ (`dev`, `preview`) không có `/cdn-cgi/image`; route `/cdn-cgi/image/` trong app chuyển về ảnh gốc. Trên Cloudflare, edge trả lời trước nên route không chạy.
+   - Ảnh mới ở admin mới (T30) chỉ cần một bản ≤ 2560px; `imageAt()` lo các cỡ, miễn nguồn nằm trong zone.
 9. **Chế độ đọc đặt `data-theme` trên khung đọc**, không đặt trên `<html>`, để Giấy dó / Đêm thiền chỉ đổi phần bài đọc.
 10. **Trong thời gian chuyển tiếp, admin cũ là nơi soạn duy nhất.** Site mới chỉ đọc B2, không bao giờ ghi vào file JSON của admin cũ. Lượt xem mới ghi vào bảng `PageView` trong D1 (từ T25); số hiển thị = số cũ trong JSON + số mới trong D1.
 11. **Admin mới dùng cùng Bootstrap + cầu nối theme**, thêm `components/_admin.scss`. Không có trang `/login`: Cloudflare Access chặn ở cửa, middleware và mọi server action tự kiểm JWT Access phía server. Phân quyền 3 vai trò theo QT-05 (Super Admin · Ban Biên Tập · Điều Phối Viên) lưu trong D1; mọi thao tác ghi tạo `AuditLog`; xóa = chuyển Lưu trữ có xác nhận và khôi phục. Trang sửa riêng thay modal khổng lồ; phản hồi lưu hiện in-line, không toast.
@@ -197,9 +200,10 @@ gói Bexon (zip) + design-system/tokens.css          T21 Admin cũ → quantri. 
   RA MẮT SỚM                                     DỮ LIỆU D1 (song song)
   T19 Nguồn dữ liệu B2 trực tiếp                 T23 Schema D1 + nhập
   T20 SEO trước ra mắt                            └─ T24 Repository D1 (chỉ v2)
-  T41d Bản thu nhỏ ảnh trên R2 (cần T41c)              ├─ T25 Lượt xem theo ngày (bật luôn trên www)
+  T41d Ảnh qua Image Transformations (đã xong)          ├─ T25 Lượt xem theo ngày (bật luôn trên www)
   T21 (đã xong) ─┐                                     └─ T26 Đăng ký khóa tu (bật ở T39)
-  T22 Kiểm thử + chuyển www ◄─┘ (cần T19, T20, T41d)
+  T41e Cache HTML/RSC ở edge (cần T19)
+  T22 Kiểm thử + chuyển www ◄─┘ (cần T19, T20, T41d, T41e)
   ══ Checkpoint E: ra mắt www ══                  ══ Checkpoint F ══
                                                         └─ ADMIN MỚI
                                                            T27a Access + RBAC + nhật ký ─ T27b Khung giao diện
@@ -255,7 +259,8 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [ ] T19: Đọc dữ liệu trực tiếp từ B2
 - [ ] T20: SEO trước ra mắt
 - [ ] T21: Đưa admin cũ sang `quantri.tunglamhoaphuc.com` sau Cloudflare Access (làm được ngay, giải quyết HT-01)
-- [ ] T41d: Bản thu nhỏ cho kho ảnh cũ trên R2 (điều kiện của T22)
+- [x] T41d: Ảnh nội dung qua Image Transformations của Cloudflare (điều kiện của T22; đổi từ bản thu nhỏ trên R2, xong 04/11)
+- [ ] T41e: Cache HTML và RSC ở edge (sau T19, điều kiện của T22)
 - [ ] T22: Kiểm thử trước ra mắt và chuyển `www`
 - [ ] **Checkpoint E** – ra mắt `www`, theo dõi 48 giờ
 
@@ -298,7 +303,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - **Phải tuần tự:** T1 → T2 → T3a → T3b → T5a → T5b → T6; T23 → T24; T27a → T27b trước mọi module admin; T29 → T30 → T31.
 - **Song song được:** T4 với T2–T6.
 - **Sau Checkpoint B:** T11, T13a, T14, T15, T17 song song. Điểm chạm chung là mảng khối của trang chủ và `_tlhp-bridge.scss`: mỗi task chỉ thêm dòng của mình.
-- **Ảnh:** T41c làm ngay, trước T16. T41d chạy song song T19–T20 khi có bucket R2 (chuẩn bị #7), phải xong trước T22.
+- **Ảnh:** T41c và T41d đã xong ngày 04/11. Còn chân dung, tác phẩm ở trang tượng và ảnh chèn trong thân bài (ghi ở T41d).
 - **Sau Checkpoint D:** giai đoạn 3 (ra mắt) và giai đoạn 4 (D1) chạy song song.
 - **Sau Checkpoint G:** T32, T33, T34, T36, T38, T38b song song; T35 chờ T34 (dùng chung trường lặp), T37 chờ T36.
 - **Sau Checkpoint E:** T41a làm được bất cứ lúc nào (không đổi giao diện).
@@ -313,7 +318,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 | Giữ hiệu ứng làm khó người lớn tuổi, trình đọc màn hình, người dùng bàn phím | Cao | Công tắc giảm chuyển động (T2); slider có nút dừng; kiểm cuộn bàn phím, liên kết neo, tìm trong trang khi bật cuộn mượt; test canh gác chạy mọi trang |
 | Đảo ngược UX-01, UX-03 đang "Đã chốt" | TB | Chuẩn bị #6: cập nhật bảng khảo sát, báo Ban Trị Sự; T3b sửa BRAND-GUIDELINES mục 1.2, 5.6 cho khớp |
 | Preloader + GSAP + CSS nặng làm trượt mục tiêu LCP < 2,0 s (UX-03) | TB | Đo mốc ở Checkpoint B; preloader ẩn ngay khi có nội dung đầu tiên; nếu vẫn trượt, chủ dự án chọn giữa preloader và mục tiêu LCP (Câu hỏi mở #6); T41a cắt Bootstrap và icon font |
-| Ảnh gốc máy ảnh (6048 px, 7–9 MB) được đưa thẳng cho khách. Đo 04/11 trên `v2.` (điện thoại 4G): LCP trang bài 47,9 s, trang danh sách 11,9 s, trang chủ 8,4 s. Admin cũ không nén ảnh, nên bài mới nào cũng thêm ảnh nặng | **Cao** | T41c sửa nhanh trong code; T41d tạo bản thu nhỏ cho kho cũ trên R2 trước khi chuyển `www` (T22); T30 tạo bản thu nhỏ ngay khi tải lên; T41b đặt ngân sách ảnh trong Lighthouse CI |
+| Ảnh gốc máy ảnh (6048 px, 7–9 MB) được đưa thẳng cho khách. Đo 04/11 trên `v2.` (điện thoại 4G): LCP trang bài 47,9 s, trang danh sách 11,9 s, trang chủ 8,4 s. Admin cũ không nén ảnh, nên bài mới nào cũng thêm ảnh nặng | TB (đã giảm từ Cao) | T41c và T41d đã xong 04/11: ảnh qua Image Transformations, trang bài còn 186 KB ảnh, LCP 4,6 s. Còn lại: quá 5.000 lần biến đổi mỗi tháng thì ảnh mới về ảnh gốc (theo dõi trang Usage; nếu thường xuyên vượt thì chủ tài khoản cân nhắc gói Images trả phí, 0,5 USD mỗi 1.000 lần); trang tượng và ảnh trong thân bài chưa đổi; T41b đặt ngân sách ảnh trong Lighthouse CI |
 | Đọc JSON trên B2 đúng lúc admin cũ đang ghi đè file | TB | Parse lỗi thì giữ bản trang cũ (ISR không thay); log lỗi; nút "Làm mới site" ở `/van-hanh/lam-moi` |
 | ISR cần bộ đệm dữ liệu (vinext dùng KV); tải lại ~12 MB JSON cho mỗi trang sẽ chậm | TB | T19 bật bộ đệm KV; mỗi file JSON tải 1 lần mỗi chu kỳ theo `ETag` |
 | Hiệu ứng tách chữ (SplitText) làm trình đọc màn hình đọc từng ký tự, hoặc lệch dấu tiếng Việt | TB | T3b giữ `aria-label` nguyên câu, kiểm dòng "Ẫ Ộ Ữ Ỹ" khi hiệu ứng đang chạy |
@@ -358,6 +363,8 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 |---|---|
 | 1 | Bản đầu: dựng mới, chuyển mã Bexon sang TypeScript + Tailwind, bỏ hiệu ứng |
 | 2 | Giữ Bootstrap/SCSS của Bexon, đổi theme qua cầu nối biến `--tj-*` → `--tlhp-*`; xem thử trên `v2.` |
+| 8 | 04/11, chủ dự án chọn xử lý ảnh bằng Cloudflare, không phụ thuộc bucket R2 `tlhp-media` và tên miền `media.`: T41d đổi sang Image Transformations của zone (đã bật, nguồn "This zone only", ảnh B2 qua `/anh-goc/`); quyết định 8 viết lại; chuẩn bị #7 bỏ; T30 chỉ cần một bản ≤ 2560px; T41b không còn phụ thuộc bản thu nhỏ trên R2 |
+| 7 | 04/11, sau khi so với divineshop.vn: thêm T41e (cache HTML và RSC ở edge, trước T22) vì mỗi lượt xem đang dựng lại trang (TTFB 0,35–2,7 s); ghi ngân sách cụ thể cho T41a (CSS ≤ 60 KB br, JS ≤ 180 KB br) và T41b (≤ 2 preload font, font ≤ 150 KB); T22 cần thêm T41e |
 | 6 | 04/11, sau review tốc độ tải trang: tách phần ảnh của T41 thành T41c (sửa nhanh, trước T16) và T41d (bản thu nhỏ trên R2, trước T22); T41b chỉ còn đo và ngân sách; quyết định 8 đổi sang bản thu nhỏ tạo sẵn thay cho Image Transformations; cập nhật T22, T30, T39; thêm chuẩn bị #7 và rủi ro ảnh |
 | 3 | Giữ toàn bộ hiệu ứng Bexon; ra mắt sớm trên `www` đọc JSON B2, admin cũ sang `quantri.`; chốt menu, thứ tự trang chủ, khẩu hiệu, TipTap; dời đăng ký, Hỏi AI, Danh Tăng ra sau ra mắt |
 | 5 | Sau T1: chạy trên Workers bằng vinext + `cf` thay cho OpenNext + Wrangler (khuyến nghị hiện tại của Cloudflare; `vinext check` 95% tương thích); cập nhật T19, T24, T38b, T39, Checkpoint G theo |

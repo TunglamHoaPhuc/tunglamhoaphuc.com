@@ -1046,7 +1046,7 @@
   | Bài "Cộng tu pháp hội niệm Phật tháng 7…" | 47,9 s → 11,2–11,3 s | 10 MB (không đổi) |
 
   - Hai trang sau vẫn tải ảnh gốc, chỉ là không còn ưu tiên. Ảnh vẫn chiếm băng thông: trang bài có Render Delay 8,4 s. Phải có T41d mới hết.
-- **Cho T16:** `StatueCard` đang làm dở có `eager` cho 4 thẻ đầu. Ảnh tượng nặng 0,2–1,5 MB nên sẽ bị React preload. Khi thêm trang tượng vào `PAGES` của `image-budget.spec.ts`, test sẽ bắt lỗi này.
+- **Cho T16:** `StatueCard` đang làm dở có `eager` cho 4 thẻ đầu. Ảnh tượng nặng 0,2–1,5 MB nên sẽ bị React preload. Khi thêm trang tượng vào `PAGES` của `image-budget.spec.ts`, test sẽ bắt lỗi này. (Đã xử lý ở T16, xem mục "Ảnh" của T16.)
 
 **Tiêu chí nghiệm thu:**
 - [x] Không trang nào preload hoặc đặt `fetchPriority="high"` cho ảnh lớn hơn 500 KB (test canh gác mới chạy mọi trang)
@@ -1074,7 +1074,7 @@
 
 **File Bexon:** `shared/cards/TeamCard*.js`, `sections/teams/TeamDetails1.js`
 
-**Kết quả 04/11/2026:** xong, đã deploy `v2.`. Làm T16 trước T41c theo lời chủ dự án; ảnh tượng theo đúng hướng của T41c (xem "Ảnh").
+**Kết quả 04/11/2026:** xong, đã deploy `v2.`. T16 và T41c được làm song song trên hai nhánh rồi gộp lại (xem "Gộp với T41c").
 - **Khác mô tả:**
   - **Không có mục Video.** Dữ liệu tượng không có trường video nào; trang cũ chỉ có khung trống. Mục sẽ thêm khi có dữ liệu (T19).
   - **Nghệ thuật Phật giáo là thẻ, không phải album.** `artVariations` (12 tượng, 40 tác phẩm) là các tượng khác của cùng vị: 34 tác phẩm có trang riêng nên thẻ dẫn sang trang đó; 6 tác phẩm còn lại không có bản ghi tượng nên chỉ hiện chữ.
@@ -1092,10 +1092,15 @@
   - Tổng quan: chân dung 3:4, nhãn loại tượng, danh hiệu, bảng thông tin (cụm tượng, chúng hội dẫn về danh sách đã lọc, nơi tôn trí dẫn sang trang khu vực, mã tượng), lời dạy kiểu kinh văn.
   - Câu chuyện trong khung đọc (cỡ chữ, nền giấy), Nghệ thuật Phật giáo, Bảo tượng liên quan (4 tượng chính cùng cụm, rồi cùng chúng hội). Thanh mục lục chỉ hiện các phần có dữ liệu.
   - Thẻ tượng ở trang khu vực nay là liên kết (`/bao-tuong` vào `livePaths`).
-- **Ảnh** (theo hướng T41c, vì ảnh tượng là ảnh gốc 0,2–1,5 MB):
+- **Ảnh** (theo quy tắc của T41c, vì ảnh tượng là ảnh gốc: 28/126 chân dung trên 500 KB, nặng nhất 4,4 MB):
   - Thẻ tượng luôn `lazy`. Bản đầu cho 4 thẻ đầu `eager`, và React chèn preload cho cả 4 ảnh (khoảng 3 MB) trước CSS; test mới đỏ trên bản đó, xanh sau khi sửa.
   - Trang danh sách chỉ tải ảnh của trang đang xem (site cũ tải 109 ảnh). Đã đo: tải trước trang tượng qua liên kết không kéo theo ảnh nào.
-  - Chân dung ở trang tượng không đặt `fetchPriority="high"`, nhưng vẫn bị React preload như chân dung ở trang Giới thiệu. Test ngân sách ảnh của T41c sẽ chạy cả trang này.
+  - Chân dung ở trang tượng dùng `topImagePriority()` của T41c như các trang khác: ảnh ngoài site được ưu tiên thấp nên React không preload.
+  - Trang danh sách và trang TP0077 (chân dung 4,4 MB, nặng nhất) được thêm vào `image-budget.spec.ts`. Test đỏ trước khi sửa (preload ảnh 4433 KB), xanh sau khi sửa.
+- **Gộp với T41c:**
+  - T41c được làm trong một worktree riêng (nhánh `perf/t41c-anh`) cùng lúc với T16. Bản T41c deploy lên `v2.` lúc 10:09, hai phút sau bản T16 (10:06), và đè mất trang tượng. Vì vậy lượt e2e đầu tiên trên `v2.` gặp 404 ở các test chạy sau mốc đó.
+  - Đã gộp `perf/t41c-anh` vào nhánh này. Chỉ xung đột ở `tasks/plan.md` (hai bên cùng tick việc của mình).
+  - Sau khi gộp, `v2.` được deploy lại với cả T16 lẫn T41c.
 - **Chờ Ban Biên Tập:**
   - 15 tượng thuộc chúng hội "chưa phân loại" mang tên chúng hội "Bảo Tượng Phật Giáo", nên bộ lọc có một mục trùng tên chuyên mục.
   - 17 tượng chính không có mã TP; 2 tượng `cong_thap` chưa có khu vực (đã có trong báo cáo snapshot từ T15).
@@ -1109,7 +1114,8 @@
 **Kiểm chứng:**
 - [x] `npm run test:e2e -- bao-tuong`: 11 test × 2 cỡ màn hình, có axe, có một test chạy không JavaScript; hai trang mới được thêm vào test canh gác
 - [x] Unit 149 xanh (thêm 10 test, 2 test cụm tượng đỏ trước khi sửa; thử đột biến 8/8 bị bắt); `tsc`, eslint sạch
-- [ ] Toàn bộ e2e: cục bộ 439 qua, 2 hỏng (test ảnh Bảo Tượng do sửa file test giữa lượt chạy, xanh sau khi build lại; lightbox album chập chờn khi máy bận, chạy riêng 8/8 qua). Trên `v2.`: ngay sau deploy các trang mới trả 200, nhưng lúc chạy e2e thì `/bao-tuong-phat-giao` và `/bao-tuong/…` trả 404 (desktop qua, mobile hỏng 10 test, sau đó cả hai đều 404). Chưa rõ nguyên nhân, có thể v2 bị deploy bản khác đè lên. Cần kiểm lại.
+- [x] Toàn bộ e2e sau khi gộp T41c (496 test, 27 bỏ qua theo thiết kế): cục bộ 469/469 qua, trên `v2.` 469/469 qua (phiên bản Worker `1cb306d0`, không có deploy nào khác trong lúc chạy). Lượt chạy trước khi gộp gặp 404 trên `v2.` vì bản T41c đè lên, xem "Gộp với T41c".
+- [x] `image-budget`: thêm trang danh sách và trang TP0077; đỏ trước khi sửa, xanh sau
 - [x] Ảnh: `docs/anh/t16-bao-tuong-phat-giao.png`
 
 **Phụ thuộc:** T15
@@ -1243,48 +1249,98 @@
 
 ---
 
-### T41d: Bản thu nhỏ cho kho ảnh cũ trên R2
+### T41d: Ảnh nội dung qua Image Transformations của Cloudflare
 
-**Mô tả:** Làm trước T22, để khách thật trên `www` không phải tải ảnh gốc 7–9 MB (mốc đo ở T41c).
+**Mô tả:** Làm trước T22, để khách thật trên `www` không phải tải ảnh gốc 7–9 MB (mốc đo ở T41c). Ngày 04/11 chủ dự án chọn xử lý bằng Cloudflare, không phụ thuộc bucket R2 `tlhp-media` và tên miền `media.tunglamhoaphuc.com`. Vì vậy bỏ phương án bản thu nhỏ tạo sẵn trên R2 (script `media-variants.ts`, manifest) đã ghi cùng ngày, chuyển sang Image Transformations của zone (quyết định 8 trong plan.md).
 
-- **Script `scripts/media-variants.ts`** (Node + `sharp`, chạy trên máy hoặc CI, không tốn CPU Worker):
-  - Lấy mọi URL ảnh trong snapshot qua `mediaUrl()`: bài viết (thẻ, bìa, album, ảnh trong nội dung), lịch, giới thiệu, Tông Chỉ, Vũ Trụ, bảo tượng. Khoảng 6.000 ảnh duy nhất.
-  - Mỗi ảnh: tải về, xoay theo EXIF rồi bỏ toàn bộ metadata (ảnh gốc Nikon còn EXIF, có thẻ GPS).
-  - Xuất WebP (chất lượng khoảng 75) ở các bề rộng 480 / 960 / 1600 / 2400, không phóng to quá cỡ gốc.
-  - Khóa R2 theo mã băm nội dung: `v/<hash>/<w>.webp`. Cùng một file nằm ở cả hai bucket B2 (`s2-cnv03`, `media-tunglamhoaphuc`) chỉ lưu và tải một lần. Hiện trang chủ tải `Phap-hoi-niem-Phat.webp` hai lần.
-  - Ghi `data/media-manifest.json`: URL gốc → mã băm, cỡ gốc.
-  - Chạy lại được nhiều lần: chỉ xử lý ảnh chưa có trong manifest; báo ảnh lỗi (404, không phải ảnh, `.jfif` WordPress trả `application/octet-stream`).
-- **Hạ tầng:** bucket R2 `tlhp-media`, tên miền `media.tunglamhoaphuc.com`, `Cache-Control: public, max-age=31536000, immutable`.
-- **Trong app:**
-  - Hàm `imageSet(src, sizes)` cạnh `mediaUrl()` trả `src`, `srcSet`, `sizes` từ manifest.
-  - Các component ảnh dùng hàm này: thẻ bài, album, ảnh bìa, hero, ảnh trong nội dung. Lightbox mở bản 2400.
-  - Manifest đọc lười như snapshot; đo CPU khi nạp, nếu nặng thì tách theo file nguồn.
-- **Ảnh tải lên sau lần chạy cuối** (admin cũ vẫn soạn tới T39):
-  - Chưa có trong manifest thì dùng ảnh gốc, tải lười, không preload; `snapshot:check` liệt kê các ảnh này.
-  - Chạy lại script sau `snapshot:fetch`. Khi T19 đọc B2 trực tiếp, chạy theo lịch (GitHub Actions sau T1b).
-  - Tùy chọn: bật Image Transformations của zone chỉ cho phần ảnh mới này.
-- **Không dùng Image Transformations hay `next/image` cho cả kho:**
-  - vinext chỉ tối ưu ảnh nằm trong app, không tối ưu ảnh ở B2/R2.
-  - Kho cũ khoảng 6.000 ảnh × 4 cỡ, tức khoảng 24.000 lần biến đổi, nhiều khả năng vượt hạn mức miễn phí (kiểm bảng giá khi làm).
-  - Tạo sẵn thì kết quả cố định và không tốn phí. Kho bản thu nhỏ dự kiến vài trăm MB, trong 10 GB miễn phí của R2.
+- **Cloudflare:** bật Transformations cho zone `tunglamhoaphuc.com` (dashboard → Images → Transformations; API báo `editable: false` nên không bật bằng lệnh được). Nguồn ảnh "This zone only". Gói Free: 5.000 lần biến đổi khác nhau mỗi tháng; vượt thì ảnh đã biến đổi vẫn phục vụ từ bộ đệm, ảnh mới trả lỗi 9422, không tính tiền.
+- **`imageAt(src, width)`** trong `media.ts`: ảnh B2 và WordPress đi qua `/cdn-cgi/image/width=…,quality=75,format=auto,onerror=redirect/<nguồn>`. Ảnh của site và host khác giữ nguyên. Ba cỡ (`IMAGE_WIDTH`): 640, 1280, 1920.
+- **`/anh-goc/<bucket>/<key>`:** route đưa ảnh B2 về chính zone, vì zone chỉ nhận nguồn của nó, và `onerror=redirect` chỉ chạy khi nguồn cùng tên miền.
+  - Chỉ hai bucket `s2-cnv03`, `media-tunglamhoaphuc`; chỉ trả ảnh; từ chối khóa có `.` hay `..`.
+  - `Cache-Control` 7 ngày. B2 không gửi header này, mà nguồn giữ dưới 1 giờ thì Cloudflare biến đổi ở mức thấp.
+- **`/cdn-cgi/image/` trong app:** cục bộ không có Transformations, nên route này chuyển về ảnh gốc. Chỉ chuyển tới đường dẫn của site và host WordPress, không thành chỗ chuyển hướng tùy ý. Trên Cloudflare, edge trả lời trước nên route không chạy.
+- **Album:** `albumImageAt` chỉ biến đổi ảnh WordPress. Ảnh B2 trong album đã nhỏ (trung vị 92 KB), còn album lớn (170 ảnh) sẽ tiêu hạn mức.
+- **Ưu tiên tải:** ảnh đã biến đổi vẫn "low", không preload, vì quá hạn mức thì nó là ảnh gốc.
+
+**Kết quả 04/11/2026:** xong, đã deploy `v2.` (commit `f545aee`).
+- **Áp vào:** thẻ bài, thẻ tin, ảnh bìa trang bài / Tông Chỉ / khu vực, chân dung Giới thiệu, bìa sách, chương trình ở trang lịch, tranh chủ đề tháng, Lời Thầy dạy, Lời chào, thẻ khu vực, thẻ tượng, ảnh video, khung hero (1280 và 1920, ảnh nhỏ 640), album.
+- **Đo ảnh:**
+  - WordPress `45-1.jpg` (6048 px, 7,9 MB): 640 px còn 24,8 KB; 1280 px còn 81 KB.
+  - B2 `2-2-scaled.jpg` (712 KB) qua `/anh-goc/`: 43 KB ở 640 px, 109 KB ở 1280 px (AVIF).
+  - Lần đầu khoảng 3 s (lấy từ B2 rồi biến đổi), sau đó `HIT` khoảng 0,43 s.
+- **Lighthouse điện thoại trên `v2.`** (trung vị 3 lượt; "trước" là mốc sáng 04/11):
+
+  | Trang | Ảnh tải về | LCP | Speed Index | Điểm |
+  |---|---|---|---|---|
+  | Bài "Cộng tu pháp hội niệm Phật tháng 7…" | 9.961 → 186 KB | 47,9 → 4,6 s | 5,2 → 4,5 s | 54 → 77 |
+  | `/dong-chay-hoang-phap` | 10.481 → 246 KB | 11,9 → 5,0 s | 6,8 → 4,4 s | 60 → 74 |
+  | Trang chủ | 1.625 → 588 KB | 8,4 → 5,0 s | 5,3 → 4,8 s | 66 → 73 |
+
+- **Sửa cùng ngày, trước T41d** (commit `5e79315`):
+  - Slider tin tức trên trang chủ tải ảnh của mọi slide đang ẩn khi hiệu ứng bật, lúc bộ hiệu ứng GSAP khởi động, dù ảnh có `loading="lazy"`. Trên điện thoại đó là 9,3 MB, có ảnh 7,9 MB.
+  - Nay chỉ slide đang hiện và slide kế tiếp có `src` (`NewsSlider` trong `Blogs2`). Trang chủ: ảnh 10,3 MB → 0,9 MB, điểm 48–53 → 66–74.
+  - Chủ dự án giữ slider tự chạy ngay khi mở trang (không đợi cuộn tới).
+- **Còn lại:**
+  - Chân dung và tác phẩm ở trang tượng (`bao-tuong/[slug]/page.tsx`, lúc làm đang có thay đổi chưa commit của phiên khác).
+  - Ảnh chèn trong thân bài (`normalize.ts`).
+  - Theo dõi trang Usage của Transformations. Các lượt e2e và Lighthouse ngày 04/11 cũng tính vào hạn mức.
 
 **Tiêu chí nghiệm thu:**
-- [ ] Lấy mẫu 50 ảnh mỗi loại: thẻ bài ≤ 80 KB, ảnh bìa ≤ 300 KB, ô album ≤ 60 KB
-- [ ] Không ảnh nào tải lớn hơn 2 lần cỡ hiển thị, ở 375 px và 1440 px
-- [ ] Trang bài "Cộng tu pháp hội niệm Phật tháng 7…" tải ≤ 1,5 MB ảnh trước khi cuộn; LCP 3 trang ở mốc T41c ghi trước–sau
-- [ ] Ảnh trên `media.` không còn EXIF
-- [ ] Chạy script lần hai không tải lại ảnh nào đã xử lý
+- [x] Thẻ bài ≤ 80 KB (test kiểm 6 thẻ đầu trang danh sách), ảnh bìa ≤ 300 KB (81 KB), ô album ảnh WordPress còn 57 KB
+- [ ] Không ảnh nào tải lớn hơn 2 lần cỡ hiển thị. Chưa đạt ở ảnh nhỏ 80 px dưới hero: dùng bản 640 (khoảng 25–40 KB), cố ý dùng chung với thẻ tin để khỏi tốn thêm lượt biến đổi
+- [x] Trang bài "Cộng tu pháp hội niệm Phật tháng 7…" tải ≤ 1,5 MB ảnh trước khi cuộn (186 KB); LCP 3 trang ghi trước–sau (ở trên)
+- [ ] Ảnh đã biến đổi không còn EXIF (chưa kiểm)
+- [x] Vượt hạn mức hay Transformations bị tắt thì ảnh vẫn hiện (về ảnh gốc): `onerror=redirect` và route dự phòng
 
 **Kiểm chứng:**
-- [ ] `npm test -- media` (`imageSet`, manifest, ảnh chưa có bản thu nhỏ)
-- [ ] `npm run test:e2e -- image-budget` (mở rộng từ T41c)
-- [ ] Lighthouse điện thoại 3 trang trên `v2.`
+- [x] `npm test -- media`: 7 test mới, đỏ trước khi viết hàm; toàn bộ unit 156 xanh; `tsc`, eslint không lỗi
+- [x] `npm run test:e2e -- image-sizes` (mới): đỏ trên bản cũ ở `v2.` (4 test), xanh sau khi deploy. Phần biến đổi bỏ qua khi chạy cục bộ; test ảnh thẻ hiện được và `/anh-goc/` chạy cả hai nơi
+- [x] Toàn bộ e2e:
+  - Cục bộ: các bộ bị ảnh hưởng 132/132.
+  - Trên `v2.`: 480 qua, 3 hỏng (giảm chuyển động ở `/services`, `/portfolios`, `/team` trên điện thoại khi chạy dài 12 phút); chạy lại riêng 6/6 qua.
+- [x] Lighthouse điện thoại 3 trang trên `v2.` (số ở trên)
 
-**Phụ thuộc:** T41c; chuẩn bị #7 (bucket R2 + tên miền)
+**Phụ thuộc:** T41c
 
-**File dự kiến:** `scripts/media-variants.ts`, `src/libs/content/media.ts`, `data/media-manifest.json`, `src/components/shared/cards/PostCard.tsx`, `src/components/sections/posts/PostGallery.tsx`, `tests/unit/content/media.test.ts`, `tests/e2e/image-budget.spec.ts`. Nếu phần thay component vượt 8 file thì tách component còn lại sang một task riêng.
+**File:** `src/libs/content/media.ts`, `src/app/anh-goc/[bucket]/[...key]/route.ts`, `src/app/cdn-cgi/image/[...rest]/route.ts`, `src/libs/home.ts`, các component ảnh (thẻ, album, bìa, hero), `tests/unit/content/media.test.ts`, `tests/e2e/image-sizes.spec.ts`
 
 **Quy mô:** L
+
+---
+
+### T41e: Cache HTML và RSC ở edge
+
+**Mô tả:** Thêm ngày 04/11, sau khi so với divineshop.vn (Gatsby, HTML dựng sẵn, TTFB khoảng 150 ms). Trang công khai chỉ đổi khi dữ liệu đổi, nhưng hiện mỗi lượt xem đều dựng lại trang.
+
+- **Mốc đo 04/11/2026** (trang chủ `v2.`, desktop, không giả lập mạng chậm, mỗi số một lượt đo):
+  - HTML trả `Cache-Control: private, no-cache, no-store`; TTFB dao động 0,35–2,7 s, có lẽ vì Worker khởi động nguội.
+  - Mỗi lượt xem kéo thêm 11 lần dựng RSC để tải trước liên kết (đã ghi ở T19a). Đây là phần tốn CPU Worker lớn nhất trên gói Free (Câu hỏi mở #8).
+  - divineshop.vn cùng lúc: TTFB 147 ms, HTML 23 KB (của mình 251 KB chưa nén).
+- **Việc làm:**
+  - Route công khai khai báo `revalidate` (cùng chu kỳ 5 phút của T19). vinext khi đó sinh `s-maxage=…, stale-while-revalidate`.
+  - Kiểm cơ chế cache thật trên Workers: phản hồi của Worker không tự vào cache CDN. Chọn giữa bộ đệm ISR của vinext (KV, T19 đã định bật) và Cache API trong Worker. Đo cả hai nếu chưa rõ.
+  - Payload RSC dùng đường dẫn riêng (`.rsc`), nên khóa cache không lẫn với HTML. Kiểm lại bằng test trước khi bật.
+  - Không cache khi phản hồi phụ thuộc người xem (cookie, `/van-hanh/*`, `/admin*`), và không cache lỗi 5xx.
+  - Nút "Làm mới site" (T19) phải xóa cả bản cache ở edge, không chỉ dữ liệu.
+  - Nếu cache RSC đã bật thì giữ tải trước liên kết. Nếu chưa, chỉ tải trước khi rê chuột cho liên kết ở menu và footer.
+  - Thu gọn dữ liệu nhúng trong HTML: client component chỉ nhận các trường nó dùng.
+
+**Tiêu chí nghiệm thu:**
+- [ ] Trang công khai lượt thứ hai trở đi: TTFB p75 ≤ 200 ms trên `v2.` (đo 20 lượt mỗi mẫu trang)
+- [ ] CPU Worker trung vị mỗi lượt xem trang chủ (gồm tải trước) giảm so với mốc T19a; ghi số trước–sau
+- [ ] Sửa bài ở admin cũ rồi bấm "Làm mới site": trang và payload RSC hiện bản mới ngay
+- [ ] Trang có cookie phiên, `/van-hanh/*`, `/admin*` và lỗi 5xx không bao giờ được cache (test)
+- [ ] HTML trang chủ ≤ 120 KB chưa nén (hiện 251 KB)
+
+**Kiểm chứng:**
+- [ ] `npm run test:e2e -- edge-cache` (header cache, khóa HTML/RSC riêng, trang không được cache)
+- [ ] Workers telemetry trước–sau; Lighthouse điện thoại 3 trang ở mốc T41c
+
+**Phụ thuộc:** T19 (ISR, bộ đệm KV, nút làm mới). Cần xong trước T22.
+
+**File dự kiến:** `cloudflare.config.ts`, `next.config.js`, `src/app/(site)/layout.tsx`, `src/app/van-hanh/lam-moi/page.tsx`, `tests/e2e/edge-cache.spec.ts`
+
+**Quy mô:** M
 
 ---
 
@@ -1301,7 +1357,7 @@
 - [ ] `npm run check:urls -- --base=https://v2.tunglamhoaphuc.com`
 - [ ] `BASE_URL=https://www.tunglamhoaphuc.com npm run test:e2e -- smoke`
 
-**Phụ thuộc:** T19, T20, T21, T41d (ảnh đúng cỡ trước khi khách thật vào)
+**Phụ thuộc:** T19, T20, T21, T41d (ảnh đúng cỡ trước khi khách thật vào), T41e (cache HTML ở edge)
 
 **File dự kiến:** `scripts/check-urls.ts`, `src/middleware.ts` (chuyển hướng admin cũ), `tests/e2e/smoke.spec.ts`, `docs/van-hanh/chuyen-www.md`
 
@@ -1497,11 +1553,11 @@
 
 ### T30: Admin – Thư viện ảnh R2
 
-**Mô tả:** `/admin/thu-vien-anh`: cây thư mục + lưới ảnh, tìm, lọc thời gian. Tải lên kéo-thả, bắt buộc mô tả ảnh (alt). Trình duyệt tự xoay ảnh theo EXIF, bỏ metadata và tạo luôn bộ bản WebP 480 / 960 / 1600 / 2400 (canvas, nhận ảnh gốc ≤ 25 MB), cùng định dạng và khóa R2 với T41d. Bộ ảnh được đẩy thẳng lên R2, Worker chỉ ghi bản ghi `Media` (mã băm, cỡ gốc, alt), nên không tốn CPU Worker và Ban Biên Tập không phải tự nén. Đổi tên / xóa có kiểm "đang dùng ở N bài". `MediaPicker` để chọn ảnh trong form. Cần bucket R2 (Giai đoạn 1 của kế hoạch Cloudflare); khi phát triển dùng R2 local.
+**Mô tả:** `/admin/thu-vien-anh`: cây thư mục + lưới ảnh, tìm, lọc thời gian. Tải lên kéo-thả, bắt buộc mô tả ảnh (alt). Trình duyệt tự xoay ảnh theo EXIF, bỏ metadata và nén thành một bản WebP cạnh dài ≤ 2560px (canvas, nhận ảnh gốc ≤ 25 MB), đẩy thẳng lên R2; Worker chỉ ghi bản ghi `Media` (mã băm, cỡ gốc, alt), nên không tốn CPU Worker và Ban Biên Tập không phải tự nén. Các cỡ hiển thị do `imageAt()` lo qua Image Transformations (T41d), nên ảnh R2 phải được phục vụ từ một địa chỉ trong zone: thêm bucket mới vào `/anh-goc/`, hoặc gắn tên miền con của zone cho bucket. Đổi tên / xóa có kiểm "đang dùng ở N bài". `MediaPicker` để chọn ảnh trong form. Cần bucket R2 (Giai đoạn 1 của kế hoạch Cloudflare); khi phát triển dùng R2 local.
 
 **Tiêu chí nghiệm thu:**
-- [ ] Ảnh JPG 8 MB (6048 px) tải lên thành bộ 4 bản WebP trong R2, bản 480 ≤ 80 KB, không còn EXIF; có bản ghi `Media` kèm alt
-- [ ] Trang công khai hiện ảnh mới tải lên bằng `imageSet()` ngay, không cần chạy script T41d
+- [ ] Ảnh JPG 8 MB (6048 px) tải lên thành một bản WebP ≤ 2560px trong R2, không còn EXIF; có bản ghi `Media` kèm alt
+- [ ] Trang công khai hiện ảnh mới tải lên qua `imageAt()` ngay (bản 640 ≤ 80 KB)
 - [ ] Xóa ảnh đang dùng bị chặn bằng thông báo in-line "Không thể xóa: ảnh đang được dùng ở 3 bài viết"
 - [ ] Chỉ nhận jpg/png/webp/gif, kiểm cả phía server theo magic bytes
 
@@ -1726,7 +1782,7 @@
 **Mô tả:** Theo thứ tự, trong một khung giờ đã báo trước:
 1. Đóng băng admin cũ (Access chỉ cho quyền xem, báo Ban Biên Tập ngừng soạn).
 2. Chạy `scripts/import.ts --from=b2` lần cuối lên D1 production.
-3. Chạy `scripts/media-variants.ts` lần cuối (T41d), rồi chép ảnh gốc còn lại trên B2 và WordPress sang R2 nếu Giai đoạn 1 của kế hoạch Cloudflare chưa làm. Đổi `mediaUrl()` sang `media.tunglamhoaphuc.com`.
+3. Nếu Giai đoạn 1 của kế hoạch Cloudflare chép ảnh B2 và WordPress sang R2 thì đổi `mediaUrl()` và nguồn của `imageAt()` (T41d) sang địa chỉ trong zone của bucket R2. Ảnh WordPress phải chép trước khi tắt WordPress, nếu không `imageAt()` mất nguồn.
 4. Đặt `CONTENT_SOURCE=d1` trên `www`.
 5. Mở `/admin` mới trên `www` (Access, vai trò từ bảng `User`) và bật `/dang-ky`; nút "Đăng ký khóa tu" trỏ về `/dang-ky`.
 6. Nạp bảng redirect 301 URL WordPress cũ.
@@ -1778,8 +1834,13 @@
 
 **Mô tả:** Thay `bootstrap.min.css` bằng import SCSS Bootstrap theo module thực dùng; cắt `font-awesome-pro` / `bexon-icons` chỉ còn biểu tượng dùng tới; xóa partial SCSS và hàm hiệu ứng GSAP không còn phần tử nào dùng; chỉ nạp GSAP ở trang có hiệu ứng cần nó. Không đổi giao diện.
 
+- **Mốc đo 04/11/2026** (trang chủ `v2.`, desktop, so với divineshop.vn):
+  - CSS: 198 KB br / 1,08 MB chưa nén, thêm 41 KB style nhúng. divineshop: 7,7 KB br.
+  - JS: khoảng 306 KB br / 895 KB chưa nén, có một tác vụ dài 356 ms. divineshop: khoảng 100 KB br.
+- Giữ toàn bộ hiệu ứng Bexon (quyết định của chủ dự án). Swiper, Chart.js, glightbox, odometer và GSAP chỉ nạp ở trang cần, và nạp sau khi trang rảnh nếu hiệu ứng không nằm ở màn hình đầu.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Dung lượng CSS và JS tải ở trang chủ giảm so với mốc Checkpoint B (ghi số trước–sau)
+- [ ] Trang chủ: CSS ≤ 60 KB br, JS ≤ 180 KB br, không tác vụ dài nào trên 200 ms lúc tải (ghi số trước–sau)
 - [ ] Ảnh chụp 6 mẫu trang trước–sau không khác nhau (so ảnh tự động)
 - [ ] Mọi biểu tượng đang dùng vẫn hiển thị (không còn ô vuông lỗi font)
 
@@ -1796,14 +1857,15 @@
 
 ### T41b: Đo toàn site, ngân sách ảnh và Lighthouse CI
 
-**Mô tả:** Phần sửa ảnh đã tách sang T41c (sửa nhanh) và T41d (bản thu nhỏ trên R2) ngày 04/11. Ảnh mới tải lên do T30 lo. T41b chỉ còn:
-- Preload font chính.
-- Lighthouse CI cho 6 mẫu trang, có ngân sách: ảnh tải trước khi cuộn ≤ 1,5 MB mỗi trang, không ảnh nào lớn hơn 2 lần cỡ hiển thị.
+**Mô tả:** Phần sửa ảnh đã tách sang T41c (sửa nhanh) và T41d (Image Transformations của Cloudflare) ngày 04/11, cả hai đã xong. Ảnh mới tải lên do T30 lo. T41b chỉ còn:
+- Font: hiện trang chủ preload 20 file và tải 26 file, khoảng 708 KB (đo 04/11; divineshop.vn không tải font web nào). Các preload này tranh băng thông với ảnh hero. Chỉ preload tối đa 2 file (bộ chữ tiếng Việt của font thân bài và font tiêu đề); chỉ giữ bộ chữ latin và tiếng Việt, bỏ độ đậm không dùng.
+- Lighthouse CI cho 6 mẫu trang, có ngân sách: ảnh tải trước khi cuộn ≤ 1,5 MB mỗi trang, không ảnh nào lớn hơn 2 lần cỡ hiển thị; CSS và JS theo ngân sách của T41a; font ≤ 150 KB.
 - axe cho mọi route công khai và admin.
 
 **Tiêu chí nghiệm thu:**
 - [ ] LCP và CLS đạt mục tiêu đã chốt ở Checkpoint B (mặc định LCP < 2,0 s, CLS = 0, mô phỏng 4G di động)
-- [ ] Lighthouse CI báo lỗi khi một trang vượt ngân sách ảnh
+- [ ] Lighthouse CI báo lỗi khi một trang vượt ngân sách ảnh, CSS, JS hoặc font
+- [ ] Mọi trang preload tối đa 2 file font; tổng font tải ở trang chủ ≤ 150 KB
 - [ ] axe 0 lỗi nghiêm trọng trên mọi mẫu trang
 
 **Kiểm chứng:**
