@@ -1047,13 +1047,43 @@
 
 **File Bexon:** `shared/cards/TeamCard*.js`, `sections/teams/TeamDetails1.js`
 
+**Kết quả 04/11/2026:** xong, đã deploy `v2.`. Làm T16 trước T41c theo lời chủ dự án; ảnh tượng theo đúng hướng của T41c (xem "Ảnh").
+- **Khác mô tả:**
+  - **Không có mục Video.** Dữ liệu tượng không có trường video nào; trang cũ chỉ có khung trống. Mục sẽ thêm khi có dữ liệu (T19).
+  - **Nghệ thuật Phật giáo là thẻ, không phải album.** `artVariations` (12 tượng, 40 tác phẩm) là các tượng khác của cùng vị: 34 tác phẩm có trang riêng nên thẻ dẫn sang trang đó; 6 tác phẩm còn lại không có bản ghi tượng nên chỉ hiện chữ.
+  - **15 "cụm" thật ra là 12.** `clusterMembers` luôn trống, nên cụm chỉ có tên (`clusterName`). Trong 15 tên, "Thập Đại Đệ Tử" được viết hai kiểu hoa thường, nay so không phân biệt; "Bảo Tượng Phật Giáo" và "Nghệ Thuật Phật Giáo" là tên chung cho tượng không thuộc cụm nào, nên không hiện là cụm. Tên cụm hiện ở phần thông tin và dùng để chọn tượng liên quan.
+- **Lớp dữ liệu** (`src/libs/content/baoTuong.ts`):
+  - `parseStatues` đọc tượng, chúng hội, cụm, lời dạy, bài viết và tác phẩm. Repository có thêm `getStatue(slug)`; trang tượng chỉ dựng HTML cho tượng được hỏi và giữ lại.
+  - Bài viết lấy `articleContent`, không có thì lấy chữ của `fullHistoryHtml`: chỉ giữ chữ trong từng đoạn, mọi thẻ HTML của người soạn bị bỏ (unit test với `<script>`, `javascript:`, `onclick`).
+  - Lời dạy chỉ hiện khi khác tên tượng: 21 tượng có "lời dạy" chỉ lặp lại tên, nay bỏ; 35 tượng để trống; 70 tượng có lời dạy thật.
+- **`/bao-tuong-phat-giao`** (server, thẻ `TeamCard`):
+  - 24 tượng mỗi trang. Lọc theo chúng hội, khu vực (14 khu vực của Vũ Trụ), loại tượng (Tượng chính / Nghệ thuật Phật giáo), tìm theo tên không cần dấu hoặc theo mã (TP0001). Mọi bộ lọc và trang nằm trên địa chỉ (`?q=&chung-hoi=&khu-vuc=&loai=&trang=`).
+  - Form là GET thường nên chạy cả khi không có JavaScript (có test). Khi có JavaScript, chỉ ô có giá trị lên địa chỉ và danh sách tải lại tại chỗ; dòng trạng thái (`role="status"`) đọc số tượng mới.
+  - Không có kết quả: "Không có tôn tượng phù hợp" kèm gợi ý và nút "Bỏ lọc". Trang quá số trang: "Không có trang N" kèm "Về trang đầu".
+- **`/bao-tuong/{slug}_{mã}`** (server, khuôn `TeamDetails1` như trang chủ đề Giới thiệu):
+  - Giữ đúng địa chỉ cũ; slug không có hoặc sai mã trả 404.
+  - Tổng quan: chân dung 3:4, nhãn loại tượng, danh hiệu, bảng thông tin (cụm tượng, chúng hội dẫn về danh sách đã lọc, nơi tôn trí dẫn sang trang khu vực, mã tượng), lời dạy kiểu kinh văn.
+  - Câu chuyện trong khung đọc (cỡ chữ, nền giấy), Nghệ thuật Phật giáo, Bảo tượng liên quan (4 tượng chính cùng cụm, rồi cùng chúng hội). Thanh mục lục chỉ hiện các phần có dữ liệu.
+  - Thẻ tượng ở trang khu vực nay là liên kết (`/bao-tuong` vào `livePaths`).
+- **Ảnh** (theo hướng T41c, vì ảnh tượng là ảnh gốc 0,2–1,5 MB):
+  - Thẻ tượng luôn `lazy`. Bản đầu cho 4 thẻ đầu `eager`, và React chèn preload cho cả 4 ảnh (khoảng 3 MB) trước CSS; test mới đỏ trên bản đó, xanh sau khi sửa.
+  - Trang danh sách chỉ tải ảnh của trang đang xem (site cũ tải 109 ảnh). Đã đo: tải trước trang tượng qua liên kết không kéo theo ảnh nào.
+  - Chân dung ở trang tượng không đặt `fetchPriority="high"`, nhưng vẫn bị React preload như chân dung ở trang Giới thiệu. Test ngân sách ảnh của T41c sẽ chạy cả trang này.
+- **Chờ Ban Biên Tập:**
+  - 15 tượng thuộc chúng hội "chưa phân loại" mang tên chúng hội "Bảo Tượng Phật Giáo", nên bộ lọc có một mục trùng tên chuyên mục.
+  - 17 tượng chính không có mã TP; 2 tượng `cong_thap` chưa có khu vực (đã có trong báo cáo snapshot từ T15).
+  - Tên "Đức Phật Phá́p Hải Thắng Huệ…" có một dấu thừa trong dữ liệu.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Trang danh sách tải ≤ 24 ảnh lúc đầu (site cũ tải 109 ảnh)
-- [ ] URL `/bao-tuong/{slug}_{mã}` cũ mở đúng tượng; mã sai trả 404
-- [ ] Lọc và tìm giữ trên URL; không có kết quả thì hiện hướng dẫn bỏ lọc
+- [x] Trang danh sách tải ≤ 24 ảnh lúc đầu (site cũ tải 109 ảnh): test kiểm không ảnh nào của trang khác được tải, không ảnh tượng nào bị preload
+- [x] URL `/bao-tuong/{slug}_{mã}` cũ mở đúng tượng; mã sai trả 404
+- [x] Lọc và tìm giữ trên URL; không có kết quả thì hiện hướng dẫn bỏ lọc
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- bao-tuong`
+- [x] `npm run test:e2e -- bao-tuong`: 11 test × 2 cỡ màn hình, có axe, có một test chạy không JavaScript; hai trang mới được thêm vào test canh gác
+- [x] Unit 149 xanh (thêm 10 test, 2 test cụm tượng đỏ trước khi sửa; thử đột biến 8/8 bị bắt); `tsc`, eslint sạch
+- [ ] Toàn bộ e2e: cục bộ 439 qua, 2 hỏng (test ảnh Bảo Tượng do sửa file test giữa lượt chạy, xanh sau khi build lại; lightbox album chập chờn khi máy bận, chạy riêng 8/8 qua). Trên `v2.`: ngay sau deploy các trang mới trả 200, nhưng lúc chạy e2e thì `/bao-tuong-phat-giao` và `/bao-tuong/…` trả 404 (desktop qua, mobile hỏng 10 test, sau đó cả hai đều 404). Chưa rõ nguyên nhân, có thể v2 bị deploy bản khác đè lên. Cần kiểm lại.
+- [x] Ảnh: `docs/anh/t16-bao-tuong-phat-giao.png`
 
 **Phụ thuộc:** T15
 

@@ -246,7 +246,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [x] T15: Vũ Trụ Phật Giáo – bản đồ 2D và trang khu vực
 - [x] T19a: Mỗi trang chỉ nạp dữ liệu nó cần (phần nạp theo nhu cầu của T19, làm trước T16 ngày 04/11)
 - [ ] T41c: Ảnh – sửa nhanh trong code (phần ảnh của T41, làm trước T16; chốt 04/11 sau review tốc độ)
-- [ ] T16: Bảo Tượng Phật Giáo
+- [x] T16: Bảo Tượng Phật Giáo (làm trước T41c theo lời chủ dự án 04/11; ảnh tượng đã theo hướng T41c)
 - [ ] T17: Trí Tuệ Phật Pháp
 - [ ] T18: Liên hệ và tìm kiếm từ khóa
 - [ ] **Checkpoint D** – site công khai hoàn chỉnh trên `v2.`
