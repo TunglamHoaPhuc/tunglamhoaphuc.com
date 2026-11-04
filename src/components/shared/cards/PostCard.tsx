@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { PostSummary } from "@/libs/content/types";
+import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
 import { dateBadge, formatDate, formatNumber } from "@/libs/format";
 
 type Props = {
@@ -21,7 +22,7 @@ export default function PostCard({ post, href, categoryHref }: Props) {
 				<Link href={href} tabIndex={-1} aria-hidden="true">
 					{post.thumbnail ? (
 						<img
-							src={post.thumbnail.src}
+							src={imageAt(post.thumbnail.src, IMAGE_WIDTH.card)}
 							alt=""
 							width={480}
 							height={360}

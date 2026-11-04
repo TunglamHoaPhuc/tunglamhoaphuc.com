@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
 import { type AreaTeaser, areaHref } from "@/libs/vuTru";
 
 type Props = { area: AreaTeaser };
@@ -13,7 +14,7 @@ export default function AreaCard({ area }: Props) {
 			<div className="project-img">
 				<Link href={href} tabIndex={-1} aria-hidden="true">
 					{area.cover ? (
-						<img src={area.cover.src} alt="" width={640} height={420} loading="lazy" decoding="async" style={{ objectPosition: area.cover.position }} />
+						<img src={imageAt(area.cover.src, IMAGE_WIDTH.card)} alt="" width={640} height={420} loading="lazy" decoding="async" style={{ objectPosition: area.cover.position }} />
 					) : (
 						<span className="tlhp-post-card-noimage" />
 					)}

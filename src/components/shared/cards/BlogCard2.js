@@ -1,4 +1,5 @@
 import { dateBadge, formatDate, formatNumber } from "@/libs/format";
+import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
 import { categoryHref, postHref } from "@/libs/postList";
 import Link from "next/link";
 
@@ -19,7 +20,7 @@ const BlogCard2 = ({ post, showPicture = true }) => {
 				<Link href={href} tabIndex={-1} aria-hidden="true">
 					{picture ? (
 						<img
-							src={showPicture ? picture.src : undefined}
+							src={showPicture ? imageAt(picture.src, IMAGE_WIDTH.card) : undefined}
 							alt=""
 							width={480}
 							height={540}

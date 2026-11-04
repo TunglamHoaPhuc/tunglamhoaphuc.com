@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
 import type { StatueSummary } from "@/libs/content/types";
 import { liveHref } from "@/libs/livePaths";
 
@@ -9,7 +10,7 @@ type Props = { statue: StatueSummary };
 export default function StatueCard({ statue }: Props) {
 	const href = liveHref(statue.href);
 	const picture = statue.image ? (
-		<img src={statue.image.src} alt="" width={360} height={480} loading="lazy" decoding="async" style={{ objectPosition: statue.image.position }} />
+		<img src={imageAt(statue.image.src, IMAGE_WIDTH.card)} alt="" width={360} height={480} loading="lazy" decoding="async" style={{ objectPosition: statue.image.position }} />
 	) : (
 		<span className="tlhp-post-card-noimage" />
 	);

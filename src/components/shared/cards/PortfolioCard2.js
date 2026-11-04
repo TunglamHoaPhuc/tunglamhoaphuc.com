@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
 import { areaHref } from "@/libs/vuTru";
 
 /**
@@ -12,7 +13,7 @@ const PortfolioCard2 = ({ area }) => {
 		<article className="project-item tlhp-area-slide">
 			<div className="project-img">
 				{area.cover ? (
-					<img src={area.cover.src} alt="" width={900} height={600} loading="lazy" decoding="async" style={{ objectPosition: area.cover.position }} />
+					<img src={imageAt(area.cover.src, IMAGE_WIDTH.card)} alt="" width={900} height={600} loading="lazy" decoding="async" style={{ objectPosition: area.cover.position }} />
 				) : null}
 			</div>
 			<div className="project-content">

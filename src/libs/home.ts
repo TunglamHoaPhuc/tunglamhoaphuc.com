@@ -3,6 +3,7 @@
 import { site } from "@/config/site";
 import { tongChi } from "@/config/tongChi";
 import { calendarHref, type EventStatus, eventStatus, lunarRange, solarRange, todayInVietnam } from "@/libs/calendar";
+import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
 import type { AboutTopic, ContentRepository, MediaImage, MonthTheme, PostSummary, ScheduleEvent } from "@/libs/content/types";
 import { countdownLabel, daysUntil } from "@/libs/countdown";
 import { formatDate } from "@/libs/format";
@@ -116,6 +117,13 @@ function welcomeSlide(): HeroSlide {
 	return { id: "noi-de-tro-ve", ...hero, text: site.intro };
 }
 
+/** An editor's picture as a frame: 1280 and 1920 px copies, and a small one for the row under the hero. */
+function framePicture({ src, position }: MediaImage): HeroImage {
+	const wide = imageAt(src, IMAGE_WIDTH.wide);
+	const full = imageAt(src, IMAGE_WIDTH.full);
+	return { src: full, srcSet: wide === full ? undefined : `${wide} 1280w, ${full} 1920w`, thumb: imageAt(src, IMAGE_WIDTH.card), position };
+}
+
 /** The newest post with a picture, as the hero's "pháp sự mới nhất" frame. */
 function latestSlide(posts: PostSummary[]): HeroSlide | null {
 	const post = posts.find((item) => item.banner);
@@ -126,7 +134,7 @@ function latestSlide(posts: PostSummary[]): HeroSlide | null {
 		title: post.title,
 		text: post.summary,
 		link: { label: "Xem bài", href: postHref(post) },
-		image: { src: post.banner.src, thumb: post.banner.src, position: post.banner.position },
+		image: framePicture(post.banner),
 	};
 }
 
@@ -152,7 +160,7 @@ function eventSlide({ event, href, countdown }: UpcomingEvent): HeroSlide {
 		title: event.title,
 		text: facts.join(" · "),
 		link: { label: "Xem lịch khóa tu", href },
-		image: { src: image.src, thumb: image.src, position: image.position },
+		image: framePicture(image),
 	};
 }
 

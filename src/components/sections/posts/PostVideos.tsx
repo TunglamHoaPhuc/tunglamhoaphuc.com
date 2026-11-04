@@ -1,5 +1,6 @@
 "use client";
 import { useLightbox } from "@/hooks/useLightbox";
+import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
 import { youtubeEmbed } from "@/libs/video";
 import type { MediaImage, Video } from "@/libs/content/types";
 
@@ -17,7 +18,7 @@ export default function PostVideos({ videos, title, poster }: Props) {
 					{/* An iframe slide (external), not GLightbox's Plyr player, which loads from youtube.com. */}
 					<a className="tlhp-video" href={youtubeEmbed(video.id)} data-type="external" data-gallery="video">
 						{poster ? (
-							<img src={poster.src} alt="" width={480} height={270} loading="lazy" style={{ objectPosition: poster.position }} />
+							<img src={imageAt(poster.src, IMAGE_WIDTH.card)} alt="" width={480} height={270} loading="lazy" style={{ objectPosition: poster.position }} />
 						) : (
 							<span className="tlhp-video-noposter" />
 						)}

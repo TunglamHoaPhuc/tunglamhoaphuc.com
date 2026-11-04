@@ -23,6 +23,7 @@ import {
 	todayInVietnam,
 } from "@/libs/calendar";
 import { getContentRepository } from "@/libs/content/repository";
+import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
 import type { ScheduleEvent } from "@/libs/content/types";
 import { buddhistYear } from "@/libs/lunar";
 
@@ -182,7 +183,7 @@ export default async function LichTuHoc({ searchParams }: Props) {
 									<article className="blog-item tlhp-post-card tlhp-program">
 										<div className="blog-thumb">
 											{program.image ? (
-												<img src={program.image.src} alt="" width={640} height={360} loading="lazy" decoding="async" style={{ objectPosition: program.image.position }} />
+												<img src={imageAt(program.image.src, IMAGE_WIDTH.card)} alt="" width={640} height={360} loading="lazy" decoding="async" style={{ objectPosition: program.image.position }} />
 											) : (
 												<span className="tlhp-post-card-noimage" />
 											)}

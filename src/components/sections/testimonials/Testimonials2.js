@@ -2,6 +2,7 @@
 import TestimonialsCard2 from "@/components/shared/cards/TestimonialsCard2";
 import PauseButton from "@/components/shared/sliders/PauseButton";
 import { useAutoplay } from "@/hooks/useAutoplay";
+import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
 import { A11y, Autoplay, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -30,7 +31,7 @@ const Testimonials2 = ({ verses }) => {
 						<div className="testimonial-img-area wow fadeInUp" data-wow-delay=".3s">
 							<div className="testimonial-img">
 								{current.poster ? (
-									<img data-speed=".8" src={current.poster} alt="" width={1200} height={1015} loading="lazy" decoding="async" />
+									<img data-speed=".8" src={imageAt(current.poster, IMAGE_WIDTH.wide)} alt="" width={1200} height={1015} loading="lazy" decoding="async" />
 								) : (
 									<span className="tlhp-verses-noimage" />
 								)}

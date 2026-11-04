@@ -10,7 +10,7 @@ import HeroInner from "@/components/sections/hero/HeroInner";
 import PostCard from "@/components/shared/cards/PostCard";
 import HeaderSpace from "@/components/shared/others/HeaderSpace";
 import { site } from "@/config/site";
-import { topImagePriority } from "@/libs/content/media";
+import { IMAGE_WIDTH, imageAt, topImagePriority } from "@/libs/content/media";
 import { getContentRepository } from "@/libs/content/repository";
 import type { Post } from "@/libs/content/types";
 import { formatDate, formatNumber } from "@/libs/format";
@@ -107,7 +107,7 @@ export default async function DongChayArticle({ params }: Props) {
 								</div>
 								{post.banner ? (
 									<div className="tlhp-article-banner">
-										<img src={post.banner.src} alt="" width={1200} height={675} style={{ objectPosition: post.banner.position }} fetchPriority={topImagePriority(post.banner.src)} />
+										<img src={imageAt(post.banner.src, IMAGE_WIDTH.wide)} alt="" width={1200} height={675} style={{ objectPosition: post.banner.position }} fetchPriority={topImagePriority(imageAt(post.banner.src, IMAGE_WIDTH.wide))} />
 									</div>
 								) : null}
 								{post.intro ? <p className="tlhp-article-intro">{post.intro}</p> : null}

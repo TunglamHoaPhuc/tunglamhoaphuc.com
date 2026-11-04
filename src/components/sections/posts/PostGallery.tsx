@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useLightbox } from "@/hooks/useLightbox";
+import { albumImageAt, IMAGE_WIDTH } from "@/libs/content/media";
 import type { GalleryImage } from "@/libs/content/types";
 
 const FIRST = 12;
@@ -26,14 +27,14 @@ export default function PostGallery({ images, title, albumId }: Props) {
 				{images.map((image, index) => (
 					<li key={image.src + index} hidden={!showAll && index >= FIRST}>
 						<a
-							href={image.src}
+							href={albumImageAt(image.src, IMAGE_WIDTH.full)}
 							className="tlhp-gallery-item"
 							data-gallery={albumId}
 							data-title={image.caption || image.title || title}
 							data-alt={`${image.caption || image.title || title} – ảnh ${index + 1}`}
 						>
 							<img
-								src={image.src}
+								src={albumImageAt(image.src, IMAGE_WIDTH.card)}
 								alt={`${image.caption || image.title || title} – ảnh ${index + 1}`}
 								width={400}
 								height={300}

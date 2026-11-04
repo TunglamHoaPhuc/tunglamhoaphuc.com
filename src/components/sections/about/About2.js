@@ -2,6 +2,7 @@ import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import FunfactSingle from "@/components/shared/funfact/FunfactSingle";
 import PopupVideo from "@/components/shared/popup-video/PopupVideo";
 import { site } from "@/config/site";
+import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
 import { youtubeEmbed } from "@/libs/video";
 
 const ICONS = ["tji-complete", "tji-worldwide", "tji-growth"];
@@ -60,7 +61,7 @@ const About2 = ({ welcome }) => {
 							</div>
 							<div className="video-img wow fadeInRight" data-wow-delay=".7s">
 								{welcome.image ? (
-									<img src={welcome.image.src} alt="" width={120} height={320} loading="lazy" decoding="async" style={{ objectPosition: welcome.image.position }} />
+									<img src={imageAt(welcome.image.src, IMAGE_WIDTH.card)} alt="" width={120} height={320} loading="lazy" decoding="async" style={{ objectPosition: welcome.image.position }} />
 								) : null}
 								<PopupVideo>
 									<a className="video-btn video-popup glightbox" href={youtubeEmbed(site.introVideo.id)} data-type="external">
@@ -84,7 +85,7 @@ const About2 = ({ welcome }) => {
 								<ul>
 									{welcome.faces.map((face, idx) => (
 										<li key={face.src} className="wow fadeInLeft" data-wow-delay={`.${3 + idx}s`}>
-											<img src={face.src} alt="" width={60} height={60} loading="lazy" decoding="async" style={{ objectPosition: face.position }} />
+											<img src={imageAt(face.src, IMAGE_WIDTH.card)} alt="" width={60} height={60} loading="lazy" decoding="async" style={{ objectPosition: face.position }} />
 										</li>
 									))}
 									<li className="wow fadeInLeft" data-wow-delay=".6s">

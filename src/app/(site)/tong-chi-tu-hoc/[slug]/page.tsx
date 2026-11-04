@@ -10,7 +10,7 @@ import ReadingFrame from "@/components/sections/posts/ReadingFrame";
 import HeaderSpace from "@/components/shared/others/HeaderSpace";
 import { site } from "@/config/site";
 import { tongChi } from "@/config/tongChi";
-import { topImagePriority } from "@/libs/content/media";
+import { IMAGE_WIDTH, imageAt, topImagePriority } from "@/libs/content/media";
 import { getContentRepository } from "@/libs/content/repository";
 import type { TongChiArticle, TongChiSummary } from "@/libs/content/types";
 import { formatNumber } from "@/libs/format";
@@ -103,7 +103,7 @@ export default async function TongChiArticlePage({ params }: Props) {
 								{article.subtitle ? <p className="tlhp-tong-chi-subtitle">{article.subtitle}</p> : null}
 								{article.banner ? (
 									<div className="tlhp-article-banner">
-										<img src={article.banner.src} alt="" width={1200} height={675} style={{ objectPosition: article.banner.position }} fetchPriority={topImagePriority(article.banner.src)} />
+										<img src={imageAt(article.banner.src, IMAGE_WIDTH.wide)} alt="" width={1200} height={675} style={{ objectPosition: article.banner.position }} fetchPriority={topImagePriority(imageAt(article.banner.src, IMAGE_WIDTH.wide))} />
 									</div>
 								) : null}
 								{article.excerpt ? <p className="tlhp-article-intro">{article.excerpt}</p> : null}
@@ -158,7 +158,7 @@ export default async function TongChiArticlePage({ params }: Props) {
 									<div className="tlhp-tong-chi-sources">
 										{article.book ? (
 											<div className="tlhp-tong-chi-source">
-												{article.book.cover ? <img src={article.book.cover} alt="" width={120} height={160} loading="lazy" decoding="async" /> : null}
+												{article.book.cover ? <img src={imageAt(article.book.cover, IMAGE_WIDTH.card)} alt="" width={120} height={160} loading="lazy" decoding="async" /> : null}
 												<div>
 													<p className="tlhp-chip">Tác phẩm</p>
 													<h3 className="h5">{article.book.href ? <Link href={article.book.href}>{article.book.title}</Link> : article.book.title}</h3>
