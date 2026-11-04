@@ -9,6 +9,7 @@ import { videosOf } from "./posts";
 import { bare, type BodyTarget, tongChiMarkdown } from "./tongChiBody";
 import type { ContentIssue, GalleryImage, Keyword, MediaImage, TongChiArticle, TongChiSummary } from "./types";
 import { titleCase } from "../format";
+import { liveHref } from "../livePaths";
 
 const text = z.string().catch("");
 
@@ -45,15 +46,7 @@ export type TongChiEntry = Omit<TongChiArticle, "contentHtml"> & { body: string 
 
 export type ParsedTongChi = { entries: TongChiEntry[]; issues: ContentIssue[] };
 
-// Pages this site serves; links elsewhere (Trí Tuệ Phật Pháp before T17) are not made links.
-const LIVE_PATHS = ["/tong-chi-tu-hoc", "/gioi-thieu", "/dong-chay-hoang-phap", "/lich-tu-hoc"];
-
 const plain = (value: string) => cleanText(value).replace(/\s+/g, " ").trim();
-
-function liveHref(url: string): string | null {
-	const path = url.trim();
-	return LIVE_PATHS.some((live) => path === live || path.startsWith(`${live}/`) || path.startsWith(`${live}#`)) ? path : null;
-}
 
 export function parseTongChi(file: unknown): ParsedTongChi {
 	const issues: ContentIssue[] = [];
