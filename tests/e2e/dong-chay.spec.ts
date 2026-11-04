@@ -47,8 +47,9 @@ test.describe("list", () => {
 					return { loading: img.getAttribute("loading"), width: img.getAttribute("width"), ratio: box.width / box.height };
 				}),
 			);
-		expect(pictures.slice(0, 3).map((p) => p.loading)).toEqual(["eager", "eager", "eager"]);
-		expect(pictures.slice(3).every((p) => p.loading === "lazy")).toBe(true);
+		// All lazy since T41c: an editor's photo can be a 7–9 MB original, and a first-row card
+		// that loads at once is preloaded by React ahead of the CSS.
+		expect(pictures.every((p) => p.loading === "lazy")).toBe(true);
 		for (const picture of pictures) {
 			expect(picture.width).toBe("480");
 			expect(picture.ratio).toBeCloseTo(4 / 3, 1);

@@ -67,6 +67,16 @@ export function mediaUrl(url: string | null | undefined): string | null {
 	return parsed.toString();
 }
 
+/**
+ * How eagerly to fetch the picture at the top of a page. The site's own pictures are made
+ * small; the old site's photos can be camera originals of 7–9 MB, and asked for first they
+ * keep the whole page waiting (an article took 47.9 s to show on a phone). "low" also keeps
+ * React from preloading them. Once T41d gives those photos small copies they can go first too.
+ */
+export function topImagePriority(src: string): "high" | "low" {
+	return src.startsWith("/") && !src.startsWith("//") ? "high" : "low";
+}
+
 /** Facebook's emoji pictures, pasted into a few posts along with the text. Not photos. */
 export function isEmojiImage(url: string | null | undefined): boolean {
 	const parsed = parse(url);

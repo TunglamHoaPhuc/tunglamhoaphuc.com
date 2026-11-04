@@ -10,6 +10,7 @@ import ReadingFrame from "@/components/sections/posts/ReadingFrame";
 import HeaderSpace from "@/components/shared/others/HeaderSpace";
 import { site } from "@/config/site";
 import { tongChi } from "@/config/tongChi";
+import { topImagePriority } from "@/libs/content/media";
 import { getContentRepository } from "@/libs/content/repository";
 import type { TongChiArticle, TongChiSummary } from "@/libs/content/types";
 import { formatNumber } from "@/libs/format";
@@ -102,7 +103,7 @@ export default async function TongChiArticlePage({ params }: Props) {
 								{article.subtitle ? <p className="tlhp-tong-chi-subtitle">{article.subtitle}</p> : null}
 								{article.banner ? (
 									<div className="tlhp-article-banner">
-										<img src={article.banner.src} alt="" width={1200} height={675} style={{ objectPosition: article.banner.position }} fetchPriority="high" />
+										<img src={article.banner.src} alt="" width={1200} height={675} style={{ objectPosition: article.banner.position }} fetchPriority={topImagePriority(article.banner.src)} />
 									</div>
 								) : null}
 								{article.excerpt ? <p className="tlhp-article-intro">{article.excerpt}</p> : null}

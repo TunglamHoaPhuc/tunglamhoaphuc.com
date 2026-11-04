@@ -1,0 +1,16 @@
+# Headers for files Workers Static Assets serves without running the Worker (the paths left
+# out of runWorkerFirst in cloudflare.config.ts). vinext writes only the first rule, and only
+# when this file is missing, so it has to stay here.
+
+# Build output: every name carries a content hash.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# The site's own pictures keep their name when replaced: a day in the browser cache, then
+# served from it while the browser checks for a new copy (T41c). Before, every visit asked
+# again (max-age=0).
+/images/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/brand/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800

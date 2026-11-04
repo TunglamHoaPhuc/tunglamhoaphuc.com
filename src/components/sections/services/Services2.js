@@ -66,10 +66,10 @@ const Services2 = ({ groups, page = false }) => {
 				</div>
 			</div>
 			<div className="bg-shape-1" aria-hidden="true">
-				<img src="/images/shape/pattern-2.svg" alt="" loading="lazy" />
+				<img src="/images/shape/pattern-2.webp" alt="" loading="lazy" />
 			</div>
 			<div className="bg-shape-2" aria-hidden="true">
-				<img src="/images/shape/pattern-3.svg" alt="" loading="lazy" />
+				<img src="/images/shape/pattern-3.webp" alt="" loading="lazy" />
 			</div>
 			<div className="bg-shape-3" aria-hidden="true">
 				<img src="/images/shape/shape-blur.svg" alt="" loading="lazy" />

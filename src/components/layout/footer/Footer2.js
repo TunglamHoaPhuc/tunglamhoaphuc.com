@@ -143,10 +143,10 @@ const Footer2 = () => {
 				</div>
 			</div>
 			<div className="bg-shape-1">
-				<img src="/images/shape/pattern-2.svg" alt="" loading="lazy" decoding="async" />
+				<img src="/images/shape/pattern-2.webp" alt="" loading="lazy" decoding="async" />
 			</div>
 			<div className="bg-shape-2">
-				<img src="/images/shape/pattern-3.svg" alt="" loading="lazy" decoding="async" />
+				<img src="/images/shape/pattern-3.webp" alt="" loading="lazy" decoding="async" />
 			</div>
 		</footer>
 	);

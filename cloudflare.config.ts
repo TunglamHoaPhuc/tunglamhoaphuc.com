@@ -13,7 +13,9 @@ export default defineConfig({
     assets: {
       htmlHandling: "none",
       notFoundHandling: "none",
-      runWorkerFirst: ["/*", "!/_next/static/*", "!/*/_next/static/*"],
+      // The site's pictures go straight from the asset store, with the cache rules in
+      // public/_headers, and cost no Worker CPU.
+      runWorkerFirst: ["/*", "!/_next/static/*", "!/*/_next/static/*", "!/images/*", "!/brand/*"],
     },
     env: {
       ASSETS: bindings.assets(),
