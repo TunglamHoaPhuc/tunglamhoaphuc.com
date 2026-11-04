@@ -5,9 +5,10 @@ import Link from "next/link";
 /**
  * Bexon's wide blog card (picture beside the text) for a TLHP post: date badge, category
  * chip, title, date and views.
- * @param {{ post: import("@/libs/content/types").PostSummary }} props
+ * `showPicture` false leaves the picture without a source until a slider brings the card near.
+ * @param {{ post: import("@/libs/content/types").PostSummary, showPicture?: boolean }} props
  */
-const BlogCard2 = ({ post }) => {
+const BlogCard2 = ({ post, showPicture = true }) => {
 	const href = postHref(post);
 	const badge = dateBadge(post.publishedDate);
 	const picture = post.thumbnail ?? post.banner;
@@ -18,7 +19,7 @@ const BlogCard2 = ({ post }) => {
 				<Link href={href} tabIndex={-1} aria-hidden="true">
 					{picture ? (
 						<img
-							src={picture.src}
+							src={showPicture ? picture.src : undefined}
 							alt=""
 							width={480}
 							height={540}

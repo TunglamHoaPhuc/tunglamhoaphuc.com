@@ -17,6 +17,55 @@ const A11Y = {
 };
 
 /**
+ * The slides of one tab. Only the slides in view and the next one get a picture source,
+ * the others as the slider reaches them: with the effects on, the browser fetched every
+ * lazy picture of the hidden slides as the page started (9.3 MB on a phone, editors'
+ * originals among them). Before the slider runs, and in the server HTML, the first two
+ * (what a wide screen shows) have theirs.
+ * @param {{ posts: import("@/libs/content/types").PostSummary[], autoplay: ReturnType<typeof useAutoplay> }} props
+ */
+const NewsSlider = ({ posts, autoplay }) => {
+	const [shown, setShown] = useState(() => new Set([0, 1]));
+	const reveal = (swiper) => {
+		const count = Math.ceil(swiper.slidesPerViewDynamic()) + 1;
+		const wanted = Array.from({ length: count }, (_, i) => ((swiper.realIndex ?? 0) + i) % posts.length);
+		setShown((prev) => (wanted.every((index) => prev.has(index)) ? prev : new Set([...prev, ...wanted])));
+	};
+	return (
+		<Swiper
+			onSwiper={(swiper) => {
+				autoplay.onSwiper(swiper);
+				reveal(swiper);
+			}}
+			onRealIndexChange={reveal}
+			onBreakpoint={reveal}
+			slidesPerView={1}
+			spaceBetween={15}
+			loop={posts.length > 3}
+			speed={1500}
+			autoplay={{ delay: 7000, pauseOnMouseEnter: true, disableOnInteraction: false }}
+			pagination={{ el: ".tlhp-news-pagination", clickable: true }}
+			navigation={{ nextEl: ".tlhp-news-next", prevEl: ".tlhp-news-prev" }}
+			a11y={A11Y}
+			breakpoints={{
+				768: { spaceBetween: 20, slidesPerView: 1 },
+				992: { slidesPerView: 2, spaceBetween: 20 },
+				1200: { slidesPerView: 2, spaceBetween: 30 },
+			}}
+			modules={[A11y, Pagination, Autoplay, Navigation]}
+			className="blog-slider"
+		>
+			{posts.map((post, index) => (
+				<SwiperSlide key={post.id}>
+					<BlogCard2 post={post} showPicture={shown.has(index)} />
+				</SwiperSlide>
+			))}
+			<div className="swiper-pagination-area tlhp-news-pagination"></div>
+		</Swiper>
+	);
+};
+
+/**
  * Bexon's blog slider as the home news block (plan.md, home block 4): two tabs, Tin mới
  * nhất and Dấu ấn hoằng pháp (most read), over one self-moving slider with a pause button.
  * @param {{ latest: import("@/libs/content/types").PostSummary[], popular: import("@/libs/content/types").PostSummary[] }} props
@@ -110,32 +159,7 @@ const Blogs2 = ({ latest, popular }) => {
 					<div className="col-12">
 						<div id="tin-tuc-bai" className="blog-wrapper" role="tabpanel" aria-labelledby={`tab-${current.id}`}>
 							{/* A new slider for each tab, so it starts from the first post. */}
-							<Swiper
-								key={current.id}
-								onSwiper={autoplay.onSwiper}
-								slidesPerView={1}
-								spaceBetween={15}
-								loop={current.posts.length > 3}
-								speed={1500}
-								autoplay={{ delay: 7000, pauseOnMouseEnter: true, disableOnInteraction: false }}
-								pagination={{ el: ".tlhp-news-pagination", clickable: true }}
-								navigation={{ nextEl: ".tlhp-news-next", prevEl: ".tlhp-news-prev" }}
-								a11y={A11Y}
-								breakpoints={{
-									768: { spaceBetween: 20, slidesPerView: 1 },
-									992: { slidesPerView: 2, spaceBetween: 20 },
-									1200: { slidesPerView: 2, spaceBetween: 30 },
-								}}
-								modules={[A11y, Pagination, Autoplay, Navigation]}
-								className="blog-slider"
-							>
-								{current.posts.map((post) => (
-									<SwiperSlide key={post.id}>
-										<BlogCard2 post={post} />
-									</SwiperSlide>
-								))}
-								<div className="swiper-pagination-area tlhp-news-pagination"></div>
-							</Swiper>
+							<NewsSlider key={current.id} posts={current.posts} autoplay={autoplay} />
 						</div>
 						<div className="tlhp-news-more">
 							<ButtonPrimary text="Xem tất cả bài viết" url="/dong-chay-hoang-phap" />

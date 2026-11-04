@@ -473,3 +473,43 @@ test.describe("loading without layout shift", () => {
 		expect(await page.evaluate(() => (window as unknown as { cls: number }).cls)).toBe(0);
 	});
 });
+
+// After T41c: with the effects on, every slide out of sight fetched its picture as the page
+// started (9.3 MB on a phone, a 7.9 MB original among them), although they are lazy. Only
+// the slides in view and the next one may; the others when the slider gets there.
+test.describe("news slider pictures", () => {
+	type Slide = { far: boolean; next: boolean; src: string };
+	const slides = (page: Page) =>
+		news(page)
+			.locator(".blog-slider")
+			.evaluate((slider): Slide[] => {
+				const box = slider.getBoundingClientRect();
+				return [...slider.querySelectorAll(".swiper-slide")].map((slide) => {
+					const { left, width } = slide.getBoundingClientRect();
+					return {
+						far: left >= box.right + width - 1,
+						next: left >= box.right - 1 && left < box.right + width - 1,
+						src: slide.querySelector("img")?.getAttribute("src") ?? "",
+					};
+				});
+			});
+
+	test("slides beyond the next one fetch no picture until the slider gets there", async ({ page }) => {
+		const fetched = new Set<string>();
+		page.on("request", (request) => request.resourceType() === "image" && fetched.add(request.url()));
+		await page.goto("/");
+		await page.waitForTimeout(6000);
+
+		const before = await slides(page);
+		expect(before.filter((slide) => slide.far).length).toBeGreaterThan(0);
+		expect(before.filter((slide) => slide.far && slide.src)).toEqual([]);
+		const next = before.find((slide) => slide.next)!;
+		expect(next.src).not.toBe("");
+
+		await news(page).locator(".blog-slider").evaluate((el: SwiperElement) => (el.swiper as unknown as { slideNext: () => void }).slideNext());
+		await page.waitForTimeout(2000);
+		const after = (await slides(page)).find((slide) => slide.next)!;
+		expect(after.src).not.toBe("");
+		expect(fetched.has(new URL(after.src, page.url()).href)).toBe(true);
+	});
+});
