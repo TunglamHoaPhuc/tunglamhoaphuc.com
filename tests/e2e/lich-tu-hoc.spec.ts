@@ -164,7 +164,11 @@ test.describe("schedule page with smooth scrolling on", () => {
 
 	test("a day glides to its event and keeps the address", async ({ page }) => {
 		await open(page);
-		await grid(page).getByRole("link", { name: /ngày 19 âm lịch/ }).click();
+		const day = grid(page).getByRole("link", { name: /ngày 19 âm lịch/ });
+		// The browser shows the day by scrolling the smoothed wrapper, as Tab does; the press
+		// comes before ScrollSmoother has taken that scroll over.
+		await day.scrollIntoViewIfNeeded();
+		await day.click();
 		const card = page.locator("#su-kien-le-tien-thuong-phap-hoi-cung-duong-tang-bao-2026");
 		await expect(card).toBeFocused();
 		await expect(page).toHaveURL(/\?thang=2026-11#su-kien-le-tien-thuong/);
