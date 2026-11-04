@@ -236,7 +236,8 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [x] T13b: Trang chủ – Lời chào và Chư Tôn Đức
 - [x] T14: Tông Chỉ Tu Học
 - [ ] **Checkpoint C** – trang chủ đủ khối chính
-- [ ] T15: Vũ Trụ Phật Giáo – bản đồ 2D và trang khu vực
+- [x] T15: Vũ Trụ Phật Giáo – bản đồ 2D và trang khu vực
+- [x] T19a: Mỗi trang chỉ nạp dữ liệu nó cần (phần nạp theo nhu cầu của T19, làm trước T16 ngày 04/11)
 - [ ] T16: Bảo Tượng Phật Giáo
 - [ ] T17: Trí Tuệ Phật Pháp
 - [ ] T18: Liên hệ và tìm kiếm từ khóa

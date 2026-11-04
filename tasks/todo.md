@@ -859,7 +859,7 @@
 - **Gói Workers Free:**
   - Trong lượt e2e trên `v2.` (khoảng 50 phút), nhật ký Worker ghi 250 yêu cầu bị ngắt vì vượt CPU, rải khắp các trang và cả file tĩnh.
   - CPU trung vị của yêu cầu thành công: trang chủ 18 ms, `/tong-chi-tu-hoc` 220 ms, `/gioi-thieu` 136 ms. Hai trang sau tốn nhiều vì Worker mới khởi động phải đọc cả `posts.json` (632 bài), dù trang chỉ cần dữ liệu Tông Chỉ hoặc Giới thiệu.
-  - Câu hỏi mở #8 (Workers Paid) và việc tách nạp snapshot (T41a) cần làm trước khi ra mắt.
+  - Câu hỏi mở #8 (Workers Paid) và việc mỗi trang chỉ đọc phần dữ liệu cần (plan giao cho T19) cần làm trước khi ra mắt.
 
 **Tiêu chí nghiệm thu:**
 - [x] `/tong-chi-tu-hoc/niem-phat-phuong-phap-tro-hanh` có nội dung trong HTML ban đầu (site cũ chỉ có "Đang tải…", và với bài này không hiện được thân bài)
@@ -897,19 +897,100 @@
 
 **File Bexon:** `sections/portfolios/Portfolios2.js`, `layout/main/PortfolioDetailsMain.js`, `shared/cards/PortfolioCard2.js` / `PortfolioCard3.js`
 
+**Kết quả 04/11/2026:** xong, đã deploy `v2.`. Có ba chỗ khác mô tả ở trên, ghi ở mục đầu.
+- **Khác mô tả:**
+  - **Hiện 14 khu vực, không phải 12.** Dữ liệu không có cờ ẩn/hiện; cả 14 thuộc Tùng Lâm Hòa Phúc. Site cũ chỉ liệt kê 12 bản ghi đầu ở lưới, nhưng ghim đủ 14 trên bản đồ và mở được cả 14 trang (Sân La Hán, Lầu Kinh Luân là hai khu vực thêm sau). Ghim "Lâm Tỳ Ni" trên bản đồ cũ không có dữ liệu nên bỏ.
+  - **Ghim đặt theo bản đồ của site cũ, không theo `mapPos`.** Bản đồ cũ không đọc `mapPos` mà dùng vị trí viết sẵn trong mã. Vẽ cả hai lên ảnh thì `mapPos` của 8 khu vực rơi ra bãi cỏ, hàng cây hoặc bãi xe. Vị trí và thứ tự ghim nay nằm ở `src/config/vuTru.ts`; `snapshot:check` liệt kê 8 khu vực lệch để Ban Biên Tập sửa trong admin (T36 gỡ bảng này).
+  - **Album, câu chuyện và Pháp thoại Giảng đường chưa có.** `stories` trống ở cả 14 khu vực, dữ liệu không có trường album. Video Pháp thoại của Giảng đường không có trong API (trang cũ chỉ có tên, mô tả, ngày, ảnh giữ chỗ, không có địa chỉ video); chờ đọc file gốc trên B2 (T19).
+- **Dữ liệu:**
+  - `npm run snapshot:fetch` lấy thêm `vu-tru.json` và `bao-tuong.json` bằng các lệnh GET chỉ đọc mà lớp chặn admin cho qua; không gọi `vu-tru/sync-wp`.
+  - Adapter `src/libs/content/vuTru.ts` đọc khu vực và tôn tượng. Repository có thêm `listAreas()` và `listStatues()`.
+- **Tượng của một khu vực:**
+  - Lấy theo cách site cũ: các tượng "TƯỢNG CHÍNH" có mã khu vực trùng (Tam Bảo đúng 20 tượng như trang cũ); bản ghi "NTPG" hiện riêng ở mục "Nghệ thuật Phật giáo".
+  - File bảo tượng gọi khu vực theo tên riêng (`nha_mau`, `lau_kinh_luan`…), nên bảng nối nằm trong config. Lầu Kinh Luân nay hiện 11 tượng (trang cũ không hiện tượng nào vì slug khu vực vẫn là `ho-phong-sinh`).
+  - `cong_thap` (Cổng Tháp, 2 tượng) chưa thuộc khu vực nào, có trong báo cáo.
+  - Địa chỉ tượng giữ đúng dạng site cũ `/bao-tuong/{slug}` (slug đã có đuôi `_tpXXXX`). 17 tượng chính không có mã TP nên địa chỉ không có đuôi này (báo cáo có danh sách).
+  - Thẻ tượng chưa là liên kết cho tới khi T16 làm trang tượng: `src/libs/livePaths.ts` gom danh sách các mục đã có trang, dùng chung với Tông Chỉ.
+- **`/vu-tru-phat-giao`** (server):
+  - Lời dẫn và sơ đồ 2D: ảnh vẽ khuôn viên, 14 ghim đánh số là liên kết rộng 48px theo thứ tự trên bản đồ. Tên khu vực hiện khi rê chuột hoặc có focus; trình đọc màn hình đọc "4. Tam Bảo".
+  - Dưới 992px, sơ đồ giữ bề rộng 960px trong khung cuộn ngang để các ghim không chồng lên nhau; trang không bị tràn ngang.
+  - Danh sách 14 khu vực dạng thẻ dự án Bexon, đánh số như trên bản đồ.
+- **`/vu-tru-phat-giao/[slug]`** (server, khuôn `PortfolioDetailsMain`):
+  - Nhãn số khu vực, tên thứ hai, ảnh bìa, nội dung.
+  - Bảo tượng và Nghệ thuật Phật giáo, mỗi mục chỉ hiện khi có tượng.
+  - Thanh bên: vị trí khu vực trên sơ đồ nhỏ và liên kết "Xem sơ đồ đầy đủ".
+  - "Khu vực khác": 3 điểm kế tiếp trên bản đồ. Slug không có trả 404.
+- **Trang chủ:**
+  - Khối "Khu vực nổi bật" (`Portfolios2`) đặt giữa Tông Chỉ và Lộ trình tu học. Slider Bexon (slide giữa lớn), tự chạy 7 giây, có nút tạm dừng, không chạy khi giảm chuyển động.
+  - Bexon ẩn tên khu vực bằng `visibility: hidden` cho tới khi rê chuột, làm liên kết rơi khỏi thứ tự Tab; nay chỉ làm mờ, và hiện cả khi có focus.
+  - Trang chỉ gửi xuống trình duyệt 5 trường của mỗi khu vực.
+- **Sửa sau review** (review 5 trục, kèm một reviewer độc lập chỉ đọc mã; thử đột biến: 7/8 thay đổi bị unit test bắt):
+  - **Critical, mọi trang tải trước ảnh bản đồ 410 KB ở mức ưu tiên cao:** liên kết tải trước trang `/vu-tru-phat-giao` (dựng tĩnh), và React chèn lệnh preload cho ảnh bản đồ `eager` + `fetchPriority="high"`. Menu có mục Vũ Trụ nên lỗi lan ra cả site; test ảnh hero bắt được. Nay ảnh bản đồ luôn `lazy`. Test mới (đỏ trên bản lỗi, xanh sau khi sửa) kiểm `/gioi-thieu` không tải ảnh bản đồ và không có preload ảnh ưu tiên cao nào.
+  - Ảnh bản đồ dùng cùng địa chỉ `s2-cnv03` với ảnh bìa Tổ Đường và Đại Nam Quốc Mẫu (trước đây là host khác nên tải 2 lần), qua `mediaUrl()`.
+  - Nội dung dài của nhiều khu vực mở đầu bằng chính câu giới thiệu viết lại; nay câu giới thiệu chỉ hiện khi không có nội dung dài.
+  - Test mới: mọi liên kết nội bộ trên trang khu vực đều mở được (đột biến "bật liên kết tượng sớm" trước đó lọt qua unit test).
+  - `snapshot:check` báo cả khu vực của tự viện khác hoặc thiếu tên tự viện.
+- **Chờ Ban Biên Tập:**
+  - 11/14 khu vực dùng chung ảnh bìa giữ chỗ: ảnh toàn cảnh chùa cho 5 khu vực; bìa sách "Đi Qua Khổ Vui Cuộc Đời" cho Tứ Ân và Thư Viện.
+  - Sửa `mapPos` của 8 khu vực trong admin.
+  - Gán khu vực cho 2 tượng `cong_thap`.
+- **Hiệu năng còn lại** (cần làm trước khi ra mắt):
+  - Ảnh tượng 0,2–1,5 MB mỗi ảnh hiển thị trong thẻ rộng khoảng 260px; cuộn hết trang Tam Bảo tải khoảng 9 MB. Cần ảnh thu nhỏ (T41b).
+  - Trang khu vực đọc thêm `bao-tuong.json` (984 KB) khi Worker khởi động nguội. Riêng bộ chuyển `posts.json` tốn khoảng 110 ms ở mọi trang, kể cả trang không dùng bài viết; plan giao việc này cho T19.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Ghim bản đồ dùng được bằng bàn phím, vùng chạm ≥ 48px, giữ đúng vị trí từ 375 đến 1440px
-- [ ] Hiển thị 12 khu vực; lý do 14 bản ghi trong dữ liệu được ghi trong báo cáo snapshot
-- [ ] Liên kết sang bảo tượng dùng đúng dạng `/bao-tuong/{slug}_{mã}`
+- [x] Ghim bản đồ dùng được bằng bàn phím, vùng chạm ≥ 48px, giữ đúng vị trí từ 375 đến 1440px (đo ở 4 cỡ, lệch < 0,5%)
+- [x] Hiển thị ~~12~~ 14 khu vực; báo cáo snapshot ghi rõ vì sao site cũ chỉ liệt kê 12 (xem "Khác mô tả")
+- [x] Liên kết sang bảo tượng dùng đúng dạng `/bao-tuong/{slug}_{mã}` (unit test trên dữ liệu thật; thẻ thành liên kết ở T16)
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- vu-tru`
+- [x] `npm run test:e2e -- vu-tru`: 11 test × 2 cỡ màn hình (3 test bề rộng bỏ qua trên điện thoại), có axe; hai trang mới được thêm vào test canh gác. Trang chủ thêm test cho slider khu vực.
+- [x] Unit 137 xanh (thêm 5 test); `tsc` và eslint sạch; `npm run snapshot:check` có dòng `vu-tru.json: 14 khu vực…` và `bao-tuong.json: 126 tôn tượng, 62 tượng chính`
+- [x] Toàn bộ e2e (438 test, 27 bỏ qua theo thiết kế): cục bộ 410 qua, 1 chập chờn (test dịch bố cục khi icon font về chậm, qua ở lần chạy lại); trên `v2.` 411/411 qua
+- [x] Ảnh: `docs/anh/t15-vu-tru-phat-giao.png`
 
 **Phụ thuộc:** T9, T10
 
 **File dự kiến:** `src/lib/content/sources/snapshot.ts` (thêm vu-tru), `src/app/(site)/vu-tru-phat-giao/page.js`, `src/app/(site)/vu-tru-phat-giao/[slug]/page.js`, `src/components/site/TempleMap.tsx`, `src/components/sections/portfolios/Portfolios2.js`
 
 **Quy mô:** M
+
+---
+
+### T19a: Mỗi trang chỉ nạp dữ liệu nó cần
+
+**Mô tả:** Kéo phần "mỗi lượt chỉ đọc phần cần" của T19 lên trước T16 (chủ dự án chọn ngày 04/11, sau review T15). Repository không còn đọc `posts.json` khi được tạo; bài viết chỉ được đọc lần đầu có trang hỏi tới bài viết, như các nguồn khác. T16 sẽ thêm 126 trang tượng, mỗi trang đều đọc file bảo tượng, nên phần này cần có trước.
+
+**Tiêu chí nghiệm thu:**
+- [x] Trang không hiện bài viết (Giới thiệu, Tông Chỉ, Vũ Trụ, Lịch tu học) không đọc `posts.json`
+- [x] Đọc lỗi thì lần sau đọc lại, không giữ lỗi mãi
+- [x] Không đổi giao diện: toàn bộ e2e xanh
+
+**Kết quả 04/11/2026:** xong, đã deploy `v2.`.
+- **Đo trước khi sửa:**
+  - Trên Node, bộ chuyển `posts.json` (632 bài) tốn khoảng 90–110 ms mỗi lần đọc. Chi phí rải đều qua việc làm sạch chữ, regex, đọc URL và zod; riêng chuyển thân bài sang HTML chỉ khoảng 8 ms.
+  - Trước đây, repository đọc `posts.json` ngay khi được tạo, nên trang nào cũng trả chi phí này mỗi lần Worker khởi động nguội.
+  - Các file khác nhẹ hơn nhiều: `tong-chi.json` khoảng 8 ms, `vu-tru.json` và `bao-tuong.json` mỗi file khoảng 4 ms.
+- **Thay đổi:**
+  - `createMemoryRepository` nhận bài viết dạng mảng (test) hoặc hàm nạp.
+  - Một helper `lazy()` thay cho sáu đoạn `??=` lặp nhau: đọc lần đầu được hỏi, giữ lại kết quả, và nếu đọc lỗi thì lần sau đọc lại (trước đây một lần đọc lỗi bị giữ đến hết đời Worker).
+  - Nay chỉ trang chủ và các trang Dòng Chảy còn đọc bài viết.
+- **Số đo trên `v2.` (Workers telemetry):** nhiễu, chỉ nên xem như chiều hướng.
+  - Mẫu trước khi sửa chỉ có vài chục yêu cầu RSC, vì truy vấn dừng ở 2000 sự kiện.
+  - CPU trung vị của yêu cầu RSC: `/gioi-thieu` 416 → 84 ms, `/lich-tu-hoc` 269 → 45 ms. `/tong-chi-tu-hoc` gần như không đổi (104 → 98 ms; mẫu trước chỉ có 8 yêu cầu).
+- **Phát hiện mới, chỗ tốn CPU lớn nhất:**
+  - Trong 9 phút chạy e2e sau khi deploy, Worker dựng khoảng 2000 bản RSC để tải trước liên kết, trong khi chỉ có khoảng 180 lượt mở trang thật.
+  - Mỗi lượt xem kéo theo khoảng 10 lượt dựng trang cho các liên kết trong menu, lối vào và footer. Mỗi lượt dựng tốn 45–240 ms CPU (trung vị), vì nhiều Worker đang khởi động nguội.
+  - Đây là đòn bẩy CPU lớn hơn việc nạp dữ liệu. Có thể tắt tải trước cho các liên kết lặp ở menu và footer, hoặc chỉ tải trước khi rê chuột, đổi lại chuyển trang chậm hơn một chút. Cần quyết cùng Câu hỏi mở #8.
+- **Sửa thêm (có từ T2/T11, hôm nay mới lộ vì thẻ ngày bị đẩy xuống dưới mép màn hình):**
+  - Khi trình duyệt vừa cuộn khung `#smooth-wrapper` để hiện một liên kết (Tab, hoặc Playwright cuộn trước khi bấm) rồi người dùng bấm ngay, sự kiện `scroll` của khung đến sau và kéo ScrollSmoother về chỗ cũ. Nội dung kẹt giữa chừng; trên trang lịch, thẻ sự kiện đứng ở 3226 px thay vì 130 px.
+  - `revealTarget` nay xóa độ cuộn đó trước khi cuộn tới đích. Test lướt tới sự kiện trên trang lịch nay luôn cuộn ngày vào màn hình trước khi bấm: đỏ trên bản cũ (3/3), xanh sau khi sửa (3/3).
+
+**Kiểm chứng:**
+- [x] Unit 139 xanh (thêm 2 test: bài viết chỉ được đọc khi có trang hỏi tới, và đọc lại sau khi lỗi; cả hai đỏ trước khi sửa); `tsc`, eslint sạch
+- [x] Toàn bộ e2e (438 test, 27 bỏ qua theo thiết kế): cục bộ 409 qua, 1 chập chờn (dịch bố cục khi icon font về chậm), 1 hỏng là lỗi lướt trang lịch ở trên (đã sửa; chạy lại các bộ lịch, Tông Chỉ, trang bài và canh gác: 146/146); trên `v2.` 411/411 qua
+
+**Phụ thuộc:** T4
 
 ---
 
