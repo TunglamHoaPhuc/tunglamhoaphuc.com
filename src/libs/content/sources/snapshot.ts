@@ -5,7 +5,8 @@ import { type ParsedAbout, parseAbout } from "../about";
 import { type ParsedPosts, parsePosts, toGallery } from "../posts";
 import { type ParsedSchedule, parseSchedule } from "../schedule";
 import { type ParsedTongChi, parseTongChi } from "../tongChi";
-import { type ParsedAreas, type ParsedStatues, parseAreas, parseStatues } from "../vuTru";
+import { type ParsedStatues, parseStatues } from "../baoTuong";
+import { type ParsedAreas, parseAreas } from "../vuTru";
 import { rawPostSchema } from "../schema";
 import type { GalleryImage } from "../types";
 

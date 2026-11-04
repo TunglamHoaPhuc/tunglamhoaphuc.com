@@ -213,11 +213,26 @@ export type StatueSummary = {
 	subtitle: string;
 	/** Its area in the Bảo Tượng file ("tam_bao"), which is not an area slug (config/vuTru.ts). */
 	areaCode: string;
-	/** A main statue (TƯỢNG CHÍNH), with a page of its own; the others are works of Buddhist art. */
+	/** A main statue (TƯỢNG CHÍNH); the others are works of Buddhist art (NTPG). */
 	main: boolean;
 	image: MediaImage | null;
 	/** Its address, the old site's: /bao-tuong/{slug}, the slug ending in its code. */
 	href: string;
+	/** Its assembly (chúng hội): "Chư Phật Hải Hội". */
+	assembly: Category;
+	/** The group it stands with: "Hoa Nghiêm Tam Thánh". */
+	cluster: string;
+};
+
+/** A work of Buddhist art showing the same figure, itself a statue of the collection. */
+export type ArtVariation = { id: string; title: string; location: string; meaning: string; image: MediaImage | null; href: string | null };
+
+export type Statue = StatueSummary & {
+	/** A teaching about the figure and who gave it; `null` where the data only repeats the name. */
+	quote: { text: string; author: string } | null;
+	/** Sanitised HTML, safe to render as is. */
+	contentHtml: string;
+	art: ArtVariation[];
 };
 
 /** Read-only access to the temple's content, whatever the source. */
@@ -237,6 +252,8 @@ export interface ContentRepository {
 	listAreas(): Promise<Area[]>;
 	/** Bảo Tượng Phật Giáo, in the editors' order. */
 	listStatues(): Promise<StatueSummary[]>;
+	/** `null` when no statue has this slug (the old address: name, then its code). */
+	getStatue(slug: string): Promise<Statue | null>;
 }
 
 /** Something wrong or odd in the source data, for `npm run snapshot:check`. */

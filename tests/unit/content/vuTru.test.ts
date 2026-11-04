@@ -1,7 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { vuTru } from "@/config/vuTru";
-import { parseAreas, parseStatues } from "@/libs/content/vuTru";
+import { parseStatues } from "@/libs/content/baoTuong";
+import { parseAreas } from "@/libs/content/vuTru";
 import { statuesIn, templeAreas } from "@/libs/vuTru";
 
 const area = (extra: Record<string, unknown>) => ({

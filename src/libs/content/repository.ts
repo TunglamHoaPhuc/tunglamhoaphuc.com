@@ -1,7 +1,8 @@
 // The one door pages use to read content: `await getContentRepository()`. Filtering,
 // sorting and paging happen here on the server, so a list page sends 12 posts, not 472.
+import { type StatueEntry, statueArticle, statueSummary } from "./baoTuong";
 import { type TongChiEntry, tongChiArticle, tongChiSummary } from "./tongChi";
-import type { AboutTopic, Area, CategoryCount, ContentRepository, GalleryImage, Page, Post, PostSort, PostSummary, Schedule, StatueSummary, TongChiArticle } from "./types";
+import type { AboutTopic, Area, CategoryCount, ContentRepository, GalleryImage, Page, Post, PostSort, PostSummary, Schedule, Statue, StatueSummary, TongChiArticle } from "./types";
 
 export const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 60;
@@ -42,7 +43,7 @@ export type MemoryRepositoryOptions = {
 	/** Vũ Trụ Phật Giáo's areas, loaded the first time a page asks for them. */
 	loadAreas?: () => Promise<Area[]>;
 	/** Bảo Tượng's statues, loaded the first time a page asks for them. */
-	loadStatues?: () => Promise<StatueSummary[]>;
+	loadStatues?: () => Promise<StatueEntry[]>;
 };
 
 const EMPTY_SCHEDULE: Schedule = { events: [], programs: [], themes: [], quotes: [] };
@@ -79,9 +80,10 @@ export function createMemoryRepository(
 	const about = lazy<AboutTopic[]>(loadAbout ?? none);
 	const tongChiEntries = lazy<TongChiEntry[]>(loadTongChi ?? none);
 	const areas = lazy<Area[]>(loadAreas ?? none);
-	const statues = lazy<StatueSummary[]>(loadStatues ?? none);
+	const statues = lazy<StatueEntry[]>(loadStatues ?? none);
 	// Bodies are turned into HTML one page at a time, once each.
 	const tongChiPages = new Map<string, TongChiArticle>();
+	const statuePages = new Map<string, Statue>();
 
 	return {
 		async listPosts({ section, category, sort = "newest", page = 1, pageSize = DEFAULT_PAGE_SIZE } = {}): Promise<Page<PostSummary>> {
@@ -142,7 +144,20 @@ export function createMemoryRepository(
 
 		listAreas: areas,
 
-		listStatues: statues,
+		async listStatues(): Promise<StatueSummary[]> {
+			return (await statues()).map(statueSummary);
+		},
+
+		async getStatue(slug) {
+			const key = slugKey(slug);
+			const cached = statuePages.get(key);
+			if (cached) return cached;
+			const entry = (await statues()).find((item) => slugKey(item.slug) === key);
+			if (!entry) return null;
+			const statue = statueArticle(entry);
+			statuePages.set(key, statue);
+			return statue;
+		},
 	};
 }
 
