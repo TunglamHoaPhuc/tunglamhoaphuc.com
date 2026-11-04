@@ -1,10 +1,10 @@
 @font-face {
 	font-family: "bexon-icons";
-	src: url("../fonts/bexon-icons.eot?yu4jya");
-	src: url("../fonts/bexon-icons.eot?yu4jya#iefix") format("embedded-opentype"),
-		url("../fonts/bexon-icons.ttf?yu4jya") format("truetype"),
-		url("../fonts/bexon-icons.woff?yu4jya") format("woff"),
-		url("../fonts/bexon-icons.svg?yu4jya#bexon-icons") format("svg");
+	/* WOFF2 (10 KB, made from the TTF) in place of the 18 KB TTF the browser took first (T41f).
+	   font-display stays block: with swap the icons first show in a fallback font at another
+	   size, and the page moves when the icon font comes (the layout-shift tests caught it). */
+	src: url("../fonts/bexon-icons.woff2") format("woff2"),
+		url("../fonts/bexon-icons.woff") format("woff");
 	font-weight: normal;
 	font-style: normal;
 	font-display: block;

@@ -118,7 +118,14 @@ test.describe("with motion", () => {
 	test("split-text headings keep their name and whole Vietnamese letters", async ({ page }) => {
 		await open(page, "/styleguide");
 		const animated = page.locator(".title-anim, .text-anim, .hero-text-anim");
-		await expect(animated.first()).toHaveAttribute("aria-label", /.+/);
+		// .text-anim headings split only when they come near the screen (T41f): scroll down to them
+		// with the wheel, as smooth scrolling takes over the page's own scrolling.
+		const unsplit = page.locator(".text-anim:not([aria-label])");
+		for (let step = 0; step < 40 && (await unsplit.count()); step++) {
+			await page.mouse.wheel(0, 400);
+			await page.waitForTimeout(150);
+		}
+		for (const heading of await animated.all()) await expect(heading).toHaveAttribute("aria-label", /.+/);
 		const headings = await animated.evaluateAll((els) =>
 			els.map((el) => {
 				const pieces = [...el.querySelectorAll("[aria-hidden] div, [aria-hidden] span")].filter((p) => !p.children.length);

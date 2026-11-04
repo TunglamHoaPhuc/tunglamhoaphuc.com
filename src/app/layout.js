@@ -1,4 +1,3 @@
-import { Be_Vietnam_Pro, Noto_Serif } from "next/font/google";
 import "swiper/css";
 import "swiper/css/effect-coverflow";
 import "swiper/css/effect-fade";
@@ -13,25 +12,17 @@ import "./assets/css/glightbox.min.css";
 import "./assets/css/meanmenu.css";
 import "./assets/css/nice-select2.css";
 import "./assets/css/odometer-theme-default.css";
+import "./assets/css/fonts.css";
 import "../../design-system/tokens.css";
 import "./globals.scss";
-
-// Variable names match design-system/tokens.css (--tlhp-font-serif / --tlhp-font-sans);
-// utilities/_tlhp-bridge.scss points Bexon's --tj-ff-* at them.
-const headingFont = Noto_Serif({
-	variable: "--font-noto-serif",
-	subsets: ["latin", "vietnamese"],
-	weight: ["400", "500", "600", "700"],
-	style: ["normal", "italic"],
-	display: "swap",
-});
-const bodyFont = Be_Vietnam_Pro({
-	variable: "--font-be-vietnam-pro",
-	subsets: ["latin", "vietnamese"],
-	weight: ["400", "500", "600", "700"],
-	style: ["normal", "italic"],
-	display: "swap",
-});
+// Noto Serif and Be Vietnam Pro are declared in assets/css/fonts.css under the names
+// design-system/tokens.css uses (--tlhp-font-serif / --tlhp-font-sans). The upright faces
+// are preloaded, latin and vietnamese: 10 small files, about 121 KB (next/font preloaded 20
+// files, over 400 KB, T41f). Fewer let text swap fonts after the first paint and move the
+// month buttons of the calendar (the layout-shift tests caught it). Italics are not preloaded.
+const PRELOADED_FONTS = Object.values(
+	import.meta.glob("./assets/fonts/tlhp/*-normal-*.woff2", { query: "?url", import: "default", eager: true }),
+);
 
 export const metadata = {
 	title: "Bexon - Corporate Business React NextJs Template",
@@ -40,16 +31,19 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
 	return (
-		// Font variables sit on <html> because the bridge resolves them at :root.
 		<html
 			lang="vi"
 			data-scroll-behavior="smooth"
 			dir="ltr"
-			className={`${headingFont.variable} ${bodyFont.variable}`}
 			// The notice strip's inline script sets an attribute and a CSS variable here
 			// before React hydrates.
 			suppressHydrationWarning
 		>
+			<head>
+				{PRELOADED_FONTS.map((href) => (
+					<link key={href} rel="preload" href={href} as="font" type="font/woff2" crossOrigin="anonymous" />
+				))}
+			</head>
 			<body>{children}</body>
 		</html>
 	);

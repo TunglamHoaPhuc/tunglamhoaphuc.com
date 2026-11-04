@@ -1339,19 +1339,53 @@
     - Nén lại ảnh hoa văn và logo (Lighthouse ước tiết kiệm 260–360 KB).
     - `srcSet` của khung hero thêm bản 640 cho điện thoại.
 
+**Kết quả 04/11/2026:** xong, đã deploy `v2.` (phiên bản `9a3276ed`).
+- **Font:**
+  - Tự host Noto Serif và Be Vietnam Pro (`assets/css/fonts.css`, file chép từ bản next/font đã tải về), chỉ bộ chữ latin và vietnamese; bỏ `next/font`.
+  - Nguyên nhân chính của 719 KB: CSS của Google khai báo latin-ext sau vietnamese, nên với ă đ ơ ư ĩ ũ trình duyệt lấy file latin-ext (Noto Serif 182–231 KB) thay cho file vietnamese (14–18 KB). Be Vietnam Pro bị cùng lỗi ở cả 4 độ đậm.
+  - Bỏ kiểu nghiêng của Be Vietnam Pro (site không dùng); Noto Serif là font biến thiên, một file cho 400–700.
+  - Font dự phòng giữ đúng số đo next/font đã tính (`size-adjust`…), nên chữ không nhảy khi font về.
+  - Trang chủ: 27 file, 719 KB, 20 preload → 13 file, khoảng 200 KB, 10 preload (khoảng 121 KB). Tên file có mã băm trong `_next/static`, bộ đệm 1 năm.
+- **Khác mô tả: preload 10 file chứ không phải 2.** Chỉ preload 2 file thì các độ đậm 500/600 và bộ chữ vietnamese về sau lần vẽ đầu, đẩy thanh chọn tháng ở trang lịch rộng 403 → 413 px (CLS 0,00016; test xô lệch bố cục bắt được). Nay preload mọi kiểu chữ thường của hai font, latin và vietnamese, bằng `import.meta.glob`; không preload chữ nghiêng.
+- **Khác mô tả: ngân sách font 200 KB chứ không phải 150 KB.** Trang dùng 4 độ đậm Be Vietnam Pro và Noto Serif thường lẫn nghiêng. Xuống 150 KB phải bỏ một độ đậm đang dùng, tức đổi giao diện.
+- **Icon font:** `bexon-icons` đổi sang woff2 (18 → 10 KB, dùng fontTools), bỏ eot/ttf/svg. Vẫn để `font-display: block`: với `swap`, icon hiện trước bằng font dự phòng ở cỡ khác rồi làm trang nhảy khi font về (test xô lệch bố cục bắt được).
+- **Hiệu ứng:**
+  - Đo trước (điện thoại, CPU chậm 4 lần): khởi động hiệu ứng là một tác vụ 1.484–1.789 ms; tắt hiệu ứng (giảm chuyển động) thì tác vụ dài nhất 466–507 ms. Khởi động lúc trình duyệt rảnh cũng không giảm TBT, vì tác vụ dài vẫn bị tính.
+  - `ClientWrapper` nay chạy mỗi hiệu ứng trong một tác vụ riêng, cùng thứ tự, nhường luồng chính giữa các bước (`scheduler.yield` hoặc `setTimeout`). `contextSafe` giữ mọi thứ trong context, nên rời trang vẫn gỡ được. Mỗi bước có `performance.measure("effect …")` để xem trong tab Performance.
+  - Hai bước nặng nhất chuyển sang chạy khi khối tới cách màn hình 200 px: `titleAnim2` (SplitText tách mọi tiêu đề `.text-anim` thành từng ký tự, 892 ms) và `tjLeftSwipeAnimation` (242 ms). Tiêu đề vẫn ẩn bằng CSS cho tới lúc đó, nên không chớp. Kiểm bằng cách cuộn hết trang chủ: 7/7 tiêu đề tách và hiện đủ, 4/4 thẻ Chư Tôn Đức hiện đủ.
+  - Tổng thời gian chặn ở trang chủ (cục bộ, CPU chậm 4 lần): 1.741–1.928 → 835–942 ms. Tác vụ dài nhất còn lại (423–495 ms) cũng có khi tắt hiệu ứng: đó là React hydrate, việc của T41a.
+- **Ảnh tĩnh:** hai ảnh hoa văn 45 → 22 KB (làm tròn kênh alpha theo bước 3; độ đục đổi tối đa 1/255).
+- **Chưa làm:**
+  - Đặt tên ảnh `/images`, `/brand` theo mã băm để giữ bộ đệm 1 năm: phải sửa mọi đường dẫn trong SCSS, config và component, mà chỉ có lợi cho lần vào sau, không đổi điểm Lighthouse. Để cùng T41a.
+  - Bản 640 cho khung hero: khung đầu là ảnh của site đã có bản dọc 760 px cho điện thoại; các khung sau tải lười, không ảnh hưởng LCP.
+- **Lighthouse 13.6 điện thoại trên `v2.`** (trước: 2 lượt; sau: 3 lượt):
+
+  | Trang | Điểm | LCP | TBT | Font | Tổng tải |
+  |---|---|---|---|---|---|
+  | Trang chủ | 53–70 → 71–74 | 6,3–8,7 → 4,9–5,0 s | 163–500 → 132–181 ms | 722 → 201 KB | 1.882 → 1.357 KB |
+  | `/dong-chay-hoang-phap` | – → 78–87 | 3,6–4,5 s | 12–63 ms | 201 KB | 974 KB |
+  | Bài "Cộng tu pháp hội niệm Phật tháng 7…" | – → 71–85 | 3,6–5,4 s | 6–148 ms | 201 KB | 938 KB |
+
+  - TTFB trong các lượt sau: 136–2.010 ms (Worker khởi động nguội). Đó là phần lớn của LCP còn lại, việc của T41e.
+  - PageSpeed Insights chưa đo lại được: API hết hạn mức trong ngày, trang web đứng ở "Running analysis".
+
 **Tiêu chí nghiệm thu:**
-- [ ] Trang chủ preload tối đa 2 file font; tổng font tải ≤ 150 KB
-- [ ] Không có tác vụ dài nào của GSAP trước lần vẽ đầu; hiệu ứng vẫn chạy (test canh gác hiệu ứng xanh, ảnh chụp trước–sau giống nhau)
-- [ ] Ảnh tĩnh có `Cache-Control` 1 năm, tên có mã băm
-- [ ] PageSpeed điện thoại trang chủ, ghi số trước–sau (mục tiêu sau cả ba đợt: ≥ 80, LCP < 2,5 s, TBT < 300 ms, CLS 0)
+- [x] Trang chủ chỉ preload kiểu chữ thường (10 file, khoảng 121 KB, thay cho 20 file); tổng font tải ≤ 200 KB (đổi từ "tối đa 2 file, ≤ 150 KB", lý do ở trên)
+- [x] Hiệu ứng không còn khởi động trong một tác vụ dài; hiệu ứng vẫn chạy (test canh gác hiệu ứng xanh; tiêu đề và thẻ hiện đủ khi cuộn)
+- [ ] Ảnh tĩnh có `Cache-Control` 1 năm, tên có mã băm (chưa làm, chuyển sang T41a). Font đã có
+- [x] Lighthouse điện thoại 3 trang ghi số trước–sau. PageSpeed Insights chưa đo lại được (hạn mức trong ngày)
 
 **Kiểm chứng:**
-- [ ] Lighthouse 13.6 điện thoại 3 lượt cho 3 trang mốc của T41c; PageSpeed Insights trên `v2.`
-- [ ] `npm run test:e2e` (canh gác hiệu ứng, `image-budget`, `image-sizes`)
+- [x] `npm run test:e2e -- performance` (mới): đỏ trên bản cũ ở `v2.` (20 preload; tác vụ 1.595 ms), xanh sau khi sửa
+- [x] Unit 156 xanh; `tsc`, eslint không lỗi
+- [x] Toàn bộ e2e:
+  - Trên `v2.` 488/488 (28 bỏ qua theo thiết kế).
+  - Cục bộ: các bộ bị ảnh hưởng xanh. Test xô lệch bố cục ở trang chủ thỉnh thoảng hỏng khi máy chạy song song nặng (CLS 0,000013, font chữ về sau lần vẽ đầu, đúng trường hợp test đã ghi chú và cho chạy lại 2 lần); chạy tuần tự 16/16.
+  - Test tách chữ ở styleguide nay lăn chuột tới tiêu đề trước khi kiểm.
 
 **Phụ thuộc:** T41d. Cần xong trước T22.
 
-**File dự kiến:** `src/app/layout.js`, `src/app/assets/sass/utilities/_icons.scss` (hoặc file khai báo `bexon-icons`), `src/components/shared/wrappers/ClientWrapper.js`, `src/libs/reveal.ts`, `public/_headers`, `src/config/site.ts`
+**File:** `src/app/layout.js`, `src/app/assets/css/fonts.css`, `src/app/assets/fonts/tlhp/*`, `src/app/assets/css/bexon-icons.css`, `src/components/shared/wrappers/ClientWrapper.js`, `src/libs/titleAnim2.js`, `src/libs/tjLeftSwipeAnimation.js`, `public/images/shape/pattern-*.webp`, `tests/e2e/performance.spec.ts`
 
 **Quy mô:** M
 
@@ -1366,6 +1400,7 @@
   - Inline phần CSS của màn hình đầu và nạp phần còn lại sau.
   - Lighthouse báo 177 KB CSS không dùng, ước tiết kiệm 0,7–1,5 s chặn hiển thị. Style & Layout đang tốn 1,1–1,3 s.
 - **Icon font:** cắt `font-awesome-pro` / `bexon-icons` chỉ còn biểu tượng dùng tới.
+- **Ảnh tĩnh** (chuyển từ T41f): `/images`, `/brand` đặt tên theo mã băm (import qua Vite hoặc đổi tên khi thay file) để giữ bộ đệm 1 năm thay cho 1 ngày.
 - **JavaScript:**
   - Xóa hàm hiệu ứng GSAP không còn phần tử nào dùng.
   - Swiper, Chart.js, glightbox, odometer và GSAP chỉ nạp ở trang cần, và nạp sau khi trang rảnh nếu hiệu ứng không nằm ở màn hình đầu. Giữ toàn bộ hiệu ứng Bexon (quyết định của chủ dự án).
@@ -1373,6 +1408,7 @@
   - Khối nào không cần tương tác thì chuyển thành server component.
   - Menu điện thoại và header dính nhân đôi chỉ dựng khi cần.
   - React DOM hiện hydrate cả trang 1.708 phần tử; dữ liệu nhúng trong HTML thu gọn cùng T41e.
+  - Sau T41f, tác vụ dài nhất ở trang chủ là React hydrate: 423–495 ms trên điện thoại CPU chậm 4 lần (có cả khi tắt hiệu ứng).
 - **Mốc đo 04/11/2026** (trang chủ `v2.`, desktop, so với divineshop.vn):
   - CSS: 198 KB br / 1,08 MB chưa nén, thêm 41 KB style nhúng. divineshop: 7,7 KB br.
   - JS: khoảng 306 KB br / 895 KB chưa nén, có một tác vụ dài 356 ms. divineshop: khoảng 100 KB br.
@@ -1926,7 +1962,7 @@
 **Tiêu chí nghiệm thu:**
 - [ ] LCP và CLS đạt mục tiêu đã chốt ở Checkpoint B (mặc định LCP < 2,0 s, CLS = 0, mô phỏng 4G di động)
 - [ ] Lighthouse CI báo lỗi khi một trang vượt ngân sách ảnh, CSS, JS hoặc font
-- [ ] Mọi trang giữ ngân sách font của T41f (tối đa 2 file preload, ≤ 150 KB)
+- [ ] Mọi trang giữ ngân sách font của T41f (chỉ preload kiểu chữ thường, font ≤ 200 KB)
 - [ ] axe 0 lỗi nghiêm trọng trên mọi mẫu trang
 
 **Kiểm chứng:**
