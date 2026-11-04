@@ -1023,15 +1023,41 @@
     - Thêm `public/_headers` với `Cache-Control: public, max-age=86400, stale-while-revalidate=604800`. Hiện các file này có `max-age=0, must-revalidate`, nên mỗi lượt vào trang trình duyệt lại phải hỏi máy chủ.
     - Bỏ hai thư mục này khỏi `runWorkerFirst` để không tốn CPU Worker.
 
+**Kết quả 04/11/2026:** xong, đã deploy `v2.` (làm trên nhánh `perf/t41c-anh`, worktree riêng, để không lẫn phần T16 đang làm dở).
+- **Ảnh đầu trang:**
+  - Hàm `topImagePriority(src)` trong `media.ts` trả "high" cho ảnh của site, "low" cho ảnh từ B2 hay WordPress.
+  - "low" còn khiến React không preload: React tự preload mọi `<img>` không có `loading="lazy"` hoặc `fetchPriority="low"`.
+  - Áp cho ảnh bìa trang bài, Tông Chỉ, khu vực Vũ Trụ và chân dung trang Giới thiệu.
+- **Trang danh sách:** thẻ bài tải lười hết; bỏ prop `eager` khỏi `PostCard`. Đảo tiêu chí "3 ảnh đầu tải ngay" của T7; test `dong-chay` sửa theo.
+- **Hoa văn:**
+  - Hai file chỉ là nét trắng rất mờ (độ đục tối đa 22/255).
+  - Xuất WebP lossless 740×1180, nền trắng, giữ nguyên kênh alpha: 45 KB mỗi file (trước 548 KB). So ảnh chụp trong Chromium trên nền tối với `mix-blend-mode: difference`: chênh tối đa 6/255, trung bình 0,07.
+  - Xóa hai file SVG cũ.
+- **`public/_headers`:**
+  - Khi có file này, vinext không tự sinh luật `/_next/static/*` nữa, nên luật đó được chép vào file.
+  - Ảnh tĩnh nay đi thẳng từ kho tài sản, nên không còn nhận header `X-Robots-Tag` của `next.config.js`. T20 lo robots theo host.
+- **Không làm:** ảnh nhỏ dưới hero vẫn dùng chung URL với ảnh của khung. Hai ảnh trùng URL nên trình duyệt chỉ tải một lần; đổi sang ảnh thẻ sẽ thành hai lần tải. Giảm dung lượng để T41d.
+- **Lighthouse điện thoại trên `v2.`** (trước → sau, sau đo 2 lượt):
+
+  | Trang | LCP | Ảnh tải về |
+  |---|---|---|
+  | Trang chủ | 8,4 s → 6,9–8,2 s | 1,6 MB → 0,9 MB |
+  | `/dong-chay-hoang-phap` | 11,9 s → 7,5–7,6 s | 10,5 MB (không đổi) |
+  | Bài "Cộng tu pháp hội niệm Phật tháng 7…" | 47,9 s → 11,2–11,3 s | 10 MB (không đổi) |
+
+  - Hai trang sau vẫn tải ảnh gốc, chỉ là không còn ưu tiên. Ảnh vẫn chiếm băng thông: trang bài có Render Delay 8,4 s. Phải có T41d mới hết.
+- **Cho T16:** `StatueCard` đang làm dở có `eager` cho 4 thẻ đầu. Ảnh tượng nặng 0,2–1,5 MB nên sẽ bị React preload. Khi thêm trang tượng vào `PAGES` của `image-budget.spec.ts`, test sẽ bắt lỗi này.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Không trang nào preload hoặc đặt `fetchPriority="high"` cho ảnh lớn hơn 500 KB (test canh gác mới chạy mọi trang)
-- [ ] Hai ảnh hoa văn ≤ 50 KB mỗi ảnh; không đổi giao diện (so ảnh chụp trước–sau)
-- [ ] `/images/*` và `/brand/*` trả `Cache-Control` ≥ 1 ngày và không chạy qua Worker
-- [ ] Lighthouse 3 trang ở bảng mốc: ghi số trước–sau
+- [x] Không trang nào preload hoặc đặt `fetchPriority="high"` cho ảnh lớn hơn 500 KB (test canh gác mới chạy mọi trang)
+- [x] Hai ảnh hoa văn ≤ 50 KB mỗi ảnh; không đổi giao diện (so ảnh chụp trước–sau)
+- [x] `/images/*` và `/brand/*` trả `Cache-Control` ≥ 1 ngày và không chạy qua Worker
+- [x] Lighthouse 3 trang ở bảng mốc: ghi số trước–sau
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- image-budget` (cục bộ và trên `v2.`)
-- [ ] Lighthouse điện thoại 3 trang trên `v2.`
+- [x] `npm run test:e2e -- image-budget`: đỏ trên bản cũ ở `v2.` (4 test), xanh cục bộ và trên `v2.`
+- [x] Lighthouse điện thoại 3 trang trên `v2.` (số ở trên)
+- [ ] Toàn bộ e2e
 
 **Phụ thuộc:** T8, T10
 
