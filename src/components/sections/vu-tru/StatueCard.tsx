@@ -4,9 +4,8 @@ import { liveHref } from "@/libs/livePaths";
 
 type Props = { statue: StatueSummary };
 
-// A statue on an area page, in the look of the Giới thiệu cards (Bexon's team card): the
-// upright picture, the name and the second name. It leads to the statue's page once that
-// section is up (T16); until then it is a card without a link.
+// A statue, in the look of the Giới thiệu cards (Bexon's team card): the upright picture,
+// the name and the second name, leading to the statue's page.
 export default function StatueCard({ statue }: Props) {
 	const href = liveHref(statue.href);
 	const picture = statue.image ? (

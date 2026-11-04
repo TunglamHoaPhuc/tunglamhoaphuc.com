@@ -1,0 +1,150 @@
+@use "../utilities" as *;
+
+/**----------------------------------------
+START: TLHP Bảo Tượng Phật Giáo (T16)
+The filter form above the statue list, a statue's facts, and its works of art.
+----------------------------------------*/
+.tlhp-statues {
+	// Paging and filtering come back to this heading; leave room for the sticky header.
+	#danh-sach-ton-tuong {
+		scroll-margin-top: 130px;
+	}
+}
+.tlhp-statue-filters {
+	display: grid;
+	grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr)) auto;
+	align-items: end;
+	gap: 16px;
+	padding: 24px;
+	border: 1px solid var(--tj-color-border-1);
+	border-radius: var(--tlhp-radius-lg);
+	background-color: var(--tj-color-common-white);
+	@media #{$lg, $md} {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+	@media #{$sm, $xs} {
+		grid-template-columns: minmax(0, 1fr);
+		padding: 20px 16px;
+	}
+}
+.tlhp-field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	label {
+		color: var(--tj-color-heading-primary);
+		font-size: var(--tlhp-text-body-sm);
+		font-weight: var(--tj-fw-medium);
+	}
+	input,
+	select {
+		min-height: 48px;
+		border-radius: var(--tlhp-radius-md);
+	}
+	select {
+		padding-right: 40px;
+		cursor: pointer;
+		appearance: none;
+		background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+		background-position: calc(100% - 22px) 50%, calc(100% - 16px) 50%;
+		background-size: 6px 6px;
+		background-repeat: no-repeat;
+	}
+}
+.tlhp-statue-filters-actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px 20px;
+	@media #{$lg, $md} {
+		grid-column: 1 / -1;
+	}
+	.tj-primary-btn {
+		min-height: 48px;
+	}
+}
+.tlhp-statue-filters-reset {
+	display: inline-flex;
+	align-items: center;
+	min-height: 48px;
+	color: var(--tj-color-theme-primary);
+	font-weight: var(--tj-fw-sbold);
+	text-decoration: underline;
+	text-underline-offset: 4px;
+}
+
+// Every part of a statue page stands apart: the story sits inside the reading column, so the
+// articles rule for one section after another does not reach it.
+.tlhp-statue .tlhp-article-section {
+	margin-top: 56px;
+}
+.tlhp-statue-facts {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 16px 24px;
+	margin: 0;
+	padding: 20px 0;
+	border-top: 1px solid var(--tj-color-border-1);
+	border-bottom: 1px solid var(--tj-color-border-1);
+	dt {
+		margin-bottom: 4px;
+		color: var(--tj-color-text-body-3);
+		font-size: var(--tlhp-text-caption);
+		font-weight: var(--tlhp-weight-overline);
+		letter-spacing: var(--tlhp-tracking-overline);
+		text-transform: uppercase;
+	}
+	dd {
+		margin: 0;
+		color: var(--tj-color-heading-primary);
+		font-weight: var(--tj-fw-medium);
+		a {
+			text-decoration: underline;
+			text-underline-offset: 4px;
+		}
+	}
+}
+
+.tlhp-art-grid {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.tlhp-art-card {
+	height: 100%;
+	overflow: hidden;
+	border: 1px solid var(--tj-color-border-1);
+	border-radius: var(--tlhp-radius-lg);
+	background-color: var(--tj-color-common-white);
+	img {
+		display: block;
+		width: 100%;
+		height: auto;
+		aspect-ratio: 4 / 3;
+		object-fit: cover;
+	}
+	> div {
+		padding: 20px;
+	}
+	h3 {
+		margin-bottom: 8px;
+		a {
+			color: inherit;
+			&:hover {
+				color: var(--tj-color-theme-primary);
+			}
+		}
+	}
+	p {
+		margin-bottom: 0;
+		font-size: var(--tlhp-text-body-sm);
+		line-height: var(--tlhp-leading-body-sm);
+	}
+	.tlhp-art-place {
+		margin-bottom: 8px;
+		color: var(--tlhp-accent-text);
+		font-weight: var(--tj-fw-medium);
+	}
+}
+
+/* !END: TLHP Bảo Tượng Phật Giáo */
