@@ -1308,6 +1308,93 @@
 
 ---
 
+### T41f: Font, icon font, hiệu ứng khởi động sau và ảnh tĩnh (đợt 1 tối ưu hiệu suất)
+
+**Mô tả:** Thêm ngày 04/11 (chủ dự án duyệt), sau khi đọc báo cáo PageSpeed và so với divineshop.vn. Ảnh không còn là nút thắt (T41d). Điểm thấp đến từ font, CSS chặn hiển thị, JavaScript trên luồng chính và TTFB. Đợt 1 gồm các việc nhanh, rủi ro thấp, không đổi giao diện. Đợt 2 là T41a (CSS, hydrate), đợt 3 là T41e (cache HTML ở edge). Cả ba xong trước T22.
+
+- **Mốc đo 04/11/2026** (trang chủ `v2.`, điện thoại, Lighthouse 13.6, 4G chậm):
+  - PageSpeed Insights lúc 17:37: **Performance 44**; FCP 2,0 s, LCP 7,4 s, TBT 1.380 ms, Speed Index 5,8 s, CLS 0. Luồng chính bận 6,1 s, 8 tác vụ dài, 217 phần tử có hoạt ảnh không chạy trên GPU.
+  - Lighthouse 13.6 trên máy (2 lượt; máy nhanh hơn máy của PageSpeed nên TBT thấp hơn):
+
+    | | `v2.` | divineshop.vn |
+    |---|---|---|
+    | Điểm | 53–70 | 84 |
+    | LCP | 6,3–8,7 s | 2,4 s |
+    | TBT | 163–500 ms | 478–521 ms (gần hết do GTM, Facebook) |
+    | TTFB | 127 ms nóng, 1.391 ms Worker nguội | 82–93 ms |
+    | CSS | 199 KB, 1 file chặn hiển thị | 8 KB |
+    | Font | 722 KB | 37 KB |
+    | JS | 314 KB | 1.099 KB |
+    | Ảnh | 588 KB | 11 MB (tải lười, sau LCP) |
+    | Luồng chính | Style & Layout 1,1–1,3 s; script 0,6–0,8 s | script 1,4 s |
+
+  - divineshop.vn nhanh vì HTML dựng sẵn ở edge, CSS 8 KB, gần như không dùng font web, ảnh LCP lấy từ CDN. Không học theo phần tag quảng cáo của họ (GTM, pixel): đó là nguồn TBT của họ.
+  - Script tốn CPU nhất: `B0PXqnjO.js` (React DOM, 219 KB) hydrate cả trang 1.708 phần tử, tác vụ dài 250–373 ms; `D08gD7ru.js` (GSAP và ScrollSmoother, 135 KB) khởi động ngay lúc tải.
+- **Việc làm:**
+  - **Font** (chuyển từ T41b): chỉ preload tối đa 2 file (bộ chữ tiếng Việt của font thân bài và font tiêu đề); chỉ giữ bộ chữ latin và tiếng Việt; bỏ độ đậm không dùng. Hiện trang chủ preload 20 file, tải 26 file.
+  - **Icon font:** `bexon-icons` đổi sang woff2 với `font-display: swap` (hiện là TTF, chặn chữ 130–160 ms). Việc cắt chỉ còn biểu tượng dùng tới vẫn ở T41a.
+  - **Hiệu ứng khởi động sau:** GSAP, ScrollSmoother, wow và SplitText khởi động khi trình duyệt rảnh, sau lần vẽ đầu, thay vì lúc tải. Giữ toàn bộ hiệu ứng (quyết định của chủ dự án), chỉ bắt đầu muộn hơn. Tách chữ chỉ áp cho tiêu đề ở màn hình đầu, hoặc tách theo từ thay vì từng ký tự, để bớt số phần tử có hoạt ảnh.
+  - **Ảnh tĩnh:**
+    - `/images`, `/brand` đặt tên theo mã băm nội dung để giữ bộ đệm 1 năm (`immutable`), thay cho 1 ngày.
+    - Nén lại ảnh hoa văn và logo (Lighthouse ước tiết kiệm 260–360 KB).
+    - `srcSet` của khung hero thêm bản 640 cho điện thoại.
+
+**Tiêu chí nghiệm thu:**
+- [ ] Trang chủ preload tối đa 2 file font; tổng font tải ≤ 150 KB
+- [ ] Không có tác vụ dài nào của GSAP trước lần vẽ đầu; hiệu ứng vẫn chạy (test canh gác hiệu ứng xanh, ảnh chụp trước–sau giống nhau)
+- [ ] Ảnh tĩnh có `Cache-Control` 1 năm, tên có mã băm
+- [ ] PageSpeed điện thoại trang chủ, ghi số trước–sau (mục tiêu sau cả ba đợt: ≥ 80, LCP < 2,5 s, TBT < 300 ms, CLS 0)
+
+**Kiểm chứng:**
+- [ ] Lighthouse 13.6 điện thoại 3 lượt cho 3 trang mốc của T41c; PageSpeed Insights trên `v2.`
+- [ ] `npm run test:e2e` (canh gác hiệu ứng, `image-budget`, `image-sizes`)
+
+**Phụ thuộc:** T41d. Cần xong trước T22.
+
+**File dự kiến:** `src/app/layout.js`, `src/app/assets/sass/utilities/_icons.scss` (hoặc file khai báo `bexon-icons`), `src/components/shared/wrappers/ClientWrapper.js`, `src/libs/reveal.ts`, `public/_headers`, `src/config/site.ts`
+
+**Quy mô:** M
+
+---
+
+### T41a: Gọn CSS, icon font và bớt phần phải hydrate (đợt 2 tối ưu hiệu suất)
+
+**Mô tả:** Kéo lên trước T22 ngày 04/11 (trước đây xếp sau Checkpoint E), vì CSS chặn hiển thị là đòn bẩy lớn nhất của LCP trên điện thoại (mốc đo ở T41f). Không đổi giao diện.
+
+- **CSS:**
+  - Thay `bootstrap.min.css` bằng import SCSS Bootstrap theo module thực dùng; xóa partial SCSS không còn phần tử nào dùng.
+  - Inline phần CSS của màn hình đầu và nạp phần còn lại sau.
+  - Lighthouse báo 177 KB CSS không dùng, ước tiết kiệm 0,7–1,5 s chặn hiển thị. Style & Layout đang tốn 1,1–1,3 s.
+- **Icon font:** cắt `font-awesome-pro` / `bexon-icons` chỉ còn biểu tượng dùng tới.
+- **JavaScript:**
+  - Xóa hàm hiệu ứng GSAP không còn phần tử nào dùng.
+  - Swiper, Chart.js, glightbox, odometer và GSAP chỉ nạp ở trang cần, và nạp sau khi trang rảnh nếu hiệu ứng không nằm ở màn hình đầu. Giữ toàn bộ hiệu ứng Bexon (quyết định của chủ dự án).
+- **Bớt phần phải hydrate:**
+  - Khối nào không cần tương tác thì chuyển thành server component.
+  - Menu điện thoại và header dính nhân đôi chỉ dựng khi cần.
+  - React DOM hiện hydrate cả trang 1.708 phần tử; dữ liệu nhúng trong HTML thu gọn cùng T41e.
+- **Mốc đo 04/11/2026** (trang chủ `v2.`, desktop, so với divineshop.vn):
+  - CSS: 198 KB br / 1,08 MB chưa nén, thêm 41 KB style nhúng. divineshop: 7,7 KB br.
+  - JS: khoảng 306 KB br / 895 KB chưa nén, có một tác vụ dài 356 ms. divineshop: khoảng 100 KB br.
+
+**Tiêu chí nghiệm thu:**
+- [ ] Trang chủ: CSS ≤ 60 KB br, JS ≤ 180 KB br, không tác vụ dài nào trên 200 ms lúc tải (ghi số trước–sau)
+- [ ] Không còn CSS chặn hiển thị quá 20 KB ở màn hình đầu
+- [ ] Ảnh chụp 6 mẫu trang trước–sau không khác nhau (so ảnh tự động)
+- [ ] Mọi biểu tượng đang dùng vẫn hiển thị (không còn ô vuông lỗi font)
+
+**Kiểm chứng:**
+- [ ] `npm run build` ghi dung lượng; `npm run test:e2e -- visual`
+- [ ] Lighthouse 13.6 điện thoại 3 lượt cho 3 trang mốc; PageSpeed Insights trên `v2.`
+
+**Phụ thuộc:** T41f (làm sau để đo riêng từng đợt). Cần xong trước T22.
+
+**File dự kiến:** `src/app/globals.scss`, `src/app/assets/sass/utilities/_bootstrap.scss`, `src/components/shared/wrappers/ClientWrapper.js`, `src/components/layout/header/*`, `tests/e2e/visual.spec.ts`
+
+**Quy mô:** L
+
+---
+
 ### T41e: Cache HTML và RSC ở edge
 
 **Mô tả:** Thêm ngày 04/11, sau khi so với divineshop.vn (Gatsby, HTML dựng sẵn, TTFB khoảng 150 ms). Trang công khai chỉ đổi khi dữ liệu đổi, nhưng hiện mỗi lượt xem đều dựng lại trang.
@@ -1357,7 +1444,7 @@
 - [ ] `npm run check:urls -- --base=https://v2.tunglamhoaphuc.com`
 - [ ] `BASE_URL=https://www.tunglamhoaphuc.com npm run test:e2e -- smoke`
 
-**Phụ thuộc:** T19, T20, T21, T41d (ảnh đúng cỡ trước khi khách thật vào), T41e (cache HTML ở edge)
+**Phụ thuộc:** T19, T20, T21, T41d (ảnh đúng cỡ trước khi khách thật vào), T41f và T41a (font, hiệu ứng, CSS), T41e (cache HTML ở edge)
 
 **File dự kiến:** `scripts/check-urls.ts`, `src/middleware.ts` (chuyển hướng admin cũ), `tests/e2e/smoke.spec.ts`, `docs/van-hanh/chuyen-www.md`
 
@@ -1830,51 +1917,25 @@
 
 ---
 
-### T41a: Gọn CSS, icon font và JavaScript hiệu ứng
-
-**Mô tả:** Thay `bootstrap.min.css` bằng import SCSS Bootstrap theo module thực dùng; cắt `font-awesome-pro` / `bexon-icons` chỉ còn biểu tượng dùng tới; xóa partial SCSS và hàm hiệu ứng GSAP không còn phần tử nào dùng; chỉ nạp GSAP ở trang có hiệu ứng cần nó. Không đổi giao diện.
-
-- **Mốc đo 04/11/2026** (trang chủ `v2.`, desktop, so với divineshop.vn):
-  - CSS: 198 KB br / 1,08 MB chưa nén, thêm 41 KB style nhúng. divineshop: 7,7 KB br.
-  - JS: khoảng 306 KB br / 895 KB chưa nén, có một tác vụ dài 356 ms. divineshop: khoảng 100 KB br.
-- Giữ toàn bộ hiệu ứng Bexon (quyết định của chủ dự án). Swiper, Chart.js, glightbox, odometer và GSAP chỉ nạp ở trang cần, và nạp sau khi trang rảnh nếu hiệu ứng không nằm ở màn hình đầu.
-
-**Tiêu chí nghiệm thu:**
-- [ ] Trang chủ: CSS ≤ 60 KB br, JS ≤ 180 KB br, không tác vụ dài nào trên 200 ms lúc tải (ghi số trước–sau)
-- [ ] Ảnh chụp 6 mẫu trang trước–sau không khác nhau (so ảnh tự động)
-- [ ] Mọi biểu tượng đang dùng vẫn hiển thị (không còn ô vuông lỗi font)
-
-**Kiểm chứng:**
-- [ ] `npm run build` ghi dung lượng; `npm run test:e2e -- visual`
-
-**Phụ thuộc:** Checkpoint E (làm được trước T39)
-
-**File dự kiến:** `src/app/globals.scss`, `src/app/assets/sass/utilities/_bootstrap.scss`, `src/components/shared/wrappers/ClientWrapper.js`, `tests/e2e/visual.spec.ts`
-
-**Quy mô:** M
-
----
-
 ### T41b: Đo toàn site, ngân sách ảnh và Lighthouse CI
 
-**Mô tả:** Phần sửa ảnh đã tách sang T41c (sửa nhanh) và T41d (Image Transformations của Cloudflare) ngày 04/11, cả hai đã xong. Ảnh mới tải lên do T30 lo. T41b chỉ còn:
-- Font: hiện trang chủ preload 20 file và tải 26 file, khoảng 708 KB (đo 04/11; divineshop.vn không tải font web nào). Các preload này tranh băng thông với ảnh hero. Chỉ preload tối đa 2 file (bộ chữ tiếng Việt của font thân bài và font tiêu đề); chỉ giữ bộ chữ latin và tiếng Việt, bỏ độ đậm không dùng.
+**Mô tả:** Phần sửa ảnh đã tách sang T41c (sửa nhanh) và T41d (Image Transformations của Cloudflare) ngày 04/11, cả hai đã xong. Ảnh mới tải lên do T30 lo; font chuyển sang T41f. T41b chỉ còn:
 - Lighthouse CI cho 6 mẫu trang, có ngân sách: ảnh tải trước khi cuộn ≤ 1,5 MB mỗi trang, không ảnh nào lớn hơn 2 lần cỡ hiển thị; CSS và JS theo ngân sách của T41a; font ≤ 150 KB.
 - axe cho mọi route công khai và admin.
 
 **Tiêu chí nghiệm thu:**
 - [ ] LCP và CLS đạt mục tiêu đã chốt ở Checkpoint B (mặc định LCP < 2,0 s, CLS = 0, mô phỏng 4G di động)
 - [ ] Lighthouse CI báo lỗi khi một trang vượt ngân sách ảnh, CSS, JS hoặc font
-- [ ] Mọi trang preload tối đa 2 file font; tổng font tải ở trang chủ ≤ 150 KB
+- [ ] Mọi trang giữ ngân sách font của T41f (tối đa 2 file preload, ≤ 150 KB)
 - [ ] axe 0 lỗi nghiêm trọng trên mọi mẫu trang
 
 **Kiểm chứng:**
 - [ ] `npx lhci autorun` trên `v2.`
 - [ ] `npm run test:e2e -- a11y`
 
-**Phụ thuộc:** T41a, T41d
+**Phụ thuộc:** T41a, T41d, T41f
 
-**File dự kiến:** `lighthouserc.json`, `src/app/layout.js` (preload font), `tests/e2e/a11y.spec.ts`
+**File dự kiến:** `lighthouserc.json`, `tests/e2e/a11y.spec.ts`
 
 **Quy mô:** M
 

@@ -202,8 +202,9 @@ gói Bexon (zip) + design-system/tokens.css          T21 Admin cũ → quantri. 
   T20 SEO trước ra mắt                            └─ T24 Repository D1 (chỉ v2)
   T41d Ảnh qua Image Transformations (đã xong)          ├─ T25 Lượt xem theo ngày (bật luôn trên www)
   T21 (đã xong) ─┐                                     └─ T26 Đăng ký khóa tu (bật ở T39)
+  T41f Font, hiệu ứng khởi động sau ─ T41a Gọn CSS, bớt hydrate
   T41e Cache HTML/RSC ở edge (cần T19)
-  T22 Kiểm thử + chuyển www ◄─┘ (cần T19, T20, T41d, T41e)
+  T22 Kiểm thử + chuyển www ◄─┘ (cần T19, T20, T41d, T41f, T41a, T41e)
   ══ Checkpoint E: ra mắt www ══                  ══ Checkpoint F ══
                                                         └─ ADMIN MỚI
                                                            T27a Access + RBAC + nhật ký ─ T27b Khung giao diện
@@ -216,12 +217,12 @@ gói Bexon (zip) + design-system/tokens.css          T21 Admin cũ → quantri. 
                                                            └─ T38 Cấu hình · T38b Sao lưu D1   ══ Checkpoint I ══
 CHUYỂN HẲN: T39 Đóng băng admin cũ → nhập lần cuối → www đọc D1 → admin mới (cần E + I)
             T40 Hỏi AI (cần thông tin Dify)
-            T41a Gọn CSS/JS (làm được từ sau E) ─ T41b Đo toàn site, ngân sách ảnh   ══ Checkpoint J ══
+            T41b Đo toàn site, ngân sách (cần T41a, T41f)   ══ Checkpoint J ══
 ```
 
 ## Danh sách task
 
-Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu, cách kiểm chứng, file dự kiến, quy mô) nằm trong [todo.md](todo.md). Task có hậu tố a/b được tách từ một task lớn để mỗi phần ≤ 5 file. Tổng cộng 51 task, 10 checkpoint.
+Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu, cách kiểm chứng, file dự kiến, quy mô) nằm trong [todo.md](todo.md). Task có hậu tố a/b được tách từ một task lớn để mỗi phần ≤ 5 file. Tổng cộng 53 task, 10 checkpoint.
 
 ### Giai đoạn 1 – Nền móng
 - [x] T1: Chạy nguyên trạng Bexon trên Cloudflare Workers (`v2.`)
@@ -260,7 +261,9 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [ ] T20: SEO trước ra mắt
 - [ ] T21: Đưa admin cũ sang `quantri.tunglamhoaphuc.com` sau Cloudflare Access (làm được ngay, giải quyết HT-01)
 - [x] T41d: Ảnh nội dung qua Image Transformations của Cloudflare (điều kiện của T22; đổi từ bản thu nhỏ trên R2, xong 04/11)
-- [ ] T41e: Cache HTML và RSC ở edge (sau T19, điều kiện của T22)
+- [ ] T41f: Font, icon font, hiệu ứng khởi động sau và ảnh tĩnh (đợt 1 tối ưu hiệu suất, thêm 04/11; điều kiện của T22)
+- [ ] T41a: Gọn CSS, icon font và bớt phần phải hydrate (đợt 2; kéo lên từ giai đoạn 6 ngày 04/11, điều kiện của T22)
+- [ ] T41e: Cache HTML và RSC ở edge (đợt 3, sau T19, điều kiện của T22)
 - [ ] T22: Kiểm thử trước ra mắt và chuyển `www`
 - [ ] **Checkpoint E** – ra mắt `www`, theo dõi 48 giờ
 
@@ -293,7 +296,6 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 ### Giai đoạn 6 – Chuyển hẳn và hoàn thiện
 - [ ] T39: Chuyển hẳn sang D1 và admin mới
 - [ ] T40: Khối "Hỏi AI Hòa Phúc"
-- [ ] T41a: Gọn CSS, icon font và JavaScript hiệu ứng
 - [ ] T41b: Đo toàn site, ngân sách ảnh và Lighthouse CI
 - [ ] **Checkpoint J** – hoàn tất, tắt admin cũ và WordPress theo kế hoạch Cloudflare
 
@@ -306,7 +308,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - **Ảnh:** T41c và T41d đã xong ngày 04/11. Còn chân dung, tác phẩm ở trang tượng và ảnh chèn trong thân bài (ghi ở T41d).
 - **Sau Checkpoint D:** giai đoạn 3 (ra mắt) và giai đoạn 4 (D1) chạy song song.
 - **Sau Checkpoint G:** T32, T33, T34, T36, T38, T38b song song; T35 chờ T34 (dùng chung trường lặp), T37 chờ T36.
-- **Sau Checkpoint E:** T41a làm được bất cứ lúc nào (không đổi giao diện).
+- **Hiệu suất:** T41f làm ngay, rồi T41a (đo riêng từng đợt); T41e sau T19. Cả ba trước T22. Không đổi giao diện, giữ hiệu ứng.
 - **T40** làm được bất cứ lúc nào sau khi có thông tin Dify; theo quyết định thì xếp sau ra mắt.
 
 ## Rủi ro và cách xử lý
@@ -318,6 +320,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 | Giữ hiệu ứng làm khó người lớn tuổi, trình đọc màn hình, người dùng bàn phím | Cao | Công tắc giảm chuyển động (T2); slider có nút dừng; kiểm cuộn bàn phím, liên kết neo, tìm trong trang khi bật cuộn mượt; test canh gác chạy mọi trang |
 | Đảo ngược UX-01, UX-03 đang "Đã chốt" | TB | Chuẩn bị #6: cập nhật bảng khảo sát, báo Ban Trị Sự; T3b sửa BRAND-GUIDELINES mục 1.2, 5.6 cho khớp |
 | Preloader + GSAP + CSS nặng làm trượt mục tiêu LCP < 2,0 s (UX-03) | TB | Đo mốc ở Checkpoint B; preloader ẩn ngay khi có nội dung đầu tiên; nếu vẫn trượt, chủ dự án chọn giữa preloader và mục tiêu LCP (Câu hỏi mở #6); T41a cắt Bootstrap và icon font |
+| Điểm hiệu suất trên điện thoại thấp khi ra mắt `www` (PageSpeed 44 ngày 04/11: LCP 7,4 s, TBT 1.380 ms), ảnh hưởng Core Web Vitals và thứ hạng tìm kiếm | **Cao** | Ba đợt trước T22: T41f (font 722 → ≤ 150 KB, GSAP khởi động sau lần vẽ đầu), T41a (CSS 199 → ≤ 60 KB, bớt hydrate), T41e (cache HTML ở edge). Mục tiêu PageSpeed điện thoại ≥ 80, LCP < 2,5 s, TBT < 300 ms. Không thêm tag quảng cáo, đo lường bên thứ ba (nguồn TBT của divineshop.vn) |
 | Ảnh gốc máy ảnh (6048 px, 7–9 MB) được đưa thẳng cho khách. Đo 04/11 trên `v2.` (điện thoại 4G): LCP trang bài 47,9 s, trang danh sách 11,9 s, trang chủ 8,4 s. Admin cũ không nén ảnh, nên bài mới nào cũng thêm ảnh nặng | TB (đã giảm từ Cao) | T41c và T41d đã xong 04/11: ảnh qua Image Transformations, trang bài còn 186 KB ảnh, LCP 4,6 s. Còn lại: quá 5.000 lần biến đổi mỗi tháng thì ảnh mới về ảnh gốc (theo dõi trang Usage; nếu thường xuyên vượt thì chủ tài khoản cân nhắc gói Images trả phí, 0,5 USD mỗi 1.000 lần); trang tượng và ảnh trong thân bài chưa đổi; T41b đặt ngân sách ảnh trong Lighthouse CI |
 | Đọc JSON trên B2 đúng lúc admin cũ đang ghi đè file | TB | Parse lỗi thì giữ bản trang cũ (ISR không thay); log lỗi; nút "Làm mới site" ở `/van-hanh/lam-moi` |
 | ISR cần bộ đệm dữ liệu (vinext dùng KV); tải lại ~12 MB JSON cho mỗi trang sẽ chậm | TB | T19 bật bộ đệm KV; mỗi file JSON tải 1 lần mỗi chu kỳ theo `ETag` |
@@ -363,6 +366,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 |---|---|
 | 1 | Bản đầu: dựng mới, chuyển mã Bexon sang TypeScript + Tailwind, bỏ hiệu ứng |
 | 2 | Giữ Bootstrap/SCSS của Bexon, đổi theme qua cầu nối biến `--tj-*` → `--tlhp-*`; xem thử trên `v2.` |
+| 9 | 04/11, sau báo cáo PageSpeed điện thoại 44 điểm và đo đối chiếu với divineshop.vn (Lighthouse 13.6): thêm T41f (font, icon font, hiệu ứng khởi động sau, ảnh tĩnh); kéo T41a lên giai đoạn 3 và thêm phần bớt hydrate, CSS màn hình đầu; font chuyển từ T41b sang T41f; T22 cần thêm T41f, T41a; thêm rủi ro điểm hiệu suất |
 | 8 | 04/11, chủ dự án chọn xử lý ảnh bằng Cloudflare, không phụ thuộc bucket R2 `tlhp-media` và tên miền `media.`: T41d đổi sang Image Transformations của zone (đã bật, nguồn "This zone only", ảnh B2 qua `/anh-goc/`); quyết định 8 viết lại; chuẩn bị #7 bỏ; T30 chỉ cần một bản ≤ 2560px; T41b không còn phụ thuộc bản thu nhỏ trên R2 |
 | 7 | 04/11, sau khi so với divineshop.vn: thêm T41e (cache HTML và RSC ở edge, trước T22) vì mỗi lượt xem đang dựng lại trang (TTFB 0,35–2,7 s); ghi ngân sách cụ thể cho T41a (CSS ≤ 60 KB br, JS ≤ 180 KB br) và T41b (≤ 2 preload font, font ≤ 150 KB); T22 cần thêm T41e |
 | 6 | 04/11, sau review tốc độ tải trang: tách phần ảnh của T41 thành T41c (sửa nhanh, trước T16) và T41d (bản thu nhỏ trên R2, trước T22); T41b chỉ còn đo và ngân sách; quyết định 8 đổi sang bản thu nhỏ tạo sẵn thay cho Image Transformations; cập nhật T22, T30, T39; thêm chuẩn bị #7 và rủi ro ảnh |
