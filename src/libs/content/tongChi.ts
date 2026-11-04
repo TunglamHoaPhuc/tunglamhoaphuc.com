@@ -4,9 +4,9 @@
 // turned into HTML only when a page asks for one (tongChiBody.ts says why they need work).
 import { z } from "zod";
 import { isUnsavedUpload, mediaUrl } from "./media";
-import { cleanText, renderContent, toIsoDate } from "./normalize";
+import { bare, cleanText, renderContent, toIsoDate } from "./normalize";
 import { videosOf } from "./posts";
-import { bare, type BodyTarget, tongChiMarkdown } from "./tongChiBody";
+import { type BodyTarget, tongChiMarkdown } from "./tongChiBody";
 import type { ContentIssue, GalleryImage, Keyword, MediaImage, TongChiArticle, TongChiSummary } from "./types";
 import { titleCase } from "../format";
 import { liveHref } from "../livePaths";

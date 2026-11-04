@@ -4,7 +4,7 @@
 // /gioi-thieu/su-phu-tru-tri carried Thích Tâm Hòa's title over Đại sư Liên Đăng's life.
 import { z } from "zod";
 import { mediaUrl } from "./media";
-import { cleanText, renderContent } from "./normalize";
+import { bare, cleanText, renderContent } from "./normalize";
 import type { AboutTopic, ContentIssue, GalleryImage, MediaImage, Milestone } from "./types";
 
 const text = z.string().catch("");
@@ -62,16 +62,6 @@ function image(url: string, position: string): MediaImage | null {
 	const src = mediaUrl(url);
 	return src ? { src, position: position.trim() || "center 50%" } : null;
 }
-
-/** Letters only, without marks, for comparing names however they are spelled ("Hoà", "Hòa"). */
-const bare = (value: string) =>
-	value
-		.normalize("NFD")
-		.replace(/\p{M}/gu, "")
-		.replace(/[đĐ]/g, "d")
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, " ")
-		.trim();
 
 /** Who or what a topic is about: the last two words of its title ("… Thích Tâm Hòa" → "tam hoa"). */
 const subjectOf = (title: string) => bare(title).split(" ").slice(-2).join(" ");

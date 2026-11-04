@@ -60,6 +60,16 @@ export function cleanText(text: string): string {
 	return decodeEntities(text).replace(BROKEN_CHARACTER, "");
 }
 
+/** Letters only, without marks: "Bồ Đề tâm" → "bo de tam", for comparing names however they are spelled ("Hoà", "Hòa"). */
+export const bare = (value: string) =>
+	value
+		.normalize("NFD")
+		.replace(/\p{M}/gu, "")
+		.replace(/[đĐ]/g, "d")
+		.toLowerCase()
+		.replace(/[^a-z0-9]+/g, " ")
+		.trim();
+
 export function escapeHtml(text: string): string {
 	return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }

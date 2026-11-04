@@ -8,22 +8,12 @@
 // author as quotes, lines in capitals as headings, emoji lines as lists, the items of an
 // infographic as a list, and "Tìm hiểu thêm về X ->" as a link to X's page.
 import { isUnsavedUpload } from "./media";
-import { cleanText } from "./normalize";
+import { bare, cleanText } from "./normalize";
 
 /** An article a body may point to. */
 export type BodyTarget = { slug: string; title: string; group: string };
 
 export type TongChiBody = { markdown: string; notes: string[] };
-
-/** Letters only, without marks: "Bồ Đề tâm" → "bo de tam". */
-export const bare = (value: string) =>
-	value
-		.normalize("NFD")
-		.replace(/\p{M}/gu, "")
-		.replace(/[đĐ]/g, "d")
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, " ")
-		.trim();
 
 const isCaps = (text: string) => {
 	const letters = text.replace(/[^\p{L}]/gu, "");

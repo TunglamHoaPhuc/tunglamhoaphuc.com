@@ -5,8 +5,7 @@
 import { z } from "zod";
 import { titleCase } from "../format";
 import { mediaUrl } from "./media";
-import { cleanText, renderContent } from "./normalize";
-import { bare } from "./tongChiBody";
+import { bare, cleanText, renderContent } from "./normalize";
 import type { Area, ContentIssue, MediaImage, StatueSummary } from "./types";
 
 const text = z.string().catch("");
