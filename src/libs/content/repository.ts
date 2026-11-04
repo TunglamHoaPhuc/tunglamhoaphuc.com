@@ -1,7 +1,7 @@
 // The one door pages use to read content: `await getContentRepository()`. Filtering,
 // sorting and paging happen here on the server, so a list page sends 12 posts, not 472.
 import { type TongChiEntry, tongChiArticle, tongChiSummary } from "./tongChi";
-import type { AboutTopic, CategoryCount, ContentRepository, GalleryImage, Page, Post, PostSort, PostSummary, Schedule, TongChiArticle } from "./types";
+import type { AboutTopic, Area, CategoryCount, ContentRepository, GalleryImage, Page, Post, PostSort, PostSummary, Schedule, StatueSummary, TongChiArticle } from "./types";
 
 export const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 60;
@@ -39,18 +39,27 @@ export type MemoryRepositoryOptions = {
 	loadAbout?: () => Promise<AboutTopic[]>;
 	/** Tông Chỉ Tu Học, loaded the first time a page asks for it. */
 	loadTongChi?: () => Promise<TongChiEntry[]>;
+	/** Vũ Trụ Phật Giáo's areas, loaded the first time a page asks for them. */
+	loadAreas?: () => Promise<Area[]>;
+	/** Bảo Tượng's statues, loaded the first time a page asks for them. */
+	loadStatues?: () => Promise<StatueSummary[]>;
 };
 
 const EMPTY_SCHEDULE: Schedule = { events: [], programs: [], themes: [], quotes: [] };
 
 /** A repository over posts already in memory (the snapshot today, B2 at launch). */
-export function createMemoryRepository(posts: Post[], { loadAlbums, loadSchedule, loadAbout, loadTongChi }: MemoryRepositoryOptions = {}): ContentRepository {
+export function createMemoryRepository(
+	posts: Post[],
+	{ loadAlbums, loadSchedule, loadAbout, loadTongChi, loadAreas, loadStatues }: MemoryRepositoryOptions = {},
+): ContentRepository {
 	const bySlug = new Map(posts.map((post) => [slugKey(post.slug), post]));
 	const summaries = posts.map(toSummary);
 	let albums: Promise<Map<string, GalleryImage[]>> | undefined;
 	let schedule: Promise<Schedule> | undefined;
 	let about: Promise<AboutTopic[]> | undefined;
 	let tongChi: Promise<TongChiEntry[]> | undefined;
+	let areas: Promise<Area[]> | undefined;
+	let statues: Promise<StatueSummary[]> | undefined;
 	// Bodies are turned into HTML one page at a time, once each.
 	const tongChiPages = new Map<string, TongChiArticle>();
 	const tongChiEntries = () => (tongChi ??= loadTongChi ? loadTongChi() : Promise.resolve([]));
@@ -117,6 +126,16 @@ export function createMemoryRepository(posts: Post[], { loadAlbums, loadSchedule
 			tongChiPages.set(key, article);
 			return article;
 		},
+
+		listAreas() {
+			areas ??= loadAreas ? loadAreas() : Promise.resolve([]);
+			return areas;
+		},
+
+		listStatues() {
+			statues ??= loadStatues ? loadStatues() : Promise.resolve([]);
+			return statues;
+		},
 	};
 }
 
@@ -136,12 +155,16 @@ export function getContentRepository(): Promise<ContentRepository> {
 	repository ??= (async () => {
 		const source = contentSource();
 		if (source !== "snapshot") throw new Error(`Nguồn "${source}" chưa có (b2: T19, d1: chuyển hẳn).`);
-		const { loadSnapshotAbout, loadSnapshotAlbums, loadSnapshotPosts, loadSnapshotSchedule, loadSnapshotTongChi } = await import("./sources/snapshot");
+		const { loadSnapshotAbout, loadSnapshotAlbums, loadSnapshotAreas, loadSnapshotPosts, loadSnapshotSchedule, loadSnapshotStatues, loadSnapshotTongChi } = await import(
+			"./sources/snapshot"
+		);
 		return createMemoryRepository((await loadSnapshotPosts()).posts, {
 			loadAlbums: loadSnapshotAlbums,
 			loadSchedule: async () => (await loadSnapshotSchedule()).schedule,
 			loadAbout: async () => (await loadSnapshotAbout()).topics,
 			loadTongChi: async () => (await loadSnapshotTongChi()).entries,
+			loadAreas: async () => (await loadSnapshotAreas()).areas,
+			loadStatues: async () => (await loadSnapshotStatues()).statues,
 		});
 	})().catch((error) => {
 		// Try again on the next request rather than keep a failed load forever.

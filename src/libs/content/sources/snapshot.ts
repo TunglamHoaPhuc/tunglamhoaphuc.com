@@ -5,6 +5,7 @@ import { type ParsedAbout, parseAbout } from "../about";
 import { type ParsedPosts, parsePosts, toGallery } from "../posts";
 import { type ParsedSchedule, parseSchedule } from "../schedule";
 import { type ParsedTongChi, parseTongChi } from "../tongChi";
+import { type ParsedAreas, type ParsedStatues, parseAreas, parseStatues } from "../vuTru";
 import { rawPostSchema } from "../schema";
 import type { GalleryImage } from "../types";
 
@@ -48,6 +49,16 @@ export async function loadSnapshotAbout(): Promise<ParsedAbout> {
 /** tong-chi.json (Tông Chỉ Tu Học); no articles when the file is not there. */
 export async function loadSnapshotTongChi(): Promise<ParsedTongChi> {
 	return parseTongChi((await readSnapshotFile("tong-chi")) ?? []);
+}
+
+/** vu-tru.json (Vũ Trụ Phật Giáo); no areas when the file is not there. */
+export async function loadSnapshotAreas(): Promise<ParsedAreas> {
+	return parseAreas((await readSnapshotFile("vu-tru")) ?? []);
+}
+
+/** bao-tuong.json (Bảo Tượng Phật Giáo); no statues when the file is not there. */
+export async function loadSnapshotStatues(): Promise<ParsedStatues> {
+	return parseStatues((await readSnapshotFile("bao-tuong")) ?? []);
 }
 
 /** schedule.json (lịch tu học); an empty schedule when the file is not there. */

@@ -8,6 +8,8 @@ import { parsePosts } from "../src/libs/content/posts";
 import { parseAbout } from "../src/libs/content/about";
 import { parseSchedule } from "../src/libs/content/schedule";
 import { parseTongChi, tongChiArticle } from "../src/libs/content/tongChi";
+import { parseAreas, parseStatues } from "../src/libs/content/vuTru";
+import { vuTru } from "../src/config/vuTru";
 import { postsFileSchema } from "../src/libs/content/schema";
 import type { ContentIssue } from "../src/libs/content/types";
 
@@ -34,6 +36,9 @@ const ISSUE_TITLES: Record<ContentIssue["kind"], string> = {
 	"about-mismatch": "Giới thiệu: tiêu đề và nội dung nói về hai người/việc khác nhau (Ban Biên Tập sửa trong admin cũ)",
 	"tong-chi-draft": "Tông Chỉ: nội dung còn là bản dặn dàn trang (đã bỏ các dòng ghi chú; Ban Biên Tập nên viết lại)",
 	"unsaved-image": "Ảnh WordPress chưa từng tải lên (đường dẫn soạn sẵn, trả 404; trang hiện như không có ảnh)",
+	"area-pin": "Vũ Trụ: vị trí ghim trong admin (mapPos) lệch bản đồ; site dùng vị trí trong src/config/vuTru.ts",
+	"statue-area": "Bảo Tượng: mã khu vực của tượng không ứng với khu vực nào (tượng không hiện ở trang khu vực)",
+	"statue-code": "Bảo Tượng: mã TP của tượng thiếu hoặc không khớp đuôi slug",
 };
 const EXAMPLES = 5;
 
@@ -111,6 +116,42 @@ if (existsSync(tongChiPath)) {
 	console.log(`
 tong-chi.json: ${entries.length} bài (${[...groups].map(([name, n]) => `${name}: ${n}`).join(", ")})`);
 	issues = [...issues, ...tongChiIssues, ...drafts];
+}
+
+// Vũ Trụ Phật Giáo and its statues, from npm run snapshot:fetch. The map's pins come from
+// src/config/vuTru.ts; an admin mapPos far from them is reported, as is a statue whose area
+// code no area claims.
+const areasPath = resolve("data/snapshot/vu-tru.json");
+if (existsSync(areasPath)) {
+	const { areas, issues: areaIssues } = parseAreas(JSON.parse(readFileSync(areasPath, "utf8")));
+	const own = areas.filter((area) => area.temple === vuTru.temple);
+	const pinned = vuTru.pins.map((pin) => pin.slug);
+	for (const area of own) {
+		const pin = vuTru.pins.find((item) => item.slug === area.slug);
+		if (!pin) areaIssues.push({ kind: "area-pin", id: area.slug, message: "chưa có chỗ trên bản đồ (thêm vào pins)" });
+		else if (area.mapPos && Math.max(Math.abs(area.mapPos.x - pin.x), Math.abs(area.mapPos.y - pin.y)) > 5) {
+			areaIssues.push({ kind: "area-pin", id: area.slug, message: `admin ${area.mapPos.x}%, ${area.mapPos.y}% · bản đồ ${pin.x}%, ${pin.y}%` });
+		}
+	}
+	for (const slug of pinned) if (!own.some((area) => area.slug === slug)) areaIssues.push({ kind: "area-pin", id: slug, message: "có ghim nhưng không còn khu vực" });
+	// Another temple's areas are left out by design; a blank or mistyped temple would vanish too.
+	for (const area of areas) if (area.temple !== vuTru.temple) areaIssues.push({ kind: "area-pin", id: area.slug, message: `tự viện "${area.temple}" (không hiện trên site)` });
+	console.log(
+		`\nvu-tru.json: ${areas.length} khu vực, ${own.length} của Tùng Lâm Hòa Phúc; site mới hiện cả ${own.length} (lưới của site cũ dừng ở 12 bản ghi đầu, bản đồ và trang riêng của nó có đủ)`,
+	);
+	issues = [...issues, ...areaIssues];
+}
+
+// Bảo Tượng's statues: the area codes no area claims (their statues show on no area page).
+const statuesPath = resolve("data/snapshot/bao-tuong.json");
+if (existsSync(statuesPath)) {
+	const { statues, issues: statueIssues } = parseStatues(JSON.parse(readFileSync(statuesPath, "utf8")));
+	const claimed = new Set(Object.values(vuTru.statueAreas).flat());
+	const loose = new Map<string, number>();
+	for (const statue of statues) if (!claimed.has(statue.areaCode)) loose.set(statue.areaCode, (loose.get(statue.areaCode) ?? 0) + 1);
+	for (const [code, n] of loose) statueIssues.push({ kind: "statue-area", id: code || "(trống)", message: `${n} tượng` });
+	console.log(`bao-tuong.json: ${statues.length} tôn tượng, ${statues.filter((statue) => statue.main).length} tượng chính`);
+	issues = [...issues, ...statueIssues];
 }
 
 // The schedule (lịch tu học), from npm run snapshot:fetch.

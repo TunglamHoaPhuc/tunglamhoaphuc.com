@@ -184,6 +184,42 @@ export type TongChiArticle = TongChiSummary & {
 	keywords: Keyword[];
 };
 
+/** An area of the temple, a stop on the Vũ Trụ Phật Giáo map. */
+export type Area = {
+	id: string;
+	slug: string;
+	/** "Tam Bảo" (the editors write names in capitals). */
+	name: string;
+	/** "Đại Hùng Bảo Điện". */
+	subtitle: string;
+	/** The temple it belongs to: "tung-lam-hoa-phuc" (the admin is made for several). */
+	temple: string;
+	cover: MediaImage | null;
+	/** Where the editors placed its pin, in % of the map picture. */
+	mapPos: { x: number; y: number } | null;
+	/** A sentence or two. */
+	intro: string;
+	/** Sanitised HTML, safe to render as is; empty when it only repeats the intro. */
+	contentHtml: string;
+};
+
+/** A statue (tôn tượng) as lists and area pages show it. */
+export type StatueSummary = {
+	id: string;
+	/** "TP0001"; a few have none. */
+	code: string;
+	slug: string;
+	name: string;
+	subtitle: string;
+	/** Its area in the Bảo Tượng file ("tam_bao"), which is not an area slug (config/vuTru.ts). */
+	areaCode: string;
+	/** A main statue (TƯỢNG CHÍNH), with a page of its own; the others are works of Buddhist art. */
+	main: boolean;
+	image: MediaImage | null;
+	/** Its address, the old site's: /bao-tuong/{slug}, the slug ending in its code. */
+	href: string;
+};
+
 /** Read-only access to the temple's content, whatever the source. */
 export interface ContentRepository {
 	listPosts(query?: PostQuery): Promise<Page<PostSummary>>;
@@ -197,6 +233,10 @@ export interface ContentRepository {
 	listTongChi(): Promise<TongChiSummary[]>;
 	/** `null` when no published article has this slug. */
 	getTongChi(slug: string): Promise<TongChiArticle | null>;
+	/** Vũ Trụ Phật Giáo: the areas of every temple, in the editors' order. */
+	listAreas(): Promise<Area[]>;
+	/** Bảo Tượng Phật Giáo, in the editors' order. */
+	listStatues(): Promise<StatueSummary[]>;
 }
 
 /** Something wrong or odd in the source data, for `npm run snapshot:check`. */
@@ -217,7 +257,10 @@ export type ContentIssue = {
 		| "other-bucket"
 		| "about-mismatch"
 		| "tong-chi-draft"
-		| "unsaved-image";
+		| "unsaved-image"
+		| "area-pin"
+		| "statue-area"
+		| "statue-code";
 	id: string;
 	message: string;
 };

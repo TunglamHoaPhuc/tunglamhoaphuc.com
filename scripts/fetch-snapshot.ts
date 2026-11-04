@@ -12,6 +12,10 @@
 // the endpoint the old home page reads, into data/snapshot/schedule.json as the API sends it;
 // the Giới thiệu topics into data/snapshot/gioi-thieu.json and Tông Chỉ Tu Học into
 // data/snapshot/tong-chi.json the same way.
+//
+// Vũ Trụ Phật Giáo (the areas) and Bảo Tượng (the statues) are read on the old site's
+// server, not from visitors' browsers; their GET endpoints are plain reads the admin guard
+// lets through (docs/van-hanh/admin-cu.md), unlike vu-tru/sync-wp, which is never called.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const ORIGIN = "https://www.tunglamhoaphuc.com";
@@ -21,6 +25,8 @@ const ALBUMS_OUT = "data/snapshot/post-albums.json";
 const SCHEDULE_OUT = "data/snapshot/schedule.json";
 const ABOUT_OUT = "data/snapshot/gioi-thieu.json";
 const TONG_CHI_OUT = "data/snapshot/tong-chi.json";
+const VU_TRU_OUT = "data/snapshot/vu-tru.json";
+const BAO_TUONG_OUT = "data/snapshot/bao-tuong.json";
 const AT_ONCE = 3;
 
 type RawPost = { id: string; slug: string; galleryCount?: number; photoGallery?: unknown[] };
@@ -94,8 +100,18 @@ async function fetchTongChi() {
 	console.log(`${TONG_CHI_OUT}: ${file.data?.length ?? 0} bài`);
 }
 
+async function fetchVuTru() {
+	const areas = await get<{ areas?: unknown[] }>("/api/admin/vu-tru");
+	writeFileSync(VU_TRU_OUT, JSON.stringify(areas));
+	console.log(`${VU_TRU_OUT}: ${areas.areas?.length ?? 0} khu vực`);
+	const statues = await get<{ statues?: unknown[] }>("/api/admin/bao-tuong");
+	writeFileSync(BAO_TUONG_OUT, JSON.stringify(statues));
+	console.log(`${BAO_TUONG_OUT}: ${statues.statues?.length ?? 0} tôn tượng`);
+}
+
 const posts = await fetchPosts();
 await fetchSchedule();
 await fetchAbout();
 await fetchTongChi();
+await fetchVuTru();
 if (process.argv.includes("--albums")) await fetchAlbums(posts);
