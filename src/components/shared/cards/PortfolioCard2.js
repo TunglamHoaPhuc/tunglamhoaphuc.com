@@ -1,34 +1,35 @@
 import Link from "next/link";
+import { areaHref } from "@/libs/vuTru";
 
-const PortfolioCard2 = ({ portfolio }) => {
-	const {
-		title = "Event Management Platform",
-		img2 = "/images/project/project-1.webp",
-		shortDesc,
-		id,
-		dataFilter,
-		category = "Connect",
-	} = portfolio ? portfolio : {};
+/**
+ * Bexon's large project slide as an area of the temple: its picture, then on hover or focus
+ * its number, name and arrow (on phones these show at once).
+ * @param {{ area: import("@/libs/vuTru").AreaTeaser }} props
+ */
+const PortfolioCard2 = ({ area }) => {
+	const href = areaHref(area.slug);
 	return (
-		<div className="project-item">
-			<div
-				className="project-img"
-				style={{ backgroundImage: `url(${img2})` }}
-			></div>
+		<article className="project-item tlhp-area-slide">
+			<div className="project-img">
+				{area.cover ? (
+					<img src={area.cover.src} alt="" width={900} height={600} loading="lazy" decoding="async" style={{ objectPosition: area.cover.position }} />
+				) : null}
+			</div>
 			<div className="project-content">
 				<span className="categories">
-					<Link href={`/portfolios/${id}`}>{category}</Link>
+					<span className="tlhp-chip">Khu vực {area.number}</span>
 				</span>
 				<div className="project-text">
 					<h3 className="title">
-						<Link href={`/portfolios/${id}`}>{title}</Link>
+						<Link href={href}>{area.name}</Link>
 					</h3>
-					<Link className="project-btn" href={`/portfolios/${id}`}>
+					{area.subtitle ? <p className="tlhp-area-subtitle">{area.subtitle}</p> : null}
+					<Link className="project-btn" href={href} tabIndex={-1} aria-hidden="true">
 						<i className="tji-arrow-right-big"></i>
 					</Link>
 				</div>
 			</div>
-		</div>
+		</article>
 	);
 };
 

@@ -17,6 +17,8 @@ const PAGES = [
 	"/gioi-thieu/tieu-su-su-to",
 	"/tong-chi-tu-hoc",
 	"/tong-chi-tu-hoc/niem-phat-phuong-phap-tro-hanh",
+	"/vu-tru-phat-giao",
+	"/vu-tru-phat-giao/tam-bao",
 ];
 
 type SliderElement = HTMLElement & { swiper?: { autoplay?: { running?: boolean } } };

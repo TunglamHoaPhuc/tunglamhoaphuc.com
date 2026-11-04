@@ -81,14 +81,15 @@ test.describe("home page content", () => {
 			'class="tj-blog-section-2',
 			'aria-labelledby="loi-chao"',
 			'aria-labelledby="tong-chi-tieu-de"',
+			'aria-labelledby="khu-vuc-noi-bat"',
 			'aria-labelledby="lo-trinh-tieu-de"',
 			'id="loi-thay-day"',
 			'aria-labelledby="chu-ton-duc"',
 		].map((marker) => html.indexOf(marker));
 		expect(order.every((at) => at > 0)).toBe(true);
 		expect([...order].sort((a, b) => a - b)).toEqual(order);
-		// Bexon's sample blocks wait for their tasks (T15); its texts are gone.
-		expect(html).not.toMatch(/Leading Future|Our Pricing|Hear from Our|Get to Know Us|happy customer|People Behind|Meet Our Team|Our Solutions|Our Process|Seamless Process/);
+		// Bexon's sample texts are gone.
+		expect(html).not.toMatch(/Leading Future|Our Pricing|Hear from Our|Get to Know Us|happy customer|People Behind|Meet Our Team|Our Solutions|Our Process|Seamless Process|Proud Projects|Breaking Boundaries/);
 	});
 
 	// The countdowns follow the day: a copy kept from the first visit (vinext caches pages it
@@ -279,6 +280,21 @@ test.describe("home page content", () => {
 		await expect(steps).toHaveCount(4);
 		await expect(steps.locator("h3 a")).toHaveText(["Dành cho người mới bắt đầu", "Dành cho người trẻ", "Dành cho người bận rộn", "Dành cho người chuyên tu"]);
 		await expect(steps.first().locator("h3 a")).toHaveAttribute("href", "/tong-chi-tu-hoc/lo-trinh-tu-hoc-nguoi-moi-bat-dau");
+	});
+
+	test("Khu vực nổi bật slides the 14 areas in map order, each leading to its page", async ({ page }) => {
+		await open(page);
+		const block = page.locator(".tlhp-area-slider");
+		await expect(block.getByRole("heading", { level: 2, name: "Khu vực nổi bật." })).toBeVisible();
+		await expect(block.locator(".tlhp-area-slide")).toHaveCount(14);
+		// In loop mode Swiper moves the slides around; each keeps its place in the list.
+		const slide = (index: number) => block.locator(`.swiper-slide[data-swiper-slide-index="${index}"] .tlhp-area-slide`);
+		await expect(slide(0).locator("h3 a")).toHaveAttribute("href", "/vu-tru-phat-giao/ho-phong-sinh");
+		await expect(slide(3).locator("h3 a")).toHaveText("Tam Bảo");
+		// Bexon shows a slide's name on hover; the focus shows it too.
+		await slide(3).locator("h3 a").focus();
+		await expect(slide(3).locator(".project-content")).toHaveCSS("opacity", "1");
+		await expect(block.getByRole("link", { name: "Xem sơ đồ 2D" })).toHaveAttribute("href", "/vu-tru-phat-giao");
 	});
 
 	test("passes axe WCAG A/AA on both tabs", async ({ page }) => {

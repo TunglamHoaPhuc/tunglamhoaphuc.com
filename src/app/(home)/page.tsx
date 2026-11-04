@@ -4,6 +4,7 @@ import About2 from "@/components/sections/about/About2";
 import Blogs2 from "@/components/sections/blogs/Blogs2";
 import Brands2 from "@/components/sections/brands/Brands2";
 import Hero2 from "@/components/sections/hero/Hero2";
+import Portfolios2 from "@/components/sections/portfolios/Portfolios2";
 import PricingPlan from "@/components/sections/pricing-plan/PricingPlan";
 import Process from "@/components/sections/process/Process";
 import Services2 from "@/components/sections/services/Services2";
@@ -34,7 +35,7 @@ const BLOCKS: Block[] = [
 	{ id: "tin-tuc", render: (data) => <Blogs2 latest={data.latest} popular={data.popular} /> },
 	{ id: "loi-chao", render: (data) => <About2 welcome={data.welcome} /> },
 	{ id: "tong-chi", render: (data) => <Services2 groups={data.tongChi} /> },
-	// T15: khu vực nổi bật (Portfolios2)
+	{ id: "khu-vuc", render: (data) => <Portfolios2 areas={data.areas} /> },
 	{ id: "lo-trinh", render: (data) => <Process group={data.paths ?? undefined} /> },
 	{ id: "loi-thay-day", render: (data) => <Testimonials2 verses={data.verses} /> },
 	{ id: "chu-ton-duc", render: (data) => <Team1 members={data.teachers} /> },
