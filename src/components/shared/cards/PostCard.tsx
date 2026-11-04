@@ -7,14 +7,12 @@ type Props = {
 	href: string;
 	/** Link of the category chip (the list filtered to that category). */
 	categoryHref: string;
-	/** For cards in the first row: their pictures load at once, the rest when scrolled to. */
-	eager?: boolean;
 };
 
 // Bexon's blog card (`.blog-item`) as the TLHP post card (BRAND-GUIDELINES 5.2): 4:3
 // picture with the date badge, then category chip, title and summary (3 lines each) and
 // the date and views.
-export default function PostCard({ post, href, categoryHref, eager = false }: Props) {
+export default function PostCard({ post, href, categoryHref }: Props) {
 	const badge = dateBadge(post.publishedDate);
 	return (
 		<article className="blog-item tlhp-post-card">
@@ -27,7 +25,7 @@ export default function PostCard({ post, href, categoryHref, eager = false }: Pr
 							alt=""
 							width={480}
 							height={360}
-							loading={eager ? "eager" : "lazy"}
+							loading="lazy"
 							decoding="async"
 							style={{ objectPosition: post.thumbnail.position }}
 						/>

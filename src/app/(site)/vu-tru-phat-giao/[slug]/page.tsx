@@ -10,6 +10,7 @@ import TempleMap from "@/components/sections/vu-tru/TempleMap";
 import HeaderSpace from "@/components/shared/others/HeaderSpace";
 import { site } from "@/config/site";
 import { vuTru } from "@/config/vuTru";
+import { topImagePriority } from "@/libs/content/media";
 import { getContentRepository } from "@/libs/content/repository";
 import type { StatueSummary } from "@/libs/content/types";
 import { areaHref, type MapArea, statuesIn, templeAreas } from "@/libs/vuTru";
@@ -95,7 +96,7 @@ export default async function VuTruArea({ params }: Props) {
 								</div>
 								{area.cover ? (
 									<div className="tlhp-article-banner">
-										<img src={area.cover.src} alt="" width={1200} height={675} style={{ objectPosition: area.cover.position }} fetchPriority="high" />
+										<img src={area.cover.src} alt="" width={1200} height={675} style={{ objectPosition: area.cover.position }} fetchPriority={topImagePriority(area.cover.src)} />
 									</div>
 								) : null}
 								{/* The long text mostly opens with the intro reworded, so the intro stands only alone. */}

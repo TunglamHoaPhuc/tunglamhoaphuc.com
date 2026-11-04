@@ -98,14 +98,11 @@ export default async function DongChayHoangPhap({ searchParams }: Props) {
 						<NoItems {...empty} />
 					) : (
 						<ul className="row row-gap-4 tlhp-post-grid">
-							{result!.items.map((post, index) => (
+							{/* No picture here loads ahead of the rest: an editor's photo can be a 7–9 MB
+							    camera original, and React would preload it before the CSS (T41c). */}
+							{result!.items.map((post) => (
 								<li key={post.id} className="col-12 col-md-6 col-xl-4">
-									<PostCard
-										post={post}
-										href={`${PATH}/${post.slug}`}
-										categoryHref={href({ category: post.category.slug, page: 1 })}
-										eager={index < 3}
-									/>
+									<PostCard post={post} href={`${PATH}/${post.slug}`} categoryHref={href({ category: post.category.slug, page: 1 })} />
 								</li>
 							))}
 						</ul>

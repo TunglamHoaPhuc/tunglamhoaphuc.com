@@ -138,10 +138,10 @@ const Contact2 = () => {
 				</div>
 			</div>
 			<div className="bg-shape-1">
-				<img src="/images/shape/pattern-2.svg" alt="" />
+				<img src="/images/shape/pattern-2.webp" alt="" />
 			</div>
 			<div className="bg-shape-2">
-				<img src="/images/shape/pattern-3.svg" alt="" />
+				<img src="/images/shape/pattern-3.webp" alt="" />
 			</div>
 		</section>
 	);

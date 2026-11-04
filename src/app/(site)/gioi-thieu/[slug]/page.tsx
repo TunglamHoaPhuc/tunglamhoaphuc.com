@@ -10,6 +10,7 @@ import Cta from "@/components/sections/cta/Cta";
 import HeroInner from "@/components/sections/hero/HeroInner";
 import HeaderSpace from "@/components/shared/others/HeaderSpace";
 import { site } from "@/config/site";
+import { topImagePriority } from "@/libs/content/media";
 import { getContentRepository } from "@/libs/content/repository";
 import type { AboutTopic } from "@/libs/content/types";
 import { formatNumber, titleCase } from "@/libs/format";
@@ -70,7 +71,7 @@ export default async function GioiThieuTopic({ params }: Props) {
 							<div className="col-12 col-md-8 col-lg-5">
 								<div className="team-details__img tlhp-about-portrait wow fadeInUp" data-wow-delay=".1s">
 									{picture ? (
-										<img src={picture.src} alt={`Chân dung: ${topic.title}`} width={600} height={800} fetchPriority="high" style={{ objectPosition: picture.position }} />
+										<img src={picture.src} alt={`Chân dung: ${topic.title}`} width={600} height={800} fetchPriority={topImagePriority(picture.src)} style={{ objectPosition: picture.position }} />
 									) : null}
 								</div>
 							</div>
