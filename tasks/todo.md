@@ -994,6 +994,53 @@
 
 ---
 
+### T41c: Ảnh – sửa nhanh trong code
+
+**Mô tả:** Kéo phần ảnh của T41 lên trước (chủ dự án chọn ngày 04/11, sau review tốc độ tải trang). Làm trước T16, vì 126 trang tượng sẽ hiện ảnh theo cùng cách. Phần này không cần hạ tầng mới; bản thu nhỏ cho kho ảnh để T41d.
+
+- **Mốc đo 04/11/2026** (Lighthouse 12.6, điện thoại 4G giả lập, trên `v2.`):
+
+  | Trang | Điểm | LCP | Tải về | Riêng ảnh |
+  |---|---|---|---|---|
+  | Trang chủ | 66 | 8,4 s | 2,9 MB | 1,6 MB |
+  | `/dong-chay-hoang-phap` | 60 | 11,9 s | 11,7 MB | 10,5 MB |
+  | Bài "Cộng tu pháp hội niệm Phật tháng 7…" | 54 | 47,9 s | 11,2 MB | 10 MB |
+
+- **Nguyên nhân:**
+  - Ảnh bài mới tải lên WordPress từ tháng 9 là ảnh gốc máy ảnh Nikon, 6048×4024 px, 7–9 MB. Admin cũ không nén.
+  - Ảnh được dùng nguyên bản ở mọi cỡ hiển thị: ảnh bìa 1200 px, thẻ bài 480 px, ô album 400 px, ảnh nhỏ dưới hero 80 px.
+  - Trang bài viết đặt `fetchPriority="high"` cho ảnh bìa 7,9 MB. Phần đầu trang (ảnh nền 5 KB) phải chờ ảnh này.
+  - Album của bài trên có 117 ảnh, tổng khoảng 188 MB; 12 ô hiện sẵn đã gần 100 MB.
+- **Mẫu kho ảnh** (HEAD toàn bộ 591 ảnh thẻ/bìa và 400 ảnh album ngẫu nhiên):
+  - Ảnh thẻ/bìa: trung vị 566 KB, p90 1,3 MB, tổng 395 MB.
+  - Ảnh album cũ trên B2 phần lớn đã nhỏ (trung vị 92 KB); ảnh mới trên WordPress là ảnh gốc.
+- **Việc làm:**
+  - `pattern-2.svg`, `pattern-3.svg` (548 KB mỗi file, bên trong là PNG nhúng, hiển thị 370×590) đổi sang WebP 740 px, sửa mọi chỗ dùng (`Footer2`, `Services2`…).
+  - Ảnh nhỏ 80×80 dưới hero (`src/libs/home.ts`, khung "Pháp sự mới nhất" và khung khóa tu) không dùng ảnh bìa gốc. Dùng ảnh thẻ của bài nếu có.
+  - Trang danh sách: bỏ `eager` của 3 thẻ đầu. React tự chèn preload cho ảnh không lazy, nên 3 ảnh này (có ảnh 7,9 MB) đang được tải trước cả CSS.
+  - Ảnh bìa ở trang bài, Tông Chỉ, Vũ Trụ: ảnh nằm ngoài site và chưa có bản thu nhỏ thì không đặt `fetchPriority="high"` và không để React preload.
+  - Ảnh tĩnh `/images/*`, `/brand/*`:
+    - Thêm `public/_headers` với `Cache-Control: public, max-age=86400, stale-while-revalidate=604800`. Hiện các file này có `max-age=0, must-revalidate`, nên mỗi lượt vào trang trình duyệt lại phải hỏi máy chủ.
+    - Bỏ hai thư mục này khỏi `runWorkerFirst` để không tốn CPU Worker.
+
+**Tiêu chí nghiệm thu:**
+- [ ] Không trang nào preload hoặc đặt `fetchPriority="high"` cho ảnh lớn hơn 500 KB (test canh gác mới chạy mọi trang)
+- [ ] Hai ảnh hoa văn ≤ 50 KB mỗi ảnh; không đổi giao diện (so ảnh chụp trước–sau)
+- [ ] `/images/*` và `/brand/*` trả `Cache-Control` ≥ 1 ngày và không chạy qua Worker
+- [ ] Lighthouse 3 trang ở bảng mốc: ghi số trước–sau
+
+**Kiểm chứng:**
+- [ ] `npm run test:e2e -- image-budget` (cục bộ và trên `v2.`)
+- [ ] Lighthouse điện thoại 3 trang trên `v2.`
+
+**Phụ thuộc:** T8, T10
+
+**File dự kiến:** `public/images/shape/pattern-2.webp`, `pattern-3.webp`, `src/components/layout/footer/Footer2.js`, `src/components/sections/services/Services2.js`, `src/libs/home.ts`, `src/app/(site)/dong-chay-hoang-phap/page.tsx`, `src/app/(site)/dong-chay-hoang-phap/[slug]/page.tsx`, `public/_headers`, `cloudflare.config.ts`, `tests/e2e/image-budget.spec.ts`
+
+**Quy mô:** L
+
+---
+
 ### T16: Bảo Tượng Phật Giáo
 
 **Mô tả:** Adapter `bao-tuong` (126 tượng, 15 cụm; ghép khu vực theo `areaId`). `/bao-tuong-phat-giao`: lưới thẻ chân dung 3:4 theo `TeamCard`, lọc chúng hội / khu vực / loại tượng (`<select>` gốc), tìm theo tên hoặc mã, phân trang 24 trên URL. `/bao-tuong/[slugCode]` theo khuôn `TeamDetails1`: chân dung, danh hiệu, lời dạy (`scripture`), bài viết, nghệ thuật Phật giáo (album), video, bảo tượng liên quan.
@@ -1139,6 +1186,51 @@
 
 ---
 
+### T41d: Bản thu nhỏ cho kho ảnh cũ trên R2
+
+**Mô tả:** Làm trước T22, để khách thật trên `www` không phải tải ảnh gốc 7–9 MB (mốc đo ở T41c).
+
+- **Script `scripts/media-variants.ts`** (Node + `sharp`, chạy trên máy hoặc CI, không tốn CPU Worker):
+  - Lấy mọi URL ảnh trong snapshot qua `mediaUrl()`: bài viết (thẻ, bìa, album, ảnh trong nội dung), lịch, giới thiệu, Tông Chỉ, Vũ Trụ, bảo tượng. Khoảng 6.000 ảnh duy nhất.
+  - Mỗi ảnh: tải về, xoay theo EXIF rồi bỏ toàn bộ metadata (ảnh gốc Nikon còn EXIF, có thẻ GPS).
+  - Xuất WebP (chất lượng khoảng 75) ở các bề rộng 480 / 960 / 1600 / 2400, không phóng to quá cỡ gốc.
+  - Khóa R2 theo mã băm nội dung: `v/<hash>/<w>.webp`. Cùng một file nằm ở cả hai bucket B2 (`s2-cnv03`, `media-tunglamhoaphuc`) chỉ lưu và tải một lần. Hiện trang chủ tải `Phap-hoi-niem-Phat.webp` hai lần.
+  - Ghi `data/media-manifest.json`: URL gốc → mã băm, cỡ gốc.
+  - Chạy lại được nhiều lần: chỉ xử lý ảnh chưa có trong manifest; báo ảnh lỗi (404, không phải ảnh, `.jfif` WordPress trả `application/octet-stream`).
+- **Hạ tầng:** bucket R2 `tlhp-media`, tên miền `media.tunglamhoaphuc.com`, `Cache-Control: public, max-age=31536000, immutable`.
+- **Trong app:**
+  - Hàm `imageSet(src, sizes)` cạnh `mediaUrl()` trả `src`, `srcSet`, `sizes` từ manifest.
+  - Các component ảnh dùng hàm này: thẻ bài, album, ảnh bìa, hero, ảnh trong nội dung. Lightbox mở bản 2400.
+  - Manifest đọc lười như snapshot; đo CPU khi nạp, nếu nặng thì tách theo file nguồn.
+- **Ảnh tải lên sau lần chạy cuối** (admin cũ vẫn soạn tới T39):
+  - Chưa có trong manifest thì dùng ảnh gốc, tải lười, không preload; `snapshot:check` liệt kê các ảnh này.
+  - Chạy lại script sau `snapshot:fetch`. Khi T19 đọc B2 trực tiếp, chạy theo lịch (GitHub Actions sau T1b).
+  - Tùy chọn: bật Image Transformations của zone chỉ cho phần ảnh mới này.
+- **Không dùng Image Transformations hay `next/image` cho cả kho:**
+  - vinext chỉ tối ưu ảnh nằm trong app, không tối ưu ảnh ở B2/R2.
+  - Kho cũ khoảng 6.000 ảnh × 4 cỡ, tức khoảng 24.000 lần biến đổi, nhiều khả năng vượt hạn mức miễn phí (kiểm bảng giá khi làm).
+  - Tạo sẵn thì kết quả cố định và không tốn phí. Kho bản thu nhỏ dự kiến vài trăm MB, trong 10 GB miễn phí của R2.
+
+**Tiêu chí nghiệm thu:**
+- [ ] Lấy mẫu 50 ảnh mỗi loại: thẻ bài ≤ 80 KB, ảnh bìa ≤ 300 KB, ô album ≤ 60 KB
+- [ ] Không ảnh nào tải lớn hơn 2 lần cỡ hiển thị, ở 375 px và 1440 px
+- [ ] Trang bài "Cộng tu pháp hội niệm Phật tháng 7…" tải ≤ 1,5 MB ảnh trước khi cuộn; LCP 3 trang ở mốc T41c ghi trước–sau
+- [ ] Ảnh trên `media.` không còn EXIF
+- [ ] Chạy script lần hai không tải lại ảnh nào đã xử lý
+
+**Kiểm chứng:**
+- [ ] `npm test -- media` (`imageSet`, manifest, ảnh chưa có bản thu nhỏ)
+- [ ] `npm run test:e2e -- image-budget` (mở rộng từ T41c)
+- [ ] Lighthouse điện thoại 3 trang trên `v2.`
+
+**Phụ thuộc:** T41c; chuẩn bị #7 (bucket R2 + tên miền)
+
+**File dự kiến:** `scripts/media-variants.ts`, `src/libs/content/media.ts`, `data/media-manifest.json`, `src/components/shared/cards/PostCard.tsx`, `src/components/sections/posts/PostGallery.tsx`, `tests/unit/content/media.test.ts`, `tests/e2e/image-budget.spec.ts`. Nếu phần thay component vượt 8 file thì tách component còn lại sang một task riêng.
+
+**Quy mô:** L
+
+---
+
 ### T22: Kiểm thử trước ra mắt và chuyển `www`
 
 **Mô tả:** Trên `v2.` với `CONTENT_SOURCE=b2`: lập danh sách mọi URL công khai từ dữ liệu (bài, tông chỉ, giới thiệu, khu vực, bảo tượng, trí tuệ) và kiểm từng URL trả 200; Lighthouse 6 mẫu trang; axe mọi mẫu trang; Ban Biên Tập soát 20 trang tiêu biểu. Trên app mới: `/admin*` và `/login` chuyển hướng sang `quantri.`. Gỡ route `www…/api/*` của Worker `tlhp-admin-guard` (T21) trước khi chuyển. Chuyển: gắn Workers Custom Domain `www.tunglamhoaphuc.com` (và tên miền gốc chuyển về `www`) cho Worker `tlhp-web`, gỡ bản ghi trỏ về Vercel. Ghi sẵn và diễn tập các bước quay lại Vercel. Theo dõi 48 giờ: log Worker, tỷ lệ 404, Web Analytics.
@@ -1152,7 +1244,7 @@
 - [ ] `npm run check:urls -- --base=https://v2.tunglamhoaphuc.com`
 - [ ] `BASE_URL=https://www.tunglamhoaphuc.com npm run test:e2e -- smoke`
 
-**Phụ thuộc:** T19, T20, T21
+**Phụ thuộc:** T19, T20, T21, T41d (ảnh đúng cỡ trước khi khách thật vào)
 
 **File dự kiến:** `scripts/check-urls.ts`, `src/middleware.ts` (chuyển hướng admin cũ), `tests/e2e/smoke.spec.ts`, `docs/van-hanh/chuyen-www.md`
 
@@ -1348,10 +1440,11 @@
 
 ### T30: Admin – Thư viện ảnh R2
 
-**Mô tả:** `/admin/thu-vien-anh`: cây thư mục + lưới ảnh, tìm, lọc thời gian. Tải lên kéo-thả; nén WebP phía trình duyệt (canvas, cạnh dài ≤ 2560px, ≤ 10 MB), bắt buộc mô tả ảnh (alt). Đổi tên / xóa có kiểm "đang dùng ở N bài". `MediaPicker` để chọn ảnh trong form. Cần bucket R2 (Giai đoạn 1 của kế hoạch Cloudflare); khi phát triển dùng R2 local.
+**Mô tả:** `/admin/thu-vien-anh`: cây thư mục + lưới ảnh, tìm, lọc thời gian. Tải lên kéo-thả, bắt buộc mô tả ảnh (alt). Trình duyệt tự xoay ảnh theo EXIF, bỏ metadata và tạo luôn bộ bản WebP 480 / 960 / 1600 / 2400 (canvas, nhận ảnh gốc ≤ 25 MB), cùng định dạng và khóa R2 với T41d. Bộ ảnh được đẩy thẳng lên R2, Worker chỉ ghi bản ghi `Media` (mã băm, cỡ gốc, alt), nên không tốn CPU Worker và Ban Biên Tập không phải tự nén. Đổi tên / xóa có kiểm "đang dùng ở N bài". `MediaPicker` để chọn ảnh trong form. Cần bucket R2 (Giai đoạn 1 của kế hoạch Cloudflare); khi phát triển dùng R2 local.
 
 **Tiêu chí nghiệm thu:**
-- [ ] Ảnh JPG 8 MB tải lên thành WebP ≤ 2560px trong R2, có bản ghi `Media` kèm alt
+- [ ] Ảnh JPG 8 MB (6048 px) tải lên thành bộ 4 bản WebP trong R2, bản 480 ≤ 80 KB, không còn EXIF; có bản ghi `Media` kèm alt
+- [ ] Trang công khai hiện ảnh mới tải lên bằng `imageSet()` ngay, không cần chạy script T41d
 - [ ] Xóa ảnh đang dùng bị chặn bằng thông báo in-line "Không thể xóa: ảnh đang được dùng ở 3 bài viết"
 - [ ] Chỉ nhận jpg/png/webp/gif, kiểm cả phía server theo magic bytes
 
@@ -1576,7 +1669,7 @@
 **Mô tả:** Theo thứ tự, trong một khung giờ đã báo trước:
 1. Đóng băng admin cũ (Access chỉ cho quyền xem, báo Ban Biên Tập ngừng soạn).
 2. Chạy `scripts/import.ts --from=b2` lần cuối lên D1 production.
-3. Chép ảnh B2 → R2 nếu Giai đoạn 1 của kế hoạch Cloudflare chưa làm; đổi `mediaUrl()` sang `media.tunglamhoaphuc.com`.
+3. Chạy `scripts/media-variants.ts` lần cuối (T41d), rồi chép ảnh gốc còn lại trên B2 và WordPress sang R2 nếu Giai đoạn 1 của kế hoạch Cloudflare chưa làm. Đổi `mediaUrl()` sang `media.tunglamhoaphuc.com`.
 4. Đặt `CONTENT_SOURCE=d1` trên `www`.
 5. Mở `/admin` mới trên `www` (Access, vai trò từ bảng `User`) và bật `/dang-ky`; nút "Đăng ký khóa tu" trỏ về `/dang-ky`.
 6. Nạp bảng redirect 301 URL WordPress cũ.
@@ -1644,22 +1737,25 @@
 
 ---
 
-### T41b: Ảnh qua Image Transformations và đo toàn site
+### T41b: Đo toàn site, ngân sách ảnh và Lighthouse CI
 
-**Mô tả:** Loader `next/image` dùng Image Transformations (`/cdn-cgi/image/width=…,format=auto/…`) trên ảnh R2; `srcset` theo cỡ hiển thị; preload font chính. Lighthouse CI cho 6 mẫu trang; axe cho mọi route công khai và admin.
+**Mô tả:** Phần sửa ảnh đã tách sang T41c (sửa nhanh) và T41d (bản thu nhỏ trên R2) ngày 04/11. Ảnh mới tải lên do T30 lo. T41b chỉ còn:
+- Preload font chính.
+- Lighthouse CI cho 6 mẫu trang, có ngân sách: ảnh tải trước khi cuộn ≤ 1,5 MB mỗi trang, không ảnh nào lớn hơn 2 lần cỡ hiển thị.
+- axe cho mọi route công khai và admin.
 
 **Tiêu chí nghiệm thu:**
 - [ ] LCP và CLS đạt mục tiêu đã chốt ở Checkpoint B (mặc định LCP < 2,0 s, CLS = 0, mô phỏng 4G di động)
-- [ ] Không ảnh nào tải lớn hơn 2 lần cỡ hiển thị
+- [ ] Lighthouse CI báo lỗi khi một trang vượt ngân sách ảnh
 - [ ] axe 0 lỗi nghiêm trọng trên mọi mẫu trang
 
 **Kiểm chứng:**
 - [ ] `npx lhci autorun` trên `v2.`
 - [ ] `npm run test:e2e -- a11y`
 
-**Phụ thuộc:** T39 (ảnh đã ở R2), T41a
+**Phụ thuộc:** T41a, T41d
 
-**File dự kiến:** `src/lib/image-loader.ts`, `next.config.js`, `lighthouserc.json`, `tests/e2e/a11y.spec.ts`
+**File dự kiến:** `lighthouserc.json`, `src/app/layout.js` (preload font), `tests/e2e/a11y.spec.ts`
 
 **Quy mô:** M
 
