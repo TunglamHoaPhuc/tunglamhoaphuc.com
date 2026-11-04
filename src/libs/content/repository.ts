@@ -47,27 +47,47 @@ export type MemoryRepositoryOptions = {
 
 const EMPTY_SCHEDULE: Schedule = { events: [], programs: [], themes: [], quotes: [] };
 
-/** A repository over posts already in memory (the snapshot today, B2 at launch). */
+type PostIndex = { bySlug: Map<string, Post>; summaries: PostSummary[] };
+
+/** `load`'s value, read on first use and kept; a failed read is tried again on the next use. */
+function lazy<T>(load: () => Promise<T>): () => Promise<T> {
+	let value: Promise<T> | undefined;
+	return () =>
+		(value ??= load().catch((error: unknown) => {
+			value = undefined;
+			throw error;
+		}));
+}
+
+const none = async () => [];
+
+/**
+ * A repository over content in memory (the snapshot today, B2 at launch). The posts are given
+ * as they are, or as a loader read the first time a page asks about posts: reading all 632
+ * of them costs a cold Worker about 100 ms of CPU, which pages without posts should not pay.
+ */
 export function createMemoryRepository(
-	posts: Post[],
+	posts: Post[] | (() => Promise<Post[]>),
 	{ loadAlbums, loadSchedule, loadAbout, loadTongChi, loadAreas, loadStatues }: MemoryRepositoryOptions = {},
 ): ContentRepository {
-	const bySlug = new Map(posts.map((post) => [slugKey(post.slug), post]));
-	const summaries = posts.map(toSummary);
-	let albums: Promise<Map<string, GalleryImage[]>> | undefined;
-	let schedule: Promise<Schedule> | undefined;
-	let about: Promise<AboutTopic[]> | undefined;
-	let tongChi: Promise<TongChiEntry[]> | undefined;
-	let areas: Promise<Area[]> | undefined;
-	let statues: Promise<StatueSummary[]> | undefined;
+	const postIndex = lazy(async (): Promise<PostIndex> => {
+		const list = typeof posts === "function" ? await posts() : posts;
+		return { bySlug: new Map(list.map((post) => [slugKey(post.slug), post])), summaries: list.map(toSummary) };
+	});
+	const albums = lazy(loadAlbums ?? (async () => new Map<string, GalleryImage[]>()));
+	const schedule = lazy(loadSchedule ?? (async () => EMPTY_SCHEDULE));
+	const about = lazy<AboutTopic[]>(loadAbout ?? none);
+	const tongChiEntries = lazy<TongChiEntry[]>(loadTongChi ?? none);
+	const areas = lazy<Area[]>(loadAreas ?? none);
+	const statues = lazy<StatueSummary[]>(loadStatues ?? none);
 	// Bodies are turned into HTML one page at a time, once each.
 	const tongChiPages = new Map<string, TongChiArticle>();
-	const tongChiEntries = () => (tongChi ??= loadTongChi ? loadTongChi() : Promise.resolve([]));
 
 	return {
 		async listPosts({ section, category, sort = "newest", page = 1, pageSize = DEFAULT_PAGE_SIZE } = {}): Promise<Page<PostSummary>> {
 			const size = Math.min(Math.max(Math.trunc(pageSize) || DEFAULT_PAGE_SIZE, 1), MAX_PAGE_SIZE);
 			const sections = section === undefined ? null : [section].flat();
+			const { summaries } = await postIndex();
 			const matching = summaries
 				.filter((post) => (!sections || sections.includes(post.section)) && (!category || post.category.slug === category))
 				.sort(compare[sort] ?? compare.newest);
@@ -83,16 +103,15 @@ export function createMemoryRepository(
 		},
 
 		async getPostBySlug(slug) {
-			const post = bySlug.get(slugKey(slug));
-			if (!post || post.gallery.length || !loadAlbums) return post ?? null;
-			albums ??= loadAlbums();
-			const gallery = (await albums).get(post.id);
+			const post = (await postIndex()).bySlug.get(slugKey(slug));
+			if (!post || post.gallery.length) return post ?? null;
+			const gallery = (await albums()).get(post.id);
 			return gallery?.length ? { ...post, gallery } : post;
 		},
 
 		async listCategories(section) {
 			const counts = new Map<string, CategoryCount>();
-			for (const post of summaries) {
+			for (const post of (await postIndex()).summaries) {
 				if (post.section !== section || !post.category.slug) continue;
 				const entry = counts.get(post.category.slug) ?? { ...post.category, count: 0 };
 				entry.count++;
@@ -101,15 +120,9 @@ export function createMemoryRepository(
 			return [...counts.values()].sort((a, b) => b.count - a.count || collator.compare(a.name, b.name));
 		},
 
-		getSchedule() {
-			schedule ??= loadSchedule ? loadSchedule() : Promise.resolve(EMPTY_SCHEDULE);
-			return schedule;
-		},
+		getSchedule: schedule,
 
-		listAboutTopics() {
-			about ??= loadAbout ? loadAbout() : Promise.resolve([]);
-			return about;
-		},
+		listAboutTopics: about,
 
 		async listTongChi() {
 			return (await tongChiEntries()).map(tongChiSummary);
@@ -127,15 +140,9 @@ export function createMemoryRepository(
 			return article;
 		},
 
-		listAreas() {
-			areas ??= loadAreas ? loadAreas() : Promise.resolve([]);
-			return areas;
-		},
+		listAreas: areas,
 
-		listStatues() {
-			statues ??= loadStatues ? loadStatues() : Promise.resolve([]);
-			return statues;
-		},
+		listStatues: statues,
 	};
 }
 
@@ -158,7 +165,7 @@ export function getContentRepository(): Promise<ContentRepository> {
 		const { loadSnapshotAbout, loadSnapshotAlbums, loadSnapshotAreas, loadSnapshotPosts, loadSnapshotSchedule, loadSnapshotStatues, loadSnapshotTongChi } = await import(
 			"./sources/snapshot"
 		);
-		return createMemoryRepository((await loadSnapshotPosts()).posts, {
+		return createMemoryRepository(async () => (await loadSnapshotPosts()).posts, {
 			loadAlbums: loadSnapshotAlbums,
 			loadSchedule: async () => (await loadSnapshotSchedule()).schedule,
 			loadAbout: async () => (await loadSnapshotAbout()).topics,

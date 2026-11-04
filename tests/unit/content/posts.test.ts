@@ -133,6 +133,39 @@ describe("memory repository", () => {
 	});
 });
 
+// T19a: a page that shows no posts (Giới thiệu, Tông Chỉ, Vũ Trụ, the calendar) must not pay
+// for reading them: on a cold Worker that costs about 100 ms of CPU.
+describe("memory repository loading posts only when asked", () => {
+	it("reads the posts on the first question about them, once", async () => {
+		let reads = 0;
+		const repo = createMemoryRepository(
+			async () => {
+				reads++;
+				return parsed.posts;
+			},
+			{ loadAbout: async () => [] },
+		);
+		await repo.listAboutTopics();
+		await repo.listTongChi();
+		expect(reads).toBe(0);
+		expect((await repo.listPosts({ section: "dong-chay-hoang-phap" })).total).toBe(4);
+		expect((await repo.getPostBySlug("khoa-le-ram-thang-7"))?.id).toBe("post-102");
+		expect(await repo.listCategories("dong-chay-hoang-phap")).toHaveLength(2);
+		expect(reads).toBe(1);
+	});
+
+	it("tries again after a failed read instead of keeping the failure", async () => {
+		let reads = 0;
+		const repo = createMemoryRepository(async () => {
+			if (++reads === 1) throw new Error("đọc lỗi");
+			return parsed.posts;
+		});
+		await expect(repo.listPosts()).rejects.toThrow("đọc lỗi");
+		expect((await repo.listPosts()).total).toBe(8);
+		expect(reads).toBe(2);
+	});
+});
+
 describe("contentSource", () => {
 	it("defaults to the snapshot and refuses unknown names", () => {
 		expect(contentSource(undefined)).toBe("snapshot");
