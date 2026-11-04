@@ -1057,7 +1057,8 @@
 **Kiểm chứng:**
 - [x] `npm run test:e2e -- image-budget`: đỏ trên bản cũ ở `v2.` (4 test), xanh cục bộ và trên `v2.`
 - [x] Lighthouse điện thoại 3 trang trên `v2.` (số ở trên)
-- [ ] Toàn bộ e2e
+- [x] Unit 139 xanh; `tsc`, eslint không lỗi
+- [x] Toàn bộ e2e: trên `v2.` 435/435 qua (27 bỏ qua theo thiết kế). Cục bộ 432 qua; 2 test `dong-chay` hỏng vì lượt chạy đã nạp bản test cũ, 1 test dịch bố cục trang lịch chập chờn (đã ghi ở T19a); chạy lại `dong-chay`, `lich-tu-hoc`, `image-budget`: 70/70
 
 **Phụ thuộc:** T8, T10
 
