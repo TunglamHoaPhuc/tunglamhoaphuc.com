@@ -12,9 +12,18 @@ import Navbar from "./Navbar";
 // that slides down when the visitor scrolls back up. Whichever copy is out of view is
 // `inert`, so keyboard and screen reader users meet one header, never two.
 // `showSearch` lets /styleguide preview the search popup before /tim-kiem exists.
+// Built later rather than with the page (T41a), as every page hydrated them though they are not
+// seen at first: the sticky copy (103 elements) once the browser is idle or the visitor has
+// scrolled 300px (it shows past 500px), and each offcanvas menu (69) on its first opening.
+const STICKY_MOUNT_SCROLL = 300;
+const whenIdle = (callback) =>
+	"requestIdleCallback" in window ? window.requestIdleCallback(callback, { timeout: 3000 }) : window.setTimeout(callback, 1500);
+
 const Header = ({ headerType = 1, isStickyHeader = false, showSearch = site.features.search }) => {
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
 	const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+	const [isMobileMenuMounted, setIsMobileMenuMounted] = useState(false);
+	const [isStickyMounted, setIsStickyMounted] = useState(false);
 	const mobileToggleRef = useRef(null);
 	const searchToggleRef = useRef(null);
 	const searchPopupRef = useRef(null);
@@ -23,6 +32,24 @@ const Header = ({ headerType = 1, isStickyHeader = false, showSearch = site.feat
 	const isStickyShown = useIsSticky(true);
 	const isHidden = isStickyHeader ? !isStickyShown : isStickyShown;
 
+	useEffect(() => {
+		if (!isStickyHeader) return;
+		const mount = () => setIsStickyMounted(true);
+		const onScroll = () => window.scrollY > STICKY_MOUNT_SCROLL && mount();
+		whenIdle(mount);
+		window.addEventListener("scroll", onScroll, { passive: true });
+		return () => window.removeEventListener("scroll", onScroll);
+	}, [isStickyHeader]);
+
+	// The menu slides in from its closed place, so it opens a frame after it is first built.
+	const openMobileMenu = () => {
+		if (isMobileMenuMounted) {
+			setIsMobileMenuOpen(true);
+			return;
+		}
+		setIsMobileMenuMounted(true);
+		requestAnimationFrame(() => requestAnimationFrame(() => setIsMobileMenuOpen(true)));
+	};
 	const closeMobileMenu = () => {
 		setIsMobileMenuOpen(false);
 		mobileToggleRef.current?.focus();
@@ -43,9 +70,11 @@ const Header = ({ headerType = 1, isStickyHeader = false, showSearch = site.feat
 		return () => document.removeEventListener("pointerdown", closeOnOutsidePress);
 	}, [isSearchOpen, closeSearch]);
 
+	if (isStickyHeader && !isStickyMounted) return null;
+
 	return (
 		<>
-			<MobileMenu id={mobileMenuId} isOpen={isMobileMenuOpen} onClose={closeMobileMenu} showSearch={showSearch} />
+			{isMobileMenuMounted ? <MobileMenu id={mobileMenuId} isOpen={isMobileMenuOpen} onClose={closeMobileMenu} showSearch={showSearch} /> : null}
 
 			{showSearch ? (
 				<div
@@ -102,8 +131,8 @@ const Header = ({ headerType = 1, isStickyHeader = false, showSearch = site.feat
 										className="menu_bar mobile_menu_bar tlhp-below-desktop"
 										aria-label="Mở menu"
 										aria-expanded={isMobileMenuOpen}
-										aria-controls={mobileMenuId}
-										onClick={() => setIsMobileMenuOpen(true)}
+										aria-controls={isMobileMenuMounted ? mobileMenuId : undefined}
+										onClick={openMobileMenu}
 									>
 										<span></span>
 										<span></span>

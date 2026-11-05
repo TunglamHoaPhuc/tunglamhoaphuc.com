@@ -1,5 +1,4 @@
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
-import Image from "next/image";
 
 /**
  * Bexon's error block: the 404 page, and the page shown when something fails to load.
@@ -16,13 +15,9 @@ const ErrorPrimary = ({ title, text, action, notFound = false }) => {
 								{/* The picture reads "404", so only the missing-page case shows it. */}
 								{notFound ? (
 									<div className="error-img">
-										<Image
-											src="/images/404/error.webp"
-											alt=""
-											width={800}
-											height={303}
-											style={{ height: "auto" }}
-										/>
+										{/* A plain <img>: this block is in the error boundary every page loads, and
+										    next/image pulled its 45 KB loader into all of them (T41a). */}
+										<img src="/images/404/error.webp" alt="" width={800} height={303} loading="lazy" decoding="async" style={{ height: "auto" }} />
 									</div>
 								) : null}
 								<h2 className="error-title title-anim">{title}</h2>

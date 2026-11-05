@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
-import { ScrollSmoother } from "@/libs/gsap.config";
+import { getSmoother } from "@/libs/smoother";
 
 type Props = {
 	text: string;
@@ -28,7 +28,7 @@ export default function ListStatus({ text, page, headingId }: Props) {
 		heading.focus({ preventScroll: true });
 		// With smooth scrolling on, the content is mid-glide and scrollIntoView aims at where
 		// it is drawn, not where it lies; let ScrollSmoother aim instead.
-		const smoother = ScrollSmoother.get();
+		const smoother = getSmoother();
 		if (smoother) smoother.scrollTo(heading, true, `top ${HEADER_ROOM}px`);
 		else heading.scrollIntoView({ block: "start" });
 	}, [page, headingId]);

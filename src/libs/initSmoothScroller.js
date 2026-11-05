@@ -1,4 +1,5 @@
 import { gsap, ScrollSmoother } from "@/libs/gsap.config";
+import { setSmoother } from "@/libs/smoother";
 
 const initSmoothScroller = contanerRef => {
 	const animItems = gsap.utils.toArray("#smooth-wrapper");
@@ -35,6 +36,8 @@ const initSmoothScroller = contanerRef => {
 			wrapper.scrollTop = 0;
 			smoother.scrollTo(smoother.scrollTop() + offset, false);
 		});
+		// pageEffects clears it when the page's effects are reverted.
+		setSmoother(smoother);
 	}
 };
 

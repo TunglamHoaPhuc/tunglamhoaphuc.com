@@ -1,0 +1,42 @@
+/* The few Font Awesome brand icons the site uses (links to the temple's pages), in place of
+   the whole font-awesome-pro.min.css: 512 KB, half of all the CSS (T41a). Add a line here
+   when a new network is linked. The font is fetched only on a page that shows one. */
+@font-face {
+	font-family: "Font Awesome 6 Brands";
+	font-style: normal;
+	font-weight: 400;
+	font-display: block;
+	src: url("../fonts/fa-brands-400.woff2") format("woff2");
+}
+
+.fa-brands,
+.fab {
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+	display: var(--fa-display, inline-block);
+	font-family: "Font Awesome 6 Brands";
+	font-style: normal;
+	font-variant: normal;
+	font-weight: 400;
+	line-height: 1;
+	text-rendering: auto;
+}
+
+.fa-facebook-f::before {
+	content: "\f39e";
+}
+.fa-x-twitter::before {
+	content: "\e61b";
+}
+.fa-instagram::before {
+	content: "\f16d";
+}
+.fa-linkedin-in::before {
+	content: "\f0e1";
+}
+.fa-youtube::before {
+	content: "\f167";
+}
+.fa-tiktok::before {
+	content: "\e07b";
+}

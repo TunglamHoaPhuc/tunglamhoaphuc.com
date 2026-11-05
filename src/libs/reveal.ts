@@ -1,4 +1,4 @@
-import { ScrollSmoother } from "@/libs/gsap.config";
+import { getSmoother } from "@/libs/smoother";
 
 // Leaves the sticky header room above the target (it shows while scrolling up).
 const HEADER_ROOM = 130;
@@ -11,7 +11,7 @@ const HEADER_ROOM = 130;
  */
 export function revealTarget(target: HTMLElement): void {
 	target.focus({ preventScroll: true });
-	const smoother = ScrollSmoother.get();
+	const smoother = getSmoother();
 	if (!smoother) {
 		target.scrollIntoView({ block: "start" });
 		return;

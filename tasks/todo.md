@@ -1413,19 +1413,63 @@
   - CSS: 198 KB br / 1,08 MB chưa nén, thêm 41 KB style nhúng. divineshop: 7,7 KB br.
   - JS: khoảng 306 KB br / 895 KB chưa nén, có một tác vụ dài 356 ms. divineshop: khoảng 100 KB br.
 
+**Kết quả 05/11/2026:** xong phần lớn, đã deploy `v2.` (phiên bản `090e8557`).
+- **CSS: 1,11 MB / 141 KB br → 430 KB / 50 KB br** (bản build).
+  - `font-awesome-pro.min.css` (512 KB, hơn nửa CSS) thay bằng `assets/css/fa-brands.css`: chỉ `fa-brands` và 6 icon mạng xã hội có trong code. `site.social` đang rỗng, nên font brands không tải ở trang nào.
+  - Bỏ `nice-select2.css` và `meanmenu.css`: không component nào dùng.
+  - `postcss.config.mjs`: PurgeCSS chỉ chạy trên `bootstrap.min.css` và `animate.min.css`, có danh sách giữ lại các class do Bootstrap JS và wow.js thêm lúc chạy, cùng các thẻ HTML trong nội dung bài.
+  - SCSS của Bexon/TLHP không lọc: nhiều class ghép lúc chạy (`is-${…}`, `tlhp-theme-${…}`) mà quét mã nguồn không thấy.
+  - **Khác mô tả:** không thay `bootstrap.min.css` bằng module SCSS. Lọc file có sẵn cho kết quả tương đương mà ít đụng mã hơn.
+- **So ảnh:** `tests/e2e/visual.spec.ts` (mới, chạy khi đặt `VISUAL=1`, ảnh không vào git). 7 mẫu trang × 2 cỡ màn hình chụp từ bản trước rồi so với bản sau: **14/14 giống**.
+  - Ảnh nội dung được che, chỉ so bố cục và kiểu dáng.
+  - Ảnh không khai báo kích thước được cho tải trước khi chụp, vì khi chưa tải chúng rộng 0 px.
+- **JS ban đầu của trang chủ: khoảng 235 → 175 KB br.**
+  - `ErrorPrimary` (trong ranh giới lỗi, mọi trang đều nạp) dùng `next/image`, kéo shim 45 KB / 13 KB br vào mọi trang. Nay là `<img>` thường.
+  - GSAP (47 KB br) và các hiệu ứng chuyển sang `libs/pageEffects.js`, được `ClientWrapper` nạp bằng `import()` sau khi trang lên, và không bao giờ nạp khi bật giảm chuyển động. `libs/smoother.ts` giữ ScrollSmoother hiện tại, để `revealTarget` và `ListStatus` không phải import GSAP.
+  - Lighthouse vẫn đếm GSAP trong tổng JS tải về (trang chủ 322 → 307 KB), vì người xem không tắt hiệu ứng vẫn tải nó, chỉ là muộn hơn.
+- **Bớt phần phải hydrate:**
+  - Header dính (103 phần tử) dựng khi trình duyệt rảnh, hoặc khi đã cuộn 300 px (nó hiện từ 500 px).
+  - Mỗi menu điện thoại (2 × 69 phần tử) dựng ở lần mở đầu tiên. Menu mở ở khung hình sau đó để hiệu ứng trượt vẫn chạy; `aria-controls` chỉ gắn khi menu đã có trong trang.
+  - DOM lúc mở trang: trang chủ 1.758 → 1.515, danh sách 789 → 546, lịch 1.153 → 910.
+  - Khối không cần tương tác ở trang chủ vốn đã là server component; bốn khối còn lại cần Swiper.
+- **Lighthouse 13.6 điện thoại:**
+  - Trên `v2.` (T41f 3 lượt, T41a 7 lượt) không so trung vị được: các lượt chia hai nhóm theo TTFB. Khi Worker nguội (TTFB 0,6–1,2 s), FCP 1,3–2,1 s và LCP 2,8–4,7 s, tốt hơn T41f. Khi TTFB nhanh (0,23–0,42 s), lần vẽ đầu chờ JS và hydrate, khoảng 1,8 s, nên FCP 2,7–3,3 s. Cả 3 lượt T41f đều rơi vào nhóm nguội.
+  - So cùng điều kiện (hai bản chạy cục bộ, xen kẽ, mỗi trang 5 lượt; chưa nén nên số tuyệt đối cao hơn thực tế):
+
+    | Trang | Điểm | FCP | LCP | TBT |
+    |---|---|---|---|---|
+    | Trang chủ | 53 → 58 | 7,3 → 4,0 s | 17,3 → 13,2 s | 248 → 177 ms |
+    | `/dong-chay-hoang-phap` | 59 → 57 (56–59 → 57–68) | 6,8 → 6,6 s | 16,4 → 11,3 s | 5 → 0 ms |
+
+  - Ở trang danh sách, Speed Index tệ hơn (6,8 → 8,0 s); chưa rõ nguyên nhân.
+  - CSS tải về trên `v2.` ở mọi trang: 199 → 69 KB. TBT trang danh sách và trang bài về 0.
+  - PageSpeed Insights chưa đo lại được: API hết hạn mức (khóa ẩn danh dùng chung).
+- **Chưa làm:**
+  - **CSS màn hình đầu đặt thẳng vào HTML:** CSS vẫn là một file 50 KB br chặn hiển thị.
+  - **Tác vụ dài lúc tải:** React hydrate cả trang, 390–500 ms trên điện thoại CPU chậm 4 lần. Thu gọn dữ liệu nhúng trong HTML (T41e) là bước tiếp theo.
+  - **Ảnh tĩnh tên có mã băm.**
+  - **Cắt `bexon-icons` theo icon dùng tới:** file chỉ còn 10 KB, lợi ích nhỏ.
+- **Ghi chú test:**
+  - Test tách chữ ở styleguide giữ nguyên.
+  - Trên `v2.` có 2 test chập chờn khi bộ test chạy dài (dấu tiếng Việt ở styleguide, không có hộp thoại ở một trang bài); chạy lại riêng 39/39 qua.
+  - Cục bộ, test "ô tìm kiếm trong menu điện thoại" hỏng một lần vì bấm trước khi trang hydrate xong; chạy riêng 12/12 qua.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Trang chủ: CSS ≤ 60 KB br, JS ≤ 180 KB br, không tác vụ dài nào trên 200 ms lúc tải (ghi số trước–sau)
-- [ ] Không còn CSS chặn hiển thị quá 20 KB ở màn hình đầu
-- [ ] Ảnh chụp 6 mẫu trang trước–sau không khác nhau (so ảnh tự động)
-- [ ] Mọi biểu tượng đang dùng vẫn hiển thị (không còn ô vuông lỗi font)
+- [x] Trang chủ: CSS ≤ 60 KB br (50 KB), JS ban đầu ≤ 180 KB br (175 KB)
+- [ ] Không tác vụ dài nào trên 200 ms lúc tải: chưa đạt (React hydrate 390–500 ms trên điện thoại CPU chậm 4 lần)
+- [ ] Không còn CSS chặn hiển thị quá 20 KB ở màn hình đầu: chưa làm
+- [x] Ảnh chụp 7 mẫu trang trước–sau không khác nhau (14/14)
+- [x] Mọi biểu tượng đang dùng vẫn hiển thị (`bexon-icons` giữ nguyên; Font Awesome còn bộ brands)
 
 **Kiểm chứng:**
-- [ ] `npm run build` ghi dung lượng; `npm run test:e2e -- visual`
-- [ ] Lighthouse 13.6 điện thoại 3 lượt cho 3 trang mốc; PageSpeed Insights trên `v2.`
+- [x] `npm run build` ghi dung lượng; `VISUAL=1 npm run test:e2e -- visual`
+- [x] Unit 156 xanh; `tsc`, eslint không lỗi
+- [x] Toàn bộ e2e: cục bộ 481/482; trên `v2.` 485 qua, 2 hỏng và 1 chập chờn khi chạy dài (chạy lại riêng đều qua)
+- [x] Lighthouse 13.6 điện thoại trên `v2.` và so cục bộ cùng điều kiện (số ở trên). PageSpeed Insights chưa đo lại được
 
 **Phụ thuộc:** T41f (làm sau để đo riêng từng đợt). Cần xong trước T22.
 
-**File dự kiến:** `src/app/globals.scss`, `src/app/assets/sass/utilities/_bootstrap.scss`, `src/components/shared/wrappers/ClientWrapper.js`, `src/components/layout/header/*`, `tests/e2e/visual.spec.ts`
+**File:** `postcss.config.mjs`, `src/app/layout.js`, `src/app/assets/css/fa-brands.css`, `src/components/sections/error/ErrorPrimary.js`, `src/components/shared/wrappers/ClientWrapper.js`, `src/libs/pageEffects.js`, `src/libs/smoother.ts`, `src/libs/reveal.ts`, `src/libs/initSmoothScroller.js`, `src/components/sections/posts/ListStatus.tsx`, `src/components/layout/header/Header.js`, `tests/e2e/visual.spec.ts`
 
 **Quy mô:** L
 
@@ -1447,6 +1491,7 @@
   - Nút "Làm mới site" (T19) phải xóa cả bản cache ở edge, không chỉ dữ liệu.
   - Nếu cache RSC đã bật thì giữ tải trước liên kết. Nếu chưa, chỉ tải trước khi rê chuột cho liên kết ở menu và footer.
   - Thu gọn dữ liệu nhúng trong HTML: client component chỉ nhận các trường nó dùng.
+  - Từ T41a: khi HTML về nhanh, lần vẽ đầu chờ JS và hydrate (khoảng 1,8 s trên điện thoại giả lập); tác vụ hydrate 390–500 ms. Thu gọn dữ liệu nhúng là cách giảm cả hai. CSS màn hình đầu đặt vào HTML và ảnh tĩnh tên có mã băm cũng chưa làm ở T41a.
 
 **Tiêu chí nghiệm thu:**
 - [ ] Trang công khai lượt thứ hai trở đi: TTFB p75 ≤ 200 ms trên `v2.` (đo 20 lượt mỗi mẫu trang)
