@@ -7,7 +7,7 @@ import Link from "next/link";
  * Bexon's wide blog card (picture beside the text) for a TLHP post: date badge, category
  * chip, title, date and views.
  * `showPicture` false leaves the picture without a source until a slider brings the card near.
- * @param {{ post: import("@/libs/content/types").PostSummary, showPicture?: boolean }} props
+ * @param {{ post: import("@/libs/home").NewsCard & { banner?: import("@/libs/content/types").MediaImage | null }, showPicture?: boolean }} props
  */
 const BlogCard2 = ({ post, showPicture = true }) => {
 	const href = postHref(post);

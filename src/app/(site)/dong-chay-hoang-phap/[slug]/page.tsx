@@ -16,6 +16,13 @@ import type { Post } from "@/libs/content/types";
 import { formatDate, formatNumber } from "@/libs/format";
 import { listHref } from "@/libs/postList";
 
+// Served from Cloudflare's Workers Cache and made again at most every 5 minutes (T41e).
+export const revalidate = 300;
+// No pages at build time; each is made on its first visit, then cached (ISR).
+export async function generateStaticParams() {
+	return [];
+}
+
 const SECTION = "dong-chay-hoang-phap";
 const PATH = `/${SECTION}`;
 const SECTION_NAME = "Dòng Chảy Hoằng Pháp";

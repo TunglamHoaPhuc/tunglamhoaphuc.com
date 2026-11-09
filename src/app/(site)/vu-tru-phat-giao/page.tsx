@@ -9,6 +9,9 @@ import { vuTru } from "@/config/vuTru";
 import { getContentRepository } from "@/libs/content/repository";
 import { templeAreas } from "@/libs/vuTru";
 
+// Served from Cloudflare's Workers Cache and made again at most every 5 minutes (T41e).
+export const revalidate = 300;
+
 export const metadata: Metadata = {
 	title: `${vuTru.title} – ${site.name}`,
 	description: vuTru.lead,

@@ -18,6 +18,17 @@ export const LIVE_SECTIONS = ["dong-chay-hoang-phap"];
 const NEWS_COUNT = 6;
 const UPCOMING_COUNT = 3;
 
+/**
+ * A post as the news slider's card shows it. The slider is a client component, so whatever it
+ * gets is written into the page a second time for React (T41e): no summary, subtitle or author,
+ * and one picture.
+ */
+export type NewsCard = Pick<PostSummary, "id" | "slug" | "section" | "title" | "category" | "publishedDate" | "views" | "thumbnail">;
+
+function newsCard({ id, slug, section, title, category, publishedDate, views, thumbnail, banner }: PostSummary): NewsCard {
+	return { id, slug, section, title, category, publishedDate, views, thumbnail: thumbnail ?? banner };
+}
+
 export type HeroImage = {
 	src: string;
 	/** Sizes made for the site; editors' pictures come in one size. */
@@ -75,9 +86,9 @@ export type HomeData = {
 	/** Khóa tu sắp tới: the next events still running or to come. */
 	upcoming: UpcomingEvent[];
 	/** Tin mới nhất. */
-	latest: PostSummary[];
+	latest: NewsCard[];
 	/** Dấu ấn hoằng pháp: most read, leaving out what Tin mới nhất already shows. */
-	popular: PostSummary[];
+	popular: NewsCard[];
 	/** Lời Thầy dạy: the month themes' verses, from this month on. */
 	verses: MonthTheme[];
 	welcome: Welcome | null;
@@ -222,8 +233,8 @@ export async function loadHomeData(repo: ContentRepository, now = new Date()): P
 	return {
 		hero,
 		upcoming,
-		latest,
-		popular,
+		latest: latest.map(newsCard),
+		popular: popular.map(newsCard),
 		verses: versesFrom(schedule.themes, Number(today.slice(5, 7))),
 		welcome: welcomeFrom(topics, teachers, stats),
 		teachers,

@@ -20,9 +20,10 @@ export const metadata: Metadata = {
 };
 
 // The countdowns ("Còn 3 ngày"), the next retreat and the month's verse follow the day in
-// Vietnam, so the page is made for each visit. vinext would otherwise take it for static
-// (it reads no request data) and serve the first copy for a year.
-export const dynamic = "force-dynamic";
+// Vietnam: the page is made again every 5 minutes and served from Cloudflare's Workers Cache
+// in between (T41e), so a new day shows within 5 minutes. Without `revalidate` vinext would
+// take it for static (it reads no request data) and keep the first copy for a year.
+export const revalidate = 300;
 
 type Block = { id: string; render: (data: HomeData) => ReactNode };
 

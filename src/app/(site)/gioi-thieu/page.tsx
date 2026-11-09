@@ -7,6 +7,9 @@ import { site } from "@/config/site";
 import { getContentRepository } from "@/libs/content/repository";
 import type { AboutTopic, Category } from "@/libs/content/types";
 
+// Served from Cloudflare's Workers Cache and made again at most every 5 minutes (T41e).
+export const revalidate = 300;
+
 const TITLE = "Giới thiệu";
 // The old site's words for this page.
 const LEAD = "Chốn già lam thanh tịnh – Nơi hội tụ truyền thống truyền thừa, tâm nguyện độ sanh và tinh hoa văn hóa Phật giáo Việt Nam.";

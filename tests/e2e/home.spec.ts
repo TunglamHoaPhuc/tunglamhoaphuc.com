@@ -93,13 +93,13 @@ test.describe("home page content", () => {
 	});
 
 	// The countdowns follow the day: a copy kept from the first visit (vinext caches pages it
-	// takes for static) said "Còn 4 ngày" a day late.
-	test("is made afresh for each visit, never served from a page cache", async ({ request }) => {
-		for (let visit = 0; visit < 2; visit++) {
-			const response = await request.get("/");
-			expect(response.headers()["x-vinext-cache"] ?? "MISS").not.toBe("HIT");
-			expect(response.headers()["cache-control"]).toMatch(/no-store/);
-		}
+	// takes for static) once said "Còn 4 ngày" a day late. Since T41e the page is cached on
+	// Cloudflare's edge but made again every 5 minutes, and browsers never keep it.
+	test("is never kept by the browser, and made again within 5 minutes", async ({ request }) => {
+		const response = await request.get("/");
+		expect(response.headers()["cache-control"]).toMatch(/max-age=0|no-store/);
+		expect(readFileSync("src/app/(home)/page.tsx", "utf8")).toMatch(/export const revalidate = (\d+);/);
+		expect(Number(/export const revalidate = (\d+);/.exec(readFileSync("src/app/(home)/page.tsx", "utf8"))![1])).toBeLessThanOrEqual(300);
 	});
 
 	test("has one h1 and names every block", async ({ page }) => {

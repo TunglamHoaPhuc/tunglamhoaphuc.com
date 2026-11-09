@@ -8,6 +8,9 @@ import { tongChi } from "@/config/tongChi";
 import { getContentRepository } from "@/libs/content/repository";
 import { groupTongChi } from "@/libs/tongChiGroups";
 
+// Served from Cloudflare's Workers Cache and made again at most every 5 minutes (T41e).
+export const revalidate = 300;
+
 export const metadata: Metadata = {
 	title: `${tongChi.title} – ${site.name}`,
 	description: tongChi.intro[0],

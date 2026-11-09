@@ -16,6 +16,13 @@ import type { TongChiArticle, TongChiSummary } from "@/libs/content/types";
 import { formatNumber } from "@/libs/format";
 import { groupTongChi, nameInGroup, tongChiHref } from "@/libs/tongChiGroups";
 
+// Served from Cloudflare's Workers Cache and made again at most every 5 minutes (T41e).
+export const revalidate = 300;
+// No pages at build time; each is made on its first visit, then cached (ISR).
+export async function generateStaticParams() {
+	return [];
+}
+
 const PATH = tongChi.path;
 
 type Props = { params: Promise<{ slug: string }> };

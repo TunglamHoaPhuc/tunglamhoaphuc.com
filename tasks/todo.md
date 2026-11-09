@@ -1493,20 +1493,59 @@
   - Thu gọn dữ liệu nhúng trong HTML: client component chỉ nhận các trường nó dùng.
   - Từ T41a: khi HTML về nhanh, lần vẽ đầu chờ JS và hydrate (khoảng 1,8 s trên điện thoại giả lập); tác vụ hydrate 390–500 ms. Thu gọn dữ liệu nhúng là cách giảm cả hai. CSS màn hình đầu đặt vào HTML và ảnh tĩnh tên có mã băm cũng chưa làm ở T41a.
 
+**Kết quả 05/11/2026** (đo lại 10/11): phần cache đã xong và deploy `v2.` (phiên bản `9dcc5ee5`, vẫn là bản đang chạy). Làm trước T19, vì cơ chế cache của vinext không cần KV: nguồn dữ liệu vẫn là snapshot trong kho.
+- **Cơ chế:** `vinext({ cache: { cdn: workersCacheCdnAdapter() } })` và `createWorkersCacheConfig()` trong `cloudflare.config.ts` (đã có trong `@vinext/cloudflare`, không phải viết Worker bọc ngoài).
+  - Cloudflare Workers Cache chỉ bật cho entrypoint `VinextCachedResponse`; entrypoint mặc định vẫn chạy định tuyến ở mọi yêu cầu rồi chuyển sang entrypoint có cache. Lượt trúng cache không chạy mã ứng dụng.
+  - Khóa cache có mã băm của bản build, nên mỗi lần deploy là một bộ cache mới (kiểm: lượt đầu sau deploy là `MISS`).
+  - Trình duyệt vẫn nhận `Cache-Control: private, max-age=0, must-revalidate`: không giữ trang. Chỉ edge giữ.
+- **Việc làm:**
+  - Trang chủ: `revalidate = 300` thay cho `dynamic = "force-dynamic"`. Đếm ngược ngày có thể trễ tối đa 5 phút, và test trang chủ nay kiểm điều này thay cho "không bao giờ cache".
+  - 7 route công khai khai báo `revalidate = 300`: Giới thiệu, Tông Chỉ, Vũ Trụ (mỗi loại gồm trang nhóm và trang bài), Dòng Chảy (trang bài). Trang có `[slug]` thêm `generateStaticParams` trả mảng rỗng, nếu không vinext coi là trang động và trả `no-store`.
+  - Dữ liệu nhúng cho slider tin tức: `NewsCard` chỉ gồm các trường thẻ dùng (bỏ `summary`, `subtitle`, `author`, `banner`, `galleryCount`; `thumbnail` lấy bìa nếu thiếu).
+- **Đo (10/11, `v2.`, 20 lượt mỗi mẫu trang, TTFB phía máy chủ = bỏ thời gian bắt tay TLS):**
+
+  | Trang | p50 | p75 | p90 | Cache |
+  |---|---|---|---|---|
+  | Trang chủ | 87 ms | 105 ms | 131 ms | HIT |
+  | Bài Dòng Chảy | 83 ms | 102 ms | 125 ms | HIT |
+  | Bài Giới thiệu | 83 ms | 92 ms | 99 ms | HIT |
+  | Bài Tông Chỉ | 81 ms | 87 ms | 94 ms | HIT |
+  | Khu vực Vũ Trụ | 81 ms | 86 ms | 92 ms | HIT |
+  | Danh sách Dòng Chảy | 110 ms | 118 ms | 122 ms | BYPASS |
+  | Lịch tu học | 109 ms | 127 ms | 136 ms | BYPASS |
+
+  - Trước T41e: 0,35–2,7 s, hay vượt 1 s khi Worker khởi động nguội. Lượt đầu tiên sau mỗi 5 phút vẫn là `MISS` (0,6–1,3 s).
+  - Payload RSC của trang bài cũng `HIT` (`/gioi-thieu/…?_rsc=…` 94 s tuổi, 0,2 s đầu-cuối). Yêu cầu RSC cần đúng mã `_rsc`; không có thì nhận 307.
+  - Danh sách và lịch đọc tham số truy vấn nên vẫn `BYPASS`; ở trạng thái Worker nóng TTFB vẫn khoảng 110–127 ms, nhưng chi phí dựng khi nguội còn nguyên.
+  - Mã 404 của slug không tồn tại cũng được cache 5 phút (`MISS` rồi `HIT`).
+- **Lighthouse 13.6 điện thoại trên `v2.`: không đổi điểm, vì lab đã chạy khi Worker nóng:**
+  - T41a (7 lượt) → T41e (5 lượt), trang chủ: TTFB 168 → 85 ms; điểm 64 → 63; LCP 6,3 → 6,4 s.
+  - Đo lại 10/11 (3 lượt, cùng bản): điểm 80–85, FCP mô phỏng khoảng 2,0 s (quan sát 0,7 s), LCP 3,5–4,5 s.
+  - Chênh giữa hai lượt đo (59–64 và 80–85) lớn hơn mọi cải thiện của một đợt, nên điểm lab một mình không đủ để kết luận về T41e; xem TTFB thật ở bảng trên.
+- **CPU Worker (telemetry 20 phút sau deploy, gồm cả các lượt e2e và Lighthouse):** 1.187 lượt chạy `ok`, trung vị 9 ms, p90 47 ms; entrypoint dựng trang (`VinextCachedResponse`, tức lượt `MISS`) 192 lượt, trung vị 20 ms, p90 188 ms. Chưa có số cùng điều kiện từ trước T41e để so, nên chưa đánh dấu tiêu chí CPU.
+- **Chưa làm:**
+  - **"Làm mới site":** `/van-hanh/lam-moi` thuộc T19, chưa có. Khi làm phải xóa cả bản cache ở edge (`revalidatePath` hoặc `ctx.cache.purge`). Hiện dữ liệu chỉ đổi khi deploy, và mỗi deploy là bộ cache mới.
+  - **Trang có tham số truy vấn** (danh sách Dòng Chảy, lịch, Bảo Tượng Phật Giáo) chưa vào cache.
+  - **HTML trang chủ 207 → 201 KB chưa nén** (đích ≤ 120 KB). Phần lớn là payload RSC (khoảng 106 KB, dòng lớn nhất là khối tin tức 9,5 KB, rồi header, vòng Lời Thầy dạy, các khối server). Muốn giảm tiếp phải chuyển khối nào chỉ hiển thị sang không nhúng dữ liệu hai lần.
+  - **Chi phí yêu cầu trên gói Workers Free:** tài liệu Workers Cache ghi khi bật cache mọi yêu cầu tới Worker đều tính theo giá yêu cầu chuẩn, kể cả yêu cầu giữa các entrypoint. Chưa kiểm một lượt xem trang tính 1 hay 2 yêu cầu so với hạn mức 100.000 yêu cầu mỗi ngày; cần biết trước T22 (Câu hỏi mở #8).
+  - Tải trước liên kết (RSC) vẫn bật: với trang có `revalidate` nó nay phục vụ từ cache.
+
 **Tiêu chí nghiệm thu:**
-- [ ] Trang công khai lượt thứ hai trở đi: TTFB p75 ≤ 200 ms trên `v2.` (đo 20 lượt mỗi mẫu trang)
-- [ ] CPU Worker trung vị mỗi lượt xem trang chủ (gồm tải trước) giảm so với mốc T19a; ghi số trước–sau
-- [ ] Sửa bài ở admin cũ rồi bấm "Làm mới site": trang và payload RSC hiện bản mới ngay
-- [ ] Trang có cookie phiên, `/van-hanh/*`, `/admin*` và lỗi 5xx không bao giờ được cache (test)
-- [ ] HTML trang chủ ≤ 120 KB chưa nén (hiện 251 KB)
+- [x] Trang công khai lượt thứ hai trở đi: TTFB p75 ≤ 200 ms (86–105 ms ở 5 mẫu có cache; 118–127 ms ở 2 mẫu chưa cache)
+- [ ] CPU Worker trung vị mỗi lượt xem trang chủ giảm so với mốc T19a: chưa có số trước cùng điều kiện (số sau ở trên)
+- [ ] Sửa bài ở admin cũ rồi bấm "Làm mới site": chờ T19
+- [ ] Trang có cookie phiên, `/van-hanh/*`, `/admin*` và lỗi 5xx không bao giờ được cache: test mới chỉ kiểm `/van-hanh/lam-moi`, một trang 404 cấp cao nhất và `/anh-goc/` với bucket lạ; chưa kiểm cookie và 5xx
+- [ ] HTML trang chủ ≤ 120 KB chưa nén: chưa đạt (201 KB)
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- edge-cache` (header cache, khóa HTML/RSC riêng, trang không được cache)
-- [ ] Workers telemetry trước–sau; Lighthouse điện thoại 3 trang ở mốc T41c
+- [x] `npm run test:e2e -- edge-cache` (mới): 5 trang `HIT` ở lượt hai, payload RSC khác HTML, trang không công khai không `HIT`. Đỏ trên bản cũ (5/7), xanh sau khi deploy; bỏ qua khi chạy cục bộ và ở chế độ điện thoại
+- [x] Unit 156 xanh; `tsc`, eslint không lỗi
+- [x] Toàn bộ e2e trên `v2.`: 495/495 (49 bỏ qua theo thiết kế). Cục bộ các bộ chính 148/148, một test xô lệch bố cục chập chờn như đã ghi
+- [x] Workers telemetry sau deploy (số ở trên); Lighthouse điện thoại ở mốc T41c
 
 **Phụ thuộc:** T19 (ISR, bộ đệm KV, nút làm mới). Cần xong trước T22.
 
-**File dự kiến:** `cloudflare.config.ts`, `next.config.js`, `src/app/(site)/layout.tsx`, `src/app/van-hanh/lam-moi/page.tsx`, `tests/e2e/edge-cache.spec.ts`
+**File:** `cloudflare.config.ts`, `vite.config.ts`, `src/app/(home)/page.tsx`, `src/app/(site)/{dong-chay-hoang-phap,gioi-thieu,tong-chi-tu-hoc,vu-tru-phat-giao}/**/page.tsx`, `src/libs/home.ts`, `src/components/sections/blogs/Blogs2.js`, `src/components/shared/cards/BlogCard2.js`, `tests/e2e/edge-cache.spec.ts`, `tests/e2e/home.spec.ts`
 
 **Quy mô:** M
 

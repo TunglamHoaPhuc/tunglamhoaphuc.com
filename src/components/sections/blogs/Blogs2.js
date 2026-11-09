@@ -22,7 +22,7 @@ const A11Y = {
  * lazy picture of the hidden slides as the page started (9.3 MB on a phone, editors'
  * originals among them). Before the slider runs, and in the server HTML, the first two
  * (what a wide screen shows) have theirs.
- * @param {{ posts: import("@/libs/content/types").PostSummary[], autoplay: ReturnType<typeof useAutoplay> }} props
+ * @param {{ posts: import("@/libs/home").NewsCard[], autoplay: ReturnType<typeof useAutoplay> }} props
  */
 const NewsSlider = ({ posts, autoplay }) => {
 	const [shown, setShown] = useState(() => new Set([0, 1]));
@@ -68,7 +68,7 @@ const NewsSlider = ({ posts, autoplay }) => {
 /**
  * Bexon's blog slider as the home news block (plan.md, home block 4): two tabs, Tin mới
  * nhất and Dấu ấn hoằng pháp (most read), over one self-moving slider with a pause button.
- * @param {{ latest: import("@/libs/content/types").PostSummary[], popular: import("@/libs/content/types").PostSummary[] }} props
+ * @param {{ latest: import("@/libs/home").NewsCard[], popular: import("@/libs/home").NewsCard[] }} props
  */
 const Blogs2 = ({ latest, popular }) => {
 	const tabs = [

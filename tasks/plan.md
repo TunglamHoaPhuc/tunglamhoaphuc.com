@@ -263,7 +263,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [x] T41d: Ảnh nội dung qua Image Transformations của Cloudflare (điều kiện của T22; đổi từ bản thu nhỏ trên R2, xong 04/11)
 - [x] T41f: Font, icon font, hiệu ứng khởi động sau và ảnh tĩnh (đợt 1 tối ưu hiệu suất, thêm 04/11; điều kiện của T22; xong 04/11)
 - [x] T41a: Gọn CSS, icon font và bớt phần phải hydrate (đợt 2; kéo lên từ giai đoạn 6 ngày 04/11, điều kiện của T22; xong 05/11, còn 2 tiêu chí chuyển sang T41e)
-- [ ] T41e: Cache HTML và RSC ở edge (đợt 3, sau T19, điều kiện của T22)
+- [x] T41e: Cache HTML và RSC ở edge (đợt 3, điều kiện của T22; phần cache xong 05/11, TTFB p75 86–105 ms; còn "Làm mới site" chờ T19, trang có tham số truy vấn, HTML ≤ 120 KB, kiểm chi phí yêu cầu trên gói Free)
 - [ ] T22: Kiểm thử trước ra mắt và chuyển `www`
 - [ ] **Checkpoint E** – ra mắt `www`, theo dõi 48 giờ
 

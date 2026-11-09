@@ -1,4 +1,9 @@
 import { bindings, defineConfig, defineWorker } from "cf/config";
+import { createWorkersCacheConfig } from "@vinext/cloudflare/cache/config";
+
+// T41e: Workers Cache on vinext's response entrypoint only (vite.config.ts); the default
+// entrypoint keeps running routing on every request. Cache hits use no Worker CPU.
+const cache = await createWorkersCacheConfig();
 
 export default defineConfig({
   accountId: "b91a395bd9b7ab86ef4cba41d1d828ae",
@@ -17,8 +22,11 @@ export default defineConfig({
       // public/_headers, and cost no Worker CPU.
       runWorkerFirst: ["/*", "!/_next/static/*", "!/*/_next/static/*", "!/images/*", "!/brand/*"],
     },
+    ...cache,
     env: {
       ASSETS: bindings.assets(),
+      ...cache.env,
     },
+    exports: { ...cache.exports },
   }),
 });
