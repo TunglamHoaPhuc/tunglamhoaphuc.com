@@ -254,7 +254,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [x] T16: Bảo Tượng Phật Giáo (làm song song với T41c ngày 04/11 trên hai nhánh, gộp sau; ảnh tượng theo quy tắc của T41c)
 - [x] T17: Trí Tuệ Phật Pháp (hai phòng đọc của site cũ có trang giới thiệu dựng phía server; phần chuyển ứng dụng tách thành T17b, chủ dự án chọn ngày 13/11)
 - [ ] T17b: Chuyển hai phòng đọc của Trí Tuệ (Học tiếng Tạng, sách "Đi Qua Khổ Vui Cuộc Đời") sang site mới – phải xong trước T22
-- [ ] T18: Liên hệ và tìm kiếm từ khóa
+- [x] T18: Liên hệ và tìm kiếm từ khóa
 - [ ] **Checkpoint D** – site công khai hoàn chỉnh trên `v2.`
 
 ### Giai đoạn 3 – Ra mắt sớm trên www

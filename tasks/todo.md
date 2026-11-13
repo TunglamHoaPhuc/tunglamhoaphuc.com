@@ -1207,14 +1207,34 @@
 
 **File Bexon:** `sections/contacts/ContactTop.js`, `sections/contacts/Contact3.js`, `layout/header/Header.js` (popup tìm kiếm)
 
+**Kết quả 13/11/2026:** xong, đã deploy `v2.`. Site cũ không có `/lien-he` (trả 404) cũng như trang tìm kiếm, nên hai trang này mới hoàn toàn.
+- **`/lien-he`** (khuôn `ContactTop` + `Contact3`, đọc từ `src/config/site.ts`):
+  - Bốn thẻ: Địa chỉ (nút "Chỉ đường" mở Google Maps), Gọi điện (số chính của Trưởng ban lãnh chúng), Giờ mở cửa, Khóa tu và cộng tu (dẫn tới phần đăng ký).
+  - Danh bạ 7 người theo vai trò; mỗi dòng là một liên kết `tel:` cao ít nhất 48 px. Hàm nhóm theo vai trò (`contactGroups`) chuyển từ footer vào `site.ts`, footer và trang này dùng chung.
+  - Không có form của Bexon (chưa có nơi nhận). Không nhúng bản đồ Google (nặng, đặt cookie): trong lúc chờ ảnh bản đồ tĩnh (GD-06), chỗ đó là ảnh toàn cảnh chùa kèm địa chỉ và nút "Mở Google Maps".
+  - Khối mạng xã hội chỉ hiện khi `site.social` có trang (đang trống, chờ GD-06).
+- **`/tim-kiem?q=&muc=&trang=`** (dựng phía server, form GET chạy cả khi không có JavaScript):
+  - Tìm trong 815 mục của 7 chuyên mục: 471 bài Dòng Chảy, 158 bài Trí Tuệ, 25 bài Tông Chỉ, 6 chủ đề Giới thiệu, 14 khu vực, 126 tôn tượng (cả mã TP), 15 sự kiện lịch tu học (dẫn tới đúng tháng và thẻ sự kiện).
+  - So không dấu và theo nguyên từ: "niem phat" và "niệm Phật" cho cùng kết quả; "co" không khớp vào giữa "Cộng". Mỗi từ của truy vấn phải có trong tiêu đề hoặc dòng tóm tắt. Bản đầu so theo chuỗi con, khiến truy vấn toàn từ ngắn ("khong co gi…") vẫn ra kết quả; test e2e bắt được, nay đổi sang nguyên từ.
+  - Xếp hạng: tiêu đề trùng khít truy vấn, rồi tiêu đề chứa cả cụm, rồi tiêu đề chứa đủ các từ; cùng hạng thì mới trước.
+  - Mặc định hiện mọi chuyên mục, mỗi chuyên mục 4 kết quả kèm "Xem cả N kết quả trong …". Chọn một chuyên mục thì có 12 kết quả một trang, phân trang trên địa chỉ.
+  - Truy vấn rỗng hoặc không có kết quả: lời nhắc và 7 chuyên mục để chọn.
+  - Kết quả chỉ có chữ, không ảnh thu nhỏ, để không tiêu thêm hạn mức Image Transformations.
+  - Trang có `noindex`. Nút tìm kiếm ở header (cờ `site.features.search` của T5b) nay bật trên mọi trang; test "cờ tắt" của T5b đổi thành test mọi trang đều tìm được.
+- **Chi phí:** chỉ mục dựng một lần mỗi Worker (khoảng 17 ms), nhưng phải đọc mọi nguồn dữ liệu trước (bài viết khoảng 210 ms, tượng 43 ms khi đo trên Node). Lúc Worker khởi động nguội, tốn như trang danh sách Dòng Chảy; mỗi lần tìm sau đó khoảng 1 ms. Trang có tham số nên không vào cache ở edge (như danh sách và lịch, T41e).
+
 **Tiêu chí nghiệm thu:**
-- [ ] "niem phat" và "niệm Phật" cho cùng kết quả
-- [ ] Truy vấn rỗng hoặc không có kết quả hiện gợi ý chuyên mục
-- [ ] Trang liên hệ không nhúng iframe bản đồ khi tải
+- [x] "niem phat" và "niệm Phật" cho cùng kết quả (unit và e2e)
+- [x] Truy vấn rỗng hoặc không có kết quả hiện gợi ý chuyên mục
+- [x] Trang liên hệ không nhúng iframe bản đồ khi tải (test kiểm không có iframe và không có yêu cầu nào tới Google Maps)
 
 **Kiểm chứng:**
-- [ ] `npm test -- search`
-- [ ] `npm run test:e2e -- lien-he tim-kiem`
+- [x] `npm test -- search contacts`: 11 test; thử đột biến 9/9 bị bắt (một đột biến lọt qua lúc đầu, đã thêm test)
+- [x] `npm run test:e2e -- lien-he tim-kiem header-extras`: 4 + 9 test × 2 cỡ màn hình, có axe và một test chạy không JavaScript; hai trang mới vào a11y, canh gác hiệu ứng; `/lien-he` vào cache ở edge
+- [x] Toàn bộ e2e, dựng từ worktree sạch như T17 (trong checkout vẫn có việc dở của phiên khác):
+  - **Cục bộ:** 580 qua, 11 hỏng rải rác ở các bộ không liên quan (đa số trên điện thoại). Lượt chạy mất 17 phút vì máy đang chạy test của các phiên khác; chạy lại riêng 11 test đó thì cả 11 qua.
+  - **`v2.`** (phiên bản Worker `7b829c64`): 608 qua, 1 hỏng là test lướt trang lịch chập chờn có sẵn (đang sửa ở phiên riêng, xem T17).
+- [x] Ảnh: `docs/anh/t18-lien-he-tim-kiem.png`
 
 **Phụ thuộc:** T5b, T13a, T14–T17
 
