@@ -24,7 +24,7 @@
 				"uses-responsive-images": ["warn", { "maxLength": 0 }],
 				"cumulative-layout-shift": ["error", { "maxNumericValue": 0.01 }],
 				"total-blocking-time": ["warn", { "maxNumericValue": 300 }],
-				"largest-contentful-paint": ["warn", { "maxNumericValue": 2500 }]
+				"largest-contentful-paint": ["warn", { "maxNumericValue": 5500 }]
 			}
 		},
 		"upload": { "target": "filesystem", "outputDir": ".lighthouseci/reports" }

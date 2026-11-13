@@ -597,7 +597,7 @@
 ### Checkpoint B: Lát cắt đầu-cuối
 - [ ] Trang chủ → danh sách → chi tiết → album chạy trọn trên `v2.` bằng dữ liệu thật
 - [ ] Test canh gác + axe xanh cho cả 4 trang
-- [ ] Ghi mốc LCP và dung lượng CSS/JS; nếu preloader làm trượt LCP < 2,0 s thì chủ dự án quyết (Câu hỏi mở #6 trong plan.md)
+- [ ] Ghi mốc LCP và dung lượng CSS/JS (mục tiêu LCP đã đổi ngày 13/11: p75 ≤ 2,5 s của người dùng thật, Câu hỏi mở #6 trong plan.md)
 - [ ] Chủ dự án xác nhận cách đổi nội dung section Bexon đạt yêu cầu trước khi nhân rộng
 
 ---
@@ -1206,6 +1206,7 @@
 **Mô tả:** `generateMetadata` cho mọi route (thay metadata "Bexon - Corporate Business…" của gói); ảnh OG động (Satori + `brand-tokens.json`); `sitemap.xml` động; `robots.txt` theo host (`www` cho phép index, `v2.` chặn); JSON-LD `Article`, `Event`, `Place`, `Organization`; bộ favicon + manifest (tạm từ logo WebP, thay khi có SVG); bật Cloudflare Web Analytics (không cookie, HT-07).
 
 **Tiêu chí nghiệm thu:**
+- [ ] Cloudflare Web Analytics bật trên `www`; sau 2 tuần ra mắt, LCP p75 trên điện thoại ≤ 2,5 s (mục tiêu LCP chốt 13/11, thay cho < 2,0 s trong Lighthouse). Nếu vượt: làm CSS màn hình đầu trong HTML và hoãn script (ghi ở T41b)
 - [ ] Không có 2 trang trùng `<title>`; sitemap liệt kê mọi trang công khai
 - [ ] Rich Results Test hợp lệ cho 1 bài viết và 1 sự kiện mẫu
 - [ ] `v2.` trả noindex, `www` (giả lập host) cho phép index
@@ -2078,7 +2079,7 @@
 - **Ghi chú:** thư mục trình duyệt của Playwright (`ms-playwright`) bị mất khỏi máy trước lượt chạy này; đã cài lại bằng `npx playwright install chromium`.
 
 **Tiêu chí nghiệm thu:**
-- [ ] LCP và CLS đạt mục tiêu đã chốt ở Checkpoint B: CLS = 0 đạt; LCP 3,9–5,2 s, chưa đạt < 2,0 s
+- [x] CLS = 0 đạt. Mục tiêu LCP đổi ngày 13/11 (chủ dự án): p75 ≤ 2,5 s của người dùng thật, đo ở T20 sau khi ra mắt; Lighthouse CI cảnh báo khi LCP mô phỏng trên 5,5 s (hiện 3,2–5,2 s)
 - [x] Lighthouse CI báo lỗi khi một trang vượt ngân sách ảnh, CSS, JS hoặc font (lượt đầu báo lỗi đúng ở 4 trang khi quy tắc ảnh quá cỡ còn là lỗi)
 - [x] Mọi trang giữ ngân sách font của T41f (201 KB, ngưỡng 210 KB)
 - [x] axe 0 lỗi nghiêm trọng trên mọi mẫu trang

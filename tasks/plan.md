@@ -296,7 +296,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 ### Giai đoạn 6 – Chuyển hẳn và hoàn thiện
 - [ ] T39: Chuyển hẳn sang D1 và admin mới
 - [ ] T40: Khối "Hỏi AI Hòa Phúc"
-- [x] T41b: Đo toàn site, ngân sách ảnh và Lighthouse CI (xong 13/11; LCP 3,9–5,2 s, chưa đạt mục tiêu < 2,0 s, chờ chủ dự án quyết)
+- [x] T41b: Đo toàn site, ngân sách ảnh và Lighthouse CI (xong 13/11; mục tiêu LCP đổi sang số của người dùng thật, xem Câu hỏi mở #6)
 - [ ] **Checkpoint J** – hoàn tất, tắt admin cũ và WordPress theo kế hoạch Cloudflare
 
 ## Làm song song
@@ -319,7 +319,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 | Admin cũ còn lỗ hổng `/login` (HT-01) trong suốt thời gian chuyển tiếp | Cao | T21 làm ngay: Access cho `quantri.` và cho `/admin`, `/api/admin`, `/login` trên `www`; bật Vercel Deployment Protection cho địa chỉ `*.vercel.app` |
 | Giữ hiệu ứng làm khó người lớn tuổi, trình đọc màn hình, người dùng bàn phím | Cao | Công tắc giảm chuyển động (T2); slider có nút dừng; kiểm cuộn bàn phím, liên kết neo, tìm trong trang khi bật cuộn mượt; test canh gác chạy mọi trang |
 | Đảo ngược UX-01, UX-03 đang "Đã chốt" | TB | Chuẩn bị #6: cập nhật bảng khảo sát, báo Ban Trị Sự; T3b sửa BRAND-GUIDELINES mục 1.2, 5.6 cho khớp |
-| Preloader + GSAP + CSS nặng làm trượt mục tiêu LCP < 2,0 s (UX-03) | TB | Đo mốc ở Checkpoint B; preloader ẩn ngay khi có nội dung đầu tiên; nếu vẫn trượt, chủ dự án chọn giữa preloader và mục tiêu LCP (Câu hỏi mở #6); T41a cắt Bootstrap và icon font |
+| Preloader + GSAP + CSS nặng làm trượt mục tiêu LCP (UX-03; mục tiêu đổi ngày 13/11 thành p75 ≤ 2,5 s của người dùng thật) | TB | Đo mốc ở Checkpoint B; preloader ẩn ngay khi có nội dung đầu tiên; nếu vẫn trượt, chủ dự án chọn giữa preloader và mục tiêu LCP (Câu hỏi mở #6); T41a cắt Bootstrap và icon font |
 | Điểm hiệu suất trên điện thoại thấp khi ra mắt `www` (PageSpeed 44 ngày 04/11: LCP 7,4 s, TBT 1.380 ms), ảnh hưởng Core Web Vitals và thứ hạng tìm kiếm | **Cao** | Ba đợt trước T22: T41f (xong 04/11: font 722 → 201 KB, hiệu ứng khởi động từng bước; Lighthouse trang chủ 53–70 → 71–74), T41a (xong 05/11: CSS 141 → 50 KB br, JS ban đầu 235 → 175 KB br, giao diện không đổi), T41e (cache HTML ở edge). Mục tiêu PageSpeed điện thoại ≥ 80, LCP < 2,5 s, TBT < 300 ms. Không thêm tag quảng cáo, đo lường bên thứ ba (nguồn TBT của divineshop.vn) |
 | Ảnh gốc máy ảnh (6048 px, 7–9 MB) được đưa thẳng cho khách. Đo 04/11 trên `v2.` (điện thoại 4G): LCP trang bài 47,9 s, trang danh sách 11,9 s, trang chủ 8,4 s. Admin cũ không nén ảnh, nên bài mới nào cũng thêm ảnh nặng | TB (đã giảm từ Cao) | T41c và T41d đã xong 04/11: ảnh qua Image Transformations, trang bài còn 186 KB ảnh, LCP 4,6 s. Còn lại: quá 5.000 lần biến đổi mỗi tháng thì ảnh mới về ảnh gốc (theo dõi trang Usage; nếu thường xuyên vượt thì chủ tài khoản cân nhắc gói Images trả phí, 0,5 USD mỗi 1.000 lần); trang tượng và ảnh trong thân bài chưa đổi; T41b đặt ngân sách ảnh trong Lighthouse CI |
 | Đọc JSON trên B2 đúng lúc admin cũ đang ghi đè file | TB | Parse lỗi thì giữ bản trang cũ (ISR không thay); log lỗi; nút "Làm mới site" ở `/van-hanh/lam-moi` |
@@ -346,7 +346,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 3. **Ai giữ quyền project Vercel** của site cũ (T21 cần).
 4. **Trợ lý AI (ND-03):** tiếp tục Dify? Cần URL API, khóa, người quản lý nguồn tri thức (T40 cần).
 5. **Danh Tăng & Tổ Sư (91 vị):** có công khai trên site không? Kế hoạch hiện chỉ dựng module admin (T35).
-6. **Preloader và LCP:** nếu đo ở Checkpoint B thấy preloader làm trượt mục tiêu LCP < 2,0 s, ưu tiên giữ preloader hay giữ mục tiêu?
+6. ~~**Preloader và LCP:** nếu đo ở Checkpoint B thấy preloader làm trượt mục tiêu LCP < 2,0 s, ưu tiên giữ preloader hay giữ mục tiêu?~~ **Chốt 13/11:** mục tiêu là LCP của người dùng thật, p75 ≤ 2,5 s trên điện thoại, đo bằng Cloudflare Web Analytics (bật ở T20) sau khi ra mắt `www`. Lighthouse CI chỉ canh thụt lùi (cảnh báo khi LCP mô phỏng trên 5,5 s). Lý do: LCP mô phỏng 3,2–5,2 s trong khi LCP đo thật 0,6–0,8 s (T41b). Cần cập nhật UX-03 trong bảng khảo sát.
 7. **Kho mã GitHub riêng tư (HT-02):** tạo bằng tài khoản của chùa khi nào? (T1b cần)
 8. **Gói Workers:** bật Workers Paid (5 USD/tháng) cho tài khoản sở hữu zone trước khi ra mắt `www`? Gói Free cho 10 ms CPU mỗi lượt, trang hiện đã vượt (xem bảng rủi ro). Chủ tài khoản quyết và tự bật; T19 cần biết trước khi chọn cách nạp dữ liệu.
 
@@ -366,6 +366,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 |---|---|
 | 1 | Bản đầu: dựng mới, chuyển mã Bexon sang TypeScript + Tailwind, bỏ hiệu ứng |
 | 2 | Giữ Bootstrap/SCSS của Bexon, đổi theme qua cầu nối biến `--tj-*` → `--tlhp-*`; xem thử trên `v2.` |
+| 10 | 13/11, sau T41b: chủ dự án đổi mục tiêu LCP từ < 2,0 s trong Lighthouse sang p75 ≤ 2,5 s của người dùng thật (Web Analytics, T20); Lighthouse CI chỉ cảnh báo thụt lùi; đóng Câu hỏi mở #6 |
 | 9 | 04/11, sau báo cáo PageSpeed điện thoại 44 điểm và đo đối chiếu với divineshop.vn (Lighthouse 13.6): thêm T41f (font, icon font, hiệu ứng khởi động sau, ảnh tĩnh); kéo T41a lên giai đoạn 3 và thêm phần bớt hydrate, CSS màn hình đầu; font chuyển từ T41b sang T41f; T22 cần thêm T41f, T41a; thêm rủi ro điểm hiệu suất |
 | 8 | 04/11, chủ dự án chọn xử lý ảnh bằng Cloudflare, không phụ thuộc bucket R2 `tlhp-media` và tên miền `media.`: T41d đổi sang Image Transformations của zone (đã bật, nguồn "This zone only", ảnh B2 qua `/anh-goc/`); quyết định 8 viết lại; chuẩn bị #7 bỏ; T30 chỉ cần một bản ≤ 2560px; T41b không còn phụ thuộc bản thu nhỏ trên R2 |
 | 7 | 04/11, sau khi so với divineshop.vn: thêm T41e (cache HTML và RSC ở edge, trước T22) vì mỗi lượt xem đang dựng lại trang (TTFB 0,35–2,7 s); ghi ngân sách cụ thể cho T41a (CSS ≤ 60 KB br, JS ≤ 180 KB br) và T41b (≤ 2 preload font, font ≤ 150 KB); T22 cần thêm T41e |
