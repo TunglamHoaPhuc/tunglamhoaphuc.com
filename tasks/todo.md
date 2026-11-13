@@ -1282,7 +1282,7 @@
   - Nay chỉ slide đang hiện và slide kế tiếp có `src` (`NewsSlider` trong `Blogs2`). Trang chủ: ảnh 10,3 MB → 0,9 MB, điểm 48–53 → 66–74.
   - Chủ dự án giữ slider tự chạy ngay khi mở trang (không đợi cuộn tới).
 - **Còn lại:**
-  - Chân dung và tác phẩm ở trang tượng (`bao-tuong/[slug]/page.tsx`, lúc làm đang có thay đổi chưa commit của phiên khác).
+  - ~~Chân dung và tác phẩm ở trang tượng~~: xong 13/11 cùng phần sửa T16 (chân dung 1280 px ưu tiên thấp, tác phẩm 360/640 px; test trong `bao-tuong.spec.ts`).
   - Ảnh chèn trong thân bài (`normalize.ts`).
   - Theo dõi trang Usage của Transformations. Các lượt e2e và Lighthouse ngày 04/11 cũng tính vào hạn mức.
 

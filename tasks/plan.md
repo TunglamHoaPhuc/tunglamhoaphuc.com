@@ -305,7 +305,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - **Phải tuần tự:** T1 → T2 → T3a → T3b → T5a → T5b → T6; T23 → T24; T27a → T27b trước mọi module admin; T29 → T30 → T31.
 - **Song song được:** T4 với T2–T6.
 - **Sau Checkpoint B:** T11, T13a, T14, T15, T17 song song. Điểm chạm chung là mảng khối của trang chủ và `_tlhp-bridge.scss`: mỗi task chỉ thêm dòng của mình.
-- **Ảnh:** T41c và T41d đã xong ngày 04/11. Còn chân dung, tác phẩm ở trang tượng và ảnh chèn trong thân bài (ghi ở T41d).
+- **Ảnh:** T41c và T41d đã xong ngày 04/11. Còn ảnh chèn trong thân bài (ghi ở T41d); chân dung và tác phẩm ở trang tượng xong 13/11.
 - **Sau Checkpoint D:** giai đoạn 3 (ra mắt) và giai đoạn 4 (D1) chạy song song.
 - **Sau Checkpoint G:** T32, T33, T34, T36, T38, T38b song song; T35 chờ T34 (dùng chung trường lặp), T37 chờ T36.
 - **Hiệu suất:** T41f làm ngay, rồi T41a (đo riêng từng đợt); T41e sau T19. Cả ba trước T22. Không đổi giao diện, giữ hiệu ứng.
