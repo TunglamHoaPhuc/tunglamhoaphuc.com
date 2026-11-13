@@ -9,6 +9,7 @@ import StatueCard from "@/components/sections/vu-tru/StatueCard";
 import HeaderSpace from "@/components/shared/others/HeaderSpace";
 import { site } from "@/config/site";
 import { areaOfStatue, relatedStatues, STATUES_PATH, statueListHref } from "@/libs/baoTuong";
+import { IMAGE_WIDTH, imageAt, imageSrcSet, topImagePriority } from "@/libs/content/media";
 import { getContentRepository } from "@/libs/content/repository";
 import { areaHref, templeAreas } from "@/libs/vuTru";
 
@@ -66,7 +67,9 @@ export default async function BaoTuongStatue({ params }: Props) {
 						<div className="row justify-content-center row-gap-4">
 							<div className="col-12 col-md-8 col-lg-5">
 								<div className="team-details__img tlhp-about-portrait wow fadeInUp" data-wow-delay=".1s">
-									{statue.image ? <img src={statue.image.src} alt={`Tôn tượng ${statue.name}`} width={600} height={800} style={{ objectPosition: statue.image.position }} /> : null}
+									{statue.image ? (
+										<img src={imageAt(statue.image.src, IMAGE_WIDTH.wide)} alt={`Tôn tượng ${statue.name}`} width={600} height={800} fetchPriority={topImagePriority(imageAt(statue.image.src, IMAGE_WIDTH.wide))} style={{ objectPosition: statue.image.position }} />
+									) : null}
 								</div>
 							</div>
 							<div className="col-12 col-lg-7">
@@ -142,7 +145,19 @@ export default async function BaoTuongStatue({ params }: Props) {
 								{statue.art.map((work) => (
 									<li key={work.id} className="col-12 col-sm-6 col-lg-4">
 										<article className="tlhp-art-card">
-											{work.image ? <img src={work.image.src} alt="" width={480} height={360} loading="lazy" decoding="async" /> : null}
+											{work.image ? (
+												<img
+													src={imageAt(work.image.src, IMAGE_WIDTH.card)}
+													// One to a row on phones, two or three on wider screens.
+													srcSet={imageSrcSet(work.image.src, [IMAGE_WIDTH.small, IMAGE_WIDTH.card])}
+													sizes="(min-width: 992px) 400px, (min-width: 576px) 50vw, 100vw"
+													alt=""
+													width={480}
+													height={360}
+													loading="lazy"
+													decoding="async"
+												/>
+											) : null}
 											<div>
 												<h3 className="h5">{work.href ? <Link href={work.href}>{work.title}</Link> : work.title}</h3>
 												{work.location ? <p className="tlhp-art-place">{work.location}</p> : null}

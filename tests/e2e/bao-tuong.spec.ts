@@ -128,6 +128,19 @@ test.describe("Bảo Tượng Phật Giáo", () => {
 		expect(await axe(page)).toEqual([]);
 	});
 
+	// Up to 4.4 MB originals (T41d): the portrait comes at 1280 px, not asked for first; the
+	// works of art at the card sizes.
+	test("a statue page asks for its pictures at display size", async ({ page }) => {
+		await open(page, THICH_CA);
+		const portrait = page.locator(".tlhp-about-portrait img");
+		await expect(portrait).toHaveAttribute("src", /^\/cdn-cgi\/image\/width=1280,/);
+		await expect(portrait).toHaveAttribute("fetchpriority", "low");
+		const art = await page.locator("#nghe-thuat .tlhp-art-card img").evaluateAll((imgs) => imgs.map((img) => img.getAttribute("src")!));
+		expect(art.length).toBeGreaterThan(0);
+		for (const src of art) expect(src).toMatch(/^\/cdn-cgi\/image\/width=640,/);
+		await expect(page.locator("#nghe-thuat .tlhp-art-card img").first()).toHaveAttribute("srcset", /width=360,.* 360w, .*width=640,.* 640w/);
+	});
+
 	test("every link inside a statue page leads to a page that is there", async ({ page, request }) => {
 		await open(page, THICH_CA);
 		const hrefs = await page.locator("main a[href^='/']").evaluateAll((links) => [...new Set(links.map((link) => link.getAttribute("href")!.split("#")[0]))]);

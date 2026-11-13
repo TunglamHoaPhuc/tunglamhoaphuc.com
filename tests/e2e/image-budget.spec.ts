@@ -14,6 +14,9 @@ const PAGES = [
 	"/tong-chi-tu-hoc/niem-phat-phuong-phap-tro-hanh",
 	"/vu-tru-phat-giao",
 	"/vu-tru-phat-giao/tam-bao",
+	"/bao-tuong-phat-giao",
+	// Its portrait is a 4.4 MB original, the heaviest of the 126 statues.
+	"/bao-tuong/na_la_dien_kim_cang_tuong_co_tp0077",
 ];
 
 const MAX_FIRST_IMAGE = 500 * 1024;
