@@ -193,7 +193,7 @@ gói Bexon (zip) + design-system/tokens.css          T21 Admin cũ → quantri. 
                       ├─ T11 Lịch ─ T12 Khóa tu sắp tới, Lời Thầy dạy, đếm ngày
                       ├─ T13a Giới thiệu ─ T13b Lời chào, Chư Tôn Đức · T14 Tông Chỉ   ══ Checkpoint C ══
                       ├─ T15 Vũ Trụ ─ T19a Nạp dữ liệu theo trang · T41c Ảnh sửa nhanh ─ T16 Bảo Tượng
-                      ├─ T17 Trí Tuệ
+                      ├─ T17 Trí Tuệ ─ T17b Chuyển hai phòng đọc (trước T22)
                       └─ T18 Liên hệ + tìm kiếm
                             ══ Checkpoint D: site công khai đủ trên v2 ══
           ┌─────────────────────┴──────────────────────┐
@@ -204,7 +204,7 @@ gói Bexon (zip) + design-system/tokens.css          T21 Admin cũ → quantri. 
   T21 (đã xong) ─┐                                     └─ T26 Đăng ký khóa tu (bật ở T39)
   T41f Font, hiệu ứng khởi động sau ─ T41a Gọn CSS, bớt hydrate
   T41e Cache HTML/RSC ở edge (cần T19)
-  T22 Kiểm thử + chuyển www ◄─┘ (cần T19, T20, T41d, T41f, T41a, T41e)
+  T22 Kiểm thử + chuyển www ◄─┘ (cần T19, T20, T41d, T41f, T41a, T41e, T17b)
   ══ Checkpoint E: ra mắt www ══                  ══ Checkpoint F ══
                                                         └─ ADMIN MỚI
                                                            T27a Access + RBAC + nhật ký ─ T27b Khung giao diện
@@ -252,7 +252,8 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [x] T19a: Mỗi trang chỉ nạp dữ liệu nó cần (phần nạp theo nhu cầu của T19, làm trước T16 ngày 04/11)
 - [x] T41c: Ảnh – sửa nhanh trong code (phần ảnh của T41, làm trước T16; chốt 04/11 sau review tốc độ)
 - [x] T16: Bảo Tượng Phật Giáo (làm song song với T41c ngày 04/11 trên hai nhánh, gộp sau; ảnh tượng theo quy tắc của T41c)
-- [ ] T17: Trí Tuệ Phật Pháp
+- [x] T17: Trí Tuệ Phật Pháp (hai phòng đọc của site cũ có trang giới thiệu dựng phía server; phần chuyển ứng dụng tách thành T17b, chủ dự án chọn ngày 13/11)
+- [ ] T17b: Chuyển hai phòng đọc của Trí Tuệ (Học tiếng Tạng, sách "Đi Qua Khổ Vui Cuộc Đời") sang site mới – phải xong trước T22
 - [ ] T18: Liên hệ và tìm kiếm từ khóa
 - [ ] **Checkpoint D** – site công khai hoàn chỉnh trên `v2.`
 

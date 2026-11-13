@@ -1132,19 +1132,72 @@
 
 **File Bexon:** như T7, T8
 
+**Kết quả 13/11/2026:** xong, đã deploy `v2.`. Có bốn chỗ khác mô tả ở trên, ghi ở mục đầu.
+- **Khác mô tả:**
+  - **Không có trình phát pháp âm, không có video.** Dữ liệu 15 bài Pháp Âm không có file âm thanh; 15 bài Video Phật Pháp không có link YouTube nào, nội dung chỉ là tiêu đề. Trang cũ của các bài này cũng không phát gì. Hai loại bài này hiện ảnh và chữ như bài thường; khi có dữ liệu thì khối Video của trang bài (T9) tự hiện.
+  - **Không có kiểu "bìa 3:4" cho trang bài sách.** Ảnh của bài "Đi Qua Khổ Vui Cuộc Đời" là ảnh chụp sách cạnh tràng hạt (khổ ngang), không phải bìa. Bìa thật (lấy từ chủ đề Giới thiệu của Thầy Thích Tâm Hòa) đặt ở trang sách riêng; bài giới thiệu sách có nút "Đọc sách" dẫn sang đó. Dữ liệu cũng không có trường "nguồn" của sách.
+  - **Danh sách cũ không hiện 158 bài.** Trang `/tri-tue-phat-phap` cũ chỉ hiện 7 mục viết sẵn trong mã (2 sách, 2 pháp âm, 1 bài, 1 video, 1 câu chuyện; 3 mục không có trong dữ liệu). Trang mới liệt kê đủ 158 bài theo 4 mục, như Dòng Chảy.
+  - **Thêm hai phòng đọc của site cũ.** Ngoài `hoc-tieng-tang`, địa chỉ `/tri-tue-phat-phap/di-qua-kho-vui-cuoc-doi` (Tông Chỉ dẫn tới) là bộ đọc toàn văn cuốn sách. Cả hai là ứng dụng riêng. Chủ dự án chọn ngày 13/11: T17 dựng trang giới thiệu phía server, còn việc chuyển ứng dụng tách thành T17b.
+- **Dùng chung với Dòng Chảy:**
+  - Tách trang danh sách và trang bài thành `PostListPage` và `PostArticle`, nhận chuyên mục từ `src/config/sections.ts` (commit riêng, không đổi hành vi).
+  - Mỗi chuyên mục chỉ mở bài của mình: slug Trí Tuệ dưới `/dong-chay-hoang-phap` trả 404, và ngược lại.
+- **`/tri-tue-phat-phap`:**
+  - 158 bài, lọc theo 4 mục (Bài Viết 126, Pháp Âm 15, Video Phật Pháp 15, Ấn Phẩm & Sách 2), sắp xếp và phân trang trên địa chỉ.
+  - Bên dưới là khối "Sách và giáo trình": cuốn sách và khóa Học tiếng Tạng.
+- **`/tri-tue-phat-phap/[slug]`:** trang bài như Dòng Chảy, có cache ở edge như các trang bài khác (T41e).
+- **`/tri-tue-phat-phap/di-qua-kho-vui-cuoc-doi`** (dựng phía server):
+  - Bìa và lời giới thiệu lấy từ chủ đề Giới thiệu; tác giả, nhà xuất bản, số trang và mục lục 7 chương mục ghi trong `src/config/triTue.ts`, đọc từ trang cũ.
+  - Nút "Đọc toàn văn" mở bộ đọc của site cũ trong thẻ mới; liên kết sang bài giới thiệu sách.
+- **`/tri-tue-phat-phap/hoc-tieng-tang`** (dựng phía server; trang cũ chỉ là một khung nhúng trống):
+  - Lời giới thiệu (chữ của trang cũ), những gì phòng học có, mục lục 24 bài của Sara Book theo trang.
+  - Chữ Tạng trong mục lục được đánh dấu `lang="bo"` để trình đọc màn hình đổi giọng và trình duyệt chọn font Tạng. Site không có font Tạng; font hệ thống trên Windows (Microsoft Himalaya) vẽ nhỏ nên được phóng to.
+  - Nút "Vào học ngay" mở phòng học ở site cũ (`/tibetan-study/`) trong thẻ mới.
+- **Trang chủ và liên kết:**
+  - `LIVE_SECTIONS` thêm Trí Tuệ: "Tin mới nhất" và "Dấu ấn hoằng pháp" lấy cả bài Trí Tuệ.
+  - `/tri-tue-phat-phap` vào `livePaths`: liên kết từ Tông Chỉ sang Trí Tuệ (danh sách và cuốn sách) nay là liên kết thật.
+  - Unit test trang chủ và Tông Chỉ dùng bài Trí Tuệ làm ví dụ "chuyên mục chưa có trang"; nay đổi sang bài thuộc Vũ Trụ Phật Giáo (chuyên mục không có trang bài) và Liên hệ (chưa có trang).
+- **Sửa thêm:** trang tượng (`/bao-tuong/[slug]`, T16) chưa vào cache ở edge vì thiếu `revalidate`; nay có, và có trong `edge-cache.spec.ts` (commit riêng).
+- **Chờ Ban Biên Tập:**
+  - Tiêu đề bài sách có dấu nháy thừa ở cuối: "Đi Qua Khổ Vui Cuộc Đời' ".
+  - Mục "Ấn Phẩm & Sách" có hai tên trong dữ liệu ("Ấn Phẩm & Sách", "Ấn Phẩm Sách").
+
 **Tiêu chí nghiệm thu:**
-- [ ] 158 mục chia đúng 4 tiểu mục (126 / 15 / 15 / 2)
-- [ ] Pháp âm không tự phát, không tải trước file âm thanh
-- [ ] `/tri-tue-phat-phap/hoc-tieng-tang` có nội dung trong HTML ban đầu
+- [x] 158 mục chia đúng 4 tiểu mục (126 / 15 / 15 / 2)
+- [x] Pháp âm không tự phát, không tải trước file âm thanh (không có file âm thanh nào; test kiểm không có `autoplay` và không có yêu cầu media)
+- [x] `/tri-tue-phat-phap/hoc-tieng-tang` có nội dung trong HTML ban đầu (test đọc HTML gốc, không chạy JavaScript)
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- tri-tue`
+- [x] `npm run test:e2e -- tri-tue`: 10 test × 2 cỡ màn hình, có axe; bốn trang mới vào a11y, ba vào canh gác hiệu ứng, ba vào ngân sách ảnh và cache ở edge
+- [x] Unit 163 xanh (thêm 5 test cho phần tách chữ Tạng và mục lục; một đột biến lọt qua lúc đầu, đã thêm test); `tsc`, eslint không lỗi
+- [x] Toàn bộ e2e (628 test, các test chỉ chạy một nơi được bỏ qua): bản sạch cục bộ 557 qua; trên `v2.` (phiên bản Worker `468dd736`) 574 qua. Mỗi nơi hỏng 1 test và đều chạy lại thì qua:
+  - **Cục bộ:** test lướt tới sự kiện ở trang lịch hỏng khoảng 1–2/10 lần, kể cả trên bản HEAD trước T17 (dựng riêng trong worktree, 2/10 hỏng, cùng dấu hiệu 3226 px như lỗi đã sửa ở T19a). Lỗi có sẵn, chưa sửa.
+  - **`v2.`:** test tiêu đề trang bài Dòng Chảy, chạy lại 4/4 qua.
+- [x] Ảnh: `docs/anh/t17-tri-tue-phat-phap.png`
+- **Cách kiểm (13/11):** trong checkout lúc đó có thay đổi chưa commit của một phiên khác (giao diện ban đêm, trang `demo-bo-cuc`). Vì vậy bản kiểm và bản deploy được dựng từ một worktree sạch ở HEAD, chỉ thêm các file của T17.
 
 **Phụ thuộc:** T8
 
 **File dự kiến:** `src/app/(site)/tri-tue-phat-phap/page.js`, `src/app/(site)/tri-tue-phat-phap/[slug]/page.js`, `src/components/site/PublicationMeta.tsx`, `src/lib/content/sources/snapshot.ts`
 
 **Quy mô:** M
+
+---
+
+### T17b: Chuyển hai phòng đọc của Trí Tuệ sang site mới
+
+**Mô tả:** Hai địa chỉ của Trí Tuệ trên site cũ là ứng dụng riêng, chưa có trên site mới (T17 chỉ dựng trang giới thiệu, nút mở bản ở site cũ). Sau khi `www` chuyển sang site mới (T22), hai nút đó sẽ dẫn vào chính trang mới, nên phải chuyển trước T22.
+- **Học tiếng Tạng** (`/tibetan-study/index.html` trên Vercel): đọc Sara Book (120 trang ảnh PNG, khoảng 35 MB), giọng đọc 34 chữ cái (`audio/*.mp3`), hai file JSON 2,6 MB (chữ và tọa độ từng từ), thư viện pdf.js. Bốn API chạy trên máy chủ của site cũ: `/api/analyze`, `/api/ask-ai`, `/api/crop-analyze`, `/api/tts` (AI và đọc giọng; cần khóa dịch vụ của chủ dự án).
+- **Sách "Đi Qua Khổ Vui Cuộc Đời" (Quyển 1)**: toàn văn 217 trang và chế độ lật sách 3D, nằm sẵn trong mã JavaScript của site cũ (trang không gọi API).
+
+**Cần chủ dự án quyết:** để ảnh và âm thanh ở đâu (thư mục tĩnh của Worker hay kho media), dùng dịch vụ AI và đọc giọng nào cho bốn API, và có giữ bản lật sách 3D không.
+
+**Tiêu chí nghiệm thu:**
+- [ ] Hai nút "Đọc toàn văn" và "Vào học ngay" mở bản trên site mới, không dẫn về `www` cũ
+- [ ] Toàn văn sách đọc được khi không có JavaScript
+
+**Phụ thuộc:** T17; phải xong trước T22
+
+**Quy mô:** L
 
 ---
 
