@@ -31,7 +31,7 @@ START: Progress bar CSS
 	&-bar {
 		width: 0;
 		height: 100%;
-		background: var(--tj-color-theme-primary);
+		background: var(--tj-color-primary-fill);
 		position: relative;
 		z-index: 1;
 	}

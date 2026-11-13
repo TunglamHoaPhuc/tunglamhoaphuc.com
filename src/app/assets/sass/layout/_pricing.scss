@@ -13,11 +13,11 @@ START: Pricing CSS
 }
 .pricing-box {
 	padding: 46px 30px 40px;
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	border-radius: 12px;
 	&.active,
 	&:has(button:not(.collapsed)) {
-		background-color: var(--tj-color-theme-primary);
+		background-color: var(--tj-color-primary-fill);
 		.package {
 			&-name {
 				color: var(--tj-color-common-white);
@@ -39,7 +39,7 @@ START: Pricing CSS
 		}
 		.pricing-btn {
 			a {
-				background-color: var(--tj-color-common-white);
+				background-color: var(--tj-color-surface);
 				border-color: var(--tj-color-common-white);
 				.btn-text {
 					color: var(--tj-color-heading-primary);

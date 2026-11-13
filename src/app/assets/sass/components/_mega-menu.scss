@@ -156,7 +156,7 @@
 									}
 								}
 								.feature-contact {
-									background-color: var(--tj-color-theme-primary);
+									background-color: var(--tj-color-primary-fill);
 									padding: 7px 12px;
 									border-radius: 50px;
 									line-height: 1;
@@ -298,7 +298,7 @@
 				line-height: 1;
 				letter-spacing: 0;
 				color: var(--tj-color-common-white);
-				background-color: var(--tj-color-theme-primary);
+				background-color: var(--tj-color-primary-fill);
 				padding: 3px 7px;
 				border-radius: 40px;
 				&-hot {
@@ -427,7 +427,7 @@
 			&:hover {
 				.mega-menu-service {
 					&-icon {
-						background-color: var(--tj-color-theme-primary);
+						background-color: var(--tj-color-primary-fill);
 						color: var(--tj-color-common-white);
 					}
 
@@ -606,7 +606,7 @@
 						line-height: 1;
 						letter-spacing: 0;
 						color: var(--tj-color-common-white);
-						background-color: var(--tj-color-theme-primary);
+						background-color: var(--tj-color-primary-fill);
 						padding: 3px 7px;
 						border-radius: 40px;
 						&-hot {

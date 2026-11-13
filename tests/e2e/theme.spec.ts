@@ -9,7 +9,7 @@ test.beforeEach(async ({ page }) => {
 	await page.waitForTimeout(2000);
 });
 
-test("Bexon surfaces and text use the TLHP palette", async ({ page }) => {
+test("Bexon surfaces and text use the TLHP dark palette of the old site", async ({ page }) => {
 	const colours = await page.evaluate(() => {
 		const style = (selector: string, prop: "color" | "backgroundColor") => {
 			const el = document.querySelector(selector);
@@ -34,17 +34,17 @@ test("Bexon surfaces and text use the TLHP palette", async ({ page }) => {
 		};
 	});
 	expect(colours).toEqual({
-		pageBackground: "rgb(250, 250, 245)", // ngà #FAFAF5
-		bodyText: "rgb(53, 48, 43)", // đá #35302B
-		sectionTitle: "rgb(44, 28, 17)", // gỗ lim #2C1C11
-		alternateSection: "rgb(244, 236, 221)", // kem #F4ECDD
-		primaryButton: "rgb(131, 84, 20)", // mộc #835414
+		pageBackground: "rgb(26, 18, 11)", // đen mun #1A120B
+		bodyText: "rgb(227, 210, 193)", // old site parchment #E3D2C1
+		sectionTitle: "rgb(242, 193, 78)", // old site gold #F2C14E
+		alternateSection: "rgb(44, 28, 17)", // gỗ lim #2C1C11
+		primaryButton: "rgb(212, 163, 115)", // hoại sắc #D4A373
 		darkSection: "rgb(26, 18, 11)", // đen mun #1A120B
 		footer: "rgb(26, 18, 11)",
 	});
 });
 
-test("headings use Noto Serif and text uses Be Vietnam Pro, with Vietnamese glyphs", async ({ page }) => {
+test("titles use UTM Niagara, headings Noto Serif and text Be Vietnam Pro, with Vietnamese glyphs", async ({ page }) => {
 	const fonts = await page.evaluate(async () => {
 		const vietnamese = "Ẫ Ộ Ữ Ỹ ạ ằ ễ ợ";
 		const coversVietnamese = async (font: string) => {
@@ -54,7 +54,9 @@ test("headings use Noto Serif and text uses Be Vietnam Pro, with Vietnamese glyp
 		return {
 			lang: document.documentElement.lang,
 			body: getComputedStyle(document.body).fontFamily.split(",")[0].replaceAll('"', ""),
-			heading: getComputedStyle(document.querySelector("h2")!).fontFamily.split(",")[0].replaceAll('"', ""),
+			title: getComputedStyle(document.querySelector(".tlhp-news .sec-title")!).fontFamily.split(",")[0].replaceAll('"', ""),
+			titleLoaded: (await document.fonts.load('400 72px "UTM Niagara"', vietnamese)).length > 0,
+			heading: getComputedStyle(document.querySelector("h3")!).fontFamily.split(",")[0].replaceAll('"', ""),
 			serifVietnamese: await coversVietnamese('600 32px "Noto Serif"'),
 			sansVietnamese: await coversVietnamese('400 18px "Be Vietnam Pro"'),
 		};
@@ -62,6 +64,8 @@ test("headings use Noto Serif and text uses Be Vietnam Pro, with Vietnamese glyp
 	expect(fonts).toEqual({
 		lang: "vi",
 		body: "Be Vietnam Pro",
+		title: "UTM Niagara",
+		titleLoaded: true,
 		heading: "Noto Serif",
 		serifVietnamese: true,
 		sansVietnamese: true,

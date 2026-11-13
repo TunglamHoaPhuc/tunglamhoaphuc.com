@@ -88,7 +88,9 @@ test.describe("with reduced motion", () => {
 		}
 
 		const primary = page.locator("main > section:not(.tlhp-dark) .tj-primary-btn:not(.transparent-btn)").first();
-		await expect(primary.locator(".btn-icon")).toHaveCSS("background-color", "rgb(212, 163, 115)"); // hoại sắc
+		// The whole site is on the dark theme: the button is hoại sắc, its icon cell đen mun.
+		await expect(primary).toHaveCSS("background-color", "rgb(212, 163, 115)");
+		await expect(primary.locator(".btn-icon")).toHaveCSS("background-color", "rgb(26, 18, 11)");
 		const darkPrimary = page.locator(".tlhp-dark .tj-primary-btn:not(.transparent-btn)").first();
 		const darkColours = await darkPrimary.evaluate((el) => [getComputedStyle(el).backgroundColor, getComputedStyle(el.querySelector(".btn-icon")!).backgroundColor]);
 		expect(darkColours[0]).not.toBe(darkColours[1]);
@@ -96,14 +98,13 @@ test.describe("with reduced motion", () => {
 		await primary.focus();
 		const ring = await primary.evaluate((el) => ({ focusVisible: el.matches(":focus-visible"), shadow: getComputedStyle(el).boxShadow }));
 		expect(ring.focusVisible).toBe(true);
-		// Two rings: page background inside, mộc outside.
-		expect(ring.shadow).toContain("rgb(250, 250, 245)");
-		expect(ring.shadow).toContain("rgb(131, 84, 20)");
+		// Two rings: page background (đen mun) inside, hoại sắc outside.
+		expect(ring.shadow).toContain("rgb(26, 18, 11)");
+		expect(ring.shadow).toContain("rgb(227, 190, 147)");
 	});
 
-	// Themes switch per block (plan decision 9): the page is light and holds one .tlhp-dark
-	// section plus the dark footer, so one pass covers both. A whole-page data-theme is not
-	// a supported mode.
+	// The whole site runs on <html data-theme="dark"> (the look of the old site, 13/11/2026);
+	// the .tlhp-dark section and the footer resolve to the same theme.
 	test("styleguide passes axe WCAG A/AA on the light page and the dark section", async ({ page }) => {
 		await open(page, "/styleguide");
 		await expect(page.locator("main .tlhp-dark")).toHaveCount(1);

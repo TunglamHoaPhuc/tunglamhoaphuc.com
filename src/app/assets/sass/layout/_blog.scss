@@ -14,7 +14,7 @@ START: Blog CSS
 		.sec-heading-wrap {
 			.sub-title {
 				color: var(--tj-color-theme-primary);
-				background-color: var(--tj-color-common-white);
+				background-color: var(--tj-color-surface);
 				border: 0;
 				padding: 7px 10px;
 			}
@@ -66,7 +66,7 @@ START: Blog CSS
 		}
 	}
 	.blog-content {
-		background-color: var(--tj-color-common-white);
+		background-color: var(--tj-color-surface);
 		padding: 25px 28px 35px 28px;
 		height: 100%;
 		.title {
@@ -99,7 +99,7 @@ START: Blog CSS
 		.categories {
 			a {
 				&:hover {
-					background-color: var(--tj-color-theme-primary);
+					background-color: var(--tj-color-primary-fill);
 					border-color: var(--tj-color-theme-primary);
 					color: var(--tj-color-common-white);
 				}
@@ -118,7 +118,7 @@ START: Blog CSS
 		padding: 15px 0 15px 15px;
 		display: flex;
 		flex-wrap: wrap;
-		background-color: var(--tj-color-common-white);
+		background-color: var(--tj-color-surface);
 		@media #{$xs} {
 			padding: 15px;
 		}
@@ -202,7 +202,7 @@ START: Blog CSS
 					color: var(--tj-color-text-body-2);
 					border-color: transparent;
 					&:hover {
-						background-color: var(--tj-color-theme-primary);
+						background-color: var(--tj-color-primary-fill);
 						color: var(--tj-color-common-white);
 					}
 				}
@@ -226,7 +226,7 @@ START: Blog CSS
 				color: var(--tj-color-common-white);
 			}
 			.btn-icon {
-				background-color: var(--tj-color-theme-primary);
+				background-color: var(--tj-color-primary-fill);
 			}
 			@media #{$xl, $lg, $md} {
 				inset-inline-start: 20px;
@@ -352,7 +352,7 @@ START: Blog CSS
 					color: var(--tj-color-heading-primary);
 				}
 				&:hover {
-					background-color: var(--tj-color-theme-primary);
+					background-color: var(--tj-color-primary-fill);
 					color: var(--tj-color-common-white);
 					border-color: var(--tj-color-theme-primary);
 					i {
@@ -428,7 +428,7 @@ TLHP post lists (T7, BRAND-GUIDELINES 5.2)
 		padding: 0 20px;
 		border: 1px solid var(--tj-color-border-1);
 		border-radius: var(--tlhp-radius-pill);
-		background-color: var(--tj-color-common-white);
+		background-color: var(--tj-color-surface);
 		color: var(--tj-color-heading-primary);
 		font-weight: var(--tj-fw-medium);
 		&:hover {
@@ -436,9 +436,9 @@ TLHP post lists (T7, BRAND-GUIDELINES 5.2)
 			color: var(--tj-color-theme-primary);
 		}
 		&[aria-current="page"] {
-			background-color: var(--tj-color-theme-primary);
+			background-color: var(--tj-color-primary-fill);
 			border-color: var(--tj-color-theme-primary);
-			color: var(--tlhp-primary-fg);
+			color: var(--tj-color-common-white);
 		}
 	}
 }
@@ -474,8 +474,8 @@ TLHP post lists (T7, BRAND-GUIDELINES 5.2)
 	padding: 0 20px;
 	border: 0;
 	border-radius: var(--tlhp-radius-pill);
-	background-color: var(--tj-color-theme-primary);
-	color: var(--tlhp-primary-fg);
+	background-color: var(--tj-color-primary-fill);
+	color: var(--tj-color-common-white);
 }
 .tlhp-list-status {
 	margin: 0;
@@ -494,7 +494,7 @@ TLHP post lists (T7, BRAND-GUIDELINES 5.2)
 	flex-direction: column;
 	border: 1px solid var(--tj-color-border-1);
 	border-radius: var(--tlhp-radius-lg);
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	transition: box-shadow var(--tlhp-duration-fast) var(--tlhp-ease-calm);
 	&:hover {
 		box-shadow: var(--tlhp-shadow-sm);
@@ -578,7 +578,7 @@ TLHP post lists (T7, BRAND-GUIDELINES 5.2)
 	text-align: center;
 	border: 1px solid var(--tj-color-border-1);
 	border-radius: var(--tlhp-radius-lg);
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 }
 .tlhp-empty-title {
 	margin-bottom: 8px;
@@ -613,7 +613,7 @@ TLHP post lists (T7, BRAND-GUIDELINES 5.2)
 	padding: 5px 22px 5px 6px;
 	border: 1px solid var(--tj-color-border-1);
 	border-radius: var(--tlhp-radius-pill);
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	color: var(--tj-color-heading-primary);
 	font-weight: var(--tj-fw-sbold);
 	transition:
@@ -634,8 +634,8 @@ TLHP post lists (T7, BRAND-GUIDELINES 5.2)
 	}
 	&[aria-selected="true"] {
 		border-color: var(--tj-color-theme-primary);
-		background-color: var(--tj-color-theme-primary);
-		color: var(--tlhp-primary-fg);
+		background-color: var(--tj-color-primary-fill);
+		color: var(--tj-color-common-white);
 	}
 }
 .tlhp-news-more {

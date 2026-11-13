@@ -67,7 +67,7 @@
 			width: 200px;
 			height: 200px;
 			border-radius: 50%;
-			background: var(--tj-color-theme-primary);
+			background: var(--tj-color-primary-fill);
 			-webkit-filter: blur(50px);
 			filter: blur(50px);
 			opacity: 0.26;
@@ -107,7 +107,7 @@
 			height: 60px;
 			line-height: 60px;
 			padding: 0 40px 0 16px;
-			background: var(--tj-color-common-white);
+			background: var(--tj-color-surface);
 			border: none;
 			outline: none;
 			font-size: 18px;

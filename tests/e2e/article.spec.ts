@@ -80,15 +80,15 @@ test.describe("article page", () => {
 		});
 	}
 
-	test("passes axe WCAG A/AA, also on the Đêm thiền ground", async ({ page }) => {
+	test("passes axe WCAG A/AA, also on the Ngà ground", async ({ page }) => {
 		await open(page);
 		const check = async () => {
 			const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
 			return results.violations.flatMap((v) => v.nodes.map((n) => `${v.id}: ${n.target.join(" ")}`));
 		};
 		expect(await check()).toEqual([]);
-		await page.getByRole("button", { name: "Đêm thiền" }).click();
-		await expect(frame(page)).toHaveAttribute("data-theme", "dark");
+		await page.getByRole("button", { name: "Ngà" }).click();
+		await expect(frame(page)).toHaveAttribute("data-theme", "light");
 		expect(await check()).toEqual([]);
 	});
 });
@@ -116,7 +116,7 @@ test.describe("reading settings", () => {
 		expect(await page.locator(".tlhp-article-meta").evaluate((el) => getComputedStyle(el).fontSize)).toBe(metaSize);
 	});
 
-	test("Giấy dó and Đêm thiền change the reading frame only, and stay after a reload", async ({ page }) => {
+	test("Giấy dó, Đêm thiền and Ngà change the reading frame only, and stay after a reload", async ({ page }) => {
 		await open(page);
 		const pageBackground = () => page.evaluate(() => getComputedStyle(document.body).backgroundColor);
 		const before = await pageBackground();
@@ -130,7 +130,8 @@ test.describe("reading settings", () => {
 		await page.getByRole("button", { name: "A+ phóng to chữ" }).click();
 		await expect(frame(page)).toHaveCSS("background-color", "rgb(26, 18, 11)");
 		expect(await pageBackground()).toBe(before);
-		expect(await page.evaluate(() => document.documentElement.hasAttribute("data-theme"))).toBe(false);
+		// The page itself stays on the dark theme of the site.
+		expect(await page.evaluate(() => document.documentElement.getAttribute("data-theme"))).toBe("dark");
 
 		await page.reload();
 		await expect(frame(page)).toHaveAttribute("data-theme", "dark");
@@ -138,7 +139,8 @@ test.describe("reading settings", () => {
 		await expect(page.getByText("Cỡ chữ 115%")).toBeVisible();
 
 		await page.getByRole("button", { name: "Ngà" }).click();
-		await expect(frame(page)).not.toHaveAttribute("data-theme", /.+/);
+		await expect(frame(page)).toHaveAttribute("data-theme", "light");
+		await expect(frame(page)).toHaveCSS("background-color", "rgb(250, 250, 245)");
 	});
 });
 

@@ -147,7 +147,7 @@ START: Project CSS
 					border: 1px solid rgba(255, 255, 255, 0.1);
 					backdrop-filter: blur(10px);
 					&:hover {
-						background-color: var(--tj-color-theme-primary);
+						background-color: var(--tj-color-primary-fill);
 					}
 				}
 			}
@@ -197,7 +197,7 @@ START: Project CSS
 			transition: all 0.3s ease-in-out;
 		}
 		&:hover {
-			background-color: var(--tj-color-theme-primary);
+			background-color: var(--tj-color-primary-fill);
 			border-color: var(--tj-color-theme-primary);
 			i {
 				color: var(--tj-color-common-white);
@@ -230,7 +230,7 @@ START: Project CSS
 	}
 }
 .project-item {
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	position: relative;
 	border-radius: 12px;
 	overflow: hidden;
@@ -344,7 +344,7 @@ START: Project CSS
 		border: 1px solid var(--tj-color-border-1);
 		backdrop-filter: blur(15px);
 		&:hover {
-			background-color: var(--tj-color-theme-primary);
+			background-color: var(--tj-color-primary-fill);
 			border-color: var(--tj-color-theme-primary);
 			color: var(--tj-color-common-white);
 		}
@@ -386,7 +386,7 @@ START: Project CSS
 					background-color: rgba(255, 255, 255, 0.1);
 					&:hover {
 						color: var(--tj-color-common-white);
-						background-color: var(--tj-color-theme-primary);
+						background-color: var(--tj-color-primary-fill);
 					}
 				}
 			}
@@ -487,7 +487,7 @@ START: Project CSS
 				color: var(--tj-color-text-body-2);
 				border-color: rgba(255, 255, 255, 0.1);
 				&:hover {
-					background-color: var(--tj-color-theme-primary);
+					background-color: var(--tj-color-primary-fill);
 					color: var(--tj-color-common-white);
 				}
 			}

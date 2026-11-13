@@ -5,7 +5,7 @@ START: Back to top CSS
 #tj-back-to-top {
 	height: 60px;
 	width: 60px;
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	border-radius: 50%;
 	position: fixed;
 	bottom: 30px;
@@ -29,7 +29,7 @@ START: Back to top CSS
 		visibility: visible;
 		animation: 500ms ease-in-out 0s normal none 1 running scrollToTop;
 		transition: 0.3s;
-		background: var(--tj-color-theme-primary);
+		background: var(--tj-color-primary-fill);
 	}
 
 	.return {
@@ -42,7 +42,7 @@ START: Back to top CSS
 	&-percentage {
 		height: calc(100% - 2px);
 		width: calc(100% - 2px);
-		background-color: var(--tj-color-common-white);
+		background-color: var(--tj-color-surface);
 		color: var(--tj-color-theme-dark);
 		border-radius: 50%;
 		display: grid;

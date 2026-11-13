@@ -31,6 +31,8 @@ export default function RootLayout({ children }) {
 	return (
 		<html
 			lang="vi"
+			// The whole site runs on the dark "Đêm thiền" theme, the look of the old site.
+			data-theme="dark"
 			data-scroll-behavior="smooth"
 			dir="ltr"
 			// The notice strip's inline script sets an attribute and a CSS variable here

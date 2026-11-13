@@ -96,7 +96,7 @@ START: About CSS
 	}
 }
 .experience-box {
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	border-radius: 10px;
 	padding: 28px 25px;
 	.sub-title {
@@ -110,7 +110,7 @@ START: About CSS
 
 .about-content-area {
 	&.style-1 {
-		background-color: var(--tj-color-common-white);
+		background-color: var(--tj-color-surface);
 		border-radius: 12px;
 		padding: 30px;
 		min-height: 408px;
@@ -137,7 +137,7 @@ START: About CSS
 	gap: 15px;
 	margin-top: 15px;
 	.client-review-cont {
-		background-color: var(--tj-color-theme-primary);
+		background-color: var(--tj-color-primary-fill);
 		color: var(--tj-color-common-white);
 		flex: 1;
 		border-radius: 10px;
@@ -302,7 +302,7 @@ START: About CSS
 }
 .customers-box {
 	&.style-2 {
-		background-color: var(--tj-color-theme-primary);
+		background-color: var(--tj-color-primary-fill);
 		height: 100%;
 		position: relative;
 		overflow: hidden;
@@ -353,7 +353,7 @@ START: About CSS
 .countup-item {
 	&.style-2 {
 		width: 100%;
-		background-color: var(--tj-color-common-white);
+		background-color: var(--tj-color-surface);
 		border-radius: 10px;
 		padding: 28px 30px;
 		align-items: start;
@@ -418,7 +418,7 @@ START: About CSS
 }
 
 .progress-box {
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	border-radius: 10px;
 	padding: 28px 30px 35px;
 	.title {
@@ -430,7 +430,7 @@ START: About CSS
 }
 .mission-vision-box {
 	flex: 1;
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	border-radius: 12px;
 	padding: 25px 20px 30px 26px;
 	.title {

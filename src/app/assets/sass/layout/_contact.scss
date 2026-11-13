@@ -61,7 +61,7 @@ START: Contact CSS
 }
 
 .contact-form {
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	margin-inline-start: 0;
 	margin-inline-end: 15px;
 	padding: 60px 50px;
@@ -253,7 +253,7 @@ START: Contact CSS
 	&-item {
 		&.style-2 {
 			padding: 30px 25px 40px;
-			background-color: var(--tj-color-common-white);
+			background-color: var(--tj-color-surface);
 			text-align: center;
 			border-radius: 12px;
 			@media #{$sm, $md} {
@@ -266,7 +266,7 @@ START: Contact CSS
 			}
 			&:hover {
 				.contact-icon {
-					background: var(--tj-color-theme-primary);
+					background: var(--tj-color-primary-fill);
 					i {
 						color: var(--tj-color-common-white);
 					}
@@ -334,7 +334,7 @@ START: Contact CSS
 		width: 220px;
 		height: 220px;
 		border-radius: 50%;
-		background: var(--tj-color-theme-primary);
+		background: var(--tj-color-primary-fill);
 		-webkit-filter: blur(40px);
 		filter: blur(40px);
 		opacity: 0.1;
@@ -429,7 +429,7 @@ START: Contact CSS
 
 	&-tooltip {
 		width: 222px;
-		background-color: var(--tj-color-theme-primary);
+		background-color: var(--tj-color-primary-fill);
 		font-size: 14px;
 		padding: 15px;
 		position: absolute;
@@ -443,7 +443,7 @@ START: Contact CSS
 		transition: all 0.3s ease-in-out;
 		&::after {
 			content: "";
-			background: var(--tj-color-theme-primary);
+			background: var(--tj-color-primary-fill);
 			width: 14px;
 			height: 14px;
 			z-index: -1;

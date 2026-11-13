@@ -265,7 +265,7 @@ input[type="email"],
 input[type="url"],
 textarea {
 	outline: none;
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	height: auto;
 	width: 100%;
 	font-size: var(--tj-fs-body);
@@ -290,7 +290,7 @@ input[type="search"]::-webkit-search-results-decoration {
 	width: 6px;
 }
 ::-webkit-scrollbar-thumb {
-	background: var(--tj-color-theme-primary);
+	background: var(--tj-color-primary-fill);
 	-webkit-border-radius: 1ex;
 	-webkit-box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.75);
 }

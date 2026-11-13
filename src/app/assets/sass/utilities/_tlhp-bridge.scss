@@ -9,10 +9,12 @@
 	--tj-color-grey-1: var(--tlhp-bg); // page background
 	--tj-color-theme-bg: var(--tlhp-bg-alt); // alternating sections
 	--tj-color-theme-bg-2: var(--tlhp-nen-do);
-	--tj-color-common-white: var(--tlhp-nen-ngoc); // cards; text on dark and primary fills
+	--tj-color-common-white: var(--tlhp-nen-ngoc); // text and marks on dark and primary fills
+	--tj-color-surface: var(--tlhp-surface); // cards; follows the theme
 
 	// Brand
 	--tj-color-theme-primary: var(--tlhp-primary);
+	--tj-color-primary-fill: var(--tlhp-primary); // primary as a ground under light text
 
 	// Dark sections and footer
 	--tj-color-theme-dark: var(--tlhp-moc-950);

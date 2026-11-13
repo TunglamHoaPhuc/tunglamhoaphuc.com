@@ -4,7 +4,7 @@
 START: Theme Header CSS
 ----------------------------------------*/
 .header-area {
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	border-end-start-radius: 12px;
 	border-end-end-radius: 12px;
 	position: relative;
@@ -23,7 +23,7 @@ START: Theme Header CSS
 		}
 		.header-wrapper {
 			padding: 0 18px;
-			background-color: var(--tj-color-common-white);
+			background-color: var(--tj-color-surface);
 		}
 	}
 	&.header-2 {
@@ -55,7 +55,7 @@ START: Theme Header CSS
 							[type="checkbox"]
 						):not([type="search"]),
 					input[type="text"] {
-						background-color: var(--tj-color-common-white);
+						background-color: var(--tj-color-surface);
 					}
 				}
 			}
@@ -107,7 +107,7 @@ START: Theme Header CSS
 		box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
 		opacity: 1;
 		visibility: visible;
-		background-color: var(--tj-color-common-white);
+		background-color: var(--tj-color-surface);
 		display: block;
 		@media #{$sm, $xs} {
 			width: 100%;
@@ -168,7 +168,7 @@ START: Theme Header CSS
 	}
 }
 .header-top {
-	background-color: var(--tj-color-theme-primary);
+	background-color: var(--tj-color-primary-fill);
 	border-end-start-radius: 12px;
 	border-end-end-radius: 12px;
 	padding: 0 12px;
@@ -375,7 +375,7 @@ START: Theme Header CSS
 				inset-inline-start: 0;
 				z-index: 99;
 				text-align: start;
-				background-color: var(--tj-color-common-white);
+				background-color: var(--tj-color-surface);
 				box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.1);
 				border-radius: 10px;
 				transform: scaleY(0);
@@ -604,7 +604,7 @@ START: Theme Header CSS
 		width: 50px;
 		height: 50px;
 		padding: 12px;
-		background: var(--tj-color-theme-primary);
+		background: var(--tj-color-primary-fill);
 		border-radius: 7px;
 		span {
 			background-color: var(--tj-color-common-white);
@@ -836,8 +836,8 @@ TLHP header (T5a)
 	background-color: var(--tj-color-grey-1);
 	transition: background-color var(--tlhp-duration-fast) var(--tlhp-ease-calm);
 	&:hover {
-		color: var(--tlhp-primary-fg);
-		background-color: var(--tj-color-theme-primary);
+		color: var(--tj-color-common-white);
+		background-color: var(--tj-color-primary-fill);
 	}
 	&:focus-visible {
 		outline: none;

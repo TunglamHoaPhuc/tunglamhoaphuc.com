@@ -142,3 +142,21 @@
 	line-gap-override: 0%;
 	size-adjust: 110.36%;
 }
+
+/* UTM Niagara, the title face of the old site (13/11/2026). One upright weight, whole font
+   in one 10 KB file (it has the Vietnamese set; its name table reads "Free for everyone").
+   Converted from bo-nhan-dien/04_Fonts_Chua/UTMNiagara.ttf. The file name matches the
+   preload glob in layout.js. The fallback is narrowed so titles keep about the same width
+   until the font arrives. */
+@font-face {
+	font-family: "UTM Niagara";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url("../fonts/tlhp/utm-niagara-normal-400.woff2") format("woff2");
+}
+@font-face {
+	font-family: "UTM Niagara Fallback";
+	src: local("Arial Narrow"), local("Arial");
+	size-adjust: 58%;
+}

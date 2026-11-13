@@ -19,7 +19,7 @@ START: CTA CSS
 	}
 }
 .cta-area {
-	background-color: var(--tj-color-theme-primary);
+	background-color: var(--tj-color-primary-fill);
 	position: relative;
 	z-index: 3;
 	overflow: hidden;
@@ -99,7 +99,7 @@ TLHP closing block (T6)
 		min-height: 320px;
 		padding: 40px;
 		// A darker brown than the text half, so it does not melt into the footer below.
-		background-color: color-mix(in srgb, var(--tj-color-theme-primary) 45%, var(--tj-color-theme-dark));
+		background-color: color-mix(in srgb, var(--tj-color-primary-fill) 45%, var(--tj-color-theme-dark));
 		img {
 			width: min(240px, 70%);
 			height: auto;

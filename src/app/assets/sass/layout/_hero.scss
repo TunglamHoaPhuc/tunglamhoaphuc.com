@@ -33,7 +33,7 @@ START: Hero CSS
 		width: 350px;
 		height: 350px;
 		border-radius: 50%;
-		background: var(--tj-color-theme-primary);
+		background: var(--tj-color-primary-fill);
 		-webkit-filter: blur(65px);
 		filter: blur(65px);
 		opacity: 0.26;
@@ -273,7 +273,7 @@ START: Hero CSS
 }
 
 .customers-box {
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	border-radius: 10px;
 	padding: 30px 25px;
 	@media #{$sm, $xs} {
@@ -310,7 +310,7 @@ START: Hero CSS
 					width: 59px;
 					height: 59px;
 					border-radius: 50%;
-					background-color: var(--tj-color-theme-primary);
+					background-color: var(--tj-color-primary-fill);
 					color: var(--tj-color-common-white);
 					display: inline-flex;
 					align-items: center;
@@ -496,7 +496,7 @@ START: Hero CSS
 		margin-inline-end: -30px;
 		&::before {
 			content: "";
-			background-color: var(--tj-color-common-white);
+			background-color: var(--tj-color-surface);
 			position: absolute;
 			bottom: 0;
 			inset-inline-start: 0;
@@ -527,7 +527,7 @@ START: Hero CSS
 					width: 8px;
 					height: 8px;
 					border-radius: 50%;
-					background-color: var(--tj-color-theme-primary);
+					background-color: var(--tj-color-primary-fill);
 					position: absolute;
 					bottom: -18px;
 					left: 50%;
@@ -634,7 +634,7 @@ START: Hero CSS
 			opacity: 1;
 			span {
 				color: var(--tj-color-common-white);
-				background-color: var(--tj-color-theme-primary);
+				background-color: var(--tj-color-primary-fill);
 				overflow: hidden;
 			}
 		}

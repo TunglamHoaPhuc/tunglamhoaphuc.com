@@ -63,7 +63,7 @@ START: Services CSS
 	}
 }
 .service-item {
-	background: var(--tj-color-common-white);
+	background: var(--tj-color-surface);
 	padding: 40px 30px 45px;
 	margin-bottom: 30px;
 	position: relative;
@@ -141,7 +141,7 @@ START: Services CSS
 		}
 		&::after {
 			content: "";
-			background: var(--tj-color-theme-primary);
+			background: var(--tj-color-primary-fill);
 			position: absolute;
 			width: 100%;
 			height: 100%;
@@ -223,7 +223,7 @@ START: Services CSS
 				color: var(--tj-color-common-white);
 			}
 			.btn-icon {
-				background-color: var(--tj-color-theme-primary);
+				background-color: var(--tj-color-primary-fill);
 			}
 
 			@media #{$xl, $lg, $md} {
@@ -338,7 +338,7 @@ START: Services CSS
 		transition: all 0.3s ease-in-out;
 
 		&:hover {
-			background-color: var(--tj-color-theme-primary);
+			background-color: var(--tj-color-primary-fill);
 			.title {
 				color: var(--tj-color-common-white);
 			}
@@ -391,9 +391,9 @@ START: Services CSS
 			max-width: 275px;
 		}
 		&:hover {
-			background-color: var(--tj-color-theme-primary);
+			background-color: var(--tj-color-primary-fill);
 			.service-icon {
-				background: var(--tj-color-common-white);
+				background: var(--tj-color-surface);
 			}
 			.desc,
 			.title {

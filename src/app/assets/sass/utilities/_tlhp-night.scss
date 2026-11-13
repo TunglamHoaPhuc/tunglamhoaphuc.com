@@ -1,0 +1,109 @@
+// The look of the old site (www, Vercel): đen mun ground, gold headings with a soft
+// glow, thin gold lines. The site now runs on the "Đêm thiền" theme of
+// design-system/tokens.css (<html data-theme="dark">); this file only adds what the
+// old site had on top of it. Loaded after tokens.css, so equal selectors win here.
+$gold: #f2c14e; // old site h1/h2
+$gold-soft: #ffe5a3; // old site card titles
+$parchment: #e3d2c1; // old site body text
+
+[data-theme="dark"],
+.tlhp-dark {
+	--tlhp-heading: #{$gold-soft};
+	--tlhp-c-heading: 255 229 163;
+	--tlhp-h-heading: 43 100% 82%;
+	--tlhp-fg: #{$parchment};
+	--tlhp-c-fg: 227 210 193;
+	--tlhp-h-fg: 30 38% 82%;
+	--tlhp-surface: #2c1c11;
+	--tlhp-c-surface: 44 28 17;
+	--tlhp-h-surface: 24.4 44.3% 12%;
+	--tlhp-ornament: #{$gold};
+	--tlhp-c-ornament: 242 193 78;
+	--tlhp-gold: #{$gold};
+	--tlhp-gold-glow: 0 0 24px rgb(242 193 78 / 0.45), 0 0 48px rgb(242 193 78 / 0.18);
+
+	// Bexon variables that need a different answer on a dark page.
+	--tj-color-border-1: color-mix(in srgb, #{$gold} 22%, transparent);
+	--tj-color-theme-bg-2: var(--tlhp-bg-alt);
+	--tj-color-text-body-4: var(--tlhp-fg);
+	--tj-color-common-black-2: var(--tlhp-heading);
+	// On a dark page the primary is light gold, for text and lines. Where Bexon fills a
+	// block with it and writes in white, the fill is nâu trầm đất (#835414, 6.6:1 with ngọc).
+	--tj-color-primary-fill: var(--tlhp-moc-600);
+}
+
+:root[data-theme="dark"] {
+	// Section, page and hero titles: UTM Niagara in gold capitals with the glow of the old
+	// site. The face is narrow, so it is set about one and a half times the serif size
+	// (old site: 72px sections, 128px hero). It has one weight; no synthetic bold.
+	.sec-title,
+	.tj-page-title,
+	.slider-title:not(.tlhp-hero-post-title) {
+		font-family: "UTM Niagara", "UTM Niagara Fallback", var(--tlhp-font-serif);
+		font-weight: 400;
+		font-synthesis: none;
+		font-size: clamp(2.75rem, 1.9rem + 3.4vw, 4.5rem);
+		line-height: 1.15;
+		letter-spacing: 0.025em;
+		text-transform: uppercase;
+		color: var(--tlhp-gold);
+		text-shadow: var(--tlhp-gold-glow);
+		span {
+			color: var(--tlhp-gold);
+		}
+	}
+	.tj-page-title {
+		font-size: clamp(3.25rem, 2rem + 5vw, 6rem);
+	}
+	.slider-title:not(.tlhp-hero-post-title) {
+		font-size: clamp(4rem, 2rem + 8vw, 8rem);
+		// The line under the slogan stays in the serif, pale and widely spaced.
+		.tlhp-hero-subtitle {
+			font-family: var(--tlhp-font-serif);
+			font-size: 0.2em;
+			letter-spacing: 0.3em;
+			color: var(--tlhp-fg);
+			text-shadow: none;
+		}
+	}
+
+	// Centred headings close with a short gold rule, after the lines of the old home page.
+	.sec-heading-centered::after {
+		content: "";
+		display: block;
+		width: min(220px, 60%);
+		height: 1px;
+		margin: 22px auto 0;
+		background: linear-gradient(to right, transparent, var(--tlhp-gold), transparent);
+	}
+
+	// Sunday in the calendar: sơn son (4.5:1 on ngà) is too dark on đen mun.
+	.is-sunday,
+	td.is-sunday .tlhp-day-solar {
+		color: var(--tlhp-chusa-300);
+	}
+
+	// The frame behind a portrait that is still loading (was light stone).
+	.team-item .team-img .team-img-inner,
+	.team-item-wrap .team-img,
+	.team-details__img {
+		background-color: var(--tlhp-bg-alt);
+	}
+
+	// Buttons that show a reading ground keep that ground's own ink.
+	.tlhp-reading-themes {
+		.tlhp-theme-nga {
+			background-color: var(--tlhp-nen-nga);
+			color: var(--tlhp-moc-900);
+		}
+		.tlhp-theme-sepia {
+			color: var(--tlhp-moc-900);
+		}
+	}
+}
+
+@media (forced-colors: active) {
+	:root[data-theme="dark"] .sec-title {
+		text-shadow: none;
+	}
+}

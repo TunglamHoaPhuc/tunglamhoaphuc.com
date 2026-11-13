@@ -191,7 +191,7 @@ START: Team Details CSS
 						height: 22px;
 						font-size: 10px;
 						color: var(--tj-color-common-white);
-						background: var(--tj-color-theme-primary);
+						background: var(--tj-color-primary-fill);
 						border-radius: 50%;
 						margin-top: 4px;
 					}
@@ -322,7 +322,7 @@ START: Team Details CSS
 	padding: 20px;
 	border: 1px solid var(--tj-color-border-1);
 	border-radius: var(--tlhp-radius-lg);
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	img {
 		flex: 0 0 auto;
 		width: 96px;

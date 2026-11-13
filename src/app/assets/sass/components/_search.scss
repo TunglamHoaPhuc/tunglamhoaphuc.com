@@ -10,7 +10,7 @@ START: Theme Search CSS
 		inset-inline-start: 0;
 		width: 100%;
 		height: auto;
-		background-color: var(--tj-color-common-white);
+		background-color: var(--tj-color-surface);
 		padding: 80px 0;
 		@include transform(translateY(calc(-100% - 200px)));
 		// Sliding up off-screen alone leaves it focusable; hide it once the slide ends.

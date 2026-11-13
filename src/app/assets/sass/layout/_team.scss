@@ -82,7 +82,7 @@ START: Team CSS
 			z-index: 1;
 		}
 		&::after {
-			background-color: var(--tj-color-theme-primary);
+			background-color: var(--tj-color-primary-fill);
 			opacity: 1;
 			z-index: -1;
 		}
@@ -110,7 +110,7 @@ START: Team CSS
 					}
 					&:hover {
 						opacity: 1;
-						background-color: var(--tj-color-theme-primary);
+						background-color: var(--tj-color-primary-fill);
 						i {
 							color: var(--tj-color-common-white);
 						}
@@ -145,7 +145,7 @@ START: Team CSS
 		width: 31px;
 		height: 31px;
 		border-radius: 50%;
-		background-color: var(--tj-color-common-white);
+		background-color: var(--tj-color-surface);
 		color: var(--tj-color-heading-primary);
 		font-size: 22px;
 		display: inline-flex;
@@ -155,7 +155,7 @@ START: Team CSS
 		top: 6px;
 		inset-inline-end: 0;
 		&:hover {
-			background-color: var(--tj-color-theme-primary);
+			background-color: var(--tj-color-primary-fill);
 			color: var(--tj-color-common-white);
 		}
 	}
@@ -223,7 +223,7 @@ START: Team CSS
 			padding: 0;
 		}
 		&-inner {
-			background-color: var(--tj-color-common-white);
+			background-color: var(--tj-color-surface);
 			position: relative;
 			text-align: start;
 			width: 100%;
@@ -287,7 +287,7 @@ START: Team CSS
 							color: var(--tj-color-common-white);
 						}
 						&:hover {
-							background-color: var(--tj-color-theme-primary);
+							background-color: var(--tj-color-primary-fill);
 						}
 					}
 				}

@@ -15,12 +15,14 @@ type Theme = (typeof THEMES)[number]["value"];
 
 const SIZE_KEY = "tlhp-reading-size";
 const THEME_KEY = "tlhp-reading-theme";
-const DEFAULTS = `${DEFAULT_SIZE}|nga`;
+// The site itself is dark (the look of the old site), so the frame starts on Đêm thiền.
+const DEFAULT_THEME = "dark";
+const DEFAULTS = `${DEFAULT_SIZE}|${DEFAULT_THEME}`;
 
-// Runs as the page parses, before first paint, so a reader who chose Đêm thiền never sees
-// the frame flash ivory first.
+// Runs as the page parses, before first paint, so a reader who chose Ngà or Giấy dó never
+// sees the frame flash dark first.
 // (No saved size means the default: `+null` would read as size 0.)
-const SYNC_SCRIPT = `(function(){var f=document.currentScript.previousElementSibling;try{var t=localStorage.getItem(${JSON.stringify(THEME_KEY)}),r=localStorage.getItem(${JSON.stringify(SIZE_KEY)}),s=r===null?0:${JSON.stringify(SIZES)}[+r];if(t==="sepia"||t==="dark")f.setAttribute("data-theme",t);if(s)f.style.setProperty("--tlhp-reading-scale",s)}catch(e){}})()`;
+const SYNC_SCRIPT = `(function(){var f=document.currentScript.previousElementSibling;try{var t=localStorage.getItem(${JSON.stringify(THEME_KEY)}),r=localStorage.getItem(${JSON.stringify(SIZE_KEY)}),s=r===null?0:${JSON.stringify(SIZES)}[+r];if(t==="sepia"||t==="dark"||t==="nga")f.setAttribute("data-theme",t==="nga"?"light":t);if(s)f.style.setProperty("--tlhp-reading-scale",s)}catch(e){}})()`;
 
 const listeners = new Set<() => void>();
 function subscribe(listener: () => void) {
@@ -33,7 +35,7 @@ function subscribe(listener: () => void) {
 }
 function snapshot(): string {
 	try {
-		return `${localStorage.getItem(SIZE_KEY) ?? DEFAULT_SIZE}|${localStorage.getItem(THEME_KEY) ?? "nga"}`;
+		return `${localStorage.getItem(SIZE_KEY) ?? DEFAULT_SIZE}|${localStorage.getItem(THEME_KEY) ?? DEFAULT_THEME}`;
 	} catch {
 		return DEFAULTS;
 	}
@@ -50,7 +52,7 @@ function save(key: string, value: string) {
 export default function ReadingFrame({ children }: { children: ReactNode }) {
 	const [storedSize, storedTheme] = useSyncExternalStore(subscribe, snapshot, () => DEFAULTS).split("|");
 	const size = SIZES[Number(storedSize)] ? Number(storedSize) : DEFAULT_SIZE;
-	const theme: Theme = THEMES.some((item) => item.value === storedTheme) ? (storedTheme as Theme) : "nga";
+	const theme: Theme = THEMES.some((item) => item.value === storedTheme) ? (storedTheme as Theme) : DEFAULT_THEME;
 
 	return (
 		<div className="tlhp-reading-box">
@@ -81,7 +83,7 @@ export default function ReadingFrame({ children }: { children: ReactNode }) {
 			</div>
 			<div
 				className="tlhp-reading-frame"
-				data-theme={theme === "nga" ? undefined : theme}
+				data-theme={theme === "nga" ? "light" : theme}
 				style={{ "--tlhp-reading-scale": SIZES[size] } as CSSProperties}
 				// SYNC_SCRIPT may have set the saved choice before React took over.
 				suppressHydrationWarning

@@ -30,7 +30,7 @@ START: TLHP schedule page (/lich-tu-hoc, T11)
 		padding: 0 18px;
 		border: 1px solid var(--tj-color-border-1);
 		border-radius: var(--tlhp-radius-pill);
-		background-color: var(--tj-color-common-white);
+		background-color: var(--tj-color-surface);
 		color: var(--tj-color-heading-primary);
 		font-weight: var(--tj-fw-sbold);
 		transition:
@@ -79,7 +79,7 @@ START: TLHP schedule page (/lich-tu-hoc, T11)
 		vertical-align: top;
 		border: 1px solid var(--tj-color-border-1);
 		border-radius: var(--tlhp-radius-md);
-		background-color: var(--tj-color-common-white);
+		background-color: var(--tj-color-surface);
 		&.is-outside {
 			border-color: transparent;
 			background-color: transparent;
@@ -154,7 +154,7 @@ td.is-sunday .tlhp-day-solar {
 	padding: 2px 6px;
 	border-inline-start: 3px solid var(--tj-color-theme-primary);
 	border-radius: var(--tlhp-radius-xs);
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	font-size: 12px;
 	font-weight: var(--tj-fw-sbold);
 	line-height: 1.35;
@@ -175,7 +175,7 @@ td.is-sunday .tlhp-day-solar {
 		padding: 0;
 		border: 0;
 		border-radius: 50%;
-		background-color: var(--tj-color-theme-primary);
+		background-color: var(--tj-color-primary-fill);
 		&.is-dai-le-su-kien {
 			background-color: var(--tj-color-red-1);
 		}
@@ -330,12 +330,12 @@ td.is-sunday .tlhp-day-solar {
 	letter-spacing: var(--tlhp-tracking-overline);
 	text-transform: uppercase;
 	&.is-upcoming {
-		background-color: var(--tj-color-theme-primary);
-		color: var(--tlhp-primary-fg);
+		background-color: var(--tj-color-primary-fill);
+		color: var(--tj-color-common-white);
 	}
 	&.is-now {
 		background-color: var(--tj-color-red-1);
-		color: var(--tlhp-primary-fg);
+		color: var(--tj-color-common-white);
 	}
 	&.is-past {
 		background-color: var(--tj-color-theme-bg);
@@ -407,7 +407,7 @@ td.is-sunday .tlhp-day-solar {
 		padding: 16px 20px;
 		border: 1px solid var(--tj-color-border-1);
 		border-radius: var(--tlhp-radius-lg);
-		background-color: var(--tj-color-common-white);
+		background-color: var(--tj-color-surface);
 	}
 	a {
 		display: inline-flex;
