@@ -7,10 +7,7 @@ import React from "react";
  */
 const HeroInner = ({ title, text, breadcrums = [], className = "" }) => {
 	return (
-		<section
-			className={`tj-page-header section-gap-x ${className}`}
-			style={{ backgroundImage: `url('/images/bg/pheader-bg.webp')` }}
-		>
+		<section className={`tj-page-header section-gap-x ${className}`}>
 			<div className="container">
 				<div className="row">
 					<div className="col-lg-12">
@@ -46,10 +43,7 @@ const HeroInner = ({ title, text, breadcrums = [], className = "" }) => {
 					</div>
 				</div>
 			</div>
-			<div
-				className="page-header-overlay"
-				style={{ backgroundImage: `url('/images/shape/pheader-overlay.webp')` }}
-			></div>
+			<div className="page-header-overlay"></div>
 		</section>
 	);
 };

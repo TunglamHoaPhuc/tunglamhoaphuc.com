@@ -2067,6 +2067,14 @@
 - **Chưa đạt:**
   - **LCP < 2,0 s:** LCP mô phỏng 3,9–5,2 s. Phần còn lại là lần vẽ đầu chờ CSS 69 KB chặn hiển thị, JS và hydrate (đã ghi ở T41a, T41e). Cần chủ dự án quyết: làm tiếp (CSS màn hình đầu trong HTML, bớt hydrate) hay nới mục tiêu.
   - **Ảnh lớn hơn cỡ hiển thị** còn ở 4 trang (1–10 ảnh), nên chỉ để cảnh báo: ảnh bìa một cỡ 1280, logo và icon của site, thẻ tượng 360 cho ô 324 px.
+- **Làm tiếp LCP (13/11, phiên bản `f27e6d3a`):**
+  - Chẩn đoán: ở trang trong, phần tử LCP là banner đầu trang với ảnh nền CSS (`pheader-bg.webp`). Là file riêng nên trình duyệt chỉ hỏi sau khi CSS về (trễ 1,7–2,5 s trong mô phỏng).
+  - Thử `<link rel="preload">` trong `HeroInner`: bỏ, vì cơ chế tải trước liên kết làm trang chủ cũng preload hai ảnh này (test ảnh hero bắt được).
+  - Cách dùng: hai ảnh nền thu còn 945 px (1,1 và 1,3 KB; chênh trung bình 0,75/255) và nhúng thẳng vào CSS bằng `?inline`; file chuyển từ `public/` sang `src/app/assets/images/`. CSS 50,3 → 52,6 KB br (Cloudflare gửi 72 KB, ngưỡng 80 KB).
+  - Lighthouse CI sau khi sửa (trung vị 3 lượt): bài Dòng Chảy 4,1 → 3,5 s; Tam Bảo 3,9 → 3,2 s; bài Giới thiệu 4,1 → 3,9 s; lịch 4,0 → 3,9 s; danh sách 4,2 s và trang chủ 5,2 s không đổi. FCP 1,9–2,3 s.
+  - **Vì sao chưa xuống dưới 2,0 s:** LCP đo thật trong cùng các lượt (không giả lập) là 0,6–0,8 s và trùng lần vẽ đầu. Số 3,2–5,2 s là ước lượng của Lighthouse cho 4G chậm và CPU chậm 4 lần: nó cộng mọi JS đã tải xong trước thời điểm LCP thật (toàn bộ script của trang), nên phần "chờ vẽ" còn 1,0–2,0 s dù ảnh đã nằm trong CSS. FCP mô phỏng 1,9–2,3 s đã chạm mục tiêu 2,0 s trước khi tính LCP.
+  - Muốn xuống tiếp phải đổi cách nạp: CSS màn hình đầu đặt trong HTML (bỏ 72 KB chặn hiển thị) và hoãn script của vinext tới sau lần vẽ đầu. Cả hai đụng vào cách vinext dựng trang, chưa làm.
+  - Đề nghị: lấy LCP của người dùng thật làm mục tiêu (p75 ≤ 2,5 s, đo bằng Cloudflare Web Analytics ở T20), còn Lighthouse CI giữ cảnh báo để canh thụt lùi.
 - **Ghi chú:** thư mục trình duyệt của Playwright (`ms-playwright`) bị mất khỏi máy trước lượt chạy này; đã cài lại bằng `npx playwright install chromium`.
 
 **Tiêu chí nghiệm thu:**

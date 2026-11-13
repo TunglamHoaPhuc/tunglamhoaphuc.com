@@ -7,6 +7,10 @@ START: Breadcrumb CSS
 	&-header {
 		padding-top: 133px;
 		padding-bottom: 150px;
+		// Inlined (?inline) with the overlay below, 5 and 7 KB: the banner is the largest thing on
+		// the first screen of every inner page, and as files they were asked for only once the
+		// stylesheet was in, 1.7–2.5 s late on a slow phone (Lighthouse LCP 3.9–4.2 s, T41b).
+		background-image: url("../../images/pheader-bg.webp?inline");
 		background-position: center;
 		background-size: cover;
 		background-repeat: no-repeat;
@@ -85,6 +89,7 @@ START: Breadcrumb CSS
 }
 
 .page-header-overlay {
+	background-image: url("../../images/pheader-overlay.webp?inline");
 	background-size: cover;
 	background-repeat: no-repeat;
 	background-position: center;
