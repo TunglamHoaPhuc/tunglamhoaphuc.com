@@ -1,6 +1,6 @@
-// Temple details and navigation shared by the header, mobile menu, footer and (later) the
-// contact page. Change the menu or a phone number here only; T29 moves these values into
-// the admin "Cấu hình" module.
+// Temple details and navigation shared by the header, mobile menu, footer and the contact
+// page. Change the menu or a phone number here only; T29 moves these values into the admin
+// "Cấu hình" module.
 
 export type NavLink = {
 	label: string;
@@ -32,6 +32,17 @@ export type Announcement = {
 /** "0979345373" → "0979.345.373", the way the temple writes numbers. */
 export function formatPhone(digits: string): string {
 	return digits.replace(/^(\d{4})(\d{3})(\d{3})$/, "$1.$2.$3");
+}
+
+/** Contacts grouped under their role, in the order the roles first appear. */
+export function contactGroups(contacts: Contact[]): { role: string; people: Contact[] }[] {
+	const groups: { role: string; people: Contact[] }[] = [];
+	for (const contact of contacts) {
+		const group = groups.find(({ role }) => role === contact.role);
+		if (group) group.people.push(contact);
+		else groups.push({ role: contact.role, people: [contact] });
+	}
+	return groups;
 }
 
 export const site = {
