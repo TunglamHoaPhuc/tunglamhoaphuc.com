@@ -1,0 +1,103 @@
+@use "../utilities" as *;
+
+/**----------------------------------------
+START: TLHP Tìm kiếm (T18)
+The search form, the results by section, and the sections offered when nothing is found.
+----------------------------------------*/
+.tlhp-search {
+	// Paging comes back to this heading; leave room for the sticky header.
+	#ket-qua {
+		scroll-margin-top: 130px;
+	}
+}
+.tlhp-search-form {
+	label {
+		display: block;
+		margin-bottom: 8px;
+		color: var(--tj-color-heading-primary);
+		font-weight: var(--tj-fw-medium);
+	}
+}
+.tlhp-search-row {
+	display: flex;
+	gap: 12px;
+	input {
+		flex: 1 1 auto;
+		min-width: 0;
+		min-height: 52px;
+		padding: 0 20px;
+		border-radius: var(--tlhp-radius-pill);
+	}
+	.tj-primary-btn {
+		flex: 0 0 auto;
+		min-height: 52px;
+	}
+}
+.tlhp-search-hint {
+	margin: 8px 0 0;
+	color: var(--tj-color-text-body-3);
+	font-size: var(--tlhp-text-body-sm);
+}
+
+.tlhp-search-results {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.tlhp-search-result {
+	padding: 18px 0;
+	border-bottom: 1px solid var(--tj-color-border-1);
+}
+.tlhp-search-title {
+	margin-bottom: 4px;
+	font-family: var(--tj-ff-heading);
+	font-size: var(--tlhp-text-title);
+	line-height: var(--tlhp-leading-title);
+	a {
+		color: var(--tj-color-heading-primary);
+		&:hover {
+			color: var(--tj-color-theme-primary);
+		}
+	}
+}
+.tlhp-search-text {
+	display: -webkit-box;
+	margin: 0;
+	overflow: hidden;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	line-clamp: 2;
+}
+.tlhp-search-date {
+	margin: 6px 0 0;
+	color: var(--tj-color-text-body-3);
+	font-size: var(--tlhp-text-body-sm);
+}
+.tlhp-search-group {
+	margin-top: 40px;
+	> .tlhp-text-link {
+		margin-top: 8px;
+	}
+}
+.tlhp-search-group-title {
+	margin-bottom: 4px;
+}
+.tlhp-empty.tlhp-search-empty {
+	max-width: none;
+	// Seven sections wrap here, phones too: a centred row that scrolls would hide its start.
+	.tlhp-pills {
+		flex-wrap: wrap;
+		justify-content: center;
+		overflow: visible;
+		margin: 0;
+		padding: 0;
+	}
+}
+.tlhp-search-suggest {
+	margin-top: 24px;
+	p {
+		margin-bottom: 12px;
+	}
+}
+
+/* !END: TLHP Tìm kiếm */

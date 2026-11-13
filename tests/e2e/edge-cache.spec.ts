@@ -13,6 +13,7 @@ const CACHED = [
 	"/tri-tue-phat-phap/tac-pham-di-qua-kho-vui-cuoc-doi",
 	"/tri-tue-phat-phap/di-qua-kho-vui-cuoc-doi",
 	"/tri-tue-phat-phap/hoc-tieng-tang",
+	"/lien-he",
 ];
 
 async function twice(request: APIRequestContext, path: string, headers: Record<string, string> = {}) {

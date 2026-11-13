@@ -96,8 +96,8 @@ export const site = {
 	announcement: null as Announcement | null,
 
 	features: {
-		// The header search button waits for the /tim-kiem page (T18); T5b finishes the popup.
-		search: false,
+		// The header search button and popup (T5b), sending to /tim-kiem (T18).
+		search: true,
 	},
 
 	// Points to the registration notes on the schedule page until /dang-ky exists (T39).
