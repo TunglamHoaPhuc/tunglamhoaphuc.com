@@ -59,3 +59,6 @@ node_modules/
 
 # On-demand before–after screenshots (tests/e2e/visual.spec.ts)
 /tests/e2e/*-snapshots/
+
+# Lighthouse CI runs (npm run lhci)
+/.lighthouseci/

@@ -108,7 +108,17 @@ export function albumImageAt(src: string, width: number): string {
 }
 
 /** Display widths of transformed pictures; few on purpose, each one counts against the quota. */
-export const IMAGE_WIDTH = { card: 640, wide: 1280, full: 1920 } as const;
+export const IMAGE_WIDTH = { small: 360, card: 640, wide: 1280, full: 1920 } as const;
+
+/**
+ * `srcSet` of a transformed picture at the given widths, for pictures shown much smaller than
+ * 640 px on phones (a statue card is about 185 px there: 324 device pixels at Lighthouse's 1.75, so 360, T41b). `undefined` for pictures that
+ * are not transformed, which come in one size.
+ */
+export function imageSrcSet(src: string, widths: readonly number[]): string | undefined {
+	if (imageAt(src, widths[0]) === src) return undefined;
+	return widths.map((width) => `${imageAt(src, width)} ${width}w`).join(", ");
+}
 
 /**
  * How eagerly to fetch the picture at the top of a page. Only the site's own pictures go first.

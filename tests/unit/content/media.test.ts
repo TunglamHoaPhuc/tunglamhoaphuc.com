@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { albumImageAt, b2Source, imageAt, topImagePriority } from "@/libs/content/media";
+import { albumImageAt, b2Source, imageAt, imageSrcSet, topImagePriority } from "@/libs/content/media";
 
 // Pictures of the old site go through Cloudflare's image transformations on this zone. B2
 // files come in through /anh-goc/ so the source is on the zone too (the zone accepts only
@@ -27,6 +27,14 @@ describe("imageAt", () => {
 		expect(imageAt("https://static.xx.fbcdn.net/images/emoji.php/v9/t4c/1/16/1f64f.png", 640)).toBe(
 			"https://static.xx.fbcdn.net/images/emoji.php/v9/t4c/1/16/1f64f.png",
 		);
+	});
+});
+
+describe("imageSrcSet", () => {
+	it("lists a transformed picture at each width, and nothing for pictures that are not transformed", () => {
+		expect(imageSrcSet(WP, [320, 640])).toBe(`${imageAt(WP, 320)} 320w, ${imageAt(WP, 640)} 640w`);
+		expect(imageSrcSet("/images/hero/toan-canh-chua-1920.webp", [320, 640])).toBeUndefined();
+		expect(imageSrcSet("https://img2.infonet.vn/a.jpg", [320, 640])).toBeUndefined();
 	});
 });
 

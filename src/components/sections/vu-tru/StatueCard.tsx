@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
+import { IMAGE_WIDTH, imageAt, imageSrcSet } from "@/libs/content/media";
 import type { StatueSummary } from "@/libs/content/types";
 import { liveHref } from "@/libs/livePaths";
 
@@ -10,7 +10,12 @@ type Props = { statue: StatueSummary };
 export default function StatueCard({ statue }: Props) {
 	const href = liveHref(statue.href);
 	const picture = statue.image ? (
-		<img src={imageAt(statue.image.src, IMAGE_WIDTH.card)} alt="" width={360} height={480} loading="lazy" decoding="async" style={{ objectPosition: statue.image.position }} />
+		<img
+			src={imageAt(statue.image.src, IMAGE_WIDTH.card)}
+			// Two to a row on phones, three or four on wider screens.
+			srcSet={imageSrcSet(statue.image.src, [IMAGE_WIDTH.small, IMAGE_WIDTH.card])}
+			sizes="(min-width: 768px) 300px, 45vw"
+			alt="" width={360} height={480} loading="lazy" decoding="async" style={{ objectPosition: statue.image.position }} />
 	) : (
 		<span className="tlhp-post-card-noimage" />
 	);

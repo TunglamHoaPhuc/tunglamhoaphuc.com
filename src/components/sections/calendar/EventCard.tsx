@@ -1,4 +1,5 @@
 import { type EventStatus, lunarRange, solarRange } from "@/libs/calendar";
+import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
 import type { ScheduleEvent } from "@/libs/content/types";
 import { dateBadge } from "@/libs/format";
 import { youtubeEmbed } from "@/libs/video";
@@ -20,7 +21,7 @@ export default function EventCard({ event, anchor, status }: Props) {
 			<div className="blog-thumb">
 				{event.image ? (
 					<img
-						src={event.image.src}
+						src={imageAt(event.image.src, IMAGE_WIDTH.card)}
 						alt=""
 						width={640}
 						height={360}

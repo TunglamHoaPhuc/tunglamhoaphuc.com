@@ -296,7 +296,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 ### Giai đoạn 6 – Chuyển hẳn và hoàn thiện
 - [ ] T39: Chuyển hẳn sang D1 và admin mới
 - [ ] T40: Khối "Hỏi AI Hòa Phúc"
-- [ ] T41b: Đo toàn site, ngân sách ảnh và Lighthouse CI
+- [x] T41b: Đo toàn site, ngân sách ảnh và Lighthouse CI (xong 13/11; LCP 3,9–5,2 s, chưa đạt mục tiêu < 2,0 s, chờ chủ dự án quyết)
 - [ ] **Checkpoint J** – hoàn tất, tắt admin cũ và WordPress theo kế hoạch Cloudflare
 
 ## Làm song song

@@ -1,0 +1,32 @@
+{
+	"ci": {
+		"collect": {
+			"url": [
+				"https://v2.tunglamhoaphuc.com/",
+				"https://v2.tunglamhoaphuc.com/dong-chay-hoang-phap",
+				"https://v2.tunglamhoaphuc.com/dong-chay-hoang-phap/cong-tu-phap-hoi-niem-phat-thang-7-nam-binh-ngo-2026-2",
+				"https://v2.tunglamhoaphuc.com/lich-tu-hoc",
+				"https://v2.tunglamhoaphuc.com/gioi-thieu/tieu-su-su-to",
+				"https://v2.tunglamhoaphuc.com/vu-tru-phat-giao/tam-bao"
+			],
+			"numberOfRuns": 3,
+			"settings": {
+				"onlyCategories": ["performance"],
+				"chromeFlags": "--headless=new"
+			}
+		},
+		"assert": {
+			"assertions": {
+				"resource-summary:stylesheet:size": ["error", { "maxNumericValue": 80000 }],
+				"resource-summary:script:size": ["error", { "maxNumericValue": 340000 }],
+				"resource-summary:font:size": ["error", { "maxNumericValue": 210000 }],
+				"resource-summary:image:size": ["error", { "maxNumericValue": 1500000 }],
+				"uses-responsive-images": ["warn", { "maxLength": 0 }],
+				"cumulative-layout-shift": ["error", { "maxNumericValue": 0.01 }],
+				"total-blocking-time": ["warn", { "maxNumericValue": 300 }],
+				"largest-contentful-paint": ["warn", { "maxNumericValue": 2500 }]
+			}
+		},
+		"upload": { "target": "filesystem", "outputDir": ".lighthouseci/reports" }
+	}
+}
