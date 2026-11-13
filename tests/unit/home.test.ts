@@ -39,7 +39,8 @@ const posts = [
 	post(8, "Đêm  thắp NẾN", "2026-01-02", 108),
 	post(9, "Lễ khai khóa", "2025-11-25", 109),
 	post(10, "Chưa ai đọc", "2025-01-01", 0),
-	post(11, "Bài Trí Tuệ đọc nhiều", "2026-10-30", 35404, { section: "tri-tue-phat-phap" }),
+	// The two posts filed under Vũ Trụ Phật Giáo have no pages of their own (its pages are its areas).
+	post(11, "Bài Vũ Trụ đọc nhiều", "2026-10-30", 35404, { section: "vu-tru-phat-giao" }),
 ];
 
 describe("home data", async () => {
@@ -65,6 +66,11 @@ describe("home data", async () => {
 		});
 	});
 
+	it("Tin mới nhất takes Trí Tuệ Phật Pháp posts too, now that they have pages", async () => {
+		const withTriTue = await loadHomeData(createMemoryRepository([...posts, post(12, "Pháp âm mới", "2026-11-01", 10, { section: "tri-tue-phat-phap" })]));
+		expect(withTriTue.latest.map((item) => item.id)).toEqual(["p12", "p1", "p2", "p3", "p4", "p5"]);
+	});
+
 	it("keeps only the welcome frame when no post has a picture", async () => {
 		const bare = await loadHomeData(createMemoryRepository([post(1, "Một bài", "2026-01-01", 1, { banner: null })]));
 		expect(bare.hero.map((slide) => slide.id)).toEqual(["noi-de-tro-ve"]);
@@ -76,7 +82,7 @@ describe("repository lists for the home page", () => {
 	const repo = createMemoryRepository(posts);
 
 	it("sorts by views, newer first on a tie, and takes several sections", async () => {
-		const page = await repo.listPosts({ section: ["dong-chay-hoang-phap", "tri-tue-phat-phap"], sort: "views", pageSize: 4 });
+		const page = await repo.listPosts({ section: ["dong-chay-hoang-phap", "vu-tru-phat-giao"], sort: "views", pageSize: 4 });
 		expect(page.items.map((item) => item.id)).toEqual(["p11", "p2", "p3", "p4"]);
 		expect(page.total).toBe(11);
 	});
@@ -210,10 +216,10 @@ describe("home data from Giới thiệu", async () => {
 			image: { src: "https://media.example/lich-su.jpg" },
 		});
 		expect(data.welcome?.faces.map((face) => face.src)).toEqual(["https://media.example/a.jpg", "https://media.example/b-banner.jpg", "https://media.example/c.jpg"]);
-		// 10 Dòng Chảy posts and 1 Trí Tuệ post in the fixture; 3 November 2026 is after Phật đản.
+		// 10 Dòng Chảy posts and none of Trí Tuệ in the fixture; 3 November 2026 is after Phật đản.
 		expect(data.welcome?.stats).toEqual([
 			{ label: "Bài viết Dòng Chảy Hoằng Pháp", value: 10 },
-			{ label: "Bài giảng, pháp âm, ấn phẩm Trí Tuệ Phật Pháp", value: 1 },
+			{ label: "Bài giảng, pháp âm, ấn phẩm Trí Tuệ Phật Pháp", value: 0 },
 			{ label: "Phật lịch", value: 2570, year: true },
 		]);
 	});

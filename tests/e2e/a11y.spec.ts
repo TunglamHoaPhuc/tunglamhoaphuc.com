@@ -18,6 +18,10 @@ const PAGES = [
 	"/vu-tru-phat-giao/tam-bao",
 	"/bao-tuong-phat-giao",
 	"/bao-tuong/duc_phat_thich_ca_mau_ni_vo_thuong_nang_nhan_tp0001",
+	"/tri-tue-phat-phap",
+	"/tri-tue-phat-phap/tac-pham-di-qua-kho-vui-cuoc-doi",
+	"/tri-tue-phat-phap/di-qua-kho-vui-cuoc-doi",
+	"/tri-tue-phat-phap/hoc-tieng-tang",
 	"/khong-co-trang-nay",
 ];
 

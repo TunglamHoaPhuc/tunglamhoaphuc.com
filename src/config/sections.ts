@@ -16,3 +16,11 @@ export const DONG_CHAY: PostSection = {
 	name: "Dòng Chảy Hoằng Pháp",
 	description: "Tin hoạt động, khóa lễ, cộng tu và đại lễ tại Tùng Lâm Hòa Phúc.",
 };
+
+export const TRI_TUE: PostSection = {
+	slug: "tri-tue-phat-phap",
+	path: "/tri-tue-phat-phap",
+	name: "Trí Tuệ Phật Pháp",
+	// The old page's words.
+	description: "Tổng hợp bài viết, câu chuyện, pháp âm & video lưu thông pháp bảo của Tùng Lâm Hòa Phúc.",
+};

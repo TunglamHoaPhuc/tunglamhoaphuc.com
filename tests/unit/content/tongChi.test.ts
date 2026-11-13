@@ -152,8 +152,9 @@ describe("Tông Chỉ file", () => {
 		const { entries, issues } = parseTongChi([
 			article({
 				videoBlock: { title: "KHÓA LỄ NIỆM PHẬT", description: "Kinh hành niệm Phật.", videoUrl: "https://www.youtube.com/watch?v=MKt_sLwxmNU" },
-				featuredArticle: { label: "PHƯƠNG PHÁP HÀNH TRÌ", title: "PHÁP MÔN NIỆM PHẬT", author: "Vô Trí", linkUrl: "/tri-tue-phat-phap" },
-				sourceBook: { bookTitle: "Niệm Phật & Tịnh Độ", author: "Vô Trí", coverImage: "https://admin.tunglamhoaphuc.com/wp-content/uploads/niem-phat.jpg", description: "", linkUrl: "" },
+				// Liên hệ has no page yet (T18); Trí Tuệ Phật Pháp has (T17).
+				featuredArticle: { label: "PHƯƠNG PHÁP HÀNH TRÌ", title: "PHÁP MÔN NIỆM PHẬT", author: "Vô Trí", linkUrl: "/lien-he" },
+				sourceBook: { bookTitle: "Niệm Phật & Tịnh Độ", author: "Vô Trí", coverImage: "https://admin.tunglamhoaphuc.com/wp-content/uploads/niem-phat.jpg", description: "", linkUrl: "/tri-tue-phat-phap/di-qua-kho-vui-cuoc-doi" },
 				photoGallery: [{ title: "HÀNH GIẢ", imageUrl: "https://s2-cnv03.s3.us-east-005.backblazeb2.com/a.webp", khuVuc: "Đạo tràng", noiDung: "Đại chúng trì niệm." }],
 				keywords: [{ keyword: "Niệm Phật", title: "Phương Pháp Niệm Phật", description: "Trì danh hiệu." }, { keyword: "Trống", title: "", description: "" }],
 			}),
@@ -162,7 +163,7 @@ describe("Tông Chỉ file", () => {
 		const [full, empty] = entries;
 		expect(full.video).toEqual({ id: "MKt_sLwxmNU", url: "https://www.youtube.com/watch?v=MKt_sLwxmNU", title: "KHÓA LỄ NIỆM PHẬT", description: "Kinh hành niệm Phật." });
 		expect(full.featured).toEqual({ label: "Phương Pháp Hành Trì", title: "Pháp Môn Niệm Phật", author: "Vô Trí", href: null });
-		expect(full.book).toMatchObject({ title: "Niệm Phật & Tịnh Độ", cover: null, href: null });
+		expect(full.book).toMatchObject({ title: "Niệm Phật & Tịnh Độ", cover: null, href: "/tri-tue-phat-phap/di-qua-kho-vui-cuoc-doi" });
 		expect(full.gallery).toEqual([{ src: "https://s2-cnv03.s3.us-east-005.backblazeb2.com/a.webp", title: "HÀNH GIẢ", caption: "Đạo tràng – Đại chúng trì niệm." }]);
 		expect(full.keywords).toEqual([{ keyword: "Niệm Phật", title: "Phương Pháp Niệm Phật", description: "Trì danh hiệu." }]);
 		expect([empty.video, empty.book, empty.featured, empty.gallery]).toEqual([null, null, null, []]);

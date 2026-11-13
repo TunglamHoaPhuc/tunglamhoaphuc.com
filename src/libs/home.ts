@@ -12,8 +12,8 @@ import { postHref } from "@/libs/postList";
 import { groupTongChi, type TongChiGroup } from "@/libs/tongChiGroups";
 import { type AreaTeaser, templeAreas } from "@/libs/vuTru";
 
-/** Sections whose post pages are built; home lists take posts from these only (T14, T17 add theirs). */
-export const LIVE_SECTIONS = ["dong-chay-hoang-phap"];
+/** Sections whose post pages are built; home lists take posts from these only. */
+export const LIVE_SECTIONS = ["dong-chay-hoang-phap", "tri-tue-phat-phap"];
 
 const NEWS_COUNT = 6;
 const UPCOMING_COUNT = 3;

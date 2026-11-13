@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 import AnchorTabs, { type AnchorTab } from "@/components/sections/posts/AnchorTabs";
 import PostGallery from "@/components/sections/posts/PostGallery";
 import PostVideos from "@/components/sections/posts/PostVideos";
@@ -16,12 +17,17 @@ import { listHref } from "@/libs/postList";
 
 const RELATED = 3;
 
-type Props = { section: PostSection; post: Post };
+type Props = {
+	section: PostSection;
+	post: Post;
+	/** Under the overview: a way into what the post presents (the book it introduces…). */
+	extra?: ReactNode;
+};
 
 // One article of a section, rendered on the server with its whole text (the old site fetched
 // it in the browser and showed "không còn tồn tại" while it loaded). Bexon's sidebar widgets
 // and comments are left out.
-export default async function PostArticle({ section, post }: Props) {
+export default async function PostArticle({ section, post, extra }: Props) {
 	const categoryHref = (slug: string) => listHref(section.path, { category: slug, sort: "moi-nhat", page: 1 });
 	const related = (await (await getContentRepository()).listPosts({ section: section.slug, category: post.category.slug, pageSize: RELATED + 1 })).items
 		.filter((item) => item.id !== post.id)
@@ -86,6 +92,7 @@ export default async function PostArticle({ section, post }: Props) {
 									</div>
 								) : null}
 								{post.intro ? <p className="tlhp-article-intro">{post.intro}</p> : null}
+								{extra}
 							</section>
 
 							{post.contentHtml ? (
