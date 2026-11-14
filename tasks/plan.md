@@ -258,7 +258,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [ ] **Checkpoint D** – site công khai hoàn chỉnh trên `v2.`
 
 ### Giai đoạn 3 – Ra mắt sớm trên www
-- [ ] T19: Đọc dữ liệu trực tiếp từ B2
+- [ ] T19: Đọc dữ liệu trực tiếp từ B2 (phần mã xong 14/11, chờ chuẩn bị #4: bucket và khóa chỉ đọc; xem docs/van-hanh/nguon-b2.md)
 - [ ] T20: SEO trước ra mắt
 - [ ] T21: Đưa admin cũ sang `quantri.tunglamhoaphuc.com` sau Cloudflare Access (làm được ngay, giải quyết HT-01)
 - [x] T41d: Ảnh nội dung qua Image Transformations của Cloudflare (điều kiện của T22; đổi từ bản thu nhỏ trên R2, xong 04/11)
