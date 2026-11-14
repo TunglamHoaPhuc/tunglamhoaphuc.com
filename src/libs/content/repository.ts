@@ -1,6 +1,7 @@
 // The one door pages use to read content: `await getContentRepository()`. Filtering,
 // sorting and paging happen here on the server, so a list page sends 12 posts, not 472.
 import { type StatueEntry, statueArticle, statueSummary } from "./baoTuong";
+import type { FileLoaders } from "./sources/files";
 import { type TongChiEntry, tongChiArticle, tongChiSummary } from "./tongChi";
 import type { AboutTopic, Area, CategoryCount, ContentRepository, GalleryImage, Page, Post, PostSort, PostSummary, Schedule, Statue, StatueSummary, TongChiArticle } from "./types";
 
@@ -170,28 +171,35 @@ export function contentSource(value = process.env.CONTENT_SOURCE): ContentSource
 	throw new Error(`CONTENT_SOURCE không hợp lệ: "${value}" (snapshot | b2 | d1)`);
 }
 
-let repository: Promise<ContentRepository> | undefined;
+function fromFiles(loaders: FileLoaders): ContentRepository {
+	return createMemoryRepository(loaders.posts, {
+		loadAlbums: loaders.albums,
+		loadSchedule: loaders.schedule,
+		loadAbout: loaders.about,
+		loadTongChi: loaders.tongChi,
+		loadAreas: loaders.areas,
+		loadStatues: loaders.statues,
+	});
+}
+
+/** `make()`, kept; a failed one is made again on the next call rather than kept forever. */
+function once<T>(make: () => Promise<T>): () => Promise<T> {
+	let value: Promise<T> | undefined;
+	return () =>
+		(value ??= make().catch((error: unknown) => {
+			value = undefined;
+			throw error;
+		}));
+}
+
+const snapshotRepository = once(async () => {
+	const [{ readSnapshot }, { createFileLoaders }] = await Promise.all([import("./sources/snapshot"), import("./sources/files")]);
+	return fromFiles(createFileLoaders(readSnapshot));
+});
 
 /** The repository for this server instance, built once from the chosen source. */
-export function getContentRepository(): Promise<ContentRepository> {
-	repository ??= (async () => {
-		const source = contentSource();
-		if (source !== "snapshot") throw new Error(`Nguồn "${source}" chưa có (b2: T19, d1: chuyển hẳn).`);
-		const { loadSnapshotAbout, loadSnapshotAlbums, loadSnapshotAreas, loadSnapshotPosts, loadSnapshotSchedule, loadSnapshotStatues, loadSnapshotTongChi } = await import(
-			"./sources/snapshot"
-		);
-		return createMemoryRepository(async () => (await loadSnapshotPosts()).posts, {
-			loadAlbums: loadSnapshotAlbums,
-			loadSchedule: async () => (await loadSnapshotSchedule()).schedule,
-			loadAbout: async () => (await loadSnapshotAbout()).topics,
-			loadTongChi: async () => (await loadSnapshotTongChi()).entries,
-			loadAreas: async () => (await loadSnapshotAreas()).areas,
-			loadStatues: async () => (await loadSnapshotStatues()).statues,
-		});
-	})().catch((error) => {
-		// Try again on the next request rather than keep a failed load forever.
-		repository = undefined;
-		throw error;
-	});
-	return repository;
+export async function getContentRepository(): Promise<ContentRepository> {
+	const source = contentSource();
+	if (source !== "snapshot") throw new Error(`Nguồn "${source}" chưa có (b2: T19, d1: chuyển hẳn).`);
+	return snapshotRepository();
 }
