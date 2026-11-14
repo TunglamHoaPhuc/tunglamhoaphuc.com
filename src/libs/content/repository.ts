@@ -1,6 +1,7 @@
 // The one door pages use to read content: `await getContentRepository()`. Filtering,
 // sorting and paging happen here on the server, so a list page sends 12 posts, not 472.
 import { type StatueEntry, statueArticle, statueSummary } from "./baoTuong";
+import type { CacheLike } from "./sources/b2";
 import type { FileLoaders } from "./sources/files";
 import { type TongChiEntry, tongChiArticle, tongChiSummary } from "./tongChi";
 import type { AboutTopic, Area, CategoryCount, ContentRepository, GalleryImage, Page, Post, PostSort, PostSummary, Schedule, Statue, StatueSummary, TongChiArticle } from "./types";
@@ -171,6 +172,18 @@ export function contentSource(value = process.env.CONTENT_SOURCE): ContentSource
 	throw new Error(`CONTENT_SOURCE không hợp lệ: "${value}" (snapshot | b2 | d1)`);
 }
 
+/** A value made again once `ttl` ms have passed since it was made. */
+export function renewing<T>(make: () => T, ttl: number, now: () => number = Date.now): () => T {
+	let current: { value: T; until: number } | undefined;
+	return () => {
+		if (!current || now() >= current.until) current = { value: make(), until: now() + ttl };
+		return current.value;
+	};
+}
+
+/** How often a Worker reading B2 starts a fresh repository (each file is asked about as often, sources/b2.ts). */
+const B2_RENEW_MS = 60_000;
+
 function fromFiles(loaders: FileLoaders): ContentRepository {
 	return createMemoryRepository(loaders.posts, {
 		loadAlbums: loaders.albums,
@@ -197,9 +210,21 @@ const snapshotRepository = once(async () => {
 	return fromFiles(createFileLoaders(readSnapshot));
 });
 
-/** The repository for this server instance, built once from the chosen source. */
+const b2Repositories = once(async () => {
+	const [{ b2Config, createB2Reader }, { createFileLoaders }] = await Promise.all([import("./sources/b2"), import("./sources/files")]);
+	const cache = (globalThis as { caches?: { default?: CacheLike } }).caches?.default;
+	const loaders = createFileLoaders(createB2Reader(b2Config(process.env), { cache }));
+	return renewing(() => fromFiles(loaders), B2_RENEW_MS);
+});
+
+/**
+ * The repository for this server instance. The snapshot never changes, so it is built once.
+ * From B2 a fresh one is made every minute on the same loaders, which turn a file into
+ * content again only when B2 says it has changed.
+ */
 export async function getContentRepository(): Promise<ContentRepository> {
 	const source = contentSource();
-	if (source !== "snapshot") throw new Error(`Nguồn "${source}" chưa có (b2: T19, d1: chuyển hẳn).`);
+	if (source === "b2") return (await b2Repositories())();
+	if (source === "d1") throw new Error('Nguồn "d1" chưa có (chuyển hẳn sang D1).');
 	return snapshotRepository();
 }
