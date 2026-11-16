@@ -1,14 +1,8 @@
 /// <reference types="vite/client" />
 // Source "snapshot": the old admin's JSON files copied into data/snapshot/ (not in git).
 // Bundled at build time; a missing file just means no content, never a failed build.
-import { type ParsedAbout, parseAbout } from "../about";
-import { type ParsedPosts, parsePosts, toGallery } from "../posts";
-import { type ParsedSchedule, parseSchedule } from "../schedule";
-import { type ParsedTongChi, parseTongChi } from "../tongChi";
-import { type ParsedStatues, parseStatues } from "../baoTuong";
-import { type ParsedAreas, parseAreas } from "../vuTru";
-import { rawPostSchema } from "../schema";
-import type { GalleryImage } from "../types";
+import { type ParsedPosts, parsePosts } from "../posts";
+import type { ReadFile } from "./files";
 
 // As text, parsed here: Vite's JSON loader rejects the half emoji ("\ud83d") one post
 // ends with, which JSON.parse accepts.
@@ -20,49 +14,14 @@ export async function readSnapshotFile(name: string): Promise<unknown> {
 	return load ? JSON.parse(await load()) : null;
 }
 
+/** The snapshot as a source (sources/files.ts): its files never change while the Worker runs. */
+export const readSnapshot: ReadFile = async (name) => {
+	const data = await readSnapshotFile(name);
+	return data === null ? null : { version: "snapshot", data };
+};
+
+/** posts.json with what the adapter found wrong in it, for tests and `snapshot:check`. */
 export async function loadSnapshotPosts(): Promise<ParsedPosts> {
 	const file = await readSnapshotFile("posts");
 	return file === null ? { posts: [], issues: [], total: 0 } : parsePosts(file);
-}
-
-const albumSchema = rawPostSchema.shape.photoGallery;
-
-/**
- * post-albums.json (`npm run snapshot:fetch -- --albums`): the albums the old admin's lists
- * leave empty, by post id. Only post pages need them, so they load on the first such page.
- */
-export async function loadSnapshotAlbums(): Promise<Map<string, GalleryImage[]>> {
-	const file = await readSnapshotFile("post-albums");
-	const albums = new Map<string, GalleryImage[]>();
-	if (!file || typeof file !== "object") return albums;
-	for (const [id, photos] of Object.entries(file)) {
-		const { gallery } = toGallery(albumSchema.parse(photos));
-		if (gallery.length) albums.set(id, gallery);
-	}
-	return albums;
-}
-
-/** gioi-thieu.json (Giới thiệu); no topics when the file is not there. */
-export async function loadSnapshotAbout(): Promise<ParsedAbout> {
-	return parseAbout((await readSnapshotFile("gioi-thieu")) ?? []);
-}
-
-/** tong-chi.json (Tông Chỉ Tu Học); no articles when the file is not there. */
-export async function loadSnapshotTongChi(): Promise<ParsedTongChi> {
-	return parseTongChi((await readSnapshotFile("tong-chi")) ?? []);
-}
-
-/** vu-tru.json (Vũ Trụ Phật Giáo); no areas when the file is not there. */
-export async function loadSnapshotAreas(): Promise<ParsedAreas> {
-	return parseAreas((await readSnapshotFile("vu-tru")) ?? []);
-}
-
-/** bao-tuong.json (Bảo Tượng Phật Giáo); no statues when the file is not there. */
-export async function loadSnapshotStatues(): Promise<ParsedStatues> {
-	return parseStatues((await readSnapshotFile("bao-tuong")) ?? []);
-}
-
-/** schedule.json (lịch tu học); an empty schedule when the file is not there. */
-export async function loadSnapshotSchedule(): Promise<ParsedSchedule> {
-	return parseSchedule((await readSnapshotFile("schedule")) ?? {});
 }

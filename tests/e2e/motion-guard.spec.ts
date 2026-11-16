@@ -24,6 +24,8 @@ const PAGES = [
 	"/tri-tue-phat-phap",
 	"/tri-tue-phat-phap/di-qua-kho-vui-cuoc-doi",
 	"/tri-tue-phat-phap/hoc-tieng-tang",
+	"/lien-he",
+	"/tim-kiem?q=niem+phat",
 ];
 
 type SliderElement = HTMLElement & { swiper?: { autoplay?: { running?: boolean } } };

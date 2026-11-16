@@ -1,0 +1,111 @@
+@use "../utilities" as *;
+
+/**----------------------------------------
+START: TLHP Liên hệ (T18)
+Bexon's contact items, the contacts by role and the temple's picture in the map's place.
+----------------------------------------*/
+.tlhp-contact-grid {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	.contact-item {
+		height: 100%;
+		p {
+			margin-bottom: 8px;
+		}
+	}
+}
+
+.tlhp-contact-book {
+	height: 100%;
+	padding: 32px;
+	border: 1px solid var(--tj-color-border-1);
+	border-radius: var(--tlhp-radius-lg);
+	background-color: var(--tj-color-common-white);
+	@media #{$xs} {
+		padding: 24px 16px;
+	}
+	.title {
+		margin-bottom: 20px;
+	}
+	ul {
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+}
+.tlhp-contact-group + .tlhp-contact-group {
+	margin-top: 20px;
+}
+.tlhp-contact-role {
+	margin-bottom: 4px;
+	color: var(--tlhp-accent-text);
+	font-family: var(--tj-ff-body);
+	font-size: var(--tlhp-text-overline);
+	font-weight: var(--tlhp-weight-overline);
+	letter-spacing: var(--tlhp-tracking-overline);
+	text-transform: uppercase;
+}
+// A whole row is the link, at least 48px high.
+.tlhp-contact-phone {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	min-height: 48px;
+	border-bottom: 1px solid var(--tj-color-border-1);
+	color: var(--tj-color-heading-primary);
+	&:hover {
+		color: var(--tj-color-theme-primary);
+	}
+}
+.tlhp-contact-number {
+	color: var(--tj-color-theme-primary);
+	font-weight: var(--tj-fw-sbold);
+	white-space: nowrap;
+}
+
+.tlhp-contact-map {
+	position: relative;
+	height: 100%;
+	min-height: 440px;
+	overflow: hidden;
+	border-radius: var(--tlhp-radius-lg);
+	@media #{$sm, $xs} {
+		min-height: 400px;
+	}
+	img {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+}
+.tlhp-contact-map-card {
+	position: absolute;
+	right: 24px;
+	bottom: 24px;
+	left: 24px;
+	padding: 24px;
+	border-radius: var(--tlhp-radius-lg);
+	background-color: var(--tj-color-common-white);
+	box-shadow: var(--tlhp-shadow-sm);
+	@media #{$xs} {
+		right: 12px;
+		bottom: 12px;
+		left: 12px;
+		padding: 20px 16px;
+	}
+	p {
+		margin-bottom: 12px;
+	}
+}
+.tlhp-contact-map-name {
+	margin-bottom: 4px !important;
+	color: var(--tj-color-heading-primary);
+	font-family: var(--tj-ff-heading);
+	font-size: var(--tlhp-text-title);
+}
+
+/* !END: TLHP Liên hệ */

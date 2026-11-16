@@ -1,6 +1,6 @@
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import MarqueeSlider1 from "@/components/shared/marquee/MarqueeSlider1";
-import { formatPhone, site } from "@/config/site";
+import { contactGroups, formatPhone, site } from "@/config/site";
 import Link from "next/link";
 import { Fragment } from "react";
 import ScrollTopLink from "./ScrollTopLink";
@@ -16,13 +16,7 @@ const ADDRESS = site.address.split(" – ").map((part, idx) => (
 	</Fragment>
 ));
 
-// Contacts grouped under their role, in the order the roles first appear.
-const CONTACT_GROUPS = site.contacts.reduce((groups, contact) => {
-	const group = groups.find(({ role }) => role === contact.role);
-	if (group) group.people.push(contact);
-	else groups.push({ role: contact.role, people: [contact] });
-	return groups;
-}, /** @type {{ role: string, people: import("@/config/site").Contact[] }[]} */ ([]));
+const CONTACT_GROUPS = contactGroups(site.contacts);
 
 // Bexon's dark Footer2 with the TLHP columns (BRAND-GUIDELINES 5.4): Bổn tự, Thời khóa tu
 // học, Liên hệ, Bản đồ. One column on phones, two from md, four from xl. `.tlhp-dark` gives

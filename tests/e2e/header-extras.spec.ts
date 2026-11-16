@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
-// /styleguide previews the search popup and a sample notice; real pages have neither yet.
+// The search popup is on every page (T18); /styleguide also previews a sample notice, which
+// real pages do not have yet.
 async function open(page: Page, path: string, width = 1440) {
 	await page.setViewportSize({ width, height: 800 });
 	await page.goto(path);
@@ -95,11 +96,12 @@ test.describe("search popup", () => {
 		});
 	}
 
-	for (const path of ["/", "/blogs", "/contact", "/dong-chay-hoang-phap"]) {
-		test(`with the flag off, ${path} has no way to /tim-kiem`, async ({ page }) => {
-			await open(page, path);
-			await expect(page.locator('a[href*="/tim-kiem"], form[action*="/tim-kiem"]')).toHaveCount(0);
-			await expect(page.getByRole("button", { name: "Tìm kiếm", exact: true })).toHaveCount(0);
+	// The flag is on since /tim-kiem exists (T18): every page can search.
+	for (const path of ["/", "/dong-chay-hoang-phap", "/lien-he"]) {
+		test(`${path} searches through the header`, async ({ page, isMobile }) => {
+			await open(page, path, isMobile ? 375 : 1440);
+			await expect(page.locator('form[action="/tim-kiem"]').first()).toBeAttached();
+			if (!isMobile) await expect(searchToggle(page)).toBeVisible();
 		});
 	}
 });
