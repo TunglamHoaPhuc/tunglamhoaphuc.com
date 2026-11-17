@@ -38,9 +38,9 @@ test("Bexon surfaces and text use the TLHP dark palette of the old site", async 
 		bodyText: "rgb(227, 210, 193)", // old site parchment #E3D2C1
 		sectionTitle: "rgb(242, 193, 78)", // old site gold #F2C14E
 		alternateSection: "rgb(44, 28, 17)", // gỗ lim #2C1C11
-		primaryButton: "rgb(212, 163, 115)", // hoại sắc #D4A373
+		primaryButton: "rgb(229, 169, 60)", // the amber end of the gold band #E5A93C
 		darkSection: "rgb(26, 18, 11)", // đen mun #1A120B
-		footer: "rgb(26, 18, 11)",
+		footer: "rgb(42, 29, 20)", // the foot of the old site's brown band #2A1D14
 	});
 });
 

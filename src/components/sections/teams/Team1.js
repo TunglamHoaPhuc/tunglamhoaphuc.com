@@ -1,5 +1,6 @@
 import AboutCard from "@/components/sections/about/AboutCard";
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
+import SectionMark from "@/components/shared/others/SectionMark";
 
 /**
  * Bexon's team section as Chư Tôn Đức (plan.md, home block 10): the teachers of the
@@ -15,6 +16,7 @@ const Team1 = ({ members = [] }) => {
 				<div className="row">
 					<div className="col-12">
 						<div className="sec-heading text-center style-2">
+							<SectionMark icon="phap-am" />
 							<span className="sub-title wow fadeInUp" data-wow-delay=".3s">
 								Giới thiệu
 							</span>

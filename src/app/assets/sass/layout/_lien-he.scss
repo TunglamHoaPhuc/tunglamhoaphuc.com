@@ -21,7 +21,7 @@ Bexon's contact items, the contacts by role and the temple's picture in the map'
 	padding: 32px;
 	border: 1px solid var(--tj-color-border-1);
 	border-radius: var(--tlhp-radius-lg);
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	@media #{$xs} {
 		padding: 24px 16px;
 	}
@@ -89,7 +89,7 @@ Bexon's contact items, the contacts by role and the temple's picture in the map'
 	left: 24px;
 	padding: 24px;
 	border-radius: var(--tlhp-radius-lg);
-	background-color: var(--tj-color-common-white);
+	background-color: var(--tj-color-surface);
 	box-shadow: var(--tlhp-shadow-sm);
 	@media #{$xs} {
 		right: 12px;

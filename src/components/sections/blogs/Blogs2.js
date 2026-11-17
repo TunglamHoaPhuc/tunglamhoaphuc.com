@@ -6,6 +6,7 @@ import { useAutoplay } from "@/hooks/useAutoplay";
 import { useRef, useState } from "react";
 import { A11y, Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import SectionMark from "@/components/shared/others/SectionMark";
 
 const A11Y = {
 	prevSlideMessage: "Bài trước",
@@ -98,6 +99,7 @@ const Blogs2 = ({ latest, popular }) => {
 				<div className="row">
 					<div className="col-12">
 						<div className="sec-heading-wrap">
+							<SectionMark icon="dong-chay-hoang-phap" />
 							<span className="sub-title wow fadeInUp" data-wow-delay=".3s">
 								Dòng Chảy Hoằng Pháp
 							</span>

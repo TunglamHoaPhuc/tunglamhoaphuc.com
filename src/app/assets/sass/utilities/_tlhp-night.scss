@@ -5,6 +5,10 @@
 $gold: #f2c14e; // old site h1/h2
 $gold-soft: #ffe5a3; // old site card titles
 $parchment: #e3d2c1; // old site body text
+$amber: #e5a93c; // old site kickers
+$gold-bright: #ffde59; // old site event names, lead paragraph
+$muted: #c9b896; // old site card descriptions
+$faint: #a69383; // old site dates (5.9:1 on #2c1c11)
 
 [data-theme="dark"],
 .tlhp-dark {
@@ -19,7 +23,16 @@ $parchment: #e3d2c1; // old site body text
 	--tlhp-h-surface: 24.4 44.3% 12%;
 	--tlhp-ornament: #{$gold};
 	--tlhp-c-ornament: 242 193 78;
+	--tlhp-muted: #{$muted};
+	--tlhp-c-muted: 201 184 150;
+	--tlhp-h-muted: 40 32% 69%;
 	--tlhp-gold: #{$gold};
+	--tlhp-gold-bright: #{$gold-bright};
+	--tlhp-amber: #{$amber};
+	--tlhp-faint: #{$faint};
+	--tlhp-gold-line: rgb(242 193 78 / 0.22);
+	--tlhp-gold-line-strong: rgb(242 193 78 / 0.55);
+	--tlhp-radius-card: 14px;
 	--tlhp-gold-glow: 0 0 24px rgb(242 193 78 / 0.45), 0 0 48px rgb(242 193 78 / 0.18);
 
 	// Bexon variables that need a different answer on a dark page.
@@ -52,9 +65,6 @@ $parchment: #e3d2c1; // old site body text
 			color: var(--tlhp-gold);
 		}
 	}
-	.tj-page-title {
-		font-size: clamp(3.25rem, 2rem + 5vw, 6rem);
-	}
 	.slider-title:not(.tlhp-hero-post-title) {
 		font-size: clamp(4rem, 2rem + 8vw, 8rem);
 		// The line under the slogan stays in the serif, pale and widely spaced.
@@ -67,14 +77,232 @@ $parchment: #e3d2c1; // old site body text
 		}
 	}
 
-	// Centred headings close with a short gold rule, after the lines of the old home page.
-	.sec-heading-centered::after {
-		content: "";
+	// Centred titles carry a gold rule on each side, as every title of the old site does.
+	// The rules hang off the title box (the title is split into lines for its entrance, so
+	// it cannot become a flex row) and are cut at the edge of the heading.
+	.sec-heading.text-center,
+	.sec-heading-centered,
+	.tj-page-header-content {
+		overflow-x: clip;
+		.sec-title,
+		.tj-page-title {
+			position: relative;
+			display: inline-block;
+			max-width: 100%;
+			&::before,
+			&::after {
+				content: "";
+				position: absolute;
+				top: 50%;
+				width: min(24vw, 340px);
+				height: 1px;
+				pointer-events: none;
+			}
+			&::before {
+				right: calc(100% + 24px);
+				background: linear-gradient(to right, transparent, var(--tlhp-gold));
+			}
+			&::after {
+				left: calc(100% + 24px);
+				background: linear-gradient(to left, transparent, var(--tlhp-gold));
+			}
+		}
+	}
+
+	// The gold mark above a section title (old site: 80px icon over every home title).
+	.tlhp-sec-mark {
 		display: block;
-		width: min(220px, 60%);
-		height: 1px;
-		margin: 22px auto 0;
-		background: linear-gradient(to right, transparent, var(--tlhp-gold), transparent);
+		width: 72px;
+		height: 72px;
+		margin: 0 0 14px;
+		filter: drop-shadow(0 0 14px rgb(242 193 78 / 0.4));
+		img {
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+		}
+		@media (max-width: 767px) {
+			width: 56px;
+			height: 56px;
+			margin-bottom: 10px;
+		}
+	}
+
+	// The line over a title: amber capitals, widely spaced, no frame.
+	.sub-title,
+	.sec-heading .sub-title,
+	.sec-heading-wrap .sub-title {
+		padding: 0;
+		border: 0;
+		border-radius: 0;
+		background: none;
+		color: var(--tlhp-amber);
+		font-size: 14px;
+		font-weight: var(--tj-fw-sbold);
+		letter-spacing: 0.22em;
+		line-height: 1.5;
+	}
+
+	.sec-heading.text-center > .tlhp-sec-mark,
+	.sec-heading-centered > .tlhp-sec-mark {
+		margin-inline: auto;
+	}
+
+	// Sub-headings inside a page: spaced serif capitals with a gold line running out to the
+	// right (old site: "LỰA CHỌN DANH MỤC", "TÔNG PHONG TRUYỀN THỪA").
+	.tlhp-section-title,
+	.tlhp-article-heading {
+		display: flex;
+		align-items: center;
+		gap: 20px;
+		letter-spacing: 0.06em;
+		text-transform: uppercase;
+		&::after {
+			content: "";
+			flex: 1 1 40px;
+			height: 1px;
+			background: linear-gradient(to right, var(--tlhp-gold-line-strong), transparent);
+		}
+	}
+
+	// The dark button of the closing block wrote in the dark ink of the gold button.
+	.tj-primary-btn.btn-dark .btn-text {
+		color: var(--tj-color-common-white);
+	}
+
+	// In a centred heading the kicker takes its own line (the title is an inline box).
+	.sec-heading.text-center .sub-title,
+	.sec-heading-centered .sub-title {
+		display: flex;
+		justify-content: center;
+	}
+
+	// Buttons: gold band for the main one, brown pill with a gold line for the second.
+	.tj-primary-btn:not(.transparent-btn):not(.btn-dark) {
+		background-color: #{$amber};
+		background-image: linear-gradient(to right, #{$gold}, #{$amber});
+		&:hover {
+			background-color: #{$amber};
+			filter: brightness(1.07);
+		}
+	}
+	.tj-primary-btn.transparent-btn {
+		background-image: linear-gradient(135deg, #4a3728, #3d2b1f);
+		border-color: var(--tlhp-gold-line-strong);
+		.btn-text {
+			color: var(--tlhp-gold);
+		}
+		&:hover {
+			border-color: var(--tlhp-gold);
+			background-image: linear-gradient(135deg, #4a3728, #3d2b1f);
+		}
+	}
+
+	// Cards: a thin gold line that brightens under the pointer.
+	.blog-item,
+	.pricing-box,
+	.service-item,
+	.process-item,
+	.choose-box,
+	.countup-item,
+	.tlhp-art-card,
+	.tlhp-statue-card,
+	.tlhp-area-card,
+	.tlhp-event-card,
+	.tlhp-about-card,
+	.contact-item,
+	.testimonial-item {
+		border: 1px solid var(--tlhp-gold-line);
+		border-radius: var(--tlhp-radius-card);
+		transition:
+			border-color var(--tlhp-duration-base) var(--tlhp-ease-calm),
+			box-shadow var(--tlhp-duration-base) var(--tlhp-ease-calm);
+		&:hover,
+		&:focus-within {
+			border-color: var(--tlhp-gold-line-strong);
+			box-shadow: 0 0 22px rgb(242 193 78 / 0.12);
+		}
+	}
+
+	// Cards stand on a brown band that darkens downwards (old site: #251810 → #150A04). Not
+	// the retreat card, whose "đang diễn ra" state fills it with the primary.
+	.blog-item,
+	.service-item,
+	.process-item,
+	.choose-box,
+	.countup-item.style-2,
+	.tlhp-art-card,
+	.tlhp-about-card,
+	.testimonial-item {
+		background-image: linear-gradient(to bottom, #2c1c11, #1e140c);
+	}
+
+	// These cards had no frame, so their words ran to the edge of the picture; inside the
+	// gold line they need room.
+	.tlhp-about-card {
+		overflow: hidden;
+		.team-content {
+			padding: 0 16px 18px;
+		}
+	}
+
+	// Card titles: gold capitals in the text face, as on the old lists.
+	.blog-item .title,
+	.tlhp-statue-card .title,
+	.tlhp-area-card .title,
+	.tlhp-about-card .title,
+	.project-item .title {
+		font-family: var(--tlhp-font-sans);
+		font-size: 1.0625rem;
+		font-weight: var(--tj-fw-bold);
+		line-height: 1.45;
+		letter-spacing: 0.02em;
+		text-transform: uppercase;
+		color: var(--tlhp-gold);
+		a {
+			color: inherit;
+		}
+	}
+
+	// Header: dark glass with a gold line; menu in spaced capitals.
+	.header-area .header-wrapper,
+	.header-area.sticky {
+		background-color: transparent;
+		background-image: linear-gradient(rgb(26 15 8 / 0.95), rgb(26 15 8 / 0.84));
+		backdrop-filter: blur(14px);
+		border: 1px solid rgb(242 193 78 / 0.28);
+	}
+	.mainmenu > ul > li {
+		> a,
+		> .tlhp-menu-toggle {
+			font-size: 14px;
+			font-weight: var(--tj-fw-bold);
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+		}
+		&:hover,
+		&.current-menu-ancestor,
+		&.current-menu-item {
+			> a,
+			> .tlhp-menu-toggle {
+				color: var(--tlhp-gold);
+			}
+		}
+	}
+
+	// Footer: the brown band of the old site under a gold line.
+	.tlhp-footer {
+		background-color: #2a1d14;
+		background-image: linear-gradient(#3d2b1f, #2a1d14);
+		border-top: 1px solid rgb(242 193 78 / 0.28);
+		.footer-widget .title {
+			font-family: var(--tlhp-font-sans);
+			font-size: 14px;
+			font-weight: var(--tj-fw-bold);
+			letter-spacing: 0.1em;
+			text-transform: uppercase;
+			color: var(--tlhp-gold);
+		}
 	}
 
 	// Sunday in the calendar: sơn son (4.5:1 on ngà) is too dark on đen mun.

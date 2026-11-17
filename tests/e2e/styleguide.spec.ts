@@ -88,8 +88,9 @@ test.describe("with reduced motion", () => {
 		}
 
 		const primary = page.locator("main > section:not(.tlhp-dark) .tj-primary-btn:not(.transparent-btn)").first();
-		// The whole site is on the dark theme: the button is hoại sắc, its icon cell đen mun.
-		await expect(primary).toHaveCSS("background-color", "rgb(212, 163, 115)");
+		// The whole site is on the dark theme: the button is a gold band, its icon cell đen mun.
+		await expect(primary).toHaveCSS("background-color", "rgb(229, 169, 60)");
+		await expect(primary).toHaveCSS("background-image", /linear-gradient/);
 		await expect(primary.locator(".btn-icon")).toHaveCSS("background-color", "rgb(26, 18, 11)");
 		const darkPrimary = page.locator(".tlhp-dark .tj-primary-btn:not(.transparent-btn)").first();
 		const darkColours = await darkPrimary.evaluate((el) => [getComputedStyle(el).backgroundColor, getComputedStyle(el.querySelector(".btn-icon")!).backgroundColor]);

@@ -2,6 +2,7 @@ import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import ProcessCard from "@/components/shared/cards/ProcessCard";
 import { tongChi } from "@/config/tongChi";
 import { nameInGroup, tongChiHref } from "@/libs/tongChiGroups";
+import SectionMark from "@/components/shared/others/SectionMark";
 
 /**
  * Bexon's process as Lộ trình tu học (plan.md, home block 8): the articles of the lộ trình
@@ -16,6 +17,7 @@ const Process = ({ group }) => {
 				<div className="row">
 					<div className="col-12">
 						<div className="sec-heading-wrap">
+							<SectionMark icon="tinh-do-nhan-gian" />
 							<span className="sub-title wow fadeInUp" data-wow-delay=".3s">
 								{group.name}
 							</span>

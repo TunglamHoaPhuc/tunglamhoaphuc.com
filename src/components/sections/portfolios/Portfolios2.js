@@ -6,6 +6,7 @@ import { vuTru } from "@/config/vuTru";
 import { useAutoplay } from "@/hooks/useAutoplay";
 import { A11y, Autoplay, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
+import SectionMark from "@/components/shared/others/SectionMark";
 
 const A11Y = {
 	paginationBulletMessage: "Tới khu vực {{index}}",
@@ -28,6 +29,7 @@ const Portfolios2 = ({ areas }) => {
 				<div className="row">
 					<div className="col-12">
 						<div className="sec-heading style-2 text-center">
+							<SectionMark icon="cac-khu-vuc-noi-bat" />
 							<span className="sub-title wow fadeInUp" data-wow-delay=".3s">
 								{vuTru.title}
 							</span>

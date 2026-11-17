@@ -1,0 +1,213 @@
+// Layout repairs found by the page audit of 17/11/2026 (tasks/dong-bo-giao-dien.md): the
+// same on every theme. Pictures keep their sources and sizes (imageAt, lazy loading); only
+// how a frame holds its picture changes here.
+
+// ── Pictures ────────────────────────────────────────────────────────────────────────────
+// Frames with a fixed shape cut their picture to fit; none may stretch it.
+.customers ul li img,
+.hero-thumb img,
+.testimonial-img-area .testimonial-img img {
+	object-fit: cover;
+}
+
+// A picture whose source is gone (37 of the old admin's files answer 404): the temple's
+// round seal on the frame's own ground, never the browser's torn-page mark. Set by the
+// PageEffects component.
+img.tlhp-img-missing {
+	object-fit: contain !important;
+	object-position: center !important;
+	padding: clamp(12px, 18%, 56px);
+	background-color: var(--tlhp-bg-alt);
+	opacity: 0.45;
+}
+
+// List cards hold their picture in one landscape frame, whatever the shape of the file:
+// an upright photo is cut to the frame from its upper part, where faces are.
+.tlhp-post-card .blog-thumb,
+.tlhp-event-card .blog-thumb,
+.tlhp-area-card .project-img {
+	aspect-ratio: 3 / 2;
+	overflow: hidden;
+	img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: center 30%;
+	}
+}
+
+// ── Inner page banner ───────────────────────────────────────────────────────────────────
+// The crumbs sit under the title, never beside it.
+.tj-page-header-content .tj-page-link {
+	display: flex;
+	width: fit-content;
+	max-width: 100%;
+	margin-inline: auto;
+}
+
+// ── Home, Lời chào ──────────────────────────────────────────────────────────────────────
+// On phones Bexon kept the 100px video strip beside the text, which left the text 60% of
+// the screen. The strip becomes a band over the text.
+@media (max-width: 767px) {
+	.tlhp-welcome .about-content-area-2 {
+		flex-direction: column-reverse;
+		gap: 24px;
+		.about-content {
+			width: 100%;
+			max-width: none;
+		}
+		.video-img {
+			position: relative;
+			width: 100%;
+			max-width: none;
+			aspect-ratio: 16 / 9;
+			border-radius: 12px;
+			overflow: hidden;
+			background-color: var(--tlhp-bg-alt);
+		}
+	}
+}
+
+// ── Home on phones: rows to swipe ───────────────────────────────────────────────────────
+// Stacked, the retreat cards, the five Tông Chỉ groups (on the home page only: on their
+// own page they are the content and stay stacked), the four paths and the four
+// teachers made the home page 18,400px long at 375px (old site: 8,700px). Each becomes one
+// row that scrolls sideways and stops on a card; the next card shows at the edge.
+@mixin tlhp-swipe-row($card: 84%) {
+	display: flex;
+	flex-wrap: nowrap;
+	// From the first card: centring a row wider than the screen puts its start out of reach.
+	justify-content: flex-start;
+	align-items: stretch;
+	gap: 14px;
+	margin-inline: calc(var(--bs-gutter-x, 24px) * -0.5);
+	padding: 4px calc(var(--bs-gutter-x, 24px) * 0.5) 16px;
+	overflow-x: auto;
+	overscroll-behavior-x: contain;
+	scroll-snap-type: x mandatory;
+	scroll-padding-inline: calc(var(--bs-gutter-x, 24px) * 0.5);
+	scrollbar-width: thin;
+	scrollbar-color: var(--tlhp-ornament) transparent;
+	> * {
+		flex: 0 0 $card;
+		width: $card;
+		max-width: none;
+		margin: 0;
+		padding-inline: 0;
+		scroll-snap-align: start;
+	}
+}
+@media (max-width: 767px) {
+	.tlhp-upcoming .row.row-gap-4,
+	.tlhp-teachers ul.row,
+	.tlhp-tong-chi-home ul.service-wrapper-2,
+	.tlhp-paths ol.working-process-area {
+		@include tlhp-swipe-row;
+	}
+	.tlhp-teachers ul.row {
+		@include tlhp-swipe-row(72%);
+	}
+	// Cards in a row are as tall as the tallest, so their feet line up.
+	.tlhp-upcoming .row.row-gap-4 > * > *,
+	.tlhp-tong-chi-home ul.service-wrapper-2 > li > *,
+	.tlhp-tong-chi-home ul.service-wrapper-2 .service-item {
+		height: 100%;
+	}
+	.tlhp-paths ol.working-process-area > li {
+		// Bexon's arrows between steps point down a column that is no longer there.
+		&::after {
+			display: none;
+		}
+	}
+
+	// The three figures of Lời chào: one row of three instead of three screens.
+	.tlhp-welcome .row > [class*="col-"]:has(> .countup-item) {
+		flex: 0 0 33.333%;
+		width: 33.333%;
+		padding-inline: 5px;
+		.countup-item {
+			height: 100%;
+			padding: 14px 10px;
+			text-align: center;
+			.count-icon,
+			.steps {
+				display: none;
+			}
+			.count-inner {
+				display: flex;
+				flex-direction: column-reverse;
+				gap: 6px;
+				padding-top: 0;
+			}
+			.count-text {
+				display: block;
+				font-size: 14px;
+				line-height: 1.35;
+			}
+			.inline-content {
+				margin: 0;
+				justify-content: center;
+				font-size: 28px;
+				line-height: 1.2;
+				.odometer {
+					font-size: inherit;
+				}
+			}
+		}
+	}
+
+	// Six ways in, lying still (reduced motion): two to a row.
+	@media (prefers-reduced-motion: reduce) {
+		.tlhp-entrances .tlhp-marquee-list {
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			gap: 10px;
+			.client-item,
+			.client-logo {
+				width: 100%;
+			}
+		}
+	}
+}
+
+// ── Giới thiệu ──────────────────────────────────────────────────────────────────────────
+// A group of one topic (Lịch Sử Chùa, Thanh Quy & Văn Hóa) left three quarters of its row
+// empty. Its card lies on its side: picture left, words right.
+@media (min-width: 768px) {
+	.tlhp-about-group > ul.row > li:only-child {
+		flex: 0 0 100%;
+		width: 100%;
+		max-width: 860px;
+		.tlhp-about-card {
+			display: grid;
+			grid-template-columns: minmax(200px, 300px) 1fr;
+			align-items: center;
+			gap: 32px;
+			.team-img,
+			.team-content {
+				margin: 0;
+			}
+			.team-content {
+				text-align: start;
+			}
+		}
+	}
+}
+
+// ── Home on tablets ─────────────────────────────────────────────────────────────────────
+// The four paths stood in one column of wide, nearly empty cards: two by two.
+@media (min-width: 768px) and (max-width: 991px) {
+	.tlhp-paths ol.working-process-area {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 20px;
+		> li {
+			width: auto;
+			max-width: none;
+			margin: 0;
+			&::after {
+				display: none;
+			}
+		}
+	}
+}

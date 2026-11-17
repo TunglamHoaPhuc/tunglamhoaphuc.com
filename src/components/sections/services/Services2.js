@@ -2,6 +2,7 @@ import RevealLinks from "@/components/sections/calendar/RevealLinks";
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import ServiceCard2 from "@/components/shared/cards/ServiceCard2";
 import { tongChi } from "@/config/tongChi";
+import SectionMark from "@/components/shared/others/SectionMark";
 
 /**
  * Bexon's dark services section as Tông Chỉ Tu Học (plan.md, home block 6, and the
@@ -14,12 +15,16 @@ import { tongChi } from "@/config/tongChi";
 const Services2 = ({ groups, page = false }) => {
 	if (!groups?.length) return null;
 	return (
-		<section className="tj-service-section service-2 section-gap section-gap-x slidebar-stickiy-container tlhp-tong-chi" aria-labelledby="tong-chi-tieu-de">
+		<section
+			className={`tj-service-section service-2 section-gap section-gap-x slidebar-stickiy-container tlhp-tong-chi${page ? "" : " tlhp-tong-chi-home"}`}
+			aria-labelledby="tong-chi-tieu-de"
+		>
 			<div className="container">
 				<div className="row">
 					<div className="col-lg-4">
 						<div className="content-wrap slidebar-stickiy">
 							<div className="sec-heading style-2">
+								<SectionMark icon="tong-chi-tu-hoc" />
 								<span className="sub-title wow fadeInUp" data-wow-delay=".3s">
 									{tongChi.title}
 								</span>

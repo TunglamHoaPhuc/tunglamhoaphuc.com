@@ -1,5 +1,6 @@
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import PricingPlanItems from "@/components/shared/pricing-plan/PricingPlanItems";
+import SectionMark from "@/components/shared/others/SectionMark";
 
 /**
  * Bexon's pricing plans as Khóa tu sắp tới (plan.md, home block 3): the next events of the
@@ -14,6 +15,7 @@ const PricingPlan = ({ events = [] }) => {
 				<div className="row">
 					<div className="col-12">
 						<div className="sec-heading text-center style-2">
+							<SectionMark icon="lich-tu-hoc" />
 							<span className="sub-title wow fadeInUp" data-wow-delay=".3s">
 								Lịch tu học
 							</span>
