@@ -4,6 +4,8 @@
 // before www does (T22). What the data lacks is written here: the contents and the book's
 // publisher, read from the old apps on 13/11/2026.
 
+import { sachDiQuaKhoVui } from "./sachDiQuaKhoVui";
+
 export type ContentsEntry = { title: string; pages: string };
 
 export const book = {
@@ -16,8 +18,8 @@ export const book = {
 	printedPages: 217,
 	/** The post that presents the book, which leads here. */
 	postSlug: "tac-pham-di-qua-kho-vui-cuoc-doi",
-	/** The old site's reader: the whole text, and the book to leaf through. */
-	readerUrl: "https://www.tunglamhoaphuc.com/tri-tue-phat-phap/di-qua-kho-vui-cuoc-doi",
+	/** The whole text, on this page (T17b); the old site's reader had it at the same address. */
+	readerUrl: "/tri-tue-phat-phap/di-qua-kho-vui-cuoc-doi#toan-van",
 	contents: [
 		{ title: "Trang Lót & Đi Cùng Tôi", pages: "1–8" },
 		{ title: "Lời Giới Thiệu", pages: "9–10" },
@@ -73,3 +75,14 @@ export const tibetan = {
 		{ title: "Bài 24: Lễ Hội & Văn Hóa Phật Giáo Tây Tạng", pages: "110–120" },
 	] as ContentsEntry[],
 };
+
+/** A piece of the book: a poem, an essay, the dedication or the printer's note. */
+export type BookSection = { type: string; title: string; pageNumber: number; author?: string; content: string };
+export type BookChapter = { title: string; pageRange: string; quote: string; quoteAuthor: string; intro?: string; sections: BookSection[] };
+
+/**
+ * The text of Quyển 1 as the old site's reader shows it ("Đọc Văn Bản"): seven parts, 29
+ * pieces, taken from its code on 17/11/2026 (T17b). Not every one of the 217 printed pages:
+ * the old reader leafed through page pictures for those, which no longer load there.
+ */
+export const bookText: { isbn: string; chapters: BookChapter[] } = sachDiQuaKhoVui;

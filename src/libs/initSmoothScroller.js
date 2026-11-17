@@ -38,6 +38,14 @@ const initSmoothScroller = contanerRef => {
 		});
 		// pageEffects clears it when the page's effects are reverted.
 		setSmoother(smoother);
+
+		// An address with an anchor (/…#toan-van, T17b): the browser scrolled the window before
+		// the smoother took over, which leaves the page at the wrong place (the footer). Go to
+		// the anchor once the smoother has measured the page, below the fixed header.
+		const anchor = window.location.hash && document.getElementById(decodeURIComponent(window.location.hash.slice(1)));
+		if (anchor && smoother.content().contains(anchor)) {
+			requestAnimationFrame(() => smoother.scrollTo(anchor, false, "top 96px"));
+		}
 	}
 };
 

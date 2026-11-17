@@ -1,6 +1,6 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { book, tibetan } from "../../src/config/triTue";
+import { book, bookText, tibetan } from "../../src/config/triTue";
 
 // T17: /tri-tue-phat-phap (the 158 posts in four categories, then the book and the Tibetan
 // course), its posts, and the two reading rooms at their old addresses, rendered from
@@ -101,9 +101,38 @@ test.describe("Trí Tuệ Phật Pháp", () => {
 		await expect(page.locator(".tlhp-contents li")).toHaveCount(7);
 		const reader = page.getByRole("link", { name: /Đọc toàn văn/ });
 		await expect(reader).toHaveAttribute("href", book.readerUrl);
-		await expect(reader).toHaveAttribute("target", "_blank");
+		await expect(reader).not.toHaveAttribute("target", "_blank");
 		await expect(page.getByRole("link", { name: "Bài giới thiệu sách" })).toHaveAttribute("href", BOOK_POST);
 		expect(await axe(page)).toEqual([]);
+	});
+
+	test("the book's whole text is on its page, readable without JavaScript, and its contents lead to each part (T17b)", async ({ browser, request }) => {
+		expect(book.readerUrl.startsWith(`${book.path}#`)).toBe(true);
+		const html = (await (await request.get(book.path)).text()).replaceAll("<!-- -->", "");
+		for (const section of bookText.chapters.flatMap((chapter) => chapter.sections)) expect(html).toContain(section.title.replaceAll("&", "&amp;").replaceAll('"', "&quot;"));
+
+		const context = await browser.newContext({ javaScriptEnabled: false });
+		const page = await context.newPage();
+		await page.goto(book.path);
+		const text = page.locator("#toan-van");
+		// No way back to the old site's reader: the canonical address names www, but no link leads there.
+		await expect(page.locator('main a[href*="tunglamhoaphuc.com"]')).toHaveCount(0);
+		await expect(text.getByRole("heading", { level: 2 })).toHaveText("Toàn văn Quyển 1");
+		await expect(text.getByRole("heading", { level: 3 })).toHaveCount(7);
+		await expect(text.getByRole("heading", { level: 4 })).toHaveCount(29);
+		// A poem keeps its lines.
+		expect(await text.locator(".tlhp-book-piece--poem p br").count()).toBeGreaterThan(100);
+		await page.locator(".tlhp-contents a").nth(2).click();
+		await expect(page).toHaveURL(new RegExp(`#phan-3$`));
+		await expect(page.locator("#phan-3 h3")).toBeInViewport();
+		await context.close();
+	});
+
+	test("an address with an anchor opens at that part, with the page's scrolling running (T17b)", async ({ page }) => {
+		await open(page, `${book.path}#phan-3`);
+		await expect(page.locator("#phan-3 h3")).toBeInViewport();
+		await open(page, book.readerUrl);
+		await expect(page.locator("#toan-van h2")).toBeInViewport();
 	});
 
 	test("the Tibetan course is made on the server, its Tibetan marked as such, with the way into the room", async ({ page, request }) => {

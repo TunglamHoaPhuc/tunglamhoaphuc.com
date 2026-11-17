@@ -1190,6 +1190,13 @@
 
 ### T17b: Chuyển hai phòng đọc của Trí Tuệ sang site mới
 
+**Kết quả 17/11/2026:** phần sách xong (chưa deploy); phần Học tiếng Tạng và lật sách 3D **chờ chủ dự án quyết**.
+- **Sách "Đi Qua Khổ Vui Cuộc Đời":** chế độ "Đọc Văn Bản" của trang cũ là 7 chương mục, 29 bài (thơ, bài viết, trang lót, thông tin xuất bản), khoảng 21.000 ký tự, nằm trong mã JS của trang cũ. Đã chép sang `src/config/sachDiQuaKhoVui.ts` (bỏ địa chỉ ảnh B2 và danh sách trang lật). Trang `/tri-tue-phat-phap/di-qua-kho-vui-cuoc-doi` (cùng địa chỉ cũ) nay có phần "Toàn văn Quyển 1" dựng phía server, đọc được khi tắt JavaScript; mỗi dòng mục lục dẫn tới phần của nó (`#phan-1`…`#phan-7`), nút "Đọc toàn văn" dẫn tới `#toan-van` trên chính trang này.
+- Đây là toàn bộ chữ mà trang cũ có, **không phải đủ 217 trang in**: trang cũ chỉ có 217 trang dưới dạng ảnh cho chế độ lật sách (`/pdf/di-qua-kho-vui-q1/page-N.jpg`), và **các ảnh đó đang trả 404 ngay trên `www`** (kiểm trang 1, 50, 217 ngày 17/11). Muốn có lật sách hay đủ 217 trang cần nguồn ảnh hoặc PDF gốc từ chủ dự án.
+- Sửa kèm `initSmoothScroller.js`: mở thẳng địa chỉ có neo (`…#toan-van`) trước đây rơi xuống chân trang vì trình duyệt cuộn trước khi ScrollSmoother chạy; nay đi tới đúng neo, dưới thanh đầu trang. Áp dụng cho mọi trang.
+- Test: `tests/unit/triTue.test.ts` (dữ liệu sách, tách đoạn, neo), `tests/e2e/tri-tue.spec.ts` (toàn văn khi tắt JavaScript, mục lục dẫn tới từng phần, mở thẳng địa chỉ có neo, vừa màn hình 375 px, axe). Chạy cục bộ: `tri-tue`, `header`, `smoke`, `motion-guard`, `a11y` 233 xanh; `npm test` 237 xanh.
+- **Học tiếng Tạng:** chưa làm. Đề xuất đã gửi: bốn API dùng Workers AI (không cần khóa dịch vụ ngoài); chờ quyết nơi để ảnh Sara Book (~35 MB) và 34 file mp3.
+
 **Mô tả:** Hai địa chỉ của Trí Tuệ trên site cũ là ứng dụng riêng, chưa có trên site mới (T17 chỉ dựng trang giới thiệu, nút mở bản ở site cũ). Sau khi `www` chuyển sang site mới (T22), hai nút đó sẽ dẫn vào chính trang mới, nên phải chuyển trước T22.
 - **Học tiếng Tạng** (`/tibetan-study/index.html` trên Vercel): đọc Sara Book (120 trang ảnh PNG, khoảng 35 MB), giọng đọc 34 chữ cái (`audio/*.mp3`), hai file JSON 2,6 MB (chữ và tọa độ từng từ), thư viện pdf.js. Bốn API chạy trên máy chủ của site cũ: `/api/analyze`, `/api/ask-ai`, `/api/crop-analyze`, `/api/tts` (AI và đọc giọng; cần khóa dịch vụ của chủ dự án).
 - **Sách "Đi Qua Khổ Vui Cuộc Đời" (Quyển 1)**: toàn văn 217 trang và chế độ lật sách 3D, nằm sẵn trong mã JavaScript của site cũ (trang không gọi API).
@@ -1197,8 +1204,8 @@
 **Cần chủ dự án quyết:** để ảnh và âm thanh ở đâu (thư mục tĩnh của Worker hay kho media), dùng dịch vụ AI và đọc giọng nào cho bốn API, và có giữ bản lật sách 3D không.
 
 **Tiêu chí nghiệm thu:**
-- [ ] Hai nút "Đọc toàn văn" và "Vào học ngay" mở bản trên site mới, không dẫn về `www` cũ
-- [ ] Toàn văn sách đọc được khi không có JavaScript
+- [ ] Hai nút "Đọc toàn văn" và "Vào học ngay" mở bản trên site mới, không dẫn về `www` cũ ("Đọc toàn văn" xong; "Vào học ngay" chờ quyết định)
+- [x] Toàn văn sách đọc được khi không có JavaScript (toàn văn như bản đọc văn bản của trang cũ; e2e tắt JavaScript)
 
 **Phụ thuộc:** T17; phải xong trước T22
 

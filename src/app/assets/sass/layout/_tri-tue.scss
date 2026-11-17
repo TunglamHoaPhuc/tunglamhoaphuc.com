@@ -137,4 +137,74 @@ The book and the Tibetan course under the list, the book's page and the course's
 	white-space: nowrap;
 }
 
+// The book's whole text (T17b): a reading column, verse with its lines, the chapter quote set apart.
+.tlhp-contents a {
+	color: inherit;
+	text-decoration: underline;
+	text-decoration-color: var(--tj-color-border-1);
+	text-underline-offset: 4px;
+	&:hover,
+	&:focus-visible {
+		color: var(--tj-color-theme-primary);
+		text-decoration-color: currentColor;
+	}
+}
+.tlhp-book-text {
+	max-width: 46rem;
+	h3 {
+		margin: 8px 0 20px;
+	}
+}
+.tlhp-book-text-note,
+.tlhp-book-piece-meta,
+.tlhp-book-chapter-pages {
+	color: var(--tj-color-text-body-3);
+	font-size: var(--tlhp-text-body-sm);
+}
+.tlhp-book-chapter {
+	margin-top: 56px;
+	padding-top: 40px;
+	border-top: 1px solid var(--tj-color-border-1);
+	scroll-margin-top: 96px;
+	.tlhp-text-link {
+		margin-top: 16px;
+	}
+}
+.tlhp-book-chapter-pages {
+	margin: 0;
+}
+.tlhp-book-quote {
+	margin: 0 0 24px;
+	padding-left: 20px;
+	border-left: 3px solid var(--tlhp-accent-text);
+	blockquote {
+		margin: 0;
+		font-style: italic;
+		color: var(--tj-color-heading-primary);
+	}
+	figcaption {
+		margin-top: 8px;
+		color: var(--tj-color-text-body-3);
+		font-size: var(--tlhp-text-body-sm);
+	}
+}
+.tlhp-book-piece {
+	margin-top: 40px;
+	// The dedication is a line of 90 dots, wider than a phone.
+	overflow-wrap: anywhere;
+	p {
+		margin: 0 0 16px;
+	}
+}
+.tlhp-book-piece-title {
+	margin: 0 0 4px;
+	font-size: 1.25rem;
+}
+.tlhp-book-piece .tlhp-book-piece-meta {
+	margin-bottom: 20px;
+}
+.tlhp-book-piece--poem p {
+	line-height: 1.9;
+}
+
 /* !END: TLHP Trí Tuệ Phật Pháp */
