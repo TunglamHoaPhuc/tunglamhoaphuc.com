@@ -16,6 +16,7 @@
 		"snapshot:fetch": "tsx scripts/fetch-snapshot.ts",
 		"check:urls": "tsx scripts/check-urls.ts",
 		"import": "tsx scripts/import.ts",
+		"media:copy": "tsx scripts/media-copy.ts",
 		"db:generate": "drizzle-kit generate"
 	},
 	"browserslist": [
@@ -61,6 +62,7 @@
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"globals": "^17.14.0",
 		"sass": "^1.94.2",
+		"sharp": "^0.34.5",
 		"tsx": "^4.23.15",
 		"typescript": "^6.0.3",
 		"typescript-eslint": "^8.72.1",

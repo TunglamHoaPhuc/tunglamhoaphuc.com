@@ -2249,6 +2249,12 @@
 
 ### T42b: Chép ảnh sang bucket R2 riêng của v2
 
+**Kết quả 17/11/2026:** xong, **20.912 ảnh (2,95 GB) đã nằm trong `tlhp-media`**. Chi tiết, quy ước khóa và cách chạy lại ở mục 6 của [docs/van-hanh/tach-du-lieu.md](../docs/van-hanh/tach-du-lieu.md).
+- Bucket riêng tư, vùng APAC, không tên miền. Khóa: `<bucket>/<key>` cho B2, `wordpress/<đường dẫn sau uploads/>`, `site/<đường dẫn>` cho ảnh câu kệ.
+- Danh sách 21.470 khóa; 558 lỗi (557 là 404 thật, 1 khóa có `..` bị Cloudflare từ chối), không thiếu khóa nào khác, không khóa thừa.
+- 5.950 ảnh được gỡ EXIF hoặc thu về ≤ 2560 px; mẫu 50 ảnh đọc lại từ R2 không còn EXIF. Chạy: 67 + 20 phút; lần chạy thứ ba chép 0 ảnh.
+- Thêm `sharp` vào `devDependencies` và lệnh `npm run media:copy` (`--verify` để kiểm).
+
 **Mô tả:** Giữ quyết định 8 (xử lý ảnh bằng Image Transformations, không có tên miền `media.`): bucket R2 `tlhp-media` **riêng tư**, chỉ Worker đọc qua binding. Cần chủ dự án đồng ý tạo bucket (chi phí) trước khi làm.
 
 - Script `scripts/media-copy.ts` chép ảnh của hai bucket B2 và WordPress sang R2, giữ nguyên khóa (`<bucket>/<key>`) để `mediaUrl()` không đổi. Chạy lại được, chỉ chép ảnh chưa có; báo ảnh lỗi (404, `.jfif` trả `application/octet-stream`).
@@ -2256,9 +2262,9 @@
 - Chép cả ảnh câu kệ của lịch từ `www`/Vercel vào cùng bucket.
 
 **Tiêu chí nghiệm thu:**
-- [ ] Số ảnh trong R2 khớp danh sách của T42a; ảnh lỗi được liệt kê
-- [ ] Chạy lần hai không chép lại ảnh nào
-- [ ] Mẫu 50 ảnh: không còn EXIF
+- [x] Số ảnh trong R2 khớp danh sách của T42a; ảnh lỗi được liệt kê (20.912 + 558 lỗi = 21.470)
+- [x] Chạy lần hai không chép lại ảnh nào
+- [x] Mẫu 50 ảnh: không còn EXIF
 
 **Phụ thuộc:** T42a; T1b nếu chạy bằng CI; chủ dự án duyệt chi phí. **Quy mô:** M
 

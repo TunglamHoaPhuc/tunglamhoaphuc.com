@@ -86,3 +86,31 @@ Quét mọi chuỗi URL trong 7 file snapshot, gom theo nơi file thật sự n�
 - **T42c**: khóa trong R2 giữ nguyên dạng `<bucket>/<key>`; bucket WordPress đặt tên riêng, ví dụ `wordpress/<đường dẫn>`.
 - Cần quyết: ảnh trang bên ngoài (157 file) — để nguyên hay thay.
 - Cần quyết: duyệt tạo bucket R2 (chi phí gần như bằng 0 với dung lượng này).
+
+## 6. T42b: ảnh đã chép sang R2 (17/11/2026)
+
+- **Bucket:** `tlhp-media`, tài khoản Cloudflare của zone (`b91a395bd9b7ab86ef4cba41d1d828ae`), vùng APAC, **riêng tư, không có tên miền công khai**. Chỉ Worker đọc, qua binding (việc của T42c).
+- **Quy ước khóa** (T42c phải đọc đúng như vậy):
+
+| Nguồn | Khóa trong R2 | Ví dụ |
+|---|---|---|
+| B2 (hai bucket) | `<bucket>/<key>`, giữ nguyên | `s2-cnv03/uploads/abc.jpg` |
+| WordPress `admin.` (cả link `tunglamhoaphuc.com/wp-content/…`) | `wordpress/<đường dẫn sau /wp-content/uploads/>` | `wordpress/2026/07/x.jpg` |
+| Ảnh `public/` của site cũ (câu kệ) | `site/<đường dẫn>` | `site/images/lich-tu-hoc/quotes/thang-01-quy-y-tam-bao.png` |
+
+  Với B2, `/anh-goc/<bucket>/<key>` chính là khóa R2. Với WordPress, `mediaUrl()` hiện cho ra `admin.tunglamhoaphuc.com/wp-content/uploads/<đường dẫn>`; T42c đổi sang khóa `wordpress/<đường dẫn>`. Ảnh câu kệ là đường dẫn tương đối `/images/lich-tu-hoc/quotes/…`, khóa là `site` cộng đường dẫn đó.
+- **Số liệu thật:** danh sách 21.470 khóa (B2 `s2-cnv03` 20.380, `media-tunglamhoaphuc` 133, WordPress 945, câu kệ 12). **20.912 ảnh đã nằm trong R2, 2,95 GB.** Không thiếu khóa nào ngoài danh sách lỗi, không có khóa thừa.
+- **558 ảnh lỗi** (danh sách trong `data/snapshot/media-copy/bao-cao-loi.json`, không đưa vào kho): 557 là 404 thật (5 B2, 552 WordPress; WordPress phần lớn là ảnh "chưa từng tải lên"), 1 là khóa `s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2019/05/1..jpg` có `..` trong tên nên Cloudflare từ chối đường dẫn (trang đã không dùng được ảnh này; T42c nên coi `..` là khóa không hợp lệ như `b2Source()` đang làm).
+- **Gỡ EXIF và thu nhỏ:** 5.950 ảnh được mã hóa lại (có EXIF, XMP hoặc xoay theo EXIF, hoặc dài hơn 2560 px); phần còn lại giữ nguyên byte. Mẫu ngẫu nhiên 50 ảnh đọc lại từ R2: 0 ảnh còn EXIF/XMP/IPTC, 0 ảnh dài hơn 2560 px. Tải về 3,63 GB, ghi vào R2 2,95 GB.
+- **Thời gian:** lần đầu 67 phút (14 luồng, 3.667 ảnh lỗi ghi nhất thời do API), lần bù 20 phút (8 luồng), lần kiểm 1 phút. Lần chạy thứ ba không chép lại ảnh nào (chỉ thử lại 558 ảnh lỗi, vẫn 404).
+- **Cách chạy lại:**
+
+```bash
+npm run media:copy -- --dry-run          # chỉ đếm danh sách
+npm run media:copy -- --limit=50         # mẫu: 50 ảnh mỗi nhóm
+npm run media:copy                       # chép phần còn thiếu (bỏ qua khóa đã có)
+npm run media:copy -- --verify           # đối chiếu số khóa, tổng dung lượng, mẫu EXIF
+```
+
+  Cần `cf auth` với profile `tlhp` và `CLOUDFLARE_ACCOUNT_ID` như trên (mặc định trong script). Báo cáo ghi ở `data/snapshot/media-copy/` (đã nằm trong `.gitignore`). Khi dữ liệu snapshot thêm ảnh mới thì chạy lại là đủ. Ảnh đã chép không bị ghi đè khi nguồn đổi; muốn thay phải xóa khóa trong R2 trước.
+- **Chưa làm:** T42c (route `/anh-goc/` đọc R2, binding) và deploy. Ảnh của 157 trang bên ngoài không chép.
