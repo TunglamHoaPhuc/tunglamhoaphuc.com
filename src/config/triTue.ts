@@ -37,7 +37,7 @@ export const tibetan = {
 	// The old page's words.
 	lead: "Học nghiên cứu tiếng Tạng qua bộ giáo trình Sara Book — công cụ học thuật quan trọng dành cho những ai muốn thâm nhập kho tàng triết học Phật giáo Tây Tạng nguyên bản.",
 	pages: 120,
-	appUrl: "https://www.tunglamhoaphuc.com/tibetan-study/index.html",
+	appUrl: "/tibetan-study/index.html",
 	/** What the app offers, as its own screens name it. */
 	features: [
 		"Đọc giáo trình Sara Book, phóng to thu nhỏ từng trang",

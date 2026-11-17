@@ -20,13 +20,15 @@ export default defineConfig({
       notFoundHandling: "none",
       // The site's pictures go straight from the asset store, with the cache rules in
       // public/_headers, and cost no Worker CPU.
-      runWorkerFirst: ["/*", "!/_next/static/*", "!/*/_next/static/*", "!/images/*", "!/brand/*"],
+      runWorkerFirst: ["/*", "!/_next/static/*", "!/*/_next/static/*", "!/images/*", "!/brand/*", "!/tibetan-study/*"],
     },
     ...cache,
     env: {
       ASSETS: bindings.assets(),
       // Original pictures (T42b, T42c): read by /anh-goc/, private, no public domain.
       MEDIA: bindings.r2({ name: "tlhp-media" }),
+      // Workers AI for the Tibetan course's /api/analyze, /api/ask-ai and /api/crop-analyze (T17b).
+      AI: bindings.ai(),
       ...cache.env,
     },
     exports: { ...cache.exports },

@@ -1190,12 +1190,20 @@
 
 ### T17b: Chuyển hai phòng đọc của Trí Tuệ sang site mới
 
-**Kết quả 17/11/2026:** phần sách xong (chưa deploy); phần Học tiếng Tạng và lật sách 3D **chờ chủ dự án quyết**.
+**Kết quả 17/11/2026:** sách và Học tiếng Tạng xong trên mã, kiểm cục bộ; **chưa lên `v2.`**, mới có bản xem trước (xem dưới). Lật sách 3D không làm: ảnh 217 trang không còn (404 trên `www`).
 - **Sách "Đi Qua Khổ Vui Cuộc Đời":** chế độ "Đọc Văn Bản" của trang cũ là 7 chương mục, 29 bài (thơ, bài viết, trang lót, thông tin xuất bản), khoảng 21.000 ký tự, nằm trong mã JS của trang cũ. Đã chép sang `src/config/sachDiQuaKhoVui.ts` (bỏ địa chỉ ảnh B2 và danh sách trang lật). Trang `/tri-tue-phat-phap/di-qua-kho-vui-cuoc-doi` (cùng địa chỉ cũ) nay có phần "Toàn văn Quyển 1" dựng phía server, đọc được khi tắt JavaScript; mỗi dòng mục lục dẫn tới phần của nó (`#phan-1`…`#phan-7`), nút "Đọc toàn văn" dẫn tới `#toan-van` trên chính trang này.
 - Đây là toàn bộ chữ mà trang cũ có, **không phải đủ 217 trang in**: trang cũ chỉ có 217 trang dưới dạng ảnh cho chế độ lật sách (`/pdf/di-qua-kho-vui-q1/page-N.jpg`), và **các ảnh đó đang trả 404 ngay trên `www`** (kiểm trang 1, 50, 217 ngày 17/11). Muốn có lật sách hay đủ 217 trang cần nguồn ảnh hoặc PDF gốc từ chủ dự án.
 - Sửa kèm `initSmoothScroller.js`: mở thẳng địa chỉ có neo (`…#toan-van`) trước đây rơi xuống chân trang vì trình duyệt cuộn trước khi ScrollSmoother chạy; nay đi tới đúng neo, dưới thanh đầu trang. Áp dụng cho mọi trang.
 - Test: `tests/unit/triTue.test.ts` (dữ liệu sách, tách đoạn, neo), `tests/e2e/tri-tue.spec.ts` (toàn văn khi tắt JavaScript, mục lục dẫn tới từng phần, mở thẳng địa chỉ có neo, vừa màn hình 375 px, axe). Chạy cục bộ: `tri-tue`, `header`, `smoke`, `motion-guard`, `a11y` 233 xanh; `npm test` 237 xanh.
-- **Học tiếng Tạng:** chưa làm. Đề xuất đã gửi: bốn API dùng Workers AI (không cần khóa dịch vụ ngoài); chờ quyết nơi để ảnh Sara Book (~35 MB) và 34 file mp3.
+- **Học tiếng Tạng** (chủ dự án duyệt làm theo đề xuất ngày 17/11): ứng dụng cũ chép nguyên sang `public/tibetan-study/`, **cùng địa chỉ** `/tibetan-study/index.html` nên liên kết cũ vẫn chạy sau T22. Là file tĩnh (ra khỏi `runWorkerFirst`, không tốn CPU Worker), `Cache-Control` 1 ngày như ảnh của site.
+  - 120 trang Sara Book đổi PNG → WebP (34,2 → 15,8 MB, chữ Tạng vẫn rõ); 34 file mp3 giữ nguyên; `sara_book_data.json`, `sara_words_coords.json` và bản tách mỗi trang một file (`coords/<n>.json`). Bỏ thẻ tải pdf.js (không dùng). Toàn thư mục 22 MB.
+  - Bốn API (`src/app/api/*`, `src/libs/tibetan/`), giữ nguyên khuôn hỏi/đáp mà `app.js` đang dùng:
+    - `/api/analyze`, `/api/ask-ai`: Workers AI, mô hình `@cf/google/gemma-4-26b-a4b-it` (thử 4 mô hình, cả 4 đọc đúng "bkra shis bde legs"; chọn mô hình này vì đúng, nhanh, rẻ nhất, không có lịch ngừng). Trang cũ trả **mẫu cố định, sai** (dịch བཀྲ་ཤིས་བདེ་ལེགས thành "Đất đai"). Kết quả giữ một tháng trong cache theo nội dung hỏi; AI lỗi thì trả bản dự phòng (tách âm tiết, báo "chưa trả lời được").
+    - `/api/crop-analyze`: lấy chữ trong vùng khoanh từ tọa độ chữ của sách, không đọc ảnh; trình duyệt không còn gửi ảnh cắt lên.
+    - `/api/tts`: Workers AI **không có giọng tiếng Tạng**, nên vẫn gọi dịch vụ đọc tiếng Tạng trên Hugging Face mà trang cũ dùng (`aipmtdd-tibetan-tts-service.hf.space`, của bên thứ ba, có thể ngừng bất cứ lúc nào); 34 chữ cái đọc từ mp3 thu sẵn; không có dịch vụ thì `app.js` dùng giọng của trình duyệt.
+    - Giới hạn: chỉ nhận chữ Tạng, ≤ 300 ký tự (câu hỏi ≤ 600), thân yêu cầu ≤ 16 KB. Chưa có giới hạn số lần gọi theo người dùng: nên thêm (Rate Limiting hoặc Turnstile) trước khi lên `www`.
+  - Binding `AI` trong `cloudflare.config.ts`; `/api/` thêm vào `robots.txt` disallow.
+  - Test: `tests/unit/tibetan.test.ts` (13), `tests/e2e/tibetan-study.spec.ts` (mở trang 1 không gọi site cũ, file tĩnh, từ chối đầu vào lạ, khoanh vùng ra đúng chữ). Workers AI không chạy cục bộ (chỉ chạy trên Cloudflare): cục bộ chỉ kiểm được nhánh dự phòng.
 
 **Mô tả:** Hai địa chỉ của Trí Tuệ trên site cũ là ứng dụng riêng, chưa có trên site mới (T17 chỉ dựng trang giới thiệu, nút mở bản ở site cũ). Sau khi `www` chuyển sang site mới (T22), hai nút đó sẽ dẫn vào chính trang mới, nên phải chuyển trước T22.
 - **Học tiếng Tạng** (`/tibetan-study/index.html` trên Vercel): đọc Sara Book (120 trang ảnh PNG, khoảng 35 MB), giọng đọc 34 chữ cái (`audio/*.mp3`), hai file JSON 2,6 MB (chữ và tọa độ từng từ), thư viện pdf.js. Bốn API chạy trên máy chủ của site cũ: `/api/analyze`, `/api/ask-ai`, `/api/crop-analyze`, `/api/tts` (AI và đọc giọng; cần khóa dịch vụ của chủ dự án).
@@ -1204,7 +1212,7 @@
 **Cần chủ dự án quyết:** để ảnh và âm thanh ở đâu (thư mục tĩnh của Worker hay kho media), dùng dịch vụ AI và đọc giọng nào cho bốn API, và có giữ bản lật sách 3D không.
 
 **Tiêu chí nghiệm thu:**
-- [ ] Hai nút "Đọc toàn văn" và "Vào học ngay" mở bản trên site mới, không dẫn về `www` cũ ("Đọc toàn văn" xong; "Vào học ngay" chờ quyết định)
+- [x] Hai nút "Đọc toàn văn" và "Vào học ngay" mở bản trên site mới, không dẫn về `www` cũ (e2e `tri-tue`, `tibetan-study`)
 - [x] Toàn văn sách đọc được khi không có JavaScript (toàn văn như bản đọc văn bản của trang cũ; e2e tắt JavaScript)
 
 **Phụ thuộc:** T17; phải xong trước T22

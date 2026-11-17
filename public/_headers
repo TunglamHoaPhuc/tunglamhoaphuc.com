@@ -14,3 +14,8 @@
 
 /brand/*
   Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+# The Tibetan course of the old site, moved as it was (T17b): page pictures, sounds and data
+# keep their names, like the site's pictures.
+/tibetan-study/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800

@@ -12,7 +12,7 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
 			userAgent: "*",
 			allow: "/",
 			// Search results, pictures served through the resizer and internal pages are not content.
-			disallow: ["/tim-kiem", "/cdn-cgi/", "/anh-goc/", "/styleguide"],
+			disallow: ["/tim-kiem", "/cdn-cgi/", "/anh-goc/", "/styleguide", "/api/"],
 		},
 		sitemap: `${originOf(host)}/sitemap.xml`,
 	};

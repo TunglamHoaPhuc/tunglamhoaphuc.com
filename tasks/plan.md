@@ -254,7 +254,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [x] T41c: Ảnh – sửa nhanh trong code (phần ảnh của T41, làm trước T16; chốt 04/11 sau review tốc độ)
 - [x] T16: Bảo Tượng Phật Giáo (làm song song với T41c ngày 04/11 trên hai nhánh, gộp sau; ảnh tượng theo quy tắc của T41c)
 - [x] T17: Trí Tuệ Phật Pháp (hai phòng đọc của site cũ có trang giới thiệu dựng phía server; phần chuyển ứng dụng tách thành T17b, chủ dự án chọn ngày 13/11)
-- [ ] T17b: Chuyển hai phòng đọc của Trí Tuệ (Học tiếng Tạng, sách "Đi Qua Khổ Vui Cuộc Đời") sang site mới – phải xong trước T22 (sách xong 17/11, chưa deploy; Học tiếng Tạng và lật sách 3D chờ chủ dự án quyết; ảnh lật sách đang 404 trên `www`)
+- [ ] T17b: Chuyển hai phòng đọc của Trí Tuệ (Học tiếng Tạng, sách "Đi Qua Khổ Vui Cuộc Đời") sang site mới – phải xong trước T22 (sách và Học tiếng Tạng xong trên mã 17/11, có bản xem trước, chưa lên `v2.`; lật sách 3D không làm vì ảnh 404 trên `www`)
 - [x] T18: Liên hệ và tìm kiếm từ khóa
 - [ ] **Checkpoint D** – site công khai hoàn chỉnh trên `v2.`
 

@@ -147,6 +147,7 @@ test.describe("Trí Tuệ Phật Pháp", () => {
 		await expect(page.locator(".tlhp-contents li").nth(2).locator('[lang="bo"]')).toHaveText("དབྱངས་བཞི");
 		const room = page.getByRole("link", { name: /Vào học ngay/ });
 		await expect(room).toHaveAttribute("href", tibetan.appUrl);
+		expect(tibetan.appUrl.startsWith("/tibetan-study/")).toBe(true);
 		await expect(room).toHaveAttribute("target", "_blank");
 		expect(await axe(page)).toEqual([]);
 	});

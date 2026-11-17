@@ -1,0 +1,68 @@
+import type { Ai, PageWords } from "./api";
+
+// What the course's routes need from the Worker: the AI binding and the static files, read
+// through cloudflare:workers, which is missing under `npm run dev` (then: no AI, no files).
+
+type Assets = { fetch(request: Request): Promise<Response> };
+type WorkerEnv = { AI?: Ai; ASSETS?: Assets };
+
+export async function workerEnv(): Promise<WorkerEnv> {
+	try {
+		const workers = (await import("cloudflare:workers" as string)) as { env?: WorkerEnv };
+		return workers.env ?? {};
+	} catch {
+		return {};
+	}
+}
+
+/** The biggest request body read; the app sends a text, a question or a rectangle. */
+const MAX_BODY = 16 * 1024;
+
+/** The JSON body of a POST, or `null` when it is missing, too big or not an object. */
+export async function readBody(request: Request): Promise<Record<string, unknown> | null> {
+	const text = await request.text();
+	if (text.length > MAX_BODY) return null;
+	try {
+		const body: unknown = JSON.parse(text);
+		return body && typeof body === "object" && !Array.isArray(body) ? (body as Record<string, unknown>) : null;
+	} catch {
+		return null;
+	}
+}
+
+export const json = (body: unknown, status = 200) => Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
+
+/** The words of one page of the book (public/tibetan-study/coords/<n>.json), or `null`. */
+export async function pageWords(pageNumber: number, request: Request, assets: Assets | undefined): Promise<PageWords | null> {
+	if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > 120) return null;
+	const url = new URL(`/tibetan-study/coords/${pageNumber}.json`, request.url);
+	try {
+		const response = assets ? await assets.fetch(new Request(url)) : await fetch(url);
+		return response.ok ? ((await response.json()) as PageWords) : null;
+	} catch {
+		return null;
+	}
+}
+
+/**
+ * An answer kept for a month in the data centre's cache, keyed by what was asked: the same
+ * text asked again costs no AI. Only answers that came from the model are kept.
+ */
+export async function cachedJson<T extends { status?: string }>(kind: string, key: string, make: () => Promise<T>): Promise<T> {
+	const cache = (globalThis as { caches?: { default?: Cache } }).caches?.default;
+	if (!cache) return make();
+	const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(key));
+	const id = [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+	const request = new Request(`https://tieng-tang.cache.invalid/${kind}/${id}`);
+	try {
+		const hit = await cache.match(request);
+		if (hit) return (await hit.json()) as T;
+	} catch {
+		// A cache that cannot be read is no cache.
+	}
+	const value = await make();
+	if (value.status === "success") {
+		await cache.put(request, Response.json(value, { headers: { "Cache-Control": "public, max-age=2592000" } })).catch(() => undefined);
+	}
+	return value;
+}
