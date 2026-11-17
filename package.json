@@ -6,7 +6,7 @@
 		"dev": "vite dev --port 3001",
 		"build": "vite build",
 		"preview": "vite preview",
-		"deploy:v2": "vinext-cloudflare deploy",
+		"deploy:v2": "node scripts/deploy-v2.mjs",
 		"lint": "eslint .",
 		"typecheck": "tsc --noEmit",
 		"test": "vitest run",

@@ -29,6 +29,13 @@ export default defineConfig({
       MEDIA: bindings.r2({ name: "tlhp-media" }),
       // Workers AI for the Tibetan course's /api/analyze, /api/ask-ai and /api/crop-analyze (T17b).
       AI: bindings.ai(),
+      // The site's data (T23, T24): read when CONTENT_SOURCE is d1.
+      DB: bindings.d1({ id: "dfee6bc6-9acf-4fcf-b25c-3ca1535c689a", name: "tlhp-db" }),
+      // Where pages read the content: snapshot | b2 | d1 (src/libs/content/repository.ts). One Worker serves
+      // v2. and, after T22, www, so this is the one switch for both. `npm run deploy:v2` sets
+      // TLHP_CONTENT_SOURCE to d1 (scripts/deploy-v2.mjs); everything run locally (dev, preview, CI's
+      // e2e), where the simulated D1 is empty, reads the snapshot.
+      CONTENT_SOURCE: bindings.text(process.env.TLHP_CONTENT_SOURCE ?? "snapshot"),
       ...cache.env,
     },
     exports: { ...cache.exports },

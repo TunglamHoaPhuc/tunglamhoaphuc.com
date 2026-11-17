@@ -2,9 +2,10 @@
 // sorting and paging happen here on the server, so a list page sends 12 posts, not 472.
 import { type StatueEntry, statueArticle, statueSummary } from "./baoTuong";
 import type { CacheLike } from "./sources/b2";
+import type { D1Like } from "./sources/d1";
 import type { FileLoaders } from "./sources/files";
 import { type TongChiEntry, tongChiArticle, tongChiSummary } from "./tongChi";
-import type { AboutTopic, Area, CategoryCount, ContentRepository, GalleryImage, Page, Post, PostSort, PostSummary, Schedule, Statue, StatueSummary, TongChiArticle } from "./types";
+import type { AboutTopic, Area, CategoryCount, ContentRepository, GalleryImage, Page, Post, PostQuery, PostSort, PostSummary, Schedule, Statue, StatueSummary, TongChiArticle } from "./types";
 
 export const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 60;
@@ -52,8 +53,38 @@ const EMPTY_SCHEDULE: Schedule = { events: [], programs: [], themes: [], quotes:
 
 type PostIndex = { bySlug: Map<string, Post>; summaries: PostSummary[] };
 
+/** The posts of a query, from the summaries of all posts: what every source answers a list page with. */
+export function queryPosts(summaries: PostSummary[], { section, category, sort = "newest", page = 1, pageSize = DEFAULT_PAGE_SIZE }: PostQuery = {}): Page<PostSummary> {
+	const size = Math.min(Math.max(Math.trunc(pageSize) || DEFAULT_PAGE_SIZE, 1), MAX_PAGE_SIZE);
+	const sections = section === undefined ? null : [section].flat();
+	const matching = summaries
+		.filter((post) => (!sections || sections.includes(post.section)) && (!category || post.category.slug === category))
+		.sort(compare[sort] ?? compare.newest);
+	const pageCount = Math.max(1, Math.ceil(matching.length / size));
+	const current = Math.max(1, Math.trunc(page) || 1);
+	return {
+		items: matching.slice((current - 1) * size, current * size),
+		total: matching.length,
+		page: current,
+		pageSize: size,
+		pageCount,
+	};
+}
+
+/** The categories of a section with their post counts, the biggest first. */
+export function countCategories(summaries: PostSummary[], section: string): CategoryCount[] {
+	const counts = new Map<string, CategoryCount>();
+	for (const post of summaries) {
+		if (post.section !== section || !post.category.slug) continue;
+		const entry = counts.get(post.category.slug) ?? { ...post.category, count: 0 };
+		entry.count++;
+		counts.set(post.category.slug, entry);
+	}
+	return [...counts.values()].sort((a, b) => b.count - a.count || collator.compare(a.name, b.name));
+}
+
 /** `load`'s value, read on first use and kept; a failed read is tried again on the next use. */
-function lazy<T>(load: () => Promise<T>): () => Promise<T> {
+export function lazy<T>(load: () => Promise<T>): () => Promise<T> {
 	let value: Promise<T> | undefined;
 	return () =>
 		(value ??= load().catch((error: unknown) => {
@@ -88,22 +119,8 @@ export function createMemoryRepository(
 	const statuePages = new Map<string, Statue>();
 
 	return {
-		async listPosts({ section, category, sort = "newest", page = 1, pageSize = DEFAULT_PAGE_SIZE } = {}): Promise<Page<PostSummary>> {
-			const size = Math.min(Math.max(Math.trunc(pageSize) || DEFAULT_PAGE_SIZE, 1), MAX_PAGE_SIZE);
-			const sections = section === undefined ? null : [section].flat();
-			const { summaries } = await postIndex();
-			const matching = summaries
-				.filter((post) => (!sections || sections.includes(post.section)) && (!category || post.category.slug === category))
-				.sort(compare[sort] ?? compare.newest);
-			const pageCount = Math.max(1, Math.ceil(matching.length / size));
-			const current = Math.max(1, Math.trunc(page) || 1);
-			return {
-				items: matching.slice((current - 1) * size, current * size),
-				total: matching.length,
-				page: current,
-				pageSize: size,
-				pageCount,
-			};
+		async listPosts(query = {}): Promise<Page<PostSummary>> {
+			return queryPosts((await postIndex()).summaries, query);
 		},
 
 		async getPostBySlug(slug) {
@@ -114,14 +131,7 @@ export function createMemoryRepository(
 		},
 
 		async listCategories(section) {
-			const counts = new Map<string, CategoryCount>();
-			for (const post of (await postIndex()).summaries) {
-				if (post.section !== section || !post.category.slug) continue;
-				const entry = counts.get(post.category.slug) ?? { ...post.category, count: 0 };
-				entry.count++;
-				counts.set(post.category.slug, entry);
-			}
-			return [...counts.values()].sort((a, b) => b.count - a.count || collator.compare(a.name, b.name));
+			return countCategories((await postIndex()).summaries, section);
 		},
 
 		getSchedule: schedule,
@@ -184,7 +194,8 @@ export function renewing<T>(make: () => T, ttl: number, now: () => number = Date
 /** How often a Worker reading B2 starts a fresh repository (each file is asked about as often, sources/b2.ts). */
 const B2_RENEW_MS = 60_000;
 
-function fromFiles(loaders: FileLoaders): ContentRepository {
+/** A repository over the old admin's files, however they are read. */
+export function repositoryFromFiles(loaders: FileLoaders): ContentRepository {
 	return createMemoryRepository(loaders.posts, {
 		loadAlbums: loaders.albums,
 		loadSchedule: loaders.schedule,
@@ -205,16 +216,27 @@ function once<T>(make: () => Promise<T>): () => Promise<T> {
 		}));
 }
 
+/** How often a Worker reading D1 starts a fresh repository, until saving in the admin refreshes the pages that changed (T24, tags). */
+const D1_RENEW_MS = 60_000;
+
+const d1Repositories = once(async () => {
+	const [{ createD1Repository }, workers] = await Promise.all([import("./sources/d1"), (import("cloudflare:workers" as string) as Promise<{ env?: { DB?: D1Like } }>).catch(() => ({}) as { env?: { DB?: D1Like } }),
+	]);
+	const db = workers.env?.DB;
+	if (!db) throw new Error('Nguồn "d1" thiếu binding DB (cloudflare.config.ts)');
+	return renewing(() => createD1Repository(db), D1_RENEW_MS);
+});
+
 const snapshotRepository = once(async () => {
 	const [{ readSnapshot }, { createFileLoaders }] = await Promise.all([import("./sources/snapshot"), import("./sources/files")]);
-	return fromFiles(createFileLoaders(readSnapshot));
+	return repositoryFromFiles(createFileLoaders(readSnapshot));
 });
 
 const b2Repositories = once(async () => {
 	const [{ b2Config, createB2Reader }, { createFileLoaders }] = await Promise.all([import("./sources/b2"), import("./sources/files")]);
 	const cache = (globalThis as { caches?: { default?: CacheLike } }).caches?.default;
 	const loaders = createFileLoaders(createB2Reader(b2Config(process.env), { cache }));
-	return renewing(() => fromFiles(loaders), B2_RENEW_MS);
+	return renewing(() => repositoryFromFiles(loaders), B2_RENEW_MS);
 });
 
 /**
@@ -225,6 +247,6 @@ const b2Repositories = once(async () => {
 export async function getContentRepository(): Promise<ContentRepository> {
 	const source = contentSource();
 	if (source === "b2") return (await b2Repositories())();
-	if (source === "d1") throw new Error('Nguồn "d1" chưa có (chuyển hẳn sang D1).');
+	if (source === "d1") return (await d1Repositories())();
 	return snapshotRepository();
 }

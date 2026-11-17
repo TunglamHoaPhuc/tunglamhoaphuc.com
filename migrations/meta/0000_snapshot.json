@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "e4a581c7-3de8-4fdb-811c-289ec7a62b7f",
+  "id": "eca708b7-10c6-418e-b682-2cfd1eb9c79b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "album": {
@@ -271,6 +271,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "variation_id": {
+          "name": "variation_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
         },
         "art_statue_id": {
           "name": "art_statue_id",
@@ -569,6 +577,14 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
         },
         "recurrence_rule": {
           "name": "recurrence_rule",
@@ -2382,6 +2398,14 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
         },
         "subtitle": {
           "name": "subtitle",

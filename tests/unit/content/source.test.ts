@@ -41,6 +41,12 @@ describe("content source", () => {
 		await expect(getContentRepository()).rejects.toThrow("B2_ENDPOINT, B2_BUCKET, B2_KEY_ID, B2_APPLICATION_KEY");
 	});
 
+	it("with D1 chosen but no DB binding, says what is missing", async () => {
+		vi.stubEnv("CONTENT_SOURCE", "d1");
+		const { getContentRepository } = await freshRepository();
+		await expect(getContentRepository()).rejects.toThrow("binding DB");
+	});
+
 	it("from B2, a post edited in the old admin shows within a minute, an unchanged file is not downloaded again", async () => {
 		for (const [name, value] of Object.entries(ENV)) vi.stubEnv(name, value);
 		vi.useFakeTimers({ toFake: ["Date"] });

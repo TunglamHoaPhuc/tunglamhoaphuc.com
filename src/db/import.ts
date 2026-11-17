@@ -144,7 +144,7 @@ export function buildStatements(content: ImportContent): { statements: Statement
 
 	const categoryRows = new Map<string, Row>();
 	function category(kind: string, section: string, slug: string, name: string): string | null {
-		if (!slug.trim()) return null;
+		if (!slug.trim() && !name.trim()) return null;
 		const id = `${kind}:${section}:${slug}`;
 		if (!categoryRows.has(id)) categoryRows.set(id, { id, kind, section, slug, name, position: categoryRows.size });
 		return id;
@@ -186,7 +186,7 @@ export function buildStatements(content: ImportContent): { statements: Statement
 			keywords: post.keywords,
 			videos: post.videos,
 			albumId: album(`post:${post.id}`, post.title, photos),
-			galleryCount: Math.max(post.galleryCount, photos.length),
+			galleryCount: post.galleryCount,
 		};
 	});
 
@@ -196,6 +196,7 @@ export function buildStatements(content: ImportContent): { statements: Statement
 			id: entry.id,
 			slug: entry.slug,
 			title: entry.title,
+			name: entry.name,
 			subtitle: entry.subtitle,
 			groupId: category("tong-chi", "", entry.group.slug, entry.group.name),
 			bannerMediaId: banner.id,
@@ -289,6 +290,7 @@ export function buildStatements(content: ImportContent): { statements: Statement
 				id: `${statue.id}:${index}`,
 				statueId: statue.id,
 				position: index,
+				variationId: variation.id,
 				artStatueId: statueIds.has(variation.id) ? variation.id : null,
 				title: variation.title,
 				location: variation.location,
@@ -341,7 +343,7 @@ export function buildStatements(content: ImportContent): { statements: Statement
 		};
 	});
 
-	const eventRows = content.schedule.events.map((event): Row => {
+	const eventRows = content.schedule.events.map((event, position): Row => {
 		const image = picture(event.image);
 		return {
 			id: event.id,
@@ -358,6 +360,7 @@ export function buildStatements(content: ImportContent): { statements: Statement
 			imageMediaId: image.id,
 			imagePosition: image.position,
 			video: event.video,
+			position,
 		};
 	});
 	const programRows = content.schedule.programs.map((program, position): Row => {

@@ -8,6 +8,10 @@
 //   --from=b2         the bucket the old admin writes (B2_ENDPOINT, B2_BUCKET, B2_KEY_ID,
 //                     B2_APPLICATION_KEY, optional B2_PREFIX; read-only key)
 //   --sql=<file>      write the statements to a .sql file, to run with `cf d1 execute`
+//   --batches=<dir>   write the statements as numbered batch-NNN.json files (each a JSON array of
+//                     { sql } under about 500 KB), for `cf d1 query <id> --batch @<file>`: the way into
+//                     a real D1, whose API takes 100 bound values a statement, so the values are written
+//                     into the SQL
 //   --db=<file>       run them on a SQLite file; with --migrate, create the tables first (migrations/)
 //   --migrate         with --db: apply migrations/ to the file before importing
 //   --allow-empty     go on when a kind of content has no rows (by default that is taken for
@@ -31,6 +35,8 @@ const args = new Map(
 const source = args.get("from") || "snapshot";
 const sqlOut = args.get("sql");
 const dbPath = args.get("db");
+const batchesDir = args.get("batches");
+const BATCH_BYTES = 500_000;
 
 const readSnapshot: ReadFile = async (name) => {
 	try {
@@ -63,6 +69,26 @@ async function main() {
 		mkdirSync(dirname(sqlOut), { recursive: true });
 		writeFileSync(sqlOut, `${statements.map(inlineStatement).join("\n")}\n`);
 		console.log(`Đã ghi ${sqlOut}`);
+	}
+	if (batchesDir) {
+		mkdirSync(batchesDir, { recursive: true });
+		let batch: { sql: string }[] = [];
+		let bytes = 0;
+		let files = 0;
+		const flush = () => {
+			if (!batch.length) return;
+			writeFileSync(`${batchesDir}/batch-${String(++files).padStart(3, "0")}.json`, JSON.stringify(batch));
+			batch = [];
+			bytes = 0;
+		};
+		for (const statement of statements) {
+			const sql = inlineStatement(statement);
+			if (batch.length && bytes + sql.length > BATCH_BYTES) flush();
+			batch.push({ sql });
+			bytes += sql.length;
+		}
+		flush();
+		console.log(`Đã ghi ${files} lô vào ${batchesDir}`);
 	}
 	if (dbPath) {
 		const db = openDatabase(dbPath);

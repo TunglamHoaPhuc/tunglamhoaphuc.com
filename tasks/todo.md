@@ -1747,16 +1747,24 @@
 
 ### T24: Repository D1 và contract test
 
+**Kết quả 17/11/2026:** phần mã và contract test xong, chạy được trên SQLite thật; **chưa nối vào Worker** (cần D1 thật, xem dưới). Hai việc còn lại ở tiêu chí.
+- **Nguồn `d1`** (`src/libs/content/sources/d1.ts`): danh sách bài lấy bằng một truy vấn nhẹ (không chữ, không album), từng bài đọc đủ khi trang hỏi; Tông Chỉ, Giới thiệu, lịch, khu vực, tượng đọc nguyên bảng một lần rồi đi qua đúng mã của hai nguồn kia. Lượt xem = số cũ của admin cũ + tổng `page_view` (T25). Bài `draft` và khu vực `visible = 0` không hiện. Phần lọc, sắp xếp, phân trang tách thành `queryPosts`/`countCategories` dùng chung (`repository.ts`).
+- **Contract test** (`tests/unit/content/contract.test.ts`): với snapshot thật, B2 (qua bộ đọc thật, bucket giả) và D1 (nhập vào SQLite) trả **y hệt** snapshot cho mọi câu hỏi: danh sách theo chuyên mục × 5 kiểu sắp × trang (và trang 9999, cỡ trang 0 và 5000), từng mục con, cả 631 bài đọc đủ theo slug (kể cả slug mã hóa phần trăm), lịch, Giới thiệu, 25 bài Tông Chỉ, khu vực, 126 tượng, và các câu trả lời "không có" (`null`). Bốn test riêng cho D1: cộng lượt xem, ẩn bài nháp và khu vực, slug trùng, bài sửa sau nhập.
+- **Sửa lại schema T23 để D1 trả đủ như nguồn tệp** (chưa ai áp migration thật nên làm lại `0000`): thêm `teaching_article.name`, `art_variation.variation_id`, `calendar_event.position`; `post.gallery_count` giữ đúng số của admin cũ; nhóm không có slug nhưng có tên không còn mất tên.
+- **Khác nguồn tệp, có chủ ý:** D1 có 632 bài, nhưng danh sách và đường dẫn chỉ cho 631 như site cũ: bài `post-1045` trùng slug với `post-29713` nằm trong D1 và ra khỏi danh sách cho tới khi admin đặt slug khác.
+- **Nối với Worker:** `CONTENT_SOURCE=d1` đọc binding `DB` (`cloudflare:workers`), làm repository mới mỗi phút; thiếu binding thì báo rõ (có test). **D1 thật đã tạo** (`tlhp-db`, APAC, migration áp, đã nhập đủ 632 bài và các bảng khác, đếm lại trên D1 thật; chi tiết ở `docs/van-hanh/d1.md` mục 6) và binding `DB` đã khai báo trong `cloudflare.config.ts`, build qua. **Đã deploy `v2.`** (phiên bản Worker `a6e935fd`, 9.904 KiB, nén 1.266 KiB, khởi động 3 ms) với `CONTENT_SOURCE=d1` đặt trong `cloudflare.config.ts` (văn bản cố định; một Worker phục vụ cả `v2.` và sau T22 là `www`, nên đây là công tắc chung cho cả hai). Bản trước để lùi: `4a6620cd`.
+- **Kiểm trên `v2.` đọc D1:** toàn bộ e2e (`BASE_URL=https://v2.tunglamhoaphuc.com`, máy tính và điện thoại) 620 qua, 72 bỏ qua theo thiết kế, 0 hỏng; `check:urls` 811/811. Chứng minh trang đọc D1 thật chứ không phải snapshot: đổi tiêu đề một bài trong D1, sau 70 giây trang (địa chỉ có chuỗi truy vấn lạ để tránh cache) hiện tiêu đề mới; đã trả lại tiêu đề cũ ngay sau đó.
+
 **Mô tả:** Nguồn `d1` cho `ContentRepository`. Bộ contract test chạy chung cho cả 3 nguồn (`snapshot`, `b2`, `d1`). Cache theo tag (`cacheTag` / `revalidateTag` của vinext trên bộ đệm KV) để trang cập nhật khi admin mới lưu. Trong giai đoạn này `d1` chỉ bật trên `v2.`; `www` vẫn đọc `b2` cho tới T39.
 
 **Tiêu chí nghiệm thu:**
-- [ ] Contract test xanh cho cả 3 nguồn
-- [ ] Toàn bộ e2e site công khai xanh khi chạy với `CONTENT_SOURCE=d1`
+- [x] Contract test xanh cho cả 3 nguồn (với snapshot thật; trên máy không có snapshot test này bỏ qua, CI có snapshot nên chạy)
+- [x] Toàn bộ e2e site công khai xanh khi chạy với `CONTENT_SOURCE=d1` (620 qua trên `v2.`)
 - [ ] Gọi `revalidateTag` sau khi ghi thì trang liên quan đổi ngay lần tải kế tiếp
 
 **Kiểm chứng:**
-- [ ] `npm test -- contract`
-- [ ] `CONTENT_SOURCE=d1 npm run preview` rồi `npm run test:e2e`
+- [x] `npm test -- contract`: 8 test; eslint (0 lỗi), `tsc`, 221 test đơn vị, build sạch
+- [x] e2e đầy đủ trên `v2.` đang đọc D1 (thay cho `npm run preview` cục bộ, vì D1 thật đã có)
 
 **Phụ thuộc:** T23
 

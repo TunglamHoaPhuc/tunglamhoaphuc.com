@@ -3,6 +3,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { join } from "node:path";
+import type { D1Like, D1Statement } from "../libs/content/sources/d1";
 import type { Statement } from "./import";
 
 export const MIGRATIONS_DIR = "migrations";
@@ -33,4 +34,13 @@ export function applyStatements(db: DatabaseSync, statements: Statement[]): void
 		db.exec("ROLLBACK");
 		throw error;
 	}
+}
+
+/** A node:sqlite database as the part of D1 the d1 content source uses, for tests and local runs. */
+export function asD1(db: DatabaseSync): D1Like {
+	const statement = (sql: string, values: unknown[]): D1Statement => ({
+		bind: (...more) => statement(sql, [...values, ...more]),
+		all: async <T>() => ({ results: db.prepare(sql).all(...(values as never[])) as T[] }),
+	});
+	return { prepare: (sql) => statement(sql, []) };
 }

@@ -131,7 +131,7 @@ export const post = sqliteTable(
 		keywords: json<{ keyword: string; title: string; description: string }[]>("keywords").notNull().default(EMPTY_LIST),
 		videos: json<{ id: string; url: string }[]>("videos").notNull().default(EMPTY_LIST),
 		albumId: text("album_id").references(() => album.id),
-		/** How many pictures the album holds, so lists need not count them. */
+		/** The picture count the lists show (the old admin's own number; the album may hold more). */
 		galleryCount: integer("gallery_count").notNull().default(0),
 		seoTitle: text("seo_title"),
 		seoDescription: text("seo_description"),
@@ -153,6 +153,8 @@ export const teachingArticle = sqliteTable(
 		id: text("id").primaryKey(),
 		slug: text("slug").notNull().unique(),
 		title: text("title").notNull(),
+		/** The title, with the subtitle where articles share one title ("Lộ Trình Tu Học: Dành cho người trẻ"). */
+		name: text("name").notNull().default(""),
 		subtitle: text("subtitle").notNull().default(""),
 		groupId: text("group_id").references(() => category.id),
 		bannerMediaId: text("banner_media_id").references(() => media.id),
@@ -291,6 +293,8 @@ export const artVariation = sqliteTable(
 			.notNull()
 			.references(() => statue.id, { onDelete: "cascade" }),
 		position: integer("position").notNull(),
+		/** The id the old admin gave the work (a statue id when it is one of the collection, else anything). */
+		variationId: text("variation_id").notNull().default(""),
 		artStatueId: text("art_statue_id").references(() => statue.id),
 		title: text("title").notNull().default(""),
 		location: text("location").notNull().default(""),
@@ -347,6 +351,8 @@ export const calendarEvent = sqliteTable(
 		imageMediaId: text("image_media_id").references(() => media.id),
 		imagePosition: text("image_position").notNull().default("center 50%"),
 		video: json<{ id: string; url: string }>("video"),
+		/** Order among events of the same dates. */
+		position: position(),
 		/** A rule for events that come back ("lunar:1,15 monthly"); empty for a single event. */
 		recurrenceRule: text("recurrence_rule"),
 		linkedPostId: text("linked_post_id").references(() => post.id),
