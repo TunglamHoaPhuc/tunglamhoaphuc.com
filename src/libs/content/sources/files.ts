@@ -5,11 +5,12 @@
 // (a file cut short, a format the adapters no longer know) does not wipe the site out.
 import { parseAbout } from "../about";
 import { parseStatues, type StatueEntry } from "../baoTuong";
+import { parseMonks } from "../monks";
 import { parsePosts, toGallery } from "../posts";
 import { parseSchedule } from "../schedule";
 import { rawPostSchema } from "../schema";
 import { parseTongChi, type TongChiEntry } from "../tongChi";
-import type { AboutTopic, Area, GalleryImage, Post, Schedule } from "../types";
+import type { AboutTopic, Area, GalleryImage, Monk, Post, Schedule } from "../types";
 import { parseAreas } from "../vuTru";
 
 /** A file as a source gives it: its parsed JSON, and a version that changes with it (the ETag on B2). */
@@ -42,6 +43,8 @@ export type FileLoaders = {
 	tongChi(): Promise<TongChiEntry[]>;
 	areas(): Promise<Area[]>;
 	statues(): Promise<StatueEntry[]>;
+	/** Danh Tăng: no page reads it yet; the import (T23) does. */
+	monks(): Promise<Monk[]>;
 };
 
 export function createFileLoaders(read: ReadFile, log: Log = console): FileLoaders {
@@ -69,5 +72,6 @@ export function createFileLoaders(read: ReadFile, log: Log = console): FileLoade
 		tongChi: () => load("tong-chi", (data) => parseTongChi(data ?? []).entries, (entries) => entries.length),
 		areas: () => load("vu-tru", (data) => parseAreas(data ?? []).areas, (areas) => areas.length),
 		statues: () => load("bao-tuong", (data) => parseStatues(data ?? []).statues, (statues) => statues.length),
+		monks: () => load("danh-tang", (data) => parseMonks(data ?? []).monks, (monks) => monks.length),
 	};
 }

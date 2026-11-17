@@ -14,7 +14,9 @@
 		"lhci": "lhci autorun",
 		"snapshot:check": "tsx scripts/check-snapshot.ts",
 		"snapshot:fetch": "tsx scripts/fetch-snapshot.ts",
-		"check:urls": "tsx scripts/check-urls.ts"
+		"check:urls": "tsx scripts/check-urls.ts",
+		"import": "tsx scripts/import.ts",
+		"db:generate": "drizzle-kit generate"
 	},
 	"browserslist": [
 		">0.3%",
@@ -27,6 +29,7 @@
 		"aws4fetch": "^1.0.20",
 		"bootstrap": "^5.3.7",
 		"chart.js": "^4.5.0",
+		"drizzle-orm": "^0.45.4",
 		"glightbox": "^3.3.1",
 		"gsap": "^3.13.0",
 		"next": "^16.2.9",
@@ -53,6 +56,7 @@
 		"@vitejs/plugin-react": "^6.2.1",
 		"@vitejs/plugin-rsc": "^0.5.38",
 		"cf": "^1.0.0-beta.26",
+		"drizzle-kit": "^0.31.11",
 		"eslint": "^10.14.0",
 		"eslint-plugin-react-hooks": "^7.1.1",
 		"globals": "^17.14.0",

@@ -52,6 +52,9 @@ node_modules/
 # Brand kit as received (UTM fonts, full-size PNGs); web copies live in public/brand
 /bo-nhan-dien/
 /data/snapshot/
+# What `npm run import -- --sql=…` writes (about 9 MB)
+/data/import.sql
+/.cf-state/
 .dev.vars*
 /test-results/
 /playwright-report/

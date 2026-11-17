@@ -27,6 +27,7 @@ const ABOUT_OUT = "data/snapshot/gioi-thieu.json";
 const TONG_CHI_OUT = "data/snapshot/tong-chi.json";
 const VU_TRU_OUT = "data/snapshot/vu-tru.json";
 const BAO_TUONG_OUT = "data/snapshot/bao-tuong.json";
+const DANH_TANG_OUT = "data/snapshot/danh-tang.json";
 const AT_ONCE = 3;
 
 type RawPost = { id: string; slug: string; galleryCount?: number; photoGallery?: unknown[] };
@@ -109,9 +110,16 @@ async function fetchVuTru() {
 	console.log(`${BAO_TUONG_OUT}: ${statues.statues?.length ?? 0} tôn tượng`);
 }
 
+async function fetchMonks() {
+	const file = await get<{ data?: unknown[] }>("/api/admin/danh-tang");
+	writeFileSync(DANH_TANG_OUT, JSON.stringify(file));
+	console.log(`${DANH_TANG_OUT}: ${file.data?.length ?? 0} vị`);
+}
+
 const posts = await fetchPosts();
 await fetchSchedule();
 await fetchAbout();
 await fetchTongChi();
 await fetchVuTru();
+await fetchMonks();
 if (process.argv.includes("--albums")) await fetchAlbums(posts);

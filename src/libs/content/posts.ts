@@ -165,8 +165,10 @@ export type ParsedPosts = { posts: Post[]; issues: ContentIssue[]; total: number
  * Reads the posts file: checks every record, skips and reports the ones a page cannot use,
  * and normalises the rest. Only published posts are returned. Order is kept from the file,
  * which decides who keeps a slug that two posts share (the old site serves the first).
+ * `keepDuplicateSlugs` keeps the later post too, for the import to D1, which holds every
+ * record; the site itself never asks for it.
  */
-export function parsePosts(file: unknown): ParsedPosts {
+export function parsePosts(file: unknown, { keepDuplicateSlugs = false }: { keepDuplicateSlugs?: boolean } = {}): ParsedPosts {
 	const issues: ContentIssue[] = [];
 	const root = postsFileSchema.safeParse(file);
 	if (!root.success) {
@@ -211,9 +213,10 @@ export function parsePosts(file: unknown): ParsedPosts {
 		const owner = bySlug.get(slug);
 		if (owner) {
 			issues.push({ kind: "duplicate-slug", id: raw.id, message: `slug "${slug}" đã thuộc ${owner}; bài này không mở được bằng đường dẫn` });
-			continue;
+			if (!keepDuplicateSlugs) continue;
+		} else {
+			bySlug.set(slug, raw.id);
 		}
-		bySlug.set(slug, raw.id);
 		const post = toPost(raw, date, names.get(`${raw.mainCategory}/${raw.subCategory}`) ?? "", issues);
 		// Same section, same title: usually a post saved twice. Both stay listed.
 		const titleKey = `${post.section}|${post.title.toLocaleLowerCase("vi")}`;

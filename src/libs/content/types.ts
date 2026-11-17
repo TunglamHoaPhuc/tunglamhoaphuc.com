@@ -235,6 +235,27 @@ export type Statue = StatueSummary & {
 	art: ArtVariation[];
 };
 
+/** A monk or nun of the Vietnamese sangha, on the old admin's Danh Tăng list. */
+export type Monk = {
+	id: string;
+	name: string;
+	/** "933–1011". */
+	lifespan: string;
+	/** "Miền Bắc", "Miền Trung", "Miền Nam", "Quốc tế". */
+	region: string;
+	/** "Tăng chúng" or "Ni chúng". */
+	sangha: string;
+	sect: string;
+	era: string;
+	subEra: string;
+	avatar: string | null;
+	/** A line of Dharma the person is known by. */
+	dharmaQuote: string;
+	bio: string;
+	/** Where the person stands on the old site's map, in %. */
+	coordinates: { x: number; y: number } | null;
+};
+
 /** Read-only access to the temple's content, whatever the source. */
 export interface ContentRepository {
 	listPosts(query?: PostQuery): Promise<Page<PostSummary>>;

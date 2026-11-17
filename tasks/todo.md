@@ -1695,16 +1695,30 @@
 
 ### T23: Schema D1 và script nhập
 
+**Kết quả 17/11/2026:** schema, migration và script nhập xong, chạy được trên SQLite thật và trên D1 mô phỏng cục bộ; chưa đụng D1 thật (chưa tạo D1 production, đó là việc của T25/T39 và cần tài khoản Cloudflare của chủ site). Chi tiết vận hành ở [docs/van-hanh/d1.md](../docs/van-hanh/d1.md).
+- **Số bản ghi khớp nguồn:** 632 bài · 25 Tông Chỉ · 6 Giới thiệu (25 mốc niên biểu) · 14 khu vực · 126 tượng · 91 Danh Tăng · 15 sự kiện · 3 chương trình · 12 chủ đề tháng (cộng 19 cụm tượng, 29 nhóm, 554 album với 21.102 ảnh, 12 ảnh pháp ngữ).
+- **Chạy lại cho cùng kết quả:** upsert theo id của admin cũ, dòng nguồn đã bỏ bị xóa, bảng của site và admin (`page_view`, `registration`, `user`, `audit_log`, `setting`, `notice`, `redirect`) không bao giờ bị đụng; cột admin sửa sau nhập (`area.visible`, `calendar_event.registration_open`…) giữ nguyên khi nhập lại. Test: băm toàn bộ bảng sau 1 và 3 lần nhập bằng nhau, cả với dữ liệu thật.
+- **Khóa ngoại thay tên lặp:** tượng trỏ khu vực (`area_id`, theo bảng mã trong `config/vuTru.ts`; chỉ "cong_thap" không có khu vực), cụm tượng (`statue_cluster`) và chúng hội (`category` loại `assembly`); không còn cột tên lặp. `PRAGMA foreign_key_check` sạch.
+- **Ảnh lưu bằng khóa:** mỗi ảnh một dòng `media` (id băm từ địa chỉ, nên ảnh dùng nhiều nơi chỉ một dòng): 21.452 dòng, 20.340 ảnh B2 chỉ có `r2_key` (khóa trên B2, cũng là khóa sẽ dùng khi chép sang R2), 1.112 ảnh WordPress còn `url`. Tên miền phía trước là một chỗ đổi (`MEDIA_BASE`).
+- **Khác mô tả / khác đặc tả 3.1, có chủ ý:**
+  - Khóa chính là chuỗi (id admin cũ đã dùng: `post-1060`, `khuong-viet`), không phải số nguyên: nhập lại trúng đúng dòng cũ, địa chỉ và số liệu cũ vẫn đúng.
+  - Khối nhỏ sửa chung một lần (từ khóa, khối video, sách, giờ của sự kiện, trích dẫn) là cột json; thứ nhiều dòng cùng trỏ tới là bảng. Danh Tăng chưa có trang nào đọc, nên `Monk` mới chỉ có bảng và bộ đọc (`libs/content/monks.ts`).
+  - Snapshot chưa có Danh Tăng: thêm `danh-tang.json` vào `npm run snapshot:fetch` (cùng đường GET của admin cũ như các tệp khác).
+  - 631 bài ra từ bộ đọc của site vì bài `post-1045` trùng slug với `post-29713` (site chỉ phục vụ bài đầu): D1 giữ cả 632, `slug` không duy nhất; ai sửa slug trong admin mới thì bài đó mở được.
+  - Chưa có `StatueRelation`, `Series`, `Publication`, `AiConversation` (không có dữ liệu nguồn hoặc không thuộc T23); `StatueRelation` đến cùng T37.
+- **Giới hạn D1 đã tính:** một câu lệnh ≤ 100 KB. Một tượng (TP0083) có bài 155 KB nên ghi theo từng đoạn 40 KB (câu đầu chèn dòng, các câu sau nối thêm vào cột chữ dài nhất); câu dài nhất sau khi cắt 79,6 KB. 1.799 câu lệnh, file `.sql` khoảng 9 MB.
+- **Chưa thử:** nhập vào D1 thật (cần D1 production); `cf d1 query --local` không có tương đương cục bộ nên kiểm D1 mô phỏng bằng chính file SQLite của nó.
+
 **Mô tả:** Schema Drizzle theo mô hình đặc tả 3.1 (thêm `Monk` cho Danh Tăng): Post, Category, TeachingArticle (+ khối con), Page + Milestone, Area, Statue, StatueCluster, ArtVariation, Monk, CalendarEvent, MonthTheme, FeaturedProgram, Media, Album, PageView, Setting, Notice, User, AuditLog, Registration, Redirect. `scripts/import.ts` đọc từ nguồn `snapshot` hoặc `b2` (dùng lại bộ chuẩn hóa), lưu khóa R2 thay URL tuyệt đối, khu vực / cụm tượng chỉ lưu một nơi. Script chạy lại được nhiều lần (sẽ chạy lần cuối ở T39).
 
 **Tiêu chí nghiệm thu:**
-- [ ] Chạy import nhiều lần cho cùng kết quả (idempotent) trên D1 local
-- [ ] Số bản ghi khớp nguồn: 632 bài · 25 Tông Chỉ · 6 Giới thiệu · 14 khu vực · 126 tượng · 91 Danh Tăng · 15 sự kiện · 3 chương trình · 12 chủ đề tháng
-- [ ] Khu vực và cụm tượng liên kết bằng khóa ngoại, không còn tên lặp
+- [x] Chạy import nhiều lần cho cùng kết quả (idempotent) trên D1 local
+- [x] Số bản ghi khớp nguồn: 632 bài · 25 Tông Chỉ · 6 Giới thiệu · 14 khu vực · 126 tượng · 91 Danh Tăng · 15 sự kiện · 3 chương trình · 12 chủ đề tháng
+- [x] Khu vực và cụm tượng liên kết bằng khóa ngoại, không còn tên lặp
 
 **Kiểm chứng:**
-- [ ] `cf d1 migrations apply --local` rồi `npm run import -- --from=snapshot`
-- [ ] `npm test -- import`
+- [x] `cf d1 migrations apply <id> --local --persist-to <thư mục>` (chạy được, bảng tạo đủ) rồi `npm run import -- --from=snapshot --db=<file .sqlite của D1 cục bộ>`
+- [x] `npm test -- import`: 8 test (7 với dữ liệu nhỏ, 1 với snapshot thật), cộng 5 test đọc Danh Tăng và bài trùng slug; eslint (0 lỗi), `tsc`, 212 test đơn vị và build sạch
 
 **Phụ thuộc:** Checkpoint D
 
