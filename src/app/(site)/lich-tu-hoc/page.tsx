@@ -19,6 +19,7 @@ import {
 	eventsInMonth,
 	lunarSpan,
 	monthGrid,
+	regularEvents,
 	monthLabel,
 	readCalendarState,
 	shiftMonth,
@@ -46,31 +47,40 @@ export default async function LichTuHoc({ searchParams }: Props) {
 	const asked = readCalendarState(await searchParams, today);
 	const schedule = await (await getContentRepository()).getSchedule();
 
-	const types = [...new Map(schedule.events.map((event) => [event.category.slug, event.category])).values()].sort((a, b) =>
+	// The regular ceremonies on their lunar days, for this month and every month ahead, as the old calendar shows them.
+	const regular = regularEvents(schedule.programs, asked.month);
+	const types = [...new Map([...schedule.events, ...regular].map((event) => [event.category.slug, event.category])).values()].sort((a, b) =>
 		a.name.localeCompare(b.name, "vi"),
 	);
 	const state: CalendarState = { ...asked, type: types.some((type) => type.slug === asked.type) ? asked.type : "" };
 	const href = (change: Partial<CalendarState>, hash = "") => calendarHref({ ...state, ...change }, today, hash);
 
 	const monthEvents = eventsInMonth(schedule.events, state.month);
-	const shown = state.type ? monthEvents.filter((event) => event.category.slug === state.type) : monthEvents;
-	const weeks = monthGrid(state.month, shown, today);
+	// The calendar shows the events and the ceremonies; the cards below are the events, the ceremonies have theirs further down.
+	const calendarItems = [...monthEvents, ...regular];
+	const shownItems = state.type ? calendarItems.filter((event) => event.category.slug === state.type) : calendarItems;
+	const shown = shownItems.filter((event) => !event.programId);
+	const weeks = monthGrid(state.month, shownItems, today);
 	const theme = schedule.themes.find((item) => item.month === Number(state.month.slice(5)));
 	const label = monthLabel(state.month);
 	const typeName = types.find((type) => type.slug === state.type)?.name;
 
 	// Each card's id, unique even if two events share a slug.
 	const anchors = new Map<string, string>();
-	for (const event of shown) {
+	for (const event of shownItems) {
+		if (event.programId) {
+			anchors.set(event.id, `khoa-le-${event.programId}`);
+			continue;
+		}
 		let anchor = `su-kien-${event.slug}`;
 		while ([...anchors.values()].includes(anchor)) anchor = `${anchor}-${event.id}`;
 		anchors.set(event.id, anchor);
 	}
-	const firstEventOf = (date: string) => shown.find((event) => event.start <= date && event.end >= date) as ScheduleEvent;
+	const firstEventOf = (date: string) => shownItems.find((event) => event.start <= date && event.end >= date) as ScheduleEvent;
 
 	// The nearest month after this one that has events, for an empty month.
 	const later = schedule.events.find((event) => event.start.slice(0, 7) > state.month);
-	const status = `Tháng ${label}: ${shown.length ? `${shown.length} sự kiện` : "chưa có sự kiện"}${typeName ? ` loại ${typeName}` : ""}`;
+	const status = `Tháng ${label}: ${shownItems.length ? `${shownItems.length} sự kiện` : "chưa có sự kiện"}${typeName ? ` loại ${typeName}` : ""}`;
 
 	return (
 		<main>
@@ -111,14 +121,14 @@ export default async function LichTuHoc({ searchParams }: Props) {
 							<ul className="tlhp-pills">
 								<li>
 									<Link href={href({ type: "" })} scroll={false} aria-current={!state.type ? "page" : undefined}>
-										Tất cả <span className="tlhp-pill-count">{monthEvents.length}</span>
+										Tất cả <span className="tlhp-pill-count">{calendarItems.length}</span>
 									</Link>
 								</li>
 								{types.map((type) => (
 									<li key={type.slug}>
 										<Link href={href({ type: type.slug })} scroll={false} aria-current={type.slug === state.type ? "page" : undefined}>
 											{type.name}{" "}
-											<span className="tlhp-pill-count">{monthEvents.filter((event) => event.category.slug === type.slug).length}</span>
+											<span className="tlhp-pill-count">{calendarItems.filter((event) => event.category.slug === type.slug).length}</span>
 										</Link>
 									</li>
 								))}
@@ -185,7 +195,7 @@ export default async function LichTuHoc({ searchParams }: Props) {
 						<ul className="row row-gap-4">
 							{schedule.programs.map((program) => (
 								<li key={program.id} className="col-12 col-md-6 col-xl-4">
-									<article className="blog-item tlhp-post-card tlhp-program">
+									<article id={`khoa-le-${program.id}`} className="blog-item tlhp-post-card tlhp-program" tabIndex={-1}>
 										<div className="blog-thumb">
 											{program.image ? (
 												<img src={imageAt(program.image.src, IMAGE_WIDTH.card)} alt="" width={640} height={360} loading="lazy" decoding="async" style={{ objectPosition: program.image.position }} />

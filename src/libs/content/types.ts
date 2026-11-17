@@ -88,6 +88,8 @@ export type ScheduleEvent = {
 	notes: string;
 	image: MediaImage | null;
 	video: Video | null;
+	/** Set on a day of a regular ceremony (khóa lễ thường kỳ), made from its program for the calendar. */
+	programId?: string;
 };
 
 /** A ceremony held on fixed lunar days each month (Đại sám hối on the 14th and the last day). */

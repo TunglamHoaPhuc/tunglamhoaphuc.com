@@ -1,7 +1,7 @@
 // The schedule page's calendar: which month and type the URL asks for (?thang=&loai=), the
 // month grid Monday → Sunday with lunar dates, and where each event stands today. Days are
 // counted in Vietnam, whatever the server's clock.
-import type { ScheduleEvent } from "@/libs/content/types";
+import type { RegularProgram, ScheduleEvent } from "@/libs/content/types";
 import { formatDate } from "@/libs/format";
 import { type LunarDate, lunarDate, lunarMonthName, lunarYearName, shortLunar } from "@/libs/lunar";
 
@@ -96,6 +96,50 @@ export function eventsInMonth(events: ScheduleEvent[], month: string): ScheduleE
 	const start = `${month}-01`;
 	const end = lastDay(month);
 	return events.filter((event) => event.start <= end && event.end >= start);
+}
+
+/**
+ * The lunar days of a regular ceremony, read from the editors' words as the old calendar
+ * does: "ngày 14 và cuối tháng" → 14 and the month's last day, "mùng 1 và ngày rằm 15" → 1, 15.
+ */
+export function programDays(summary: string): { days: number[]; last: boolean } {
+	const text = summary.toLocaleLowerCase("vi");
+	const days = new Set([...text.matchAll(/(?<![\dh:])(\d{1,2})(?![\dh:])/g)].map((match) => Number(match[1])).filter((day) => day >= 1 && day <= 30));
+	if (/rằm/.test(text)) days.add(15);
+	return { days: [...days].sort((a, b) => a - b), last: /cuối tháng/.test(text) };
+}
+
+const REGULAR = { slug: "khoa-le-truyen-thong", name: "Khóa Lễ Truyền Thống" };
+
+/** The days of the month on which the regular ceremonies fall, as one-day events, for every month ahead. */
+export function regularEvents(programs: RegularProgram[], month: string): ScheduleEvent[] {
+	const rules = programs.map((program) => ({ program, ...programDays(program.summary) })).filter((rule) => rule.days.length || rule.last);
+	const events: ScheduleEvent[] = [];
+	for (let day = 1; day <= daysInMonth(month); day++) {
+		const date = addDays(`${month}-01`, day - 1);
+		const lunar = lunarDate(date);
+		const last = lunarDate(addDays(date, 1)).day === 1;
+		for (const { program, days, last: onLast } of rules) {
+			if (!days.includes(lunar.day) && !(onLast && last)) continue;
+			events.push({
+				id: `${program.id}-${date}`,
+				slug: `${program.id}-${date}`,
+				title: program.title,
+				subtitle: program.subtitle,
+				category: REGULAR,
+				start: date,
+				end: date,
+				times: program.time ? [{ label: "", time: program.time }] : [],
+				location: program.location,
+				description: program.summary,
+				notes: "",
+				image: program.image,
+				video: null,
+				programId: program.id,
+			});
+		}
+	}
+	return events;
 }
 
 export type CalendarDay = {

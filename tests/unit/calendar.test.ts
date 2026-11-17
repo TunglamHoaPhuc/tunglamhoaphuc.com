@@ -6,12 +6,15 @@ import {
 	lunarRange,
 	lunarSpan,
 	monthGrid,
+	programDays,
 	readCalendarState,
+	regularEvents,
 	shiftMonth,
 	solarRange,
 	todayInVietnam,
 } from "@/libs/calendar";
 import { categorySlug, parseSchedule } from "@/libs/content/schedule";
+import { lunarDate } from "@/libs/lunar";
 import type { ScheduleEvent } from "@/libs/content/types";
 
 const event = (id: string, start: string, end = start): ScheduleEvent => ({
@@ -153,3 +156,52 @@ describe("calendar", () => {
 		expect(lunarSpan("2027-02")).toBe("tháng Chạp năm Bính Ngọ – tháng Giêng năm Đinh Mùi âm lịch");
 	});
 });
+
+describe("regular ceremonies (khóa lễ thường kỳ)", () => {
+	const program = (id: string, title: string, summary: string) => ({ id, title, subtitle: "Khóa lễ", summary, time: "19h00", duration: "", location: "", image: null });
+	const programs = [
+		program("p1", "ĐẠI SÁM HỐI", "Thời khóa sám hối trang nghiêm vào ngày 14 và cuối tháng âm lịch, nuôi dưỡng tâm bồ đề"),
+		program("p2", "TIỂU SÁM HỐI", "Thời khóa tụng kinh sám hối vào ngày mùng 8 và 23 âm lịch, gột rửa thân tâm."),
+		program("p3", "CẦU QUỐC THÁI DÂN AN", "Khóa lễ tụng kinh cầu an vào sáng mùng 1 và ngày rằm 15 âm lịch, cầu nguyện quốc thái dân an."),
+	];
+
+	it("reads the lunar days from the editors' words", () => {
+		expect(programDays(programs[0].summary)).toEqual({ days: [14], last: true });
+		expect(programDays(programs[1].summary)).toEqual({ days: [8, 23], last: false });
+		expect(programDays(programs[2].summary)).toEqual({ days: [1, 15], last: false });
+		expect(programDays("Mỗi Chủ nhật")).toEqual({ days: [], last: false });
+	});
+
+	it("puts them on the days the old calendar shows for November 2026", () => {
+		const days = regularEvents(programs, "2026-11").map((event) => [event.start, event.title]);
+		expect(days).toEqual([
+			["2026-11-01", "TIỂU SÁM HỐI"],
+			["2026-11-08", "ĐẠI SÁM HỐI"],
+			["2026-11-09", "CẦU QUỐC THÁI DÂN AN"],
+			["2026-11-16", "TIỂU SÁM HỐI"],
+			["2026-11-22", "ĐẠI SÁM HỐI"],
+			["2026-11-23", "CẦU QUỐC THÁI DÂN AN"],
+		]);
+		for (const event of regularEvents(programs, "2026-11")) {
+			expect(event).toMatchObject({ end: event.start, programId: expect.any(String), category: { slug: "khoa-le-truyen-thong", name: "Khóa Lễ Truyền Thống" } });
+		}
+	});
+
+	it("keeps doing so in every month ahead, the last day of a 29-day lunar month included", () => {
+		for (let by = 0; by < 24; by++) {
+			const month = shiftMonth("2026-11", by);
+			for (const event of regularEvents(programs, month)) {
+				const lunar = lunarDate(event.start).day;
+				const isLast = lunarDate(lastDayAfter(event.start)).day === 1;
+				if (event.programId === "p1") expect(lunar === 14 || isLast, event.start).toBe(true);
+				if (event.programId === "p2") expect([8, 23]).toContain(lunar);
+				if (event.programId === "p3") expect([1, 15]).toContain(lunar);
+			}
+			expect(regularEvents(programs, month).length, month).toBeGreaterThanOrEqual(5);
+		}
+	});
+});
+
+function lastDayAfter(date: string): string {
+	return new Date(Date.parse(`${date}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
+}
