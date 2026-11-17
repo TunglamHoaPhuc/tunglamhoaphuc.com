@@ -11,6 +11,8 @@ const SEAL = "/brand/logo-tung-lam-hoa-phuc-tron-nga.webp";
 function showSeal(img: HTMLImageElement) {
 	if (img.classList.contains("tlhp-img-missing") || !img.getAttribute("src")) return;
 	img.classList.add("tlhp-img-missing");
+	// The address that failed stays readable, for the editors and for the tests.
+	img.dataset.tlhpSrc = img.getAttribute("src") ?? "";
 	img.removeAttribute("srcset");
 	img.src = SEAL;
 }

@@ -220,3 +220,13 @@ img.tlhp-img-missing {
 		gap: 8px;
 	}
 }
+
+// ── Footer slogan ───────────────────────────────────────────────────────────────────────
+// It was the only italic serif on most pages and made each of them fetch both italic
+// Noto Serif files (65 KB) for one line. The old site sets it in its text face, slanted;
+// Be Vietnam Pro has no italic of its own, so the browser slants the upright here.
+.tlhp-footer .tlhp-footer-slogan {
+	font-family: var(--tlhp-font-sans);
+	font-style: italic;
+	font-synthesis: style;
+}

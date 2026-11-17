@@ -12,9 +12,10 @@ test.describe("fonts", () => {
 			files.set(response.url(), (await response.body().catch(() => Buffer.alloc(0))).length);
 		});
 		await page.goto("/");
-		// Be Vietnam Pro 400–700 and Noto Serif, each latin and vietnamese: 10 files, no italic.
+		// Be Vietnam Pro 400–700 and Noto Serif, each latin and vietnamese: 10 files, no italic;
+		// and UTM Niagara, the title face of the old site, one 10 KB file.
 		const preloads = page.locator('link[rel="preload"][as="font"]');
-		await expect(preloads).toHaveCount(10);
+		await expect(preloads).toHaveCount(11);
 		expect((await preloads.evaluateAll((links) => links.map((link) => link.getAttribute("href")!))).filter((href) => /italic/.test(href))).toEqual([]);
 		await page.mouse.wheel(0, 20_000);
 		await page.waitForTimeout(3000);

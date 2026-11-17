@@ -123,7 +123,7 @@ Làm thêm ngoài dự kiến: tiêu đề phụ trong trang (`.tlhp-section-tit
 - [x] B1. Ảnh hỏng từ nguồn: thay bằng khung có ấn tròn của chùa, không hiện biểu tượng ảnh vỡ. Đã kiểm ở trang Giới thiệu và trang chủ (chân dung Sư Tổ): máy đo không còn ảnh vỡ.
 - [x] B2. Ảnh dọc trong khung thẻ: thẻ bài, thẻ sự kiện, thẻ khu vực dùng khung ngang 3:2; ảnh dọc được cắt theo khung, lấy phần trên. Thẻ chân dung (Chư Tôn Đức, Bảo tượng) giữ khung dọc vì là ảnh người và tượng.
 - [x] B3. Ảnh méo: ảnh nhỏ ở hero, ảnh đại diện tròn và ảnh khối Lời Thầy dạy từng bị bóp méo (20 chỗ), nay cắt theo khung. Máy đo không thấy ảnh nào tràn ra ngoài khung hay gây cuộn ngang.
-- [~] B4. Giữ nguyên tối ưu ảnh: không đổi nguồn, cỡ hay cách tải ảnh; `image-sizes` xanh trên máy chủ dev. `image-budget` cần bản build: đang chạy, chưa có kết quả.
+- [x] B4. Giữ nguyên tối ưu ảnh: không đổi nguồn, cỡ hay cách tải ảnh. `image-sizes`, `image-budget` và `edge-cache` xanh trên bản build (17/11). Ảnh hỏng nguồn khi hiện ấn tròn vẫn giữ địa chỉ đã xin trong `data-tlhp-src`.
 - [x] B5. Danh sách ảnh hỏng cho Ban Biên Tập ở mục 5 (chưa gửi).
 
 ### Đợt C – Trang chủ
@@ -152,7 +152,8 @@ Mỗi trang đã được máy đo ở cả bốn cỡ và xem ảnh chụp ở 
 ### Đợt E – Kiểm tra và bàn giao
 
 - [x] E1. `tsc --noEmit` sạch, lint 0 lỗi (72 cảnh báo có từ trước), 187 unit test xanh.
-- [~] E2. E2E trên máy chủ dev (17/11): lượt đầy đủ máy tính 284 xanh, di động 257 xanh, mỗi bản 1 đỏ ở test bộ lọc Bảo tượng (bấm trước khi trang kịp chạy JavaScript trên dev; thử tay chạy đúng). Sau đợt sửa thứ hai: 376 xanh ở nhóm test chính của cả hai bản; test phân trang Dòng Chảy đỏ một lần khi chạy song song, chạy riêng 6/6 xanh. Bản build đã dựng được (`npm run build`), bộ test trên bản build đang chạy, chưa có kết quả. Test `visual` chưa chạy.
+- [~] E2. E2E trên máy chủ dev (17/11): lượt đầy đủ máy tính 284 xanh, di động 257 xanh, mỗi bản 1 đỏ ở test bộ lọc Bảo tượng (bấm trước khi trang kịp chạy JavaScript trên dev; thử tay chạy đúng). Trên bản build (`npm run build`, cổng 4175), máy tính lượt đầu: 307 xanh, 2 đỏ do chính đợt này và đã sửa (đếm phông tải trước nay là 11 vì có UTM Niagara; test cỡ ảnh trang tượng đọc phải địa chỉ ấn tròn). Lượt chạy lại đầy đủ trên bản build cho cả hai bản đang chạy, chưa có kết quả. Test `visual` chưa chạy.
+- [x] E2b. Ngân sách phông 200 KB: thêm UTM Niagara làm trang chủ tải 206 KB. Dòng khẩu hiệu ở footer là chỗ duy nhất dùng Noto Serif nghiêng và kéo theo 64,6 KB trên mọi trang; đổi sang chữ không chân nghiêng như web cũ. Trang chủ nay tải 141,3 KB phông.
 - [ ] E3. Chụp lại ảnh mẫu `visual.spec.ts` (chỉ khi chủ site duyệt giao diện)
 - [ ] E4. Cập nhật `BRAND-GUIDELINES.md`, quyết định 9 trong `tasks/plan.md`, bảng khảo sát (Q1, TH-03)
 - [ ] E5. Đưa lên `v2.` (chỉ khi chủ site bảo)
