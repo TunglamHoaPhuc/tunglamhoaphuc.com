@@ -1,7 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
-const MENU = ["Giới thiệu", "Tin tức – Pháp thoại", "Lịch tu học", "Đăng ký khóa tu", "Liên hệ"];
+const MENU = ["Giới thiệu", "Tin tức – Pháp thoại", "Lịch tu học", "Liên hệ"];
 
 async function open(page: Page, width: number, path = "/") {
 	await page.setViewportSize({ width, height: 800 });

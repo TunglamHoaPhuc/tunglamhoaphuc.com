@@ -230,3 +230,21 @@ img.tlhp-img-missing {
 	font-style: italic;
 	font-synthesis: style;
 }
+
+// Mộc Ấn hangs below the header bar on wide screens, as on the old site (194 × 144 there).
+// The seal leaves the row's flow, so the bar keeps its height; the link keeps room for it.
+// From 1280px only: below that the bar is the compact one with the menu button.
+@media (min-width: 1280px) {
+	.header-area .site_logo.tlhp-logo .logo {
+		position: relative;
+		padding-left: 150px;
+		min-height: 48px;
+	}
+	.header-area .site_logo.tlhp-logo .tlhp-logo-seal {
+		position: absolute;
+		left: 0;
+		top: -14px;
+		height: 104px;
+		filter: drop-shadow(0 10px 18px rgb(0 0 0 / 0.55));
+	}
+}

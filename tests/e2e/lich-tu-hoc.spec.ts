@@ -132,7 +132,7 @@ test.describe("schedule page", () => {
 		await expect(theme.locator("figcaption")).toHaveText("— Vô Trí - Tâm Hòa");
 	});
 
-	test("Đăng ký khóa tu in the menu lands on how to sign up by phone", async ({ page }) => {
+	test("Đăng ký khóa tu in the header lands on how to sign up by phone", async ({ page }) => {
 		await open(page, `${PATH}#khoa-tu`);
 		const section = page.locator("#khoa-tu");
 		await expect(section.getByRole("heading", { name: "Đăng ký khóa tu" })).toBeInViewport();

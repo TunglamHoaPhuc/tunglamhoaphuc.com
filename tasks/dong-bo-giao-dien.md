@@ -73,8 +73,8 @@ Số đo web cũ lấy bằng máy ngày 17/11/2026 ở 1440px và 375px trên 9
 | I2 | Huy hiệu tròn giữa ảnh và chữ của thẻ | có | có ở thẻ bài, thẻ khu vực, thẻ tượng | [x] |
 | I3 | Loại sự kiện trong lịch | cộng tu, khóa lễ, đại lễ | có | [x] |
 | I4 | Menu | không icon | icon vàng trong menu thả | [x] giữ (dễ nhận hơn) |
-| I5 | Mạng xã hội ở footer | 6 nút (Facebook ×2, nhóm ×2, Instagram, TikTok, YouTube, web) | chưa có (chờ GD-06) | [?] |
-| I6 | Logo | Mộc Ấn treo dưới header 194×144 | Mộc Ấn nhỏ trong thanh header | [?] |
+| I5 | Mạng xã hội ở footer | 9 nút (Zalo, nhóm, Instagram, Facebook, TikTok, YouTube, Facebook và web Quỳnh Nhai Cam Lộ Tự…), **không nút nào gắn địa chỉ** | chưa có (chờ GD-06) | [?] web cũ không có địa chỉ để lấy; cần Ban Truyền Thông gửi danh sách |
+| I6 | Logo | Mộc Ấn treo dưới header 194×144 | Mộc Ấn 140×104 treo dưới thanh header từ 1280px; dưới 1280px giữ ấn nhỏ trong thanh | [x] |
 
 ### 2.4 Kiểu chữ
 
@@ -124,7 +124,7 @@ Làm thêm ngoài dự kiến: tiêu đề phụ trong trang (`.tlhp-section-tit
 - [x] B2. Ảnh dọc trong khung thẻ: thẻ bài, thẻ sự kiện, thẻ khu vực dùng khung ngang 3:2; ảnh dọc được cắt theo khung, lấy phần trên. Thẻ chân dung (Chư Tôn Đức, Bảo tượng) giữ khung dọc vì là ảnh người và tượng.
 - [x] B3. Ảnh méo: ảnh nhỏ ở hero, ảnh đại diện tròn và ảnh khối Lời Thầy dạy từng bị bóp méo (20 chỗ), nay cắt theo khung. Máy đo không thấy ảnh nào tràn ra ngoài khung hay gây cuộn ngang.
 - [x] B4. Giữ nguyên tối ưu ảnh: không đổi nguồn, cỡ hay cách tải ảnh. `image-sizes`, `image-budget` và `edge-cache` xanh trên bản build (17/11). Ảnh hỏng nguồn khi hiện ấn tròn vẫn giữ địa chỉ đã xin trong `data-tlhp-src`.
-- [x] B5. Danh sách ảnh hỏng cho Ban Biên Tập ở mục 5 (chưa gửi).
+- [x] B5. Danh sách ảnh hỏng cho Ban Biên Tập: `docs/anh-hong-nguon.md`, 37 dòng có tên bài, ô dữ liệu và địa chỉ ảnh (chưa gửi; chờ chủ site cho biết gửi ai, qua kênh nào).
 
 ### Đợt C – Trang chủ
 
@@ -186,11 +186,11 @@ Không ảnh nào trong 6.050 ảnh mang cờ xoay EXIF. 76 ảnh nặng trên 3
 
 ## 6. Đề xuất thêm (cùng tuyến nội dung, chờ chủ site quyết)
 
-- [?] P1. Menu: bỏ mục "Đăng ký khóa tu" trong menu vì đã có nút cùng tên ở góc phải; thay bằng "Trí Tuệ Phật Pháp" hoặc để 4 mục.
-- [?] P2. Mạng xã hội ở footer: web cũ có 8 liên kết, web mới đang chờ danh sách chính thức (GD-06).
-- [?] P3. Logo Mộc Ấn treo dưới header như web cũ.
-- [?] P4. Gỡ 7 trang mẫu Bexon còn mở công khai (`/contact`, `/blogs`, `/services`, `/team`, `/history`, `/our-gallery`, `/portfolios`).
-- [?] P5. Thanh điều hướng chấm bên trái trang chủ của web cũ: không đưa sang vì che nội dung trên điện thoại.
+- [x] P1. Menu còn 4 mục: Giới thiệu ▾ · Tin tức – Pháp thoại ▾ · Lịch tu học · Liên hệ. "Đăng ký khóa tu" chỉ còn là nút vàng ở header và trong menu điện thoại (17/11). Trí Tuệ Phật Pháp đã có trong "Tin tức – Pháp thoại" nên không thêm mục riêng.
+- [?] P2. Mạng xã hội ở footer: đã dò web cũ ngày 17/11, 9 nút ở footer chỉ là hình, không gắn địa chỉ. Footer web mới đã sẵn chỗ (`site.social`), chỉ cần danh sách chính thức (GD-06).
+- [x] P3. Logo Mộc Ấn treo dưới header như web cũ, từ 1280px trở lên (xem I6).
+- [x] P4. 7 trang mẫu Bexon (`/contact`, `/blogs`, `/services`, `/team`, `/history`, `/our-gallery`, `/portfolios` và trang con) chuyển vào nhóm route `(mau-bexon)`: trả 404 trên `www`, noindex, vẫn mở được trên `v2.` để làm khuôn mẫu và cho bộ test (giống `/styleguide`). Không xóa mã vì `footer`, `motion-guard`, `styleguide` đang test trên các trang này.
+- [x] P5. Thanh điều hướng chấm bên trái trang chủ của web cũ: không đưa sang vì che nội dung trên điện thoại (chốt 17/11).
 
 ## 7. Việc còn lại và skill sẽ dùng (tra ngày 17/11/2026)
 

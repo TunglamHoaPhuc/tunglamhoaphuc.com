@@ -439,7 +439,8 @@ Cỡ chữ co giãn mượt từ màn hình 375px (giá trị nhỏ) đến 1320
 | Chiều cao | 80px desktop · 64px mobile (`h-header`) |
 | Hành vi dính | `sticky top-0`; trên hero: nền trong suốt; cuộn quá 80px: nền `background/92` + `backdrop-blur-[10px]` + `shadow-md`, chuyển trong 250ms |
 | Bố cục | Logo trái (48/40px) · menu giữa · cụm hành động phải: nút tròn 48px "Gọi điện" (`tel:`), "Chỉ đường" (Google Maps), CTA pill "Đăng ký khóa tu" |
-| Menu mẹ (Q6) | Giới thiệu ▾ · Tin tức – Pháp thoại ▾ · Lịch tu học · Đăng ký khóa tu · Liên hệ |
+| Menu mẹ (Q6) | Giới thiệu ▾ · Tin tức – Pháp thoại ▾ · Lịch tu học · Liên hệ ("Đăng ký khóa tu" là nút ở header, từ 17/11 không lặp lại trong menu) |
+| Logo ở header | Từ 1280px, Mộc Ấn 140×104 treo dưới thanh header như web cũ; dưới 1280px là ấn nhỏ 40–48px trong thanh |
 | Menu con | Mở khi **bấm** (hoặc di chuột có độ trễ 150ms), là bảng liên kết gắn dưới mục mẹ; đóng bằng Esc/bấm ra ngoài; điều hướng được bằng bàn phím (`aria-expanded`) |
 | Điểm ngắt | Menu ngang từ `xl` (1280px). Dưới 1280px: nút "Menu" mở **bảng điều hướng đẩy nội dung xuống** (accordion trong luồng trang), không dùng ngăn kéo phủ lớp |
 | Chữ menu | `text-nav` 16px/500, khoảng cách mục 32px; mục đang xem gạch chân 2px màu `accent` |

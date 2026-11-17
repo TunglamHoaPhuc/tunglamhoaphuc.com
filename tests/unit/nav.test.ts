@@ -32,8 +32,9 @@ describe("isCurrentItem", () => {
 });
 
 describe("site config", () => {
-	it("has the five agreed menu items in order", () => {
-		expect(site.nav.map((item) => item.label)).toEqual(["Giới thiệu", "Tin tức – Pháp thoại", "Lịch tu học", "Đăng ký khóa tu", "Liên hệ"]);
+	it("has the four menu items in order; Đăng ký khóa tu is the header button", () => {
+		expect(site.nav.map((item) => item.label)).toEqual(["Giới thiệu", "Tin tức – Pháp thoại", "Lịch tu học", "Liên hệ"]);
+		expect(site.register).toEqual({ label: "Đăng ký khóa tu", href: "/lich-tu-hoc#khoa-tu" });
 	});
 
 	it("keeps every phone number at 10 digits starting with 0", () => {

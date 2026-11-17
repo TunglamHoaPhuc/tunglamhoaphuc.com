@@ -156,8 +156,9 @@ export const site = {
 				{ label: "Trí Tuệ Phật Pháp", href: "/tri-tue-phat-phap", image: "/brand/icons/icon-tri-tue-phat-phap.webp" },
 			],
 		},
+		// "Đăng ký khóa tu" is the gold button at the right of the header (`register` above),
+		// so it is not repeated as a menu item (17/11/2026).
 		{ label: "Lịch tu học", href: "/lich-tu-hoc" },
-		{ label: "Đăng ký khóa tu", href: "/lich-tu-hoc#khoa-tu" },
 		{ label: "Liên hệ", href: "/lien-he" },
 	] as NavItem[],
 };

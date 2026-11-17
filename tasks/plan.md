@@ -20,7 +20,7 @@ Lộ trình có 3 mốc:
 | Phạm vi | Site công khai + trang quản trị | – |
 | Nền giao diện | Lấy gói Bexon làm gốc, giữ Bootstrap 5 + SCSS, chỉ đổi màu, font, nội dung | – |
 | Hiệu ứng | **Giữ toàn bộ hiệu ứng Bexon**: hiện dần khi cuộn, cuộn mượt + parallax, slider tự chạy, nút lên đầu trang nổi, preloader, con trỏ hiệu ứng, số đếm chạy, chữ chạy ở footer | **Đảo ngược UX-01, UX-03** (đang "Đã chốt") và GD-02 (hero 1 khung). Cần cập nhật bảng khảo sát và BRAND-GUIDELINES mục 1.2, 5.6 |
-| Menu | Giới thiệu ▾ (Lịch sử Bổn tự · Chư Tôn Đức · Thanh quy · Vũ Trụ Phật Giáo · Bảo Tượng Phật Giáo) · Tin tức – Pháp thoại ▾ (Dòng Chảy Hoằng Pháp · Tông Chỉ Tu Học · Trí Tuệ Phật Pháp) · Lịch tu học · Đăng ký khóa tu · Liên hệ | Chốt GD-01, ND-01 (phần menu) |
+| Menu | Giới thiệu ▾ (Lịch sử Bổn tự · Chư Tôn Đức · Thanh quy · Vũ Trụ Phật Giáo · Bảo Tượng Phật Giáo) · Tin tức – Pháp thoại ▾ (Dòng Chảy Hoằng Pháp · Tông Chỉ Tu Học · Trí Tuệ Phật Pháp) · Lịch tu học · Liên hệ. Sửa 17/11: bỏ mục "Đăng ký khóa tu" khỏi menu vì đã có nút cùng tên ở header | Chốt GD-01, ND-01 (phần menu) |
 | Trang chủ | Ưu tiên nội dung chùa: Hero → Lối vào chuyên mục → Khóa tu sắp tới → Tin mới nhất → Lời chào → Tông Chỉ → Khu vực nổi bật → Lộ trình tu học → Lời Thầy dạy → Chư Tôn Đức | – |
 | Khẩu hiệu hero | "Nơi để trở về" + dòng phụ "Chốn thiêng bình yên" | Chốt TH-06 |
 | Soạn thảo admin mới | TipTap, lưu HTML đã làm sạch; nhập WordPress + Google Sheets một lần rồi bỏ đồng bộ | Chốt QT-03 |
