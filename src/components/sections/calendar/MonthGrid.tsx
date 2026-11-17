@@ -13,6 +13,13 @@ type Props = {
 
 const WEEKDAY_FULL = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy", "Chủ Nhật"];
 
+/** The old calendar's icon of each type of event (public/brand/icons); other types get a dot. */
+const ICONS: Record<string, string> = {
+	"khoa-le-truyen-thong": "/brand/icons/icon-khoa-le-truyen-thong.webp",
+	"cong-tu": "/brand/icons/icon-cong-tu.webp",
+	"dai-le-su-kien": "/brand/icons/icon-dai-le-su-kien.webp",
+};
+
 /** Lunar day as the calendar shows it: "1/10" on the first, "Rằm" on the 15th. */
 function lunarLabel(day: CalendarDay): string {
 	if (day.lunar.day === 1) return shortLunar(day.lunar);
@@ -20,9 +27,11 @@ function lunarLabel(day: CalendarDay): string {
 	return String(day.lunar.day);
 }
 
-// The month as a table, Monday to Sunday: the day, its lunar date under it, and the names
-// of the day's events. A day with events is one link (a large target) to its first event's
-// card; the cards below list the same events in full, for screen readers too.
+// The month as a table, Monday to Sunday, drawn as the old site's calendar: the day, its
+// lunar date beside it (in red on the 1st and the 15th), and an icon for each event or
+// ceremony of the day, its name shown on hover and read by screen readers. Days of an event
+// lasting several days glow; today glows most. A day with events is one link (a large
+// target) to its first event's card.
 export default function MonthGrid({ weeks, label, hrefFor, describedBy }: Props) {
 	return (
 		<table className="tlhp-month" aria-describedby={describedBy}>
@@ -60,9 +69,12 @@ export default function MonthGrid({ weeks, label, hrefFor, describedBy }: Props)
 									{day.events.length ? (
 										<span className="tlhp-day-events">
 											{day.events.map((event) => (
-												// On phones the name is read out but drawn as a dot.
-												<span key={event.id} className={`tlhp-day-event is-${event.category.slug}`}>
-													<span className="tlhp-day-event-name">{event.title}</span>
+												<span key={event.id} className={`tlhp-day-event is-${event.category.slug}${event.start !== event.end ? " is-long" : ""}`}>
+													{ICONS[event.category.slug] ? <img src={ICONS[event.category.slug]} alt="" width={24} height={24} loading="lazy" decoding="async" /> : <span className="tlhp-day-event-dot" />}
+													<span className="visually-hidden">{event.title}</span>
+													<span className="tlhp-day-event-name" aria-hidden="true">
+														{event.title}
+													</span>
 												</span>
 											))}
 										</span>
@@ -72,7 +84,7 @@ export default function MonthGrid({ weeks, label, hrefFor, describedBy }: Props)
 							return (
 								<td
 									key={day.date}
-									className={[day.today ? "is-today" : "", day.events.length ? "has-events" : "", idx === 6 ? "is-sunday" : ""].filter(Boolean).join(" ") || undefined}
+									className={[day.today ? "is-today" : "", day.events.length ? "has-events" : "", day.events.some((event) => event.start !== event.end) ? "in-range" : "", idx === 6 ? "is-sunday" : ""].filter(Boolean).join(" ") || undefined}
 									aria-current={day.today ? "date" : undefined}
 								>
 									{day.events.length ? (

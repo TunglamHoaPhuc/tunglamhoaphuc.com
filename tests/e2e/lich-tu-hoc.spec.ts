@@ -82,6 +82,41 @@ test.describe("schedule page", () => {
 		await expect(today.locator(".tlhp-day-solar")).toContainText(String(Number(todayInVietnam().slice(8))));
 	});
 
+	// As on the old calendar: the regular ceremonies on their lunar days, in every month ahead.
+	test("puts the regular ceremonies on their lunar days, this month and the months ahead", async ({ page }) => {
+		await open(page);
+		const cell = (day: number) => grid(page).locator("td:not(.is-outside)").nth(day - 1);
+		const expected: [number, string, string][] = [
+			[1, "TIỂU SÁM HỐI", "p2"],
+			[8, "ĐẠI SÁM HỐI", "p1"],
+			[9, "CẦU QUỐC THÁI DÂN AN", "p3"],
+			[16, "TIỂU SÁM HỐI", "p2"],
+			[22, "ĐẠI SÁM HỐI", "p1"],
+			[23, "CẦU QUỐC THÁI DÂN AN", "p3"],
+		];
+		for (const [day, name] of expected) {
+			await expect(cell(day).locator(".tlhp-day-event.is-khoa-le-truyen-thong img")).toHaveCount(1);
+			await expect(cell(day)).toContainText(name);
+		}
+		// A day with only a ceremony leads to the ceremony's card further down.
+		await expect(cell(1).getByRole("link")).toHaveAttribute("href", /#khoa-le-p2$/);
+		await expect(page.locator("#khoa-le-p2")).toHaveCount(1);
+		const types = page.getByRole("navigation", { name: "Loại sự kiện" });
+		await expect(types.getByRole("link", { name: /Khóa Lễ Truyền Thống/ }).locator(".tlhp-pill-count")).toHaveText("6");
+
+		await open(page, `${PATH}?thang=2027-06`);
+		expect(await grid(page).locator(".tlhp-day-event.is-khoa-le-truyen-thong").count()).toBeGreaterThanOrEqual(5);
+	});
+
+	test("draws the old calendar's marks: red lunar badge, glowing today and long-event days", async ({ page }) => {
+		await open(page);
+		const cell = (day: number) => grid(page).locator("td:not(.is-outside)").nth(day - 1);
+		await expect(cell(9).locator(".tlhp-day-lunar")).toHaveCSS("background-color", "rgb(220, 38, 38)");
+		await expect(cell(12)).toHaveClass(/in-range/);
+		await expect(cell(12).locator(".tlhp-day-solar")).toHaveCSS("color", "rgb(255, 222, 89)");
+		await expect(cell(4)).not.toHaveClass(/in-range/);
+	});
+
 	test("a day with events leads the keyboard to its first event card", async ({ page }) => {
 		await open(page);
 		const day = grid(page).getByRole("link", { name: "Thứ Bảy, ngày 7 âm lịch ngày 29 tháng Chín: PHÁP HỘI NIỆM PHẬT" });

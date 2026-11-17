@@ -51,146 +51,238 @@ START: TLHP schedule page (/lich-tu-hoc, T11)
 	margin-bottom: 16px;
 }
 
-// The month: a table of rounded day boxes, Sunday in the ceremonial red.
-// The spacing between boxes would also pad the outer edge; the negative margin takes it back.
+// The month, drawn as the old site's calendar (www, 11/2026): dark boxes edged in gold,
+// the lunar day beside the day (a red badge on the 1st and the 15th), an icon for each
+// event, the days of a long event glowing softly and today glowing most. The weekday names
+// sit in one dark bar, Chủ Nhật on gold. The spacing between boxes would also pad the outer
+// edge; the negative margin takes it back.
 .tlhp-month {
+	--tlhp-cal-gold: #f2c14e;
+	--tlhp-cal-bright: #ffde59;
 	width: calc(100% + 12px);
 	margin: -6px;
 	table-layout: fixed;
 	border-collapse: separate;
 	border-spacing: 6px;
+	thead tr {
+		background-color: rgb(0 0 0 / 0.6);
+	}
 	th {
-		padding: 6px 0;
+		padding: 8px 0;
 		text-align: center;
 		font-size: var(--tlhp-text-caption);
-		font-weight: var(--tj-fw-sbold);
-		color: var(--tj-color-text-body-3);
+		font-weight: var(--tj-fw-bold);
+		letter-spacing: 0.06em;
+		color: #ffe5a3;
+		border-block: 1px solid rgb(242 193 78 / 0.3);
+		&:first-child {
+			border-inline-start: 1px solid rgb(242 193 78 / 0.3);
+			border-radius: var(--tlhp-radius-md) 0 0 var(--tlhp-radius-md);
+		}
+		&:last-child {
+			border-inline-end: 1px solid rgb(242 193 78 / 0.3);
+			border-radius: 0 var(--tlhp-radius-md) var(--tlhp-radius-md) 0;
+		}
 		abbr {
 			text-decoration: none;
 			cursor: default;
 		}
-		&.is-sunday {
-			color: var(--tj-color-red-1);
+		&.is-sunday abbr {
+			display: inline-block;
+			min-width: 70%;
+			padding: 1px 0;
+			border-radius: var(--tlhp-radius-sm);
+			background-image: linear-gradient(90deg, var(--tlhp-cal-gold), var(--tlhp-cal-bright));
+			color: #1c0f08;
+			font-weight: 900;
 		}
 	}
 	td {
-		height: 108px;
+		position: relative;
+		height: 88px;
 		padding: 0;
 		vertical-align: top;
-		border: 1px solid var(--tj-color-border-1);
-		border-radius: var(--tlhp-radius-md);
-		background-color: var(--tj-color-surface);
+		border: 1px solid rgb(242 193 78 / 0.2);
+		border-radius: var(--tlhp-radius-lg);
+		background-color: rgb(0 0 0 / 0.45);
+		transition:
+			border-color 0.3s ease,
+			background-color 0.3s ease;
+		&:hover:not(.is-outside) {
+			border-color: rgb(242 193 78 / 0.6);
+			background-color: rgb(0 0 0 / 0.65);
+		}
 		&.is-outside {
 			border-color: transparent;
 			background-color: transparent;
 		}
-		&.has-events {
-			border-color: color-mix(in srgb, var(--tj-color-theme-primary) 45%, transparent);
-			background-color: var(--tlhp-accent-soft);
+		&.in-range {
+			border-color: rgb(242 193 78 / 0.5);
+			background-color: rgb(37 21 12 / 0.9);
+			box-shadow: 0 0 10px rgb(242 193 78 / 0.2);
+			&:hover {
+				border-color: var(--tlhp-cal-bright);
+				background-color: #351c0f;
+			}
+			.tlhp-day-solar {
+				color: var(--tlhp-cal-bright);
+			}
 		}
 		&.is-today {
-			box-shadow: inset 0 0 0 2px var(--tj-color-theme-primary);
+			z-index: 1;
+			border: 2px solid var(--tlhp-cal-bright);
+			background-image: linear-gradient(180deg, #552e14, #3c1f0b, #201007);
+			box-shadow:
+				0 0 0 2px rgb(255 222 89 / 0.7),
+				0 0 22px rgb(255 222 89 / 0.9);
+			.tlhp-day-solar {
+				color: var(--tlhp-cal-bright);
+				text-shadow: 0 0 8px rgb(255 222 89 / 0.95);
+			}
 		}
 		@media #{$md} {
-			height: 88px;
+			height: 76px;
 		}
 		@media #{$sm, $xs} {
-			height: 66px;
+			height: 58px;
 			border-radius: var(--tlhp-radius-sm);
 		}
 	}
 }
+// Sunday's number stays white as on the old calendar (the night theme reds it elsewhere);
+// gold like the other days in a long event or today.
+table.tlhp-month tbody td.is-sunday:not(.is-outside) .tlhp-day-solar {
+	color: #fff;
+}
+table.tlhp-month tbody td.is-sunday.in-range:not(.is-outside) .tlhp-day-solar,
+table.tlhp-month tbody td.is-sunday.is-today:not(.is-outside) .tlhp-day-solar {
+	color: var(--tlhp-cal-bright);
+}
 .tlhp-day {
 	display: flex;
-	flex-direction: column;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	justify-content: space-between;
 	height: 100%;
-	padding: 8px;
+	padding: 6px 8px;
 	color: inherit;
 	@media #{$sm, $xs} {
-		padding: 5px 4px;
+		padding: 4px;
 	}
-}
-a.tlhp-day:hover .tlhp-day-solar {
-	color: var(--tj-color-theme-primary);
 }
 .tlhp-day-solar {
-	font-family: var(--tj-ff-heading);
-	font-size: 20px;
-	font-weight: var(--tj-fw-sbold);
-	line-height: 1.2;
-	color: var(--tj-color-heading-primary);
+	font-size: 18px;
+	font-weight: 900;
+	line-height: 1;
+	color: #fff;
+	text-shadow: 0 1px 3px rgb(0 0 0 / 0.8);
 	@media #{$sm, $xs} {
-		font-size: 16px;
+		font-size: 13px;
 	}
-}
-td.is-sunday .tlhp-day-solar {
-	color: var(--tj-color-red-1);
 }
 .tlhp-day-lunar {
-	font-size: var(--tlhp-text-caption);
+	padding: 1px 4px;
+	border-radius: var(--tlhp-radius-xs);
+	font-size: 10px;
+	font-weight: var(--tj-fw-bold);
 	line-height: 1.3;
-	color: var(--tj-color-text-body-3);
+	color: rgb(253 230 138 / 0.8);
 	&.is-special {
-		font-weight: var(--tj-fw-sbold);
-		color: var(--tlhp-accent-text);
+		background-color: #dc2626;
+		color: #fff;
+		font-weight: 900;
 	}
 	@media #{$sm, $xs} {
-		font-size: 12px;
+		padding: 0 2px;
+		font-size: 8px;
 	}
 }
 .tlhp-day-events {
 	display: flex;
-	flex-direction: column;
-	gap: 3px;
+	flex: 1 0 100%;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
 	margin-top: auto;
-	@media #{$md, $sm, $xs} {
-		flex-direction: row;
-		flex-wrap: wrap;
-		gap: 4px;
+	padding-bottom: 6px;
+	@media #{$sm, $xs} {
+		gap: 2px;
+		padding-bottom: 2px;
 	}
 }
 .tlhp-day-event {
+	position: relative;
+	display: inline-flex;
+	img {
+		display: block;
+		width: 24px;
+		height: 24px;
+		object-fit: contain;
+		filter: drop-shadow(0 2px 4px rgb(0 0 0 / 0.8));
+		transition: transform 0.2s ease;
+	}
+	// Each day of a long event: a smaller icon, as the old calendar draws it.
+	&.is-long img {
+		width: 16px;
+		height: 16px;
+		opacity: 0.85;
+	}
+	@media #{$sm, $xs} {
+		img {
+			width: 16px;
+			height: 16px;
+		}
+		&.is-long img {
+			width: 12px;
+			height: 12px;
+		}
+	}
+}
+.tlhp-day-event-dot {
 	display: block;
-	padding: 2px 6px;
-	border-inline-start: 3px solid var(--tj-color-theme-primary);
-	border-radius: var(--tlhp-radius-xs);
-	background-color: var(--tj-color-surface);
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background-color: var(--tlhp-cal-gold, #f2c14e);
+}
+// The name: read by screen readers always, shown above the icon on hover or focus.
+.tlhp-day-event-name {
+	position: absolute;
+	bottom: calc(100% + 8px);
+	left: 50%;
+	z-index: 5;
+	width: max-content;
+	max-width: 220px;
+	padding: 6px 10px;
+	border: 1px solid #ffde59;
+	border-radius: var(--tlhp-radius-md);
+	background-color: rgb(28 15 8 / 0.98);
+	box-shadow: 0 10px 25px rgb(0 0 0 / 0.95);
+	color: #ffe5a3;
 	font-size: 12px;
-	font-weight: var(--tj-fw-sbold);
+	font-weight: var(--tj-fw-bold);
 	line-height: 1.35;
-	color: var(--tlhp-accent-text);
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	&.is-dai-le-su-kien {
-		border-inline-start-color: var(--tj-color-red-1);
+	white-space: normal;
+	text-align: center;
+	pointer-events: none;
+	transform: translateX(-50%);
+	// Out of the layout while hidden: a hidden box at the edge would still widen the page.
+	display: none;
+	@media (hover: none) {
+		display: none !important;
 	}
-	&.is-khoa-le-truyen-thong {
-		border-inline-start-color: var(--tlhp-accent);
+}
+.tlhp-day-event:hover {
+	img {
+		transform: scale(1.25);
 	}
-	// A dot on smaller screens; the name stays for screen readers.
-	@media #{$md, $sm, $xs} {
-		width: 10px;
-		height: 10px;
-		padding: 0;
-		border: 0;
-		border-radius: 50%;
-		background-color: var(--tj-color-primary-fill);
-		&.is-dai-le-su-kien {
-			background-color: var(--tj-color-red-1);
-		}
-		&.is-khoa-le-truyen-thong {
-			background-color: var(--tlhp-accent);
-		}
-		.tlhp-day-event-name {
-			position: absolute;
-			width: 1px;
-			height: 1px;
-			overflow: hidden;
-			clip-path: inset(50%);
-			white-space: nowrap;
-		}
+	.tlhp-day-event-name {
+		display: block;
 	}
+}
+a.tlhp-day:focus-visible .tlhp-day-event-name {
+	display: block;
 }
 .tlhp-calendar-note {
 	margin: 16px 0 0;
