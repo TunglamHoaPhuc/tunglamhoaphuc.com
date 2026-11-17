@@ -1,12 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	reactStrictMode: false,
-	// The app only runs on the v2. preview host until launch; T20 replaces this
-	// with per-host robots rules before www switches over.
+	// Only the public site may be indexed (T20): every other host (v2., quantri., local) says
+	// noindex. Keep the host list in step with src/libs/hosts.ts.
 	async headers() {
 		return [
 			{
 				source: "/:path*",
+				missing: [{ type: "host", value: String.raw`(www\.)?tunglamhoaphuc\.com(:\d+)?` }],
 				headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
 			},
 		];

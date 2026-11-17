@@ -14,6 +14,8 @@ import { getContentRepository } from "@/libs/content/repository";
 import type { Post } from "@/libs/content/types";
 import { formatDate, formatNumber } from "@/libs/format";
 import { listHref } from "@/libs/postList";
+import { articleJsonLd } from "@/libs/seo";
+import JsonLd from "@/components/shared/others/JsonLd";
 
 const RELATED = 3;
 
@@ -43,6 +45,7 @@ export default async function PostArticle({ section, post, extra }: Props) {
 
 	return (
 		<main>
+			<JsonLd data={articleJsonLd(post, `${section.path}/${post.slug}`)} />
 			<HeaderSpace />
 			<HeroInner
 				className="tlhp-article-hero"

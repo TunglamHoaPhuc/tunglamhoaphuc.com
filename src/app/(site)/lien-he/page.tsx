@@ -5,6 +5,8 @@ import HeroInner from "@/components/sections/hero/HeroInner";
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import HeaderSpace from "@/components/shared/others/HeaderSpace";
 import { contactGroups, formatPhone, site } from "@/config/site";
+import { placeJsonLd } from "@/libs/seo";
+import JsonLd from "@/components/shared/others/JsonLd";
 
 // Served from Cloudflare's Workers Cache and made again at most every 5 minutes (T41e).
 export const revalidate = 300;
@@ -24,6 +26,7 @@ export default function LienHe() {
 	const main = site.contacts.find((contact) => contact.phone === site.phone);
 	return (
 		<main>
+			<JsonLd data={placeJsonLd()} />
 			<HeaderSpace />
 			<HeroInner title={TITLE} text={TITLE} />
 			<section className="tj-contact-area section-gap tlhp-contact" aria-labelledby="thong-tin-lien-he">

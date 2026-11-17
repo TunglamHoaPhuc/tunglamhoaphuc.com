@@ -1295,14 +1295,25 @@
 
 **Mô tả:** `generateMetadata` cho mọi route (thay metadata "Bexon - Corporate Business…" của gói); ảnh OG động (Satori + `brand-tokens.json`); `sitemap.xml` động; `robots.txt` theo host (`www` cho phép index, `v2.` chặn); JSON-LD `Article`, `Event`, `Place`, `Organization`; bộ favicon + manifest (tạm từ logo WebP, thay khi có SVG); bật Cloudflare Web Analytics (không cookie, HT-07).
 
+**Kết quả 17/11/2026:** phần mã xong, đã deploy `v2.` (phiên bản Worker `e4327ff2`, 9.825 KiB, nén 1.251 KiB). Còn hai việc ngoài mã (xem tiêu chí).
+- **Kiểm chứng:** toàn bộ e2e trên bản build 601 qua, 1 chập chờn qua ở lần thử lại (không dịch chuyển bố cục khi tải), 1 hỏng là test giữ focus của bộ lọc Dòng Chảy (chập chờn có sẵn khi máy bận; chạy riêng 8/8 xanh). Trên `v2.`: sitemap 811 địa chỉ theo host `v2.`, `robots.txt` chặn tất cả, header noindex còn nguyên, 9 test SEO qua (các test giả lập host `www` chỉ chạy được cục bộ). Sitemap trả trong 0,3–1,3 giây.
+- **Theo host** (`src/libs/hosts.ts` là nguồn duy nhất của danh sách host công khai):
+  - Header `X-Robots-Tag: noindex, nofollow` chỉ gắn khi host **không** phải `www`/tên miền gốc (`next.config.js`, điều kiện `missing` theo host). Bản đầu viết regex bằng chuỗi thường nên dấu chấm và `\d` mất nghĩa; test đơn vị bắt được, nay dùng `String.raw`.
+  - `robots.txt` (`src/app/robots.ts`): host không công khai trả `Disallow: /`; `www` cho vào, chặn `/tim-kiem`, `/cdn-cgi/`, `/anh-goc/`, `/styleguide`, kèm dòng `Sitemap`.
+  - `sitemap.xml` (`src/app/sitemap.ts`, làm lại tối đa mỗi giờ, vào cache ở edge): 811 địa chỉ (11 trang cố định, 471 + 158 bài, 6 chủ đề giới thiệu, 25 bài Tông Chỉ, 14 khu vực, 126 tượng), theo host đang hỏi, có `lastmod` cho bài; không có `/tim-kiem`, `/styleguide` hay trang mẫu Bexon.
+  - Bản xem thử nhận `Host` giả (`preview.allowedHosts` trong `vite.config.ts`, chỉ chạy cục bộ) để test được câu trả lời của `www` mà chưa chuyển tên miền.
+- **Metadata gốc** (`src/app/layout.js`) thay metadata Bexon: `metadataBase` là `www`, canonical của từng trang, `og:image` 1200×630 (`public/brand/og-tung-lam-hoa-phuc.jpg`, 140 KB, dựng từ ảnh toàn cảnh chùa, ấn tròn và UTM Niagara), `og:locale vi_VN`, `twitter:card`, favicon, apple-touch-icon, `manifest.webmanifest` (nền `#1a120b`), `theme-color`. Mỗi trang vẫn có `title` và `description` riêng như trước.
+- **JSON-LD** (`src/libs/seo.ts`, thành phần `JsonLd`, chữ `<` được thoát để nội dung không đóng được thẻ): `Organization` + `BuddhistTemple` ở trang chủ, `Article` ở mọi bài Dòng Chảy và Trí Tuệ, `Event` cho từng sự kiện của tháng đang xem ở `/lich-tu-hoc`, `Place` ở `/lien-he`.
+- **Khác mô tả:** không làm ảnh OG động bằng Satori. Satori cần WASM (khoảng 2 MB) mà Worker gói Free giới hạn 3 MB nén (hiện 1,2 MB), còn mọi trang dùng chung một ảnh chia sẻ nên ảnh tĩnh đủ. Khi mỗi bài cần ảnh riêng thì dùng ảnh bìa của bài (đã có trong `openGraph` của từng trang).
+
 **Tiêu chí nghiệm thu:**
 - [ ] Cloudflare Web Analytics bật trên `www`; sau 2 tuần ra mắt, LCP p75 trên điện thoại ≤ 2,5 s (mục tiêu LCP chốt 13/11, thay cho < 2,0 s trong Lighthouse). Nếu vượt: làm CSS màn hình đầu trong HTML và hoãn script (ghi ở T41b)
-- [ ] Không có 2 trang trùng `<title>`; sitemap liệt kê mọi trang công khai
-- [ ] Rich Results Test hợp lệ cho 1 bài viết và 1 sự kiện mẫu
-- [ ] `v2.` trả noindex, `www` (giả lập host) cho phép index
+- [x] Không có 2 trang trùng `<title>`; sitemap liệt kê mọi trang công khai (e2e: mọi trang chuyên mục, chủ đề, khu vực, Tông Chỉ không trùng tiêu đề; 24 địa chỉ lấy mẫu từ sitemap đều 200 và có tiêu đề riêng. Bài viết được lấy mẫu, vì dữ liệu có sẵn một số bài trùng tiêu đề trong cùng chuyên mục, ghi ở `parsePosts`)
+- [ ] Rich Results Test hợp lệ cho 1 bài viết và 1 sự kiện mẫu (dữ liệu có đủ trường Google yêu cầu và có test; công cụ của Google chỉ chạy được trên địa chỉ công khai, nên chờ `www`)
+- [x] `v2.` trả noindex, `www` (giả lập host) cho phép index (e2e trên bản build: header, `robots.txt`, trang mẫu 404 trên `www`)
 
 **Kiểm chứng:**
-- [ ] `npm run test:e2e -- seo`
+- [x] `npm run test:e2e -- seo`: 12 test (máy tính; trên điện thoại cùng câu trả lời nên bỏ qua); `npm test -- seo next-config`: 12 test, đã bắt lỗi regex host; eslint, `tsc` sạch
 
 **Phụ thuộc:** Checkpoint D. Song song được với T19.
 

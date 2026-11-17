@@ -13,6 +13,8 @@ import Testimonials2 from "@/components/sections/testimonials/Testimonials2";
 import { site } from "@/config/site";
 import { getContentRepository } from "@/libs/content/repository";
 import { type HomeData, loadHomeData } from "@/libs/home";
+import { organizationJsonLd } from "@/libs/seo";
+import JsonLd from "@/components/shared/others/JsonLd";
 
 export const metadata: Metadata = {
 	title: `${site.name} – ${site.slogan}`,
@@ -46,6 +48,7 @@ export default async function Home() {
 	const data = await loadHomeData(await getContentRepository());
 	return (
 		<main>
+			<JsonLd data={organizationJsonLd()} />
 			<div className="top-space-15"></div>
 			{BLOCKS.map((block) => (
 				<Fragment key={block.id}>{block.render(data)}</Fragment>

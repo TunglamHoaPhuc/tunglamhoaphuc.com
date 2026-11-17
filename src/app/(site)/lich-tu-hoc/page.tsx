@@ -10,6 +10,8 @@ import HeaderSpace from "@/components/shared/others/HeaderSpace";
 import LightboxLinks from "@/components/shared/others/LightboxLinks";
 import NoItems from "@/components/shared/others/NoItems";
 import { formatPhone, site } from "@/config/site";
+import { eventJsonLd } from "@/libs/seo";
+import JsonLd from "@/components/shared/others/JsonLd";
 import {
 	type CalendarState,
 	calendarHref,
@@ -72,6 +74,9 @@ export default async function LichTuHoc({ searchParams }: Props) {
 
 	return (
 		<main>
+			{monthEvents.map((event) => (
+				<JsonLd key={event.id} data={eventJsonLd(event)} />
+			))}
 			<HeaderSpace />
 			<HeroInner title={TITLE} text={TITLE} />
 

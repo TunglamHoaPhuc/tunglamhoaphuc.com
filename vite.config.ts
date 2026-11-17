@@ -4,6 +4,9 @@ import { cloudflare } from "@cloudflare/vite-plugin";
 import { workersCacheCdnAdapter } from "@vinext/cloudflare/cache/workers-cache-cdn-adapter";
 
 export default defineConfig({
+  // `vite preview` refuses a Host it does not know; the SEO tests send the public host to
+  // check what www would answer. Preview is a local check only, never deployed.
+  preview: { allowedHosts: true },
   plugins: [
     // T41e: pages that declare `revalidate` are served from Cloudflare's Workers Cache, so a
     // view no longer renders the page (CPU and TTFB); see cloudflare.config.ts.
