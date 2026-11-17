@@ -673,6 +673,69 @@ START: Testimonial CSS
 		display: block;
 		height: 100%;
 	}
+	// This month's poster, whole (its words are part of it), with the month as its caption.
+	.tlhp-verses-poster {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		margin: 0;
+		overflow: hidden;
+		border: 1px solid var(--tlhp-gold-line, var(--tj-color-border-1));
+		border-radius: 12px;
+		background: var(--tj-color-surface);
+		img {
+			display: block;
+			width: 100%;
+			height: auto;
+		}
+		// The caption takes what height the verse card beside it adds, so both end on one line.
+		figcaption {
+			display: flex;
+			flex: 1 1 auto;
+			align-items: center;
+			gap: 18px;
+			min-height: 88px;
+			padding: 18px 24px;
+			border-top: 1px solid var(--tlhp-gold-line, var(--tj-color-border-1));
+		}
+	}
+	.tlhp-verses-month {
+		flex: 0 0 auto;
+		font-family: var(--tj-ff-heading);
+		font-size: 52px;
+		font-weight: var(--tj-fw-sbold);
+		line-height: 1;
+		color: var(--tj-color-theme-primary);
+		font-variant-numeric: tabular-nums;
+	}
+	.tlhp-verses-theme {
+		color: var(--tj-color-heading-primary);
+		font-weight: var(--tj-fw-medium);
+		line-height: 1.45;
+		text-wrap: balance;
+	}
+	// The verse card is as tall as the poster: its verse sits in the middle, not at the top
+	// of an empty box.
+	.testimonial-slider-2,
+	.testimonial-slider-2 .swiper-wrapper {
+		height: 100%;
+	}
+	.testimonial-slider-2 .swiper-slide {
+		height: auto;
+	}
+	.testimonial-item.tlhp-verse-card {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		height: 100%;
+		// Room for the dots: at Bexon's place (bottom right) they lay over the month's name.
+		padding-bottom: 76px;
+	}
+	.testimonial-slider-2 .swiper-pagination-area.tlhp-verses-pagination {
+		inset-inline: 30px;
+		bottom: 28px;
+		max-width: none;
+	}
 	.rating-box .title {
 		margin-bottom: 24px;
 		@media #{$sm, $xs} {

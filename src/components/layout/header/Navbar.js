@@ -6,14 +6,36 @@ import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
 
 // Desktop menu (from 1280px). Dropdowns follow the disclosure pattern: the parent is a
-// button that opens on click (not hover), Esc closes and returns focus to it, and the
-// panel closes when focus or a click moves elsewhere.
+// button, Enter/Space/click or a tap opens it, Esc closes and returns focus to it, and the
+// panel closes when focus or a click moves elsewhere. Under a mouse it also unfolds on hover
+// (asked for 17/11/2026, as on the old site) and stays a moment after the pointer leaves, so
+// a diagonal move to the panel does not close it. aria-expanded follows what is shown.
+const HOVER_CLOSE_MS = 180;
+
 const Navbar = () => {
 	const pathname = usePathname();
 	const [openIndex, setOpenIndex] = useState(null);
 	const navRef = useRef(null);
 	const toggleRefs = useRef([]);
 	const baseId = useId();
+	const hoverTimer = useRef(null);
+	const openedByHover = useRef(false);
+
+	const openUnderPointer = (index, event) => {
+		if (event.pointerType !== "mouse") return;
+		clearTimeout(hoverTimer.current);
+		openedByHover.current = true;
+		setOpenIndex(index);
+	};
+	const closeAfterPointer = (index, event) => {
+		if (event.pointerType !== "mouse") return;
+		clearTimeout(hoverTimer.current);
+		hoverTimer.current = setTimeout(() => {
+			openedByHover.current = false;
+			setOpenIndex((current) => (current === index ? null : current));
+		}, HOVER_CLOSE_MS);
+	};
+	useEffect(() => () => clearTimeout(hoverTimer.current), []);
 
 	useEffect(() => setOpenIndex(null), [pathname]);
 
@@ -61,6 +83,8 @@ const Navbar = () => {
 								onBlur={(event) => {
 									if (isOpen && !event.currentTarget.contains(event.relatedTarget)) setOpenIndex(null);
 								}}
+								onPointerEnter={(event) => openUnderPointer(index, event)}
+								onPointerLeave={(event) => closeAfterPointer(index, event)}
 							>
 								<button
 									ref={(el) => {
@@ -70,7 +94,14 @@ const Navbar = () => {
 									className="tlhp-menu-toggle"
 									aria-expanded={isOpen}
 									aria-controls={panelId}
-									onClick={() => setOpenIndex(isOpen ? null : index)}
+									onClick={() => {
+										// A click on a menu the pointer has just opened keeps it open; the next one closes it.
+										if (isOpen && openedByHover.current) {
+											openedByHover.current = false;
+											return;
+										}
+										setOpenIndex(isOpen ? null : index);
+									}}
 								>
 									{item.label}
 								</button>
@@ -84,7 +115,7 @@ const Navbar = () => {
 													href={child.href}
 													aria-current={ariaCurrent(pathname, child)}
 												>
-													<span className="mega-menu-service-icon tlhp-brand-icon" aria-hidden="true">
+													<span className={`mega-menu-service-icon tlhp-brand-icon ${child.image ? "" : "tlhp-brand-dot"}`} aria-hidden="true">
 														{child.image ? <img src={child.image} alt="" width={128} height={128} loading="lazy" /> : null}
 													</span>
 													<span className="mega-menu-service-title">{child.label}</span>

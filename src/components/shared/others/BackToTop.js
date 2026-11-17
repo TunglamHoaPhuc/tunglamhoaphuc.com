@@ -63,7 +63,7 @@ const BackToTop = () => {
 			onClick={scrollToPageTop}
 			className={isShown ? "active" : ""}
 			style={{
-				background: `conic-gradient(var(--tj-color-theme-primary) ${scrollValue}%, var(--tj-color-common-white) ${scrollValue}%)`,
+				background: `conic-gradient(var(--tj-color-theme-primary) ${scrollValue}%, var(--tlhp-ring-track, var(--tj-color-common-white)) ${scrollValue}%)`,
 			}}
 		>
 			{/* The percentage is drawn by CSS (data-value), not written as text: the button's

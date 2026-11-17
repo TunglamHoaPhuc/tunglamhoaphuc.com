@@ -300,6 +300,9 @@ test.describe("home page content", () => {
 	test("passes axe WCAG A/AA on both tabs", async ({ page }) => {
 		await open(page);
 		const check = async () => {
+			// A block that has just come into view is half-way through its fade (calm tier, 0.6 s): axe
+			// would measure its text while it is still pale. Wait until nothing is fading.
+			await expect(page.locator(".tlhp-fade.is-in")).toHaveCount(0);
 			const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
 			return results.violations.flatMap((v) => v.nodes.map((n) => `${v.id}: ${n.target.join(" ")}`));
 		};

@@ -5,7 +5,8 @@
 export type NavLink = {
 	label: string;
 	href: string;
-	/** Gold brand icon shown in the dropdown, from public/brand/icons. */
+	/** Gold brand icon shown in the dropdown, from public/brand/icons: only the icon drawn for that
+	 * section (bo-nhan-dien/README says which is which). Without one the item gets a gold dot. */
 	image?: string;
 };
 
@@ -140,9 +141,9 @@ export const site = {
 			href: "/gioi-thieu",
 			children: [
 				// Slugs of the Giới thiệu topics; Chư Tôn Đức is the group of the four teachers.
-				{ label: "Lịch sử Bổn tự", href: "/gioi-thieu/lich-su-tung-lam-hoa-phuc", image: "/brand/icons/icon-dau-an-hoang-phap.webp" },
-				{ label: "Chư Tôn Đức", href: "/gioi-thieu#nguoi-lien-quan", image: "/brand/icons/icon-quote-chu-de.webp" },
-				{ label: "Thanh quy", href: "/gioi-thieu/van-hoa-ung-xu", image: "/brand/icons/icon-phap-am.webp" },
+				{ label: "Lịch sử Bổn tự", href: "/gioi-thieu/lich-su-tung-lam-hoa-phuc", image: "/brand/logo-tung-lam-hoa-phuc-tron-nga.webp" },
+				{ label: "Chư Tôn Đức", href: "/gioi-thieu#nguoi-lien-quan" },
+				{ label: "Thanh quy", href: "/gioi-thieu/van-hoa-ung-xu" },
 				{ label: "Vũ Trụ Phật Giáo", href: "/vu-tru-phat-giao", image: "/brand/icons/icon-cac-khu-vuc-noi-bat.webp" },
 				{ label: "Bảo Tượng Phật Giáo", href: "/bao-tuong-phat-giao", image: "/brand/icons/icon-cac-bao-tuong-noi-bat.webp" },
 			],

@@ -16,6 +16,28 @@ export const vuTru = {
 		height: 1087,
 	},
 
+	// The picture of each area, as the old site's list shows it: its own set of twelve in B2
+	// (04-vu-tru-phat-giao/khu-vuc), by area slug. The admin's imgUrl is a stand-in for most areas
+	// (the whole-temple view four times, a book cover for the library), so these come first.
+	// Sân La Hán and Lầu Kinh Luân are not on the old list, but their pictures are in the folder.
+	coverFolder: "https://s2-cnv03.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc",
+	covers: {
+		"tam-bao": "tam-bao.webp",
+		"to-duong": "to-duong.webp",
+		"dai-nam-quoc-mau": "dai-nam-quoc-mau.webp",
+		"bao-tang": "bao-tang.webp",
+		"bao-thap-van-phat-xa-loi": "bao-thap.webp",
+		"giang-duong": "giang-duong.webp",
+		"tu-an": "tu-an.webp",
+		"tang-kinh-cac": "tang-kinh-cac-v2.webp",
+		"trai-duong": "trai-duong.webp",
+		"san-di-da": "san-di-da.webp",
+		"cong-tam-quan": "cong-tam-quan.webp",
+		"lang-xa-tam-linh": "lang-xa-tam-linh.webp",
+		"san-la-han": "san-la-han.webp",
+		"ho-phong-sinh": "lau-kinh-luan.webp",
+	} as Record<string, string>,
+
 	// The pins, in the old map's order (a walk from Lầu Kinh Luân by the river to Sân La Hán),
 	// at the old map's places, in % of the drawing. The admin's mapPos is out of date for nine
 	// areas (their pins fall on the lawn or the car park); npm run snapshot:check lists them.

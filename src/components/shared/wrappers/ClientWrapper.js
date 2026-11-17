@@ -1,4 +1,5 @@
 "use client";
+import { startCalmEffects } from "@/libs/calmMotion";
 import { hasFinePointer, prefersReducedMotion, stopAutoplayingSliders } from "@/libs/motion";
 import smoothScrollToTop from "@/libs/smoothScrollToTop";
 import tjMagicCursorAnimation from "@/libs/tjMagicCursorAnimation";
@@ -8,8 +9,9 @@ const ClientWrapper = () => {
 	useEffect(() => {
 		smoothScrollToTop();
 		if (prefersReducedMotion()) {
+			// Nothing moves; blocks only fade in as they come into view (libs/calmMotion).
 			stopAutoplayingSliders();
-			return;
+			return startCalmEffects();
 		}
 		let stopped = false;
 		let effects;

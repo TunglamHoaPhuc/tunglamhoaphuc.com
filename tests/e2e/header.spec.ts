@@ -21,14 +21,33 @@ test.describe("desktop menu", () => {
 		await expect(nav.locator(":scope > ul > li > :is(a, button)")).toHaveText(MENU);
 	});
 
-	test("dropdowns open on click, not hover, and Esc returns focus", async ({ page }) => {
+	test("dropdowns unfold under the mouse, say so, and close after it leaves", async ({ page }) => {
 		await open(page, 1440);
 		const header = liveHeader(page);
 		const toggle = header.getByRole("button", { name: "Giới thiệu" });
 		const panel = header.locator(`#${await toggle.getAttribute("aria-controls")}`);
+		await expect(panel).toBeHidden();
 
 		await toggle.hover();
-		await page.waitForTimeout(600);
+		await expect(toggle).toHaveAttribute("aria-expanded", "true");
+		await expect(panel).toBeVisible();
+		// A click on the menu the pointer has just opened does not shut it.
+		await toggle.click();
+		await expect(panel).toBeVisible();
+		// The pointer may travel down into the panel.
+		await panel.getByRole("link").first().hover();
+		await expect(panel).toBeVisible();
+
+		await page.mouse.move(700, 700);
+		await expect(toggle).toHaveAttribute("aria-expanded", "false");
+		await expect(panel).toBeHidden();
+	});
+
+	test("dropdowns open from the keyboard, and Esc returns focus", async ({ page }) => {
+		await open(page, 1440);
+		const header = liveHeader(page);
+		const toggle = header.getByRole("button", { name: "Giới thiệu" });
+		const panel = header.locator(`#${await toggle.getAttribute("aria-controls")}`);
 		await expect(panel).toBeHidden();
 
 		await toggle.focus();

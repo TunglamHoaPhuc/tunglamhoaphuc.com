@@ -1,6 +1,12 @@
-// Visitors who ask their OS to reduce motion get every CSS animation and transition
-// finished at once (marquees, pulses, hover effects). JS effects are switched off in
-// ClientWrapper (src/libs/motion.ts).
+// Visitors whose system asks for reduced motion get nothing that moves: every CSS animation
+// and transition is finished at once (marquees, pulses, slides, hover lifts), and the JS
+// effects (smooth scrolling, parallax, split titles, sliders running by themselves) are not
+// started (ClientWrapper, src/libs/motion.ts).
+//
+// The calm tier (17/11/2026) keeps what does not travel across the screen, so the site is not
+// dead on the many machines that have the system's animations off: blocks fade in as they
+// come into view, the menu unfolds, links and buttons change colour softly. Each exception
+// below names the properties it lets through; position and size never are among them.
 @media (prefers-reduced-motion: reduce) {
 	*,
 	*::before,
@@ -12,5 +18,37 @@
 		transition-delay: 0s !important;
 		animation-delay: 0s !important;
 		scroll-behavior: auto !important;
+	}
+
+	// Colour only, on what answers the pointer.
+	a,
+	button,
+	.tj-primary-btn,
+	.tlhp-entry {
+		transition-property: color, background-color, border-color, box-shadow, opacity !important;
+		transition-duration: 0.2s !important;
+	}
+
+	// A block coming into view (libs/calmMotion.ts adds and removes these classes).
+	.tlhp-fade {
+		opacity: 0;
+		transition-property: opacity !important;
+		transition-duration: 0.6s !important;
+		transition-timing-function: ease-out !important;
+		&.is-in {
+			opacity: 1;
+		}
+	}
+
+	// The menu unfolds in place (a clip and a fade); its items do not slide.
+	.mainmenu ul > li.tlhp-dropdown {
+		> .sub-menu {
+			transform: none !important;
+			transition-property: opacity, clip-path !important;
+			transition-duration: 0.24s !important;
+			> li {
+				transform: none !important;
+			}
+		}
 	}
 }

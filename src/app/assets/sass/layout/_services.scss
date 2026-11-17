@@ -692,3 +692,12 @@ START: Services CSS
 		margin: 50px 0 0;
 	}
 }
+
+// TLHP: every group of Tông Chỉ Tu Học wears the icon of Tông Chỉ (ServiceCard2.js).
+.service-item .service-icon img {
+	width: 64%;
+	height: 64%;
+	object-fit: contain;
+	border: 0;
+	border-radius: 0;
+}

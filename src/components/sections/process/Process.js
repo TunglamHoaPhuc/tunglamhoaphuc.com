@@ -17,7 +17,7 @@ const Process = ({ group }) => {
 				<div className="row">
 					<div className="col-12">
 						<div className="sec-heading-wrap">
-							<SectionMark icon="tinh-do-nhan-gian" />
+							<SectionMark icon="tong-chi-tu-hoc" />
 							<span className="sub-title wow fadeInUp" data-wow-delay=".3s">
 								{group.name}
 							</span>

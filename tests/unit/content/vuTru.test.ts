@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { vuTru } from "@/config/vuTru";
 import { parseStatues } from "@/libs/content/baoTuong";
 import { parseAreas } from "@/libs/content/vuTru";
-import { statuesIn, templeAreas } from "@/libs/vuTru";
+import { areaCover, statuesIn, templeAreas } from "@/libs/vuTru";
 
 const area = (extra: Record<string, unknown>) => ({
 	id: 1,
@@ -110,5 +110,27 @@ describe("the temple map", () => {
 		expect(tamBao.main.map((item) => item.href)).toContain("/bao-tuong/duc_phat_thich_ca_mau_ni_vo_thuong_nang_nhan_tp0001");
 		expect(tamBao.main.map((item) => item.href)).toContain("/bao-tuong/su_to_ngo_chan_tu_khai_sang_to_dinh_hoang_phap_tp0061");
 		for (const item of statues.filter((one) => one.code)) expect(item.href, item.id).toMatch(new RegExp(`^/bao-tuong/[a-z0-9_]+_${item.code.toLowerCase()}$`));
+	});
+});
+
+describe("an area's picture", () => {
+	it("is its own from the old site's set, not the admin's stand-in", () => {
+		// The admin gives the library a book cover and four areas the same view of the temple.
+		const admin = { src: "/anh-goc/s2-cnv03/tunglamhoaphuc2/08-tu-an-book/di-qua-kho-vui-cuoc-doi-bia-1.webp", position: "center 20%" };
+		expect(areaCover({ slug: "tang-kinh-cac", cover: admin })?.src).toMatch(/04-vu-tru-phat-giao\/khu-vuc\/tang-kinh-cac-v2\.webp$/);
+		expect(areaCover({ slug: "bao-thap-van-phat-xa-loi", cover: null })?.src).toMatch(/khu-vuc\/bao-thap\.webp$/);
+		expect(areaCover({ slug: "ho-phong-sinh", cover: admin })?.src).toMatch(/khu-vuc\/lau-kinh-luan\.webp$/);
+	});
+
+	it("is the admin's for an area the set does not know", () => {
+		const admin = { src: "/anh-goc/s2-cnv03/x.webp", position: "center 20%" };
+		expect(areaCover({ slug: "khu-moi", cover: admin })).toEqual(admin);
+		expect(areaCover({ slug: "khu-moi", cover: null })).toBeNull();
+	});
+
+	it("has a picture for every pin of the map, each a different file", () => {
+		const files = vuTru.pins.map((pin) => vuTru.covers[pin.slug]);
+		expect(files.every(Boolean)).toBe(true);
+		expect(new Set(files).size).toBe(files.length);
 	});
 });

@@ -302,7 +302,17 @@ START: Client CSS
 		font-size: 16px;
 	}
 }
+// "Vũ Trụ Phật / Giáo" left one word alone on its line: the two lines are balanced, and the
+// label may shrink beside its icon instead of pushing the card.
+.tlhp-entry-label {
+	min-width: 0;
+	text-wrap: balance;
+}
+.client-logo.tlhp-entry {
+	border: 1px solid var(--tlhp-gold-line, transparent);
+}
 .tlhp-entry-icon {
+	flex: 0 0 auto;
 	width: 64px;
 	height: 64px;
 	img {

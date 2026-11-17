@@ -16,7 +16,7 @@ const Team1 = ({ members = [] }) => {
 				<div className="row">
 					<div className="col-12">
 						<div className="sec-heading text-center style-2">
-							<SectionMark icon="phap-am" />
+							<SectionMark icon="logo" />
 							<span className="sub-title wow fadeInUp" data-wow-delay=".3s">
 								Giới thiệu
 							</span>

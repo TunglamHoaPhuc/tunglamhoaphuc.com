@@ -1,5 +1,6 @@
 "use client";
 import TestimonialsCard2 from "@/components/shared/cards/TestimonialsCard2";
+import SectionMark from "@/components/shared/others/SectionMark";
 import PauseButton from "@/components/shared/sliders/PauseButton";
 import { useAutoplay } from "@/hooks/useAutoplay";
 import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
@@ -16,7 +17,9 @@ const A11Y = {
 /**
  * Bexon's testimonials as Lời Thầy dạy (plan.md, home block 9): the verses of the month
  * themes, this month's first, sliding by themselves with a pause button; beside them this
- * month's poster under the heading, with the month's theme where the rating was.
+ * month's poster. The poster carries its own words ("Ân Đức Tổ Thầy"), so it shows whole,
+ * with nothing laid over it: the title stands over the block and the month's theme is the
+ * poster's caption (17/11/2026; Bexon's heading and rating box covered the poster's words).
  * @param {{ verses: import("@/libs/content/types").MonthTheme[] }} props
  */
 const Testimonials2 = ({ verses }) => {
@@ -26,33 +29,33 @@ const Testimonials2 = ({ verses }) => {
 	return (
 		<section className="tj-testimonial-section-2 section-gap tlhp-verses" aria-labelledby="loi-thay-day" onFocus={autoplay.onFocus}>
 			<div className="container">
+				<div className="row">
+					<div className="col-12">
+						<div className="sec-heading text-center style-2">
+							<SectionMark icon="quote-chu-de" />
+							<span className="sub-title wow fadeInUp" data-wow-delay=".3s">
+								Chủ đề tháng {current.month}
+							</span>
+							<h2 id="loi-thay-day" className="sec-title text-anim">
+								Lời Thầy <span>dạy.</span>
+							</h2>
+						</div>
+					</div>
+				</div>
 				<div className="row row-gap-3">
 					<div className="col-lg-6">
-						<div className="testimonial-img-area wow fadeInUp" data-wow-delay=".3s">
-							<div className="testimonial-img">
-								{current.poster ? (
-									<img data-speed=".8" src={imageAt(current.poster, IMAGE_WIDTH.wide)} alt="" width={1200} height={1015} loading="lazy" decoding="async" />
-								) : (
-									<span className="tlhp-verses-noimage" />
-								)}
-								<div className="sec-heading style-2">
-									<h2 id="loi-thay-day" className="sec-title text-anim">
-										Lời Thầy <span>dạy.</span>
-									</h2>
-								</div>
-							</div>
-							<div className="box-area">
-								<div className="rating-box wow fadeInUp" data-wow-delay=".3s">
-									<p className="title" aria-hidden="true">
-										{current.month}
-									</p>
-									<span className="rating-text">
-										Chủ đề tháng {current.month}
-										{current.title ? `: ${current.title}` : ""}
-									</span>
-								</div>
-							</div>
-						</div>
+						<figure className="tlhp-verses-poster wow fadeInUp" data-wow-delay=".3s">
+							{current.poster ? <img src={imageAt(current.poster, IMAGE_WIDTH.wide)} alt="" width={1200} height={1015} loading="lazy" decoding="async" /> : null}
+							<figcaption>
+								<span className="tlhp-verses-month" aria-hidden="true">
+									{String(current.month).padStart(2, "0")}
+								</span>
+								<span className="tlhp-verses-theme">
+									Chủ đề tháng {current.month}
+									{current.title ? `: ${current.title}` : ""}
+								</span>
+							</figcaption>
+						</figure>
 					</div>
 					<div className="col-lg-6">
 						<div className="testimonial-wrapper wow fadeInUp" data-wow-delay=".5s">

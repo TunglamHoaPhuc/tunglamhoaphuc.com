@@ -47,19 +47,27 @@ test.describe("no popups or toasts", () => {
 	}
 });
 
-test.describe("reduced motion turns every effect off", () => {
+// With reduced motion nothing moves (no smooth scrolling, no slider or row running by itself,
+// no animation that travels). The calm tier stays (17/11/2026): a block below the screen fades
+// in when it comes into view, so what is on screen must be fully shown soon after it gets there.
+test.describe("reduced motion keeps only what does not move", () => {
 	test.use({ reducedMotion: "reduce" });
 
 	for (const path of PAGES) {
-		test(`${path} shows content at once and keeps sliders still`, async ({ page }) => {
+		test(`${path} shows what is on screen and keeps sliders still`, async ({ page }) => {
 			await settle(page, path);
 			await page.mouse.wheel(0, 1500);
-			await page.waitForTimeout(500);
+			// The fade of a block that has just come into view lasts 0.6 s.
+			await page.waitForTimeout(1200);
 
 			const state = await page.evaluate(() => {
 				const smooth = document.querySelector<HTMLElement>("#smooth-content");
-				const hiddenTitles = [...document.querySelectorAll(".title-anim, .text-anim, .hero-text-anim")].filter(
-					(el) => getComputedStyle(el).opacity !== "1",
+				const onScreen = (el: Element) => {
+					const box = el.getBoundingClientRect();
+					return box.height > 0 && box.bottom > 0 && box.top < window.innerHeight * 0.9;
+				};
+				const hiddenTitles = [...document.querySelectorAll(".title-anim, .text-anim, .hero-text-anim, .tlhp-fade")].filter(
+					(el) => onScreen(el) && getComputedStyle(el).opacity !== "1",
 				).length;
 				const hiddenWow = [...document.querySelectorAll<HTMLElement>(".wow")].filter(
 					(el) => getComputedStyle(el).visibility === "hidden",
@@ -67,17 +75,48 @@ test.describe("reduced motion turns every effect off", () => {
 				const runningSliders = [...document.querySelectorAll<SliderElement>(".swiper")].filter(
 					(el) => el.swiper?.autoplay?.running,
 				).length;
+				// Whatever is animated or in a transition may only change colour or opacity.
+				const moving = document
+					.getAnimations()
+					.flatMap((animation) => {
+						const name = (animation as CSSTransition).transitionProperty ?? (animation as CSSAnimation).animationName ?? "";
+						return /transform|translate|scale|rotate|top|left|right|bottom|width|height|margin|inset/.test(name) ? [name] : [];
+					});
 				return {
 					smoothTransform: smooth ? getComputedStyle(smooth).transform : "none",
 					hiddenTitles,
 					hiddenWow,
 					runningSliders,
+					moving,
 				};
 			});
 
-			expect(state).toEqual({ smoothTransform: "none", hiddenTitles: 0, hiddenWow: 0, runningSliders: 0 });
+			expect(state).toEqual({ smoothTransform: "none", hiddenTitles: 0, hiddenWow: 0, runningSliders: 0, moving: [] });
 		});
 	}
+
+	test("a block below the screen fades in when it comes into view, and only fades", async ({ page }) => {
+		await settle(page, "/");
+		// The fade classes are there only after the page's script has run: nothing is hidden without it.
+		const waiting = page.locator(".tlhp-fade:not(.is-in)");
+		expect(await waiting.count()).toBeGreaterThan(3);
+		// One block, held by itself: the locator above moves on to the next block once this one is in.
+		const block = (await waiting.first().elementHandle())!;
+		expect(await block.evaluate((el) => getComputedStyle(el).opacity)).toBe("0");
+		expect(await block.evaluate((el) => getComputedStyle(el).transitionProperty)).toBe("opacity");
+		await block.scrollIntoViewIfNeeded();
+		await expect.poll(() => block.evaluate((el) => getComputedStyle(el).opacity)).toBe("1");
+		// Afterwards it is left as it was made.
+		await expect.poll(() => block.evaluate((el) => el.classList.contains("tlhp-fade"))).toBe(false);
+	});
+
+	test("without script nothing waits to fade in", async ({ browser }) => {
+		const context = await browser.newContext({ javaScriptEnabled: false, reducedMotion: "reduce" });
+		const page = await context.newPage();
+		await page.goto("/");
+		await expect(page.locator(".tlhp-fade")).toHaveCount(0);
+		await context.close();
+	});
 
 	// The hero slider delays its title, text and button by 1–1.4 s; finishing a transition
 	// at once is not enough if it still waits to start.

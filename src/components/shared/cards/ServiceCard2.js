@@ -8,13 +8,13 @@ import { nameInGroup, tongChiHref } from "@/libs/tongChiGroups";
  * @param {{ group: import("@/libs/tongChiGroups").TongChiGroup, headingLevel?: "h3" | "h2" }} props
  */
 const ServiceCard2 = ({ group, headingLevel: Heading = "h3" }) => {
-	const { name, line, icon, articles } = group;
+	const { name, line, articles } = group;
 	return (
 		<div className="service-item-wrapper tj-fadein-right-on-scroll">
 			<div className="service-item style-2">
 				<div className="title-area">
 					<div className="service-icon" aria-hidden="true">
-						<i className={icon}></i>
+						<img src="/brand/icons/icon-tong-chi-tu-hoc.webp" alt="" width={128} height={128} loading="lazy" decoding="async" />
 					</div>
 					<Heading className="title h4">{name}</Heading>
 				</div>

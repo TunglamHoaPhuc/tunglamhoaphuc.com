@@ -774,7 +774,10 @@ TLHP header (T5a)
 	color: var(--tj-color-common-white);
 }
 
-// Dropdown parents are buttons that open on click (disclosure pattern), not on hover.
+// Dropdown parents are buttons (disclosure pattern); Navbar.js opens them on click, on a tap
+// and under a mouse pointer, and says so with .is-open. The panel unfolds downwards from the
+// bar (a clip, so the text is never squeezed as Bexon's scaleY did), its items following one
+// after another; it leaves faster than it comes.
 .mainmenu .tlhp-menu-toggle {
 	background: none;
 	border: 0;
@@ -782,6 +785,22 @@ TLHP header (T5a)
 	cursor: pointer;
 }
 .mainmenu ul > li.tlhp-dropdown {
+	> .sub-menu {
+		transform: translateY(-10px);
+		clip-path: inset(0 0 100% 0);
+		transition:
+			opacity 0.18s ease-in,
+			transform 0.18s ease-in,
+			clip-path 0.18s ease-in,
+			visibility 0s linear 0.18s;
+		> li {
+			opacity: 0;
+			transform: translateY(-8px);
+			transition:
+				opacity 0.12s ease-in,
+				transform 0.12s ease-in;
+		}
+	}
 	&:hover:not(.is-open) {
 		> .tlhp-menu-toggle::after {
 			transform: none;
@@ -789,7 +808,8 @@ TLHP header (T5a)
 		> .sub-menu {
 			opacity: 0;
 			visibility: hidden;
-			transform: scaleY(0);
+			transform: translateY(-10px);
+			clip-path: inset(0 0 100% 0);
 			pointer-events: none;
 		}
 	}
@@ -800,11 +820,30 @@ TLHP header (T5a)
 		> .sub-menu {
 			opacity: 1;
 			visibility: visible;
-			transform: scaleY(1);
-			transition: all 0.5s ease;
+			transform: none;
+			// Wider than the box, so its shadow shows.
+			clip-path: inset(-12px -24px -32px -24px);
+			transition:
+				opacity 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+				transform 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+				clip-path 0.36s cubic-bezier(0.22, 1, 0.36, 1),
+				visibility 0s;
 			pointer-events: inherit;
+			> li {
+				opacity: 1;
+				transform: none;
+				transition:
+					opacity 0.3s ease-out,
+					transform 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+				@for $i from 1 through 8 {
+					&:nth-child(#{$i}) {
+						transition-delay: #{0.04 + $i * 0.035}s;
+					}
+				}
+			}
 		}
 	}
+	// With reduced motion the panel still unfolds, without sliding (components/_reduced-motion.scss).
 }
 
 // The temple's icons are gold, drawn for dark grounds: set them on đen mun.
@@ -815,6 +854,15 @@ TLHP header (T5a)
 		width: 40px;
 		height: 40px;
 		object-fit: contain;
+	}
+	// An item the icon set has nothing for: the old menu's gold dot.
+	&.tlhp-brand-dot::before {
+		content: "";
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		background: var(--tj-color-theme-primary);
+		box-shadow: 0 0 10px rgb(242 193 78 / 0.55);
 	}
 }
 

@@ -223,3 +223,36 @@ Skill bên ngoài tìm bằng `skills find`, **chưa cài**, cần chủ site đ
 | T31 trình soạn thảo bài viết | `jezweb/claude-skills@tiptap` | 478 |
 | T1b CI | `callstackincubator/agent-skills@github-actions` | 12,4K |
 | E3 ảnh mẫu | `codeatcode/oss-ai-skills@playwright-visual-regression` | 24 (ít người dùng, `ecc:e2e-testing` đã đủ) |
+
+## 8. Rà bố cục, icon, menu và ảnh khu vực (17/11/2026, đợt 2)
+
+Theo tám ảnh chụp chủ dự án gửi. Skill dùng: `ui-ux-pro-max` (tra luật "nhãn gọn không rớt một chữ xuống dòng"), `frontend-ui-engineering`.
+
+| # | Việc | Kết quả |
+|---|---|---|
+| 1 | Dải 6 chuyên mục: chữ rớt một từ xuống dòng ("Vũ Trụ Phật / Giáo") | ✅ Hai dòng cân nhau (`text-wrap: balance`), thẻ có viền vàng mảnh |
+| 2 | Nút về đầu trang: số % đen trên nền đen (1:1) | ✅ Số vàng, phần vòng chưa cuộn là vàng nhạt thay cho trắng |
+| 3 | Lời Thầy dạy: tiêu đề và ô "11" đè lên chữ của áp phích tháng, áp phích bị cắt | ✅ Áp phích hiện nguyên (1200×1015), tiêu đề đưa lên trên khối, tháng và chủ đề là chú thích dưới áp phích; chấm chuyển câu không còn đè tên chủ đề |
+| 4 | Menu sổ ra khi rê chuột | ✅ Mở dưới con trỏ, mở dần từ trên xuống, từng mục hiện nối nhau; rời chuột 0,18 giây thì đóng. Bàn phím, chạm và Esc như cũ; `aria-expanded` theo đúng trạng thái |
+| 5 | Ảnh đại diện khu vực | ✅ Dùng bộ ảnh riêng từng khu của site cũ (`04-vu-tru-phat-giao/khu-vuc/`, 14 ảnh, đã kiểm cả 14 trả 200). Dữ liệu admin cũ chỉ có ảnh tạm: "toàn cảnh chùa" cho 5 khu, bìa sách cho Thư viện và Tứ Ân, `canh-1` cho 2 khu |
+| 6 | Icon đặt sai mục | ✅ Xem bảng dưới |
+| 7 | Hiệu ứng mượt | ✅ Mã không tắt hiệu ứng nào; ảnh chụp của chủ dự án cho thấy máy đang ở chế độ "giảm chuyển động" (dải chuyên mục đứng yên thành lưới), khi đó site tắt mọi hiệu ứng theo quyết định 02/11. Chủ dự án chọn "giữ hiệu ứng nhẹ" (17/11): ở chế độ đó khối hiện dần khi cuộn tới, menu sổ ra, nút và liên kết đổi màu êm; không có gì di chuyển (không cuộn mượt, không dải chạy, slider không tự chạy). Không thêm thư viện, không tải GSAP ở chế độ này: tốc độ tải không đổi |
+
+**Icon, theo đúng tên trong `bo-nhan-dien/README_BO_NHAN_DIEN.md`** (`SectionMark.tsx` nay có kiểu `BrandIcon` liệt kê đủ bộ):
+
+| Chỗ | Trước | Nay |
+|---|---|---|
+| Tiêu đề "Lộ trình tu học" | `tinh-do-nhan-gian` (hình đỏ, là mục bài viết) | `tong-chi-tu-hoc` (Lộ trình là một nhóm của Tông Chỉ; site cũ đánh dấu các thẻ này bằng icon đó) |
+| Tiêu đề "Chư Tôn Đức" | `phap-am` (chuông pháp âm) | logo tròn (bộ icon không có hình cho mục này) |
+| Tiêu đề "Lời Thầy dạy" | không có | `quote-chu-de` (đúng nghĩa: trích dẫn / chủ đề tháng) |
+| Ba ô số liệu ở Lời chào | icon mẫu Bexon (dấu tích, quả địa cầu, biểu đồ) | `dong-chay-hoang-phap`, `tri-tue-phat-phap`, `lich-tu-hoc` theo đúng thứ được đếm |
+| Năm nhóm Tông Chỉ | icon mẫu Bexon (`tji-service-1…5`) | `tong-chi-tu-hoc` |
+| Menu: Lịch sử Bổn tự, Chư Tôn Đức, Thanh quy | `dau-an-hoang-phap`, `quote-chu-de`, `phap-am` | logo tròn cho Lịch sử; chấm vàng (như menu site cũ) cho hai mục không có icon riêng |
+
+Chưa đổi: icon mục bài (`cong-tu`, `khoa-le-truyen-thong`, `dai-le-su-kien`) chưa hiện trên thẻ bài và thẻ lịch như site cũ; thanh điều hướng chấm dọc và thẻ có huy hiệu icon của site cũ (ảnh 7, 8) chưa làm, chờ chủ dự án xác nhận có cần không.
+
+**Kiểm chứng:** 253 test đơn vị (thêm 3 test ảnh khu vực), eslint 0 lỗi, `tsc`, build sạch. e2e trên máy chủ dev: `header home vu-tru tong-chi` 124 qua; 5 hỏng đều là quá 30 giây khi duyệt hàng chục trang trên máy chủ dev (chạy riêng từng test với thời gian chờ dài thì cả ba test đó đều qua). `a11y motion-guard` máy tính 80/80. Test menu đổi: mở dưới chuột, mở bằng bàn phím. Chưa deploy.
+
+**Tầng hiệu ứng nhẹ (thêm sau):** `motion-guard` đổi tên và nội dung: ở chế độ giảm chuyển động, mọi trang (24 trang × máy tính và điện thoại) không có gì đang di chuyển, không slider tự chạy, không cuộn mượt, và thứ đã vào màn hình thì hiện đủ; thêm test khối dưới màn hình hiện dần khi cuộn tới rồi trả lại như cũ, và test tắt JavaScript thì không khối nào bị ẩn. Máy tính 93 test (`motion-guard header`) và điện thoại 27 test đều qua; 253 test đơn vị, eslint 0 lỗi, build sạch.
+
+**Deploy `v2.` 17/11/2026:** phiên bản Worker `ff01a8b0` (9.993 KiB, nén 1.289 KiB, khởi động 2 ms), deploy bằng `scripts/deploy-v2.mjs` (lần chạy đầu của lệnh mới, nguồn nội dung `d1`). Trên `v2.`: các trang chính 200, trang lạ 404; ở cả hai chế độ chuyển động menu mở dưới chuột, 7 tiêu đề khối mang đúng icon, 14 khu vực mang 14 ảnh riêng; ở chế độ giảm chuyển động có 53 khối chờ hiện dần và không có cuộn mượt. e2e `smoke seo header home vu-tru tong-chi motion-guard a11y`: 298 qua, 40 bỏ qua, 1 chập chờn có sẵn (không dịch bố cục khi tải). 3 hỏng ở lượt đầu: test axe trang chủ (2 khổ) đo chữ khi khối đang hiện dần giữa chừng, đã sửa test chờ hiện xong rồi mới đo, chạy lại 2/2 qua; `vu-tru:114` khổ điện thoại hỏng một lần khi chạy 4 luồng, chạy riêng thì qua. Bản trước để lùi: `a6e935fd`.

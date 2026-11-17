@@ -88,6 +88,16 @@ START: Back to top CSS
 	border: 0;
 	color: inherit;
 }
+// On the dark theme the ring's ground and the number were both đen mun (1:1): the number is
+// gold, and the part of the ring still to go is a faint gold instead of white.
+#tj-back-to-top {
+	--tlhp-ring-track: rgb(242 193 78 / 0.22);
+}
+#tj-back-to-top-percentage {
+	color: var(--tj-color-theme-primary);
+	font-size: 13px;
+	font-variant-numeric: tabular-nums;
+}
 // The scroll percentage, kept out of the button's text (BackToTop.js).
 #tj-back-to-top-percentage[data-value]::after {
 	content: attr(data-value);

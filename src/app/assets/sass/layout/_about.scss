@@ -480,3 +480,10 @@ START: About CSS
 		object-fit: cover;
 	}
 }
+
+// TLHP: the figures of Lời chào wear the temple's icons (About2.js), not Bexon's glyphs.
+.countup-item .count-icon img {
+	width: 62%;
+	height: 62%;
+	object-fit: contain;
+}

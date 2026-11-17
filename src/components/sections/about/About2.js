@@ -5,7 +5,8 @@ import { site } from "@/config/site";
 import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
 import { youtubeEmbed } from "@/libs/video";
 
-const ICONS = ["tji-complete", "tji-worldwide", "tji-growth"];
+// What each figure counts, by the temple's own icon for it: posts of Dòng Chảy, works of Trí Tuệ, the Buddhist year.
+const ICONS = ["dong-chay-hoang-phap", "tri-tue-phat-phap", "lich-tu-hoc"];
 // Bexon's grid places the figures around the greeting: one before it, two after the faces.
 const ORDERS = ["order-lg-1 order-3", "order-lg-4 order-4", "order-lg-5 order-5"];
 
@@ -17,7 +18,7 @@ const Figure = ({ stat, index }) => (
 	<div className={`col-lg-4 col-md-6 ${ORDERS[index]}`}>
 		<div className="countup-item style-2 wow fadeInUp" data-wow-delay={`.${1 + index * 2}s`}>
 			<span className="count-icon" aria-hidden="true">
-				<i className={ICONS[index]}></i>
+				<img src={`/brand/icons/icon-${ICONS[index]}.webp`} alt="" width={128} height={128} loading="lazy" decoding="async" />
 			</span>
 			<span className="steps" aria-hidden="true">
 				0{index + 1}.

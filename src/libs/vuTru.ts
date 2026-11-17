@@ -1,7 +1,8 @@
 // Vũ Trụ Phật Giáo for the pages: the temple's areas in map order, each numbered with its pin,
 // and the statues standing in an area (config/vuTru.ts holds what the data lacks).
 import { vuTru } from "@/config/vuTru";
-import type { Area, StatueSummary } from "@/libs/content/types";
+import { mediaUrl } from "@/libs/content/media";
+import type { Area, MediaImage, StatueSummary } from "@/libs/content/types";
 
 export type MapArea = Area & {
 	/** Its number on the map and in the lists, 1 for the first pin. */
@@ -12,6 +13,13 @@ export type MapArea = Area & {
 
 /** What a card or a slide needs of an area (a page sends no more to the browser). */
 export type AreaTeaser = Pick<MapArea, "slug" | "number" | "name" | "subtitle" | "cover">;
+
+/** An area's own picture (config/vuTru.ts), or the admin's when the set has none for it. */
+export function areaCover(area: Pick<Area, "slug" | "cover">): MediaImage | null {
+	const file = vuTru.covers[area.slug];
+	const src = file ? mediaUrl(`${vuTru.coverFolder}/${file}`) : null;
+	return src ? { src, position: "center 50%" } : area.cover;
+}
 
 /**
  * The areas of Tùng Lâm Hòa Phúc in the map's order, then any area the map does not know
@@ -29,7 +37,7 @@ export function templeAreas(areas: Area[]): MapArea[] {
 		.sort((a, b) => rank(a.area) - rank(b.area) || a.index - b.index)
 		.map(({ area }, at) => {
 			const pin = vuTru.pins.find((item) => item.slug === area.slug);
-			return { ...area, number: at + 1, pin: pin ? { x: pin.x, y: pin.y } : area.mapPos };
+			return { ...area, cover: areaCover(area), number: at + 1, pin: pin ? { x: pin.x, y: pin.y } : area.mapPos };
 		});
 }
 

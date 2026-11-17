@@ -39,7 +39,6 @@ const Services2 = ({ groups, page = false }) => {
 											{groups.map((group) => (
 												<li key={group.slug}>
 													<a href={`${tongChi.path}#${group.slug}`}>
-														<i className={group.icon} aria-hidden="true"></i>
 														{group.name}
 													</a>
 												</li>

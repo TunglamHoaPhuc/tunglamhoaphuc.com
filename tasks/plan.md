@@ -95,7 +95,7 @@ Lộ trình có 3 mốc:
    | `--tj-ff-heading`, `--tj-ff-body` | Mona Sans | Noto Serif, Be Vietnam Pro (`next/font`, subset `vietnamese`) |
    | `--tj-fs-h1…h6`, `--tj-fs-body` (74/48/32/24/20/18, 16px) | Cỡ chữ | Thang `--tlhp-text-*` (display 44→80 … body 17→18px), line-height tiêu đề ≥ 1.15 |
 
-3. **Giữ hiệu ứng nhưng có công tắc.** Mọi hiệu ứng trong `ClientWrapper`, wow.js, autoplay Swiper, preloader, magic cursor, odometer, chữ chạy tắt khi `prefers-reduced-motion: reduce`; magic cursor tắt trên thiết bị cảm ứng. Cuộn mượt không được làm hỏng cuộn bằng bàn phím, liên kết neo và tìm trong trang. Vẫn cấm: toast/hộp thông báo nổi, hộp thoại tự bật khi tải trang (kể cả popup chào mừng của site cũ), banner cookie nổi, bong bóng chat nổi.
+3. **Giữ hiệu ứng nhưng có công tắc.** Mọi hiệu ứng trong `ClientWrapper`, wow.js, autoplay Swiper, preloader, magic cursor, odometer, chữ chạy tắt khi `prefers-reduced-motion: reduce`; magic cursor tắt trên thiết bị cảm ứng. Cuộn mượt không được làm hỏng cuộn bằng bàn phím, liên kết neo và tìm trong trang. Vẫn cấm: toast/hộp thông báo nổi, hộp thoại tự bật khi tải trang (kể cả popup chào mừng của site cũ), banner cookie nổi, bong bóng chat nổi. **Sửa 17/11/2026 (chủ dự án quyết):** khi hệ điều hành bật "giảm chuyển động", site giữ tầng hiệu ứng nhẹ, tức những gì không di chuyển trên màn hình: khối hiện dần khi cuộn tới (chỉ đổi độ trong), menu sổ ra tại chỗ, liên kết và nút đổi màu êm. Vẫn tắt hẳn: cuộn mượt, parallax, chữ tách ký tự, dải chạy, slider tự chạy và mọi chuyển động có dịch vị trí hay đổi kích thước (`src/libs/calmMotion.ts`, `components/_reduced-motion.scss`, test `motion-guard`).
 4. **Kho mã phải riêng tư** (chứa mã Bexon và Font Awesome Pro theo giấy phép ThemeForest). File zip và bản gốc chưa sửa (`reference/bexon/`) nằm trong `.gitignore`.
 5. **Lớp nội dung có "đường nối".** Trang (server component) gọi `ContentRepository` rồi truyền props cho section Bexon. Ba nguồn cài đặt cùng một interface, đổi bằng biến `CONTENT_SOURCE`:
    - `snapshot`: đọc file trong `data/snapshot/` (phát triển, test);
@@ -223,11 +223,11 @@ CHUYỂN HẲN: T39 Đóng băng admin cũ → nhập lần cuối → www đọ
 
 ## Danh sách task
 
-Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu, cách kiểm chứng, file dự kiến, quy mô) nằm trong [todo.md](todo.md). Task có hậu tố a/b được tách từ một task lớn để mỗi phần ≤ 5 file. Tổng cộng 53 task, 10 checkpoint.
+Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu, cách kiểm chứng, file dự kiến, quy mô) nằm trong [todo.md](todo.md). Task có hậu tố a/b được tách từ một task lớn để mỗi phần ≤ 5 file. Tổng cộng 58 task (thêm T42a–T42e ngày 17/11), 10 checkpoint.
 
 ### Giai đoạn 1 – Nền móng
 - [x] T1: Chạy nguyên trạng Bexon trên Cloudflare Workers (`v2.`)
-- [ ] T1b: Kho mã GitHub riêng tư và CI
+- [ ] T1b: Kho mã GitHub riêng tư và CI (phần mã xong 17/11, chờ kho GitHub: câu hỏi mở #7; xem docs/van-hanh/ci.md)
 - [x] T2: Gỡ trang, thư viện thừa và thêm công tắc giảm chuyển động
 - [x] T3a: Cầu nối theme TLHP: màu, font, cỡ chữ
 - [x] T3b: Quét màu viết cứng, chỉnh chữ tiếng Việt và trang styleguide
@@ -260,18 +260,18 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 
 ### Giai đoạn 3 – Ra mắt sớm trên www
 - [ ] T19: Đọc dữ liệu trực tiếp từ B2 (phần mã xong 14/11, chờ chuẩn bị #4: bucket và khóa chỉ đọc; xem docs/van-hanh/nguon-b2.md)
-- [ ] T20: SEO trước ra mắt
-- [ ] T21: Đưa admin cũ sang `quantri.tunglamhoaphuc.com` sau Cloudflare Access (làm được ngay, giải quyết HT-01)
+- [ ] T20: SEO trước ra mắt (phần mã xong, đã deploy `v2.` 17/11; còn bật Web Analytics trên `www` và kiểm Rich Results Test)
+- [ ] T21: Đưa admin cũ sang `quantri.tunglamhoaphuc.com` sau Cloudflare Access (làm được ngay, giải quyết HT-01; phần 1 xong 02/11: Zero Trust, 2 ứng dụng Access, Worker `tlhp-admin-guard`; phần 2 chuyển sang `quantri.` chưa làm)
 - [x] T41d: Ảnh nội dung qua Image Transformations của Cloudflare (điều kiện của T22; đổi từ bản thu nhỏ trên R2, xong 04/11)
 - [x] T41f: Font, icon font, hiệu ứng khởi động sau và ảnh tĩnh (đợt 1 tối ưu hiệu suất, thêm 04/11; điều kiện của T22; xong 04/11)
 - [x] T41a: Gọn CSS, icon font và bớt phần phải hydrate (đợt 2; kéo lên từ giai đoạn 6 ngày 04/11, điều kiện của T22; xong 05/11, còn 2 tiêu chí chuyển sang T41e)
 - [x] T41e: Cache HTML và RSC ở edge (đợt 3, điều kiện của T22; phần cache xong 05/11, TTFB p75 86–105 ms; còn "Làm mới site" chờ T19, trang có tham số truy vấn, HTML ≤ 120 KB, kiểm chi phí yêu cầu trên gói Free)
-- [ ] T22: Kiểm thử trước ra mắt và chuyển `www`
+- [ ] T22: Kiểm thử trước ra mắt và chuyển `www` (phần mã và tài liệu xong 17/11, chưa chuyển, chưa diễn tập quay lại; chờ T19 khóa B2, T21 phần 2, T17b, duyệt của Ban Trị Sự; xem docs/van-hanh/chuyen-www.md)
 - [ ] **Checkpoint E** – ra mắt `www`, theo dõi 48 giờ
 
 ### Giai đoạn 4 – Dữ liệu D1 (song song với giai đoạn 3)
-- [ ] T23: Schema D1 và script nhập
-- [ ] T24: Repository D1 và contract test
+- [x] T23: Schema D1 và script nhập (xong 17/11; D1 thật `tlhp-db` đã tạo và nhập đủ, xem docs/van-hanh/d1.md)
+- [ ] T24: Repository D1 và contract test (xong 17/11, `v2.` đọc D1, e2e xanh; còn `revalidateTag`)
 - [ ] T25: Đếm lượt xem theo ngày
 - [ ] T26: Đăng ký khóa tu (công khai)
 - [ ] **Checkpoint F** – dữ liệu khớp, đăng ký chạy đầu-cuối trên `v2.`

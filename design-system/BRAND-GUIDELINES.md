@@ -59,7 +59,7 @@ Hệ thống giao thoa hai nguồn:
 |---|---|---|
 | **Khoảng lặng** | Khoảng trống là một phần của nội dung | Section 64→120px; tối đa 1 lời kêu gọi chính mỗi màn hình; đoạn văn ≤ 720px |
 | **Chất liệu thật** | Màu đến từ vật liệu chùa, không từ màu điện tử | Không dùng xanh neon, tím, gradient cầu vồng; quầng sáng vàng chỉ ở tiêu đề lớn và viền thẻ khi hover (từ 17/11, xem mục 0) |
-| **Nhịp chậm** | Chuyển động chỉ để dẫn mắt, không để gây chú ý | Giữ bộ hiệu ứng của Bexon (hiện dần khi cuộn, cuộn mượt + parallax, chữ tách từng ký tự, dải chữ chạy, slider tự chạy, nút về đầu trang) theo quyết định ngày 02/11/2026. Mọi hiệu ứng tắt hẳn khi hệ điều hành bật "giảm chuyển động"; slider tự chạy ≥ 7 giây/khung, có nút tạm dừng, dừng khi di chuột hoặc focus; không âm thanh tự phát |
+| **Nhịp chậm** | Chuyển động chỉ để dẫn mắt, không để gây chú ý | Giữ bộ hiệu ứng của Bexon (hiện dần khi cuộn, cuộn mượt + parallax, chữ tách từng ký tự, dải chữ chạy, slider tự chạy, nút về đầu trang) theo quyết định ngày 02/11/2026. Mọi hiệu ứng có chuyển động tắt hẳn khi hệ điều hành bật "giảm chuyển động", chỉ còn tầng hiệu ứng nhẹ (sửa 17/11/2026, xem `tasks/plan.md` quyết định 3: khối hiện dần, menu sổ ra, đổi màu êm; không gì di chuyển); slider tự chạy ≥ 7 giây/khung, có nút tạm dừng, dừng khi di chuột hoặc focus; không âm thanh tự phát |
 | **Khiêm nhường** | Nội dung Phật pháp đứng trước, giao diện lùi sau | Thẻ phẳng, viền 1px; đỏ chu sa chỉ dành cho dấu ấn, đại lễ (≤ 5% bề mặt) |
 | **Dễ đọc cho người cao tuổi** | Ai cũng đọc được trên điện thoại | Thân bài 17–18px, dòng cao 1.7; tương phản thân bài ≥ 7:1; vùng chạm ≥ 48×48px |
 
