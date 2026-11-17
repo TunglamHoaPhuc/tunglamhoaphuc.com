@@ -4,6 +4,9 @@
 
 export const MODEL = "@cf/google/gemma-4-26b-a4b-it";
 
+/** Part of the cache key of an answer: raise it when the prompt changes, so old answers are not served. */
+export const PROMPT_VERSION = 2;
+
 type Message = { role: "system" | "user"; content: string };
 
 const TEACHER =
@@ -15,9 +18,9 @@ const ANALYSIS_SHAPE = `{
   "wylie": "chuyển tự Wylie của cả câu",
   "full_translation": "nghĩa tiếng Việt của cả câu",
   "dictionary": { "vn": "nghĩa ngắn", "usage": "dùng khi nào" },
-  "table_rows": [ { "tibetan": "một từ", "phonetic": "phiên âm Lhasa", "wylie": "Wylie", "meaning": "nghĩa tiếng Việt", "pos": "từ loại tiếng Việt" } ],
+  "table_rows": [ { "tibetan": "một từ, viết bằng chữ Tạng", "phonetic": "phiên âm Lhasa", "wylie": "Wylie", "meaning": "nghĩa tiếng Việt", "pos": "từ loại tiếng Việt" } ],
   "syllables": [ {
-    "syllable": "một âm tiết", "wylie": "Wylie", "root": "chữ gốc", "prefix": "tiền tố hoặc -", "suffix": "hậu tố hoặc -", "vowel": "nguyên âm a/i/u/e/o",
+    "syllable": "một âm tiết, viết bằng chữ Tạng", "wylie": "Wylie của âm tiết", "root": "chữ gốc, viết bằng chữ Tạng", "prefix": "tiền tố bằng chữ Tạng hoặc -", "suffix": "hậu tố bằng chữ Tạng hoặc -", "vowel": "nguyên âm a/i/u/e/o",
     "spelling_steps": ["các bước đánh vần như sách Tạng"],
     "coach_guide": { "root_guide": { "ipa": "IPA", "tone": "thanh cao/thấp", "aspiration": "bật hơi hay không", "guide": "khẩu hình" }, "correction_tips": ["lỗi người Việt hay mắc"] }
   } ],
@@ -28,7 +31,10 @@ const ANALYSIS_SHAPE = `{
 /** The messages that ask for the analysis of a Tibetan text, as one JSON object. */
 export function analysisMessages(text: string): Message[] {
 	return [
-		{ role: "system", content: `${TEACHER} Chỉ trả lời bằng một đối tượng JSON đúng khuôn sau, không thêm chữ nào ngoài JSON:\n${ANALYSIS_SHAPE}` },
+		{
+			role: "system",
+			content: `${TEACHER} Mỗi âm tiết của đoạn là một mục trong "syllables", theo đúng thứ tự. Chỉ trả lời bằng một đối tượng JSON đúng khuôn sau, không thêm chữ nào ngoài JSON:\n${ANALYSIS_SHAPE}`,
+		},
 		{ role: "user", content: `Phân tích đoạn tiếng Tạng: ${text}` },
 	];
 }
@@ -36,7 +42,13 @@ export function analysisMessages(text: string): Message[] {
 /** The messages for a question of the learner about a Tibetan text. */
 export function askMessages(question: string, target: string): Message[] {
 	return [
-		{ role: "system", content: `${TEACHER} Trả lời bằng Markdown đơn giản (đậm, gạch đầu dòng), dưới 250 chữ.` },
-		{ role: "user", content: target ? `Đoạn tiếng Tạng đang học: ${target}\n\nCâu hỏi: ${question}` : question },
+		{
+			role: "system",
+			content: `${TEACHER} Trả lời bằng Markdown đơn giản (đậm, gạch đầu dòng), dưới 250 chữ.`,
+		},
+		{
+			role: "user",
+			content: target ? `Đoạn tiếng Tạng đang học: ${target}\n\nCâu hỏi: ${question}` : question,
+		},
 	];
 }

@@ -8,7 +8,9 @@ type WorkerEnv = { AI?: Ai; ASSETS?: Assets };
 
 export async function workerEnv(): Promise<WorkerEnv> {
 	try {
-		const workers = (await import("cloudflare:workers" as string)) as { env?: WorkerEnv };
+		const workers = (await import("cloudflare:workers" as string)) as {
+			env?: WorkerEnv;
+		};
 		return workers.env ?? {};
 	} catch {
 		return {};
@@ -62,7 +64,14 @@ export async function cachedJson<T extends { status?: string }>(kind: string, ke
 	}
 	const value = await make();
 	if (value.status === "success") {
-		await cache.put(request, Response.json(value, { headers: { "Cache-Control": "public, max-age=2592000" } })).catch(() => undefined);
+		await cache
+			.put(
+				request,
+				Response.json(value, {
+					headers: { "Cache-Control": "public, max-age=2592000" },
+				}),
+			)
+			.catch(() => undefined);
 	}
 	return value;
 }

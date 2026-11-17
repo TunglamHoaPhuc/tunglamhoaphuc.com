@@ -5,7 +5,9 @@ import { analysisMessages, askMessages, MODEL } from "./prompts";
 // without either.
 
 /** The part of the Workers AI binding these services use. */
-export type Ai = { run(model: string, input: Record<string, unknown>): Promise<unknown> };
+export type Ai = {
+	run(model: string, input: Record<string, unknown>): Promise<unknown>;
+};
 
 /** Longest text or question taken, so one request cannot run up the AI bill. */
 export const MAX_TEXT = 300;
@@ -27,7 +29,10 @@ export function syllablesOf(text: string): string[] {
 /** The text a model answered with, from either answer shape Workers AI gives. */
 export function answerText(result: unknown): string {
 	if (!result || typeof result !== "object") return typeof result === "string" ? result : "";
-	const value = result as { response?: unknown; choices?: { message?: { content?: unknown } }[] };
+	const value = result as {
+		response?: unknown;
+		choices?: { message?: { content?: unknown } }[];
+	};
 	if (typeof value.response === "string") return value.response;
 	if (value.response && typeof value.response === "object") return JSON.stringify(value.response);
 	const content = value.choices?.[0]?.message?.content;
@@ -68,10 +73,19 @@ export function shapeAnalysis(text: string, answer: Record<string, unknown> | nu
 		status: answer ? "success" : "fallback",
 		wylie: str(raw.wylie),
 		full_translation: translation,
-		dictionary: { vn: str(dictionary.vn) || translation, usage: str(dictionary.usage) },
+		dictionary: {
+			vn: str(dictionary.vn) || translation,
+			usage: str(dictionary.usage),
+		},
 		table_rows: list(raw.table_rows)
 			.map(obj)
-			.map((row) => ({ tibetan: str(row.tibetan), phonetic: str(row.phonetic), wylie: str(row.wylie), meaning: str(row.meaning), pos: str(row.pos, "Từ vựng") }))
+			.map((row) => ({
+				tibetan: str(row.tibetan),
+				phonetic: str(row.phonetic),
+				wylie: str(row.wylie),
+				meaning: str(row.meaning),
+				pos: str(row.pos, "Từ vựng"),
+			}))
 			.filter((row) => row.tibetan),
 		syllables: syllables.map((syllable) => {
 			const coach = obj(syllable.coach_guide);
@@ -85,13 +99,26 @@ export function shapeAnalysis(text: string, answer: Record<string, unknown> | nu
 				vowel: str(syllable.vowel, "a"),
 				spelling_steps: strings(syllable.spelling_steps),
 				coach_guide: {
-					root_guide: { ipa: str(root.ipa), tone: str(root.tone), aspiration: str(root.aspiration), guide: str(root.guide) },
+					root_guide: {
+						ipa: str(root.ipa),
+						tone: str(root.tone),
+						aspiration: str(root.aspiration),
+						guide: str(root.guide),
+					},
 					correction_tips: strings(coach.correction_tips),
 				},
 			};
 		}),
-		usage_context: { situation: str(usage.situation), cultural_notes: str(usage.cultural_notes), dialogue_examples: list(usage.dialogue_examples) },
-		buddhist_context: { scripture_quote: str(buddhist.scripture_quote), teachings: str(buddhist.teachings), philosophy_reflection: str(buddhist.philosophy_reflection) },
+		usage_context: {
+			situation: str(usage.situation),
+			cultural_notes: str(usage.cultural_notes),
+			dialogue_examples: list(usage.dialogue_examples),
+		},
+		buddhist_context: {
+			scripture_quote: str(buddhist.scripture_quote),
+			teachings: str(buddhist.teachings),
+			philosophy_reflection: str(buddhist.philosophy_reflection),
+		},
 	};
 }
 
@@ -110,7 +137,12 @@ export async function analyze(text: string, ai: Ai | undefined): Promise<Analysi
 		});
 		return shapeAnalysis(text, firstJsonObject(answerText(result)));
 	} catch (error) {
-		console.error(JSON.stringify({ event: "tibetan-analyze-error", message: error instanceof Error ? error.message : String(error) }));
+		console.error(
+			JSON.stringify({
+				event: "tibetan-analyze-error",
+				message: error instanceof Error ? error.message : String(error),
+			}),
+		);
 		return shapeAnalysis(text, null);
 	}
 }
@@ -128,13 +160,22 @@ export async function ask(question: string, target: string, ai: Ai | undefined):
 		});
 		return answerText(result).trim() || unavailable;
 	} catch (error) {
-		console.error(JSON.stringify({ event: "tibetan-ask-error", message: error instanceof Error ? error.message : String(error) }));
+		console.error(
+			JSON.stringify({
+				event: "tibetan-ask-error",
+				message: error instanceof Error ? error.message : String(error),
+			}),
+		);
 		return unavailable;
 	}
 }
 
 /** One page of sara_words_coords.json: its size in PDF points and its words, [x0, y0, x1, y1, text]. */
-export type PageWords = { width: number; height: number; words: [number, number, number, number, string][] };
+export type PageWords = {
+	width: number;
+	height: number;
+	words: [number, number, number, number, string][];
+};
 
 /**
  * The words of a page inside a rectangle drawn on it: `rect` is in pixels of the page as shown
@@ -169,7 +210,11 @@ const VOICE = "https://aipmtdd-tibetan-tts-service.hf.space/gradio_api/call/gene
 /** The address of a spoken Tibetan text, or `null` when the voice service does not answer. */
 export async function speak(text: string, fetcher: typeof fetch = fetch): Promise<string | null> {
 	try {
-		const call = await fetcher(VOICE, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ data: [text] }) });
+		const call = await fetcher(VOICE, {
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify({ data: [text] }),
+		});
 		const id = call.ok ? str(obj(await call.json()).event_id) : "";
 		if (!id) return null;
 		const stream = await fetcher(`${VOICE}/${encodeURIComponent(id)}`);

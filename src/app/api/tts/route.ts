@@ -8,5 +8,15 @@ export async function POST(request: Request) {
 	const text = tibetanText((await readBody(request))?.text);
 	if (!text) return json({ status: "error" }, 400);
 	const url = await speak(text);
-	return json(url ? { status: "success", audio_url: url, type: "neural_tibetan", text, speed: 0.75 } : { status: "fallback", text, speed: 0.75 });
+	return json(
+		url
+			? {
+					status: "success",
+					audio_url: url,
+					type: "neural_tibetan",
+					text,
+					speed: 0.75,
+				}
+			: { status: "fallback", text, speed: 0.75 },
+	);
 }

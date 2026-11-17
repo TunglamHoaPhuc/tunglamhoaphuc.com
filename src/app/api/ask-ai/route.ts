@@ -1,4 +1,5 @@
 import { ask, MAX_QUESTION, tibetanText } from "@/libs/tibetan/api";
+import { PROMPT_VERSION } from "@/libs/tibetan/prompts";
 import { cachedJson, json, readBody, workerEnv } from "@/libs/tibetan/server";
 
 // The Tibetan course (T17b): the learner's question about the text being studied, from Workers AI.
@@ -8,9 +9,12 @@ export async function POST(request: Request) {
 	if (!question) return json({ answer: "Mời nhập câu hỏi." }, 400);
 	const target = tibetanText(body?.target_text);
 	const { AI } = await workerEnv();
-	const result = await cachedJson("ask", `${target}\n${question}`, async () => {
+	const result = await cachedJson(`ask-v${PROMPT_VERSION}`, `${target}\n${question}`, async () => {
 		const answer = await ask(question, target, AI);
-		return { status: /chưa trả lời được/.test(answer) ? "fallback" : "success", answer };
+		return {
+			status: /chưa trả lời được/.test(answer) ? "fallback" : "success",
+			answer,
+		};
 	});
 	return json({ answer: result.answer });
 }

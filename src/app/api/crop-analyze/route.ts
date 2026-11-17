@@ -1,4 +1,5 @@
 import { analyze, tibetanText, wordsInRect } from "@/libs/tibetan/api";
+import { PROMPT_VERSION } from "@/libs/tibetan/prompts";
 import { cachedJson, json, pageWords, readBody, workerEnv } from "@/libs/tibetan/server";
 
 // The Tibetan course (T17b): the learner draws a rectangle on a page of the book. The words in
@@ -12,7 +13,16 @@ export async function POST(request: Request) {
 	const rect = Array.isArray(body.rect) ? body.rect.map(Number) : [];
 	const size = Array.isArray(body.canvas_size) ? body.canvas_size.map(Number) : [];
 	const text = tibetanText(page ? wordsInRect(page, rect, size) : "") || tibetanText(body.fallback_text);
-	if (!text) return json({ status: "error", message: "Không thấy chữ Tạng trong vùng đã chọn." });
-	const analysis = await cachedJson("analyze", text, () => analyze(text, AI));
-	return json({ ...analysis, status: "success", detected_text: text, cropped_image: null });
+	if (!text)
+		return json({
+			status: "error",
+			message: "Không thấy chữ Tạng trong vùng đã chọn.",
+		});
+	const analysis = await cachedJson(`analyze-v${PROMPT_VERSION}`, text, () => analyze(text, AI));
+	return json({
+		...analysis,
+		status: "success",
+		detected_text: text,
+		cropped_image: null,
+	});
 }
