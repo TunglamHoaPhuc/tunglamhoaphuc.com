@@ -1,0 +1,14 @@
+name: Content snapshot
+description: Puts data/snapshot/*.json in place (it is not in git), from cache or from the old site's public API.
+runs:
+  using: composite
+  steps:
+    - id: week
+      shell: bash
+      run: echo "week=$(date +%G-%V)" >> "$GITHUB_OUTPUT"
+    - uses: actions/cache@v4
+      with:
+        path: data/snapshot
+        key: snapshot-${{ hashFiles('scripts/fetch-snapshot.ts') }}-${{ steps.week.outputs.week }}
+    - shell: bash
+      run: test -f data/snapshot/posts.json -a -f data/snapshot/post-albums.json || npm run snapshot:fetch -- --albums

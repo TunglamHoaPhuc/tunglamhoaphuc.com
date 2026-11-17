@@ -42,10 +42,15 @@
 
 **Mô tả:** Theo HT-02: tạo kho GitHub riêng tư bằng tài khoản của chùa, đẩy mã từ T1 lên (zip, `reference/`, `.dev.vars` không lên kho). GitHub Actions chạy lint, typecheck, test, build, e2e trên mỗi pull request; nhánh `main` tự deploy lên `v2.` (Worker `tlhp-web`) bằng API token Cloudflare chỉ có quyền Workers trong tài khoản sở hữu zone. Secrets lưu trong GitHub, không nằm trong mã.
 
+**Tiến độ 17/11/2026: phần mã xong, chờ kho GitHub (câu hỏi mở #7).** Chưa có kho nên chưa chạy workflow trên GitHub; các lệnh trong đó đã chạy được trên máy. Việc của chủ site (tạo kho, token, secret, bật bảo vệ nhánh) và việc kiểm sau khi có kho: [docs/van-hanh/ci.md](../docs/van-hanh/ci.md).
+- `.github/workflows/ci.yml`: job `check` (lint, kiểm kiểu, test đơn vị, build) và job `e2e` (toàn bộ, trừ `visual`); `.github/workflows/deploy-v2.yml`: đẩy vào `main` thì test đơn vị, `npm run deploy:v2`, rồi `smoke` và `seo` vào `v2.`; chỉ bước deploy thấy secret.
+- `.github/actions/snapshot`: bản build gói `data/snapshot/` (không nằm trong git) nên mọi job phải có nó; lấy từ cache theo tuần, không có thì `snapshot:fetch -- --albums`. Giới hạn: nguồn đó là site cũ công khai, biến mất sau T22.
+- `git ls-files` không có zip, `reference/`, `.dev.vars` hay khóa nào (kiểm).
+
 **Tiêu chí nghiệm thu:**
 - [ ] Pull request làm hỏng 1 test thì CI báo đỏ, không merge được
 - [ ] Merge vào `main` thì `v2.` cập nhật trong ≤ 10 phút
-- [ ] `git ls-files` không có file zip, `reference/`, `.dev.vars` hay khóa bí mật nào
+- [x] `git ls-files` không có file zip, `reference/`, `.dev.vars` hay khóa bí mật nào
 
 **Kiểm chứng:**
 - [ ] Tạo pull request thử: hỏng test → đỏ; sửa → xanh → merge → `v2.` đổi
@@ -1657,13 +1662,18 @@
 
 **Mô tả:** Trên `v2.` với `CONTENT_SOURCE=b2`: lập danh sách mọi URL công khai từ dữ liệu (bài, tông chỉ, giới thiệu, khu vực, bảo tượng, trí tuệ) và kiểm từng URL trả 200; Lighthouse 6 mẫu trang; axe mọi mẫu trang; Ban Biên Tập soát 20 trang tiêu biểu. Trên app mới: `/admin*` và `/login` chuyển hướng sang `quantri.`. Gỡ route `www…/api/*` của Worker `tlhp-admin-guard` (T21) trước khi chuyển. Chuyển: gắn Workers Custom Domain `www.tunglamhoaphuc.com` (và tên miền gốc chuyển về `www`) cho Worker `tlhp-web`, gỡ bản ghi trỏ về Vercel. Ghi sẵn và diễn tập các bước quay lại Vercel. Theo dõi 48 giờ: log Worker, tỷ lệ 404, Web Analytics.
 
+**Tiến độ 17/11/2026: phần mã và tài liệu xong, chưa chuyển** (còn chờ T19 khóa B2, T21 phần 2, duyệt của Ban Trị Sự). Điều kiện và các bước ở [docs/van-hanh/chuyen-www.md](../docs/van-hanh/chuyen-www.md); các bước chuyển và quay lại ghi theo cấu hình hiện có nhưng **chưa diễn tập**.
+- `npm run check:urls -- --base=… [--write=…]` (`scripts/check-urls.ts`): lấy danh sách từ sitemap (dựng từ dữ liệu), kiểm từng địa chỉ trả 200 và có `h1`, thử lại khi 5xx, thoát mã 1 nếu có lỗi. Kết quả: **811/811** trên bản build và trên `v2.`; danh sách lưu ở `docs/van-hanh/url-cong-khai.txt`.
+- `/admin`, `/login`, `/van-hanh` (và đường con) chuyển 307 sang `quantri.` chỉ trên host công khai (`next.config.js`); `tunglamhoaphuc.com` chuyển 308 sang `www`. Đã đo: vinext làm mất chuỗi truy vấn khi chuyển sang tên miền khác, nên tên miền gốc nên dùng Redirect Rule của Cloudflare (ghi trong tài liệu).
+- `smoke.spec.ts` theo host: trên `www` không noindex, các trang chính 200, địa chỉ admin cũ chuyển sang `quantri.` (cục bộ giả lập bằng Host).
+
 **Tiêu chí nghiệm thu:**
-- [ ] 100% URL công khai từ dữ liệu trả 200 trên `v2.` trước khi chuyển (danh sách lưu trong repo)
+- [x] 100% URL công khai từ dữ liệu trả 200 trên `v2.` trước khi chuyển (danh sách lưu trong repo) (811/811, `docs/van-hanh/url-cong-khai.txt`; lặp lại bằng nguồn B2 khi có khóa)
 - [ ] Sau khi chuyển, e2e smoke xanh trên `https://www.tunglamhoaphuc.com`; `www/admin` chuyển sang `quantri.`
 - [ ] Các bước quay lại Vercel đã diễn tập, thực hiện được trong ≤ 15 phút
 
 **Kiểm chứng:**
-- [ ] `npm run check:urls -- --base=https://v2.tunglamhoaphuc.com`
+- [x] `npm run check:urls -- --base=https://v2.tunglamhoaphuc.com`
 - [ ] `BASE_URL=https://www.tunglamhoaphuc.com npm run test:e2e -- smoke`
 
 **Phụ thuộc:** T19, T20, T21, T41d (ảnh đúng cỡ trước khi khách thật vào), T41f và T41a (font, hiệu ứng, CSS), T41e (cache HTML ở edge)

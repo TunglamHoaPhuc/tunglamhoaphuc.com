@@ -1,0 +1,59 @@
+# T1b: every pull request (and every push to main) is checked before it can merge.
+# Branch protection on GitHub (Settings > Branches > main) must require both jobs below;
+# that setting is the owner's, see docs/van-hanh/ci.md.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CF_SEND_TELEMETRY: "false"
+
+jobs:
+  check:
+    name: Lint, types, unit tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      # The build bundles data/snapshot/*.json (not in git), so fetch it first.
+      - uses: ./.github/actions/snapshot
+      - run: npm run build
+
+  e2e:
+    name: End-to-end tests (desktop and phone)
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: ./.github/actions/snapshot
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      # playwright.config.ts starts `npm run preview` on port 4173 by itself. The picture
+      # comparison (visual) is on demand only.
+      - run: npx playwright test --grep-invert visual
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-results
+          path: test-results/
+          retention-days: 7

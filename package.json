@@ -13,7 +13,8 @@
 		"test:e2e": "playwright test",
 		"lhci": "lhci autorun",
 		"snapshot:check": "tsx scripts/check-snapshot.ts",
-		"snapshot:fetch": "tsx scripts/fetch-snapshot.ts"
+		"snapshot:fetch": "tsx scripts/fetch-snapshot.ts",
+		"check:urls": "tsx scripts/check-urls.ts"
 	},
 	"browserslist": [
 		">0.3%",
