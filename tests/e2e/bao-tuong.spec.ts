@@ -133,7 +133,8 @@ test.describe("Bảo Tượng Phật Giáo", () => {
 	test("a statue page asks for its pictures at display size", async ({ page }) => {
 		await open(page, THICH_CA);
 		const portrait = page.locator(".tlhp-about-portrait img");
-		await expect(portrait).toHaveAttribute("src", /^\/cdn-cgi\/image\/width=1280,/);
+		// The address asked for: kept in data-tlhp-src when the file did not arrive and the seal stands in.
+		expect(await portrait.evaluate((img) => (img as HTMLElement).dataset.tlhpSrc ?? img.getAttribute("src"))).toMatch(/^\/cdn-cgi\/image\/width=1280,/);
 		await expect(portrait).toHaveAttribute("fetchpriority", "low");
 		// A picture missing at the source shows the round seal; the address asked for is kept in data-tlhp-src.
 		const art = await page.locator("#nghe-thuat .tlhp-art-card img").evaluateAll((imgs) => imgs.map((img) => (img as HTMLElement).dataset.tlhpSrc ?? img.getAttribute("src")!));

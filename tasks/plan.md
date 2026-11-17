@@ -27,6 +27,7 @@ Lộ trình có 3 mốc:
 | Ra mắt | Ra mắt sớm trên `www` sau khi xong site công khai; admin cũ ở `quantri.tunglamhoaphuc.com` sau Access | Ảnh hưởng HT-01 (được giải quyết luôn) |
 | Tính năng mới | Đăng ký khóa tu, Hỏi AI, module Danh Tăng làm **sau** ra mắt sớm | – |
 | Tên miền xem thử | `v2.tunglamhoaphuc.com` (Worker `tlhp-web` đã gắn sẵn, noindex) | – |
+| Giao diện nền tối (13–17/11/2026) | Cả site dùng nền tối, vàng kim như web cũ; tiêu đề mục, tiêu đề trang và khẩu hiệu dùng UTM Niagara. Duyệt ngày 17/11 sau khi xem trên `v2.`. Chi tiết: `tasks/dong-bo-giao-dien.md`, BRAND-GUIDELINES mục 0 | Cập nhật TH-01 (nền mặc định không còn là ngà) và TH-03 (thêm UTM Niagara) |
 
 ## Đầu vào sẵn có
 
@@ -112,7 +113,7 @@ Lộ trình có 3 mốc:
    - Ảnh đã biến đổi vẫn tải ưu tiên thấp, không preload: quá hạn mức thì nó là ảnh gốc 7–9 MB.
    - Cục bộ (`dev`, `preview`) không có `/cdn-cgi/image`; route `/cdn-cgi/image/` trong app chuyển về ảnh gốc. Trên Cloudflare, edge trả lời trước nên route không chạy.
    - Ảnh mới ở admin mới (T30) chỉ cần một bản ≤ 2560px; `imageAt()` lo các cỡ, miễn nguồn nằm trong zone.
-9. **Chế độ đọc đặt `data-theme` trên khung đọc**, không đặt trên `<html>`, để Giấy dó / Đêm thiền chỉ đổi phần bài đọc.
+9. **Cả site mặc định nền tối: `<html data-theme="dark">`** (sửa 17/11/2026; trước đó chủ đề chỉ đặt theo khối và nền mặc định là ngà). Phần lấy theo web cũ nằm trong `utilities/_tlhp-night.scss`, nạp sau cầu nối. **Chế độ đọc vẫn đặt `data-theme` trên khung đọc**, không đổi `<html>`: mặc định Đêm thiền, chọn Ngà (`light`) hoặc Giấy dó (`sepia`) chỉ đổi phần bài đọc. Thẻ và khối tô màu chính dùng hai biến cầu nối mới `--tj-color-surface` và `--tj-color-primary-fill` để tự đổi theo chủ đề.
 10. **Trong thời gian chuyển tiếp, admin cũ là nơi soạn duy nhất.** Site mới chỉ đọc B2, không bao giờ ghi vào file JSON của admin cũ. Lượt xem mới ghi vào bảng `PageView` trong D1 (từ T25); số hiển thị = số cũ trong JSON + số mới trong D1.
 11. **Admin mới dùng cùng Bootstrap + cầu nối theme**, thêm `components/_admin.scss`. Không có trang `/login`: Cloudflare Access chặn ở cửa, middleware và mọi server action tự kiểm JWT Access phía server. Phân quyền 3 vai trò theo QT-05 (Super Admin · Ban Biên Tập · Điều Phối Viên) lưu trong D1; mọi thao tác ghi tạo `AuditLog`; xóa = chuyển Lưu trữ có xác nhận và khôi phục. Trang sửa riêng thay modal khổng lồ; phản hồi lưu hiện in-line, không toast.
 12. **Soạn thảo:** TipTap, lưu HTML đã làm sạch. Không dựng "Đồng bộ từ WordPress" và "Nhập từ Google Sheets".
@@ -367,6 +368,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 |---|---|
 | 1 | Bản đầu: dựng mới, chuyển mã Bexon sang TypeScript + Tailwind, bỏ hiệu ứng |
 | 2 | Giữ Bootstrap/SCSS của Bexon, đổi theme qua cầu nối biến `--tj-*` → `--tlhp-*`; xem thử trên `v2.` |
+| 11 | 17/11: chủ dự án duyệt giao diện nền tối kiểu web cũ làm mặc định cả site và UTM Niagara cho tiêu đề (nhánh `feat/chu-de-toi-web-cu`, đã lên `v2.`); quyết định 9 viết lại; thêm checklist `tasks/dong-bo-giao-dien.md`; BRAND-GUIDELINES lên bản 1.1.0 |
 | 10 | 13/11, sau T41b: chủ dự án đổi mục tiêu LCP từ < 2,0 s trong Lighthouse sang p75 ≤ 2,5 s của người dùng thật (Web Analytics, T20); Lighthouse CI chỉ cảnh báo thụt lùi; đóng Câu hỏi mở #6 |
 | 9 | 04/11, sau báo cáo PageSpeed điện thoại 44 điểm và đo đối chiếu với divineshop.vn (Lighthouse 13.6): thêm T41f (font, icon font, hiệu ứng khởi động sau, ảnh tĩnh); kéo T41a lên giai đoạn 3 và thêm phần bớt hydrate, CSS màn hình đầu; font chuyển từ T41b sang T41f; T22 cần thêm T41f, T41a; thêm rủi ro điểm hiệu suất |
 | 8 | 04/11, chủ dự án chọn xử lý ảnh bằng Cloudflare, không phụ thuộc bucket R2 `tlhp-media` và tên miền `media.`: T41d đổi sang Image Transformations của zone (đã bật, nguồn "This zone only", ảnh B2 qua `/anh-goc/`); quyết định 8 viết lại; chuẩn bị #7 bỏ; T30 chỉ cần một bản ≤ 2560px; T41b không còn phụ thuộc bản thu nhỏ trên R2 |

@@ -1,6 +1,6 @@
 # HỒ SƠ NHẬN DIỆN THƯƠNG HIỆU & DESIGN TOKENS – TÙNG LÂM HÒA PHÚC
 
-> Phiên bản 1.0.0 · 02/11/2026 · Áp dụng cho website tái cấu trúc (Next.js trên Cloudflare)
+> Phiên bản 1.1.0 · 17/11/2026 (bản 1.0.0: 02/11/2026; thay đổi ở mục 0) · Áp dụng cho website tái cấu trúc (Next.js trên Cloudflare)
 > Khung bố cục tham chiếu: [Bexon React Home-02](https://bexon-react.vercel.app/home-02) (đo trực tiếp CSS đã render ở 1440px)
 > Nguồn yêu cầu: [Bảng khảo sát Khao_Sat_Yeu_Cau](https://docs.google.com/spreadsheets/d/1rV0opZnf00H4B0ROK-BeBxWYAV5isukZcHWaBZDUK7w/edit) (các câu Q1, Q2, Q4, Q5, Q6, Q10–Q15)
 > Màu logo: lấy mẫu điểm ảnh từ file `logo-moc-an.webp` và `logo-tung-lam-hoa-phuc-tron.webp` đang dùng trên site.
@@ -13,6 +13,28 @@
 | [tailwind.config.js](tailwind.config.js) | `theme.extend` đầy đủ: colors, fontFamily, fontSize, borderRadius, boxShadow, spacing, motion, z-index. Đã biên dịch thử với Tailwind 3.4.17 và 4.1.11 |
 | [brand-tokens.json](brand-tokens.json) | Toàn bộ token dạng JSON để import vào React/Next.js, email HTML, ảnh OG (Satori), kèm bảng kiểm tra tương phản |
 | BRAND-GUIDELINES.md | Tài liệu này |
+
+---
+
+## 0. Cập nhật 17/11/2026 (bản 1.1.0): nền tối kiểu web cũ là mặc định
+
+Chủ dự án duyệt ngày 17/11/2026 sau khi xem trên `v2.`: cả site dùng nền tối, vàng kim như web cũ (`www`). Mục này **thay** những chỗ trái với nó ở các mục dưới; phần còn lại của tài liệu giữ nguyên hiệu lực.
+
+| Hạng mục | Bản 1.0.0 | Từ 17/11/2026 |
+|---|---|---|
+| Chủ đề mặc định | Ngà (`:root`) | Tối: `<html data-theme="dark">`. Ngà và Giấy dó chỉ còn là lựa chọn trong chế độ đọc bài |
+| Nền | Ngà `#FAFAF5`, kem `#F4ECDD` | Đen mun `#1A120B`; nền xen kẽ và thẻ là gỗ lim `#2C1C11` |
+| Chữ | Đá `#35302B`, tiêu đề gỗ lim | Thân bài `#E3D2C1`; chữ phụ `#C9B896`; ngày tháng `#A69383` |
+| Tiêu đề lớn | Noto Serif, không phát sáng | UTM Niagara in hoa, vàng kim `#F2C14E`, quầng sáng 24px (bỏ điều cấm "glow vàng" ở mục 1.2) |
+| Dòng dẫn trên tiêu đề | Chip có khung | In hoa, giãn 0.22em, màu amber `#E5A93C`, không khung; phía trên có icon vàng |
+| Nút chính | Nền mộc, chữ ngà | Dải vàng `#F2C14E → #E5A93C`, chữ nâu đen; nút phụ là viên thuốc nâu `#4A3728 → #3D2B1F` viền vàng |
+| Thẻ | Phẳng, viền 1px, bo 12px | Dải `#2C1C11 → #1E140C`, viền vàng 22% (hover 55%), bo 14px, huy hiệu tròn giữa ảnh và chữ |
+| Header, footer | Kính mờ sáng; footer đen mun | Header `rgba(26,15,8,.95 → .84)` mờ nền 14px, menu in hoa 14px; footer dải `#3D2B1F → #2A1D14` |
+| Tỷ lệ màu trên trang | 60% ngà/kem · 25% chữ nâu-đá | 60% nâu đen · 25% chữ ngà ấm · 10% vàng kim · ≤ 5% chu sa (trên nền tối dùng `#D97A66`) |
+
+Giữ nguyên từ bản 1.0.0: ba màu neo và bảng màu gốc (mục 3.1, 3.2), Noto Serif cho tiêu đề phụ và kinh văn, Be Vietnam Pro cho nội dung, không chữ dưới 14px và đoạn văn ≥ 16px (web cũ dùng 10–13px, không lấy theo), tương phản AA, vùng chạm ≥ 44px, mọi quy tắc về chuyển động.
+
+Nơi khai báo: giá trị chủ đề tối trong [tokens.css](tokens.css) (`[data-theme="dark"]`), phần lấy theo web cũ trong `src/app/assets/sass/utilities/_tlhp-night.scss`, sửa bố cục trong `_tlhp-layout.scss`. Bảng đối chiếu từng tiểu tiết với web cũ: `tasks/dong-bo-giao-dien.md` mục 2. Cột "Đêm thiền" ở mục 3.3 là giá trị gốc của token; `_tlhp-night.scss` ghi đè chữ, tiêu đề, bề mặt và chữ phụ bằng các giá trị trong bảng trên.
 
 ---
 
@@ -36,12 +58,12 @@ Hệ thống giao thoa hai nguồn:
 | Nguyên tắc | Nghĩa là | Biểu hiện cụ thể |
 |---|---|---|
 | **Khoảng lặng** | Khoảng trống là một phần của nội dung | Section 64→120px; tối đa 1 lời kêu gọi chính mỗi màn hình; đoạn văn ≤ 720px |
-| **Chất liệu thật** | Màu đến từ vật liệu chùa, không từ màu điện tử | Không dùng xanh neon, tím, gradient cầu vồng; không glow vàng phát sáng như site cũ |
+| **Chất liệu thật** | Màu đến từ vật liệu chùa, không từ màu điện tử | Không dùng xanh neon, tím, gradient cầu vồng; quầng sáng vàng chỉ ở tiêu đề lớn và viền thẻ khi hover (từ 17/11, xem mục 0) |
 | **Nhịp chậm** | Chuyển động chỉ để dẫn mắt, không để gây chú ý | Giữ bộ hiệu ứng của Bexon (hiện dần khi cuộn, cuộn mượt + parallax, chữ tách từng ký tự, dải chữ chạy, slider tự chạy, nút về đầu trang) theo quyết định ngày 02/11/2026. Mọi hiệu ứng tắt hẳn khi hệ điều hành bật "giảm chuyển động"; slider tự chạy ≥ 7 giây/khung, có nút tạm dừng, dừng khi di chuột hoặc focus; không âm thanh tự phát |
 | **Khiêm nhường** | Nội dung Phật pháp đứng trước, giao diện lùi sau | Thẻ phẳng, viền 1px; đỏ chu sa chỉ dành cho dấu ấn, đại lễ (≤ 5% bề mặt) |
 | **Dễ đọc cho người cao tuổi** | Ai cũng đọc được trên điện thoại | Thân bài 17–18px, dòng cao 1.7; tương phản thân bài ≥ 7:1; vùng chạm ≥ 48×48px |
 
-**Tỷ lệ phân bổ màu trên một trang:** 60% nền ngà/kem · 25% chữ nâu-đá · 10% mộc + hoại sắc · ≤ 5% chu sa + đồng.
+**Tỷ lệ phân bổ màu trên một trang** (chủ đề Ngà; chủ đề tối mặc định xem mục 0): 60% nền ngà/kem · 25% chữ nâu-đá · 10% mộc + hoại sắc · ≤ 5% chu sa + đồng.
 
 ### 1.3. Từ Bexon Home-02 sang Tùng Lâm Hòa Phúc
 
@@ -222,9 +244,9 @@ Bảng khảo sát Q1 (trạng thái "Đã chốt"): **Nâu trầm đất `#8354
 
 Lập trình viên dùng **màu vai trò** (`bg-background`, `text-foreground`, `bg-primary`…), không dùng thẳng màu gốc, để giao diện tự đổi theo chủ đề:
 
-- **Ngà** (mặc định, `:root`)
+- **Đêm thiền** (mặc định của cả site từ 17/11/2026: `<html data-theme="dark">`; lớp `.tlhp-dark` cho một section tối đứng riêng)
+- **Ngà** (giá trị gốc ở `:root`; chọn được trong chế độ đọc bài, `data-theme="light"` trên khung đọc)
 - **Giấy dó** (`data-theme="sepia"`, chế độ đọc kinh – Q14)
-- **Đêm thiền** (`data-theme="dark"` cho cả trang, hoặc lớp `.tlhp-dark` cho một section tối kiểu Bexon)
 
 | Vai trò | Lớp Tailwind | Biến CSS | Ngà | Giấy dó | Đêm thiền | Dùng cho |
 |---|---|---|---|---|---|---|
@@ -319,11 +341,12 @@ Các cặp chính (chủ đề Ngà):
 
 | Vai trò | Phông | Lý do chọn |
 |---|---|---|
-| **Tiêu đề, kinh văn, câu kệ** | **Noto Serif** (400, 500, 600, 700, nghiêng 400) | Có chân, trang trọng, nét thanh; Google thiết kế cho đủ dấu tiếng Việt chồng tầng; có trong danh sách Q5 đã chốt; miễn phí (OFL) |
+| **Tiêu đề mục, tiêu đề trang, khẩu hiệu hero** | **UTM Niagara** (400, in hoa) | Chữ tiêu đề của web cũ, chủ dự án chọn ngày 13/11/2026; tự host một file woff2 10 KB (`src/app/assets/fonts/tlhp/`), bảng tên của font ghi "Free for everyone"; cỡ 44 → 72px, hero 64 → 128px |
+| **Tiêu đề phụ, tiêu đề bài, kinh văn, câu kệ** | **Noto Serif** (400, 500, 600, 700, nghiêng 400) | Có chân, trang trọng, nét thanh; Google thiết kế cho đủ dấu tiếng Việt chồng tầng; có trong danh sách Q5 đã chốt; miễn phí (OFL) |
 | **Nội dung, giao diện, nút, form** | **Be Vietnam Pro** (400, 500, 600, 700, nghiêng 400) | Do người Việt thiết kế riêng cho tiếng Việt, dấu rõ và thoáng ở cỡ nhỏ, chiều cao chữ thường lớn dễ đọc cho người cao tuổi; dự phòng Inter |
 | Mã số | Font mono hệ thống | Mã đăng ký, mã bảo tượng `TP0001` |
 
-Đã loại: **Cinzel** (không có bộ ký tự tiếng Việt – đã kiểm tra trên Google Fonts, chỉ có latin/latin-ext), **Playfair Display** (tương phản nét quá mạnh, dấu nhỏ dễ mất ở cỡ dưới 20px), bộ **UTM** của site cũ (font thương mại cần giấy phép web, đang tải TTF nặng).
+Đã loại: **Cinzel** (không có bộ ký tự tiếng Việt – đã kiểm tra trên Google Fonts, chỉ có latin/latin-ext), **Playfair Display** (tương phản nét quá mạnh, dấu nhỏ dễ mất ở cỡ dưới 20px), **UTM Avo** và **UTM Classizism Antiqua** của site cũ (đang tải TTF nặng; Be Vietnam Pro và Noto Serif thay vai). Riêng UTM Niagara được dùng lại từ 13/11/2026, xem bảng trên.
 
 Nạp bằng `next/font/google` với `subsets: ['latin', 'vietnamese']` (subset `vietnamese` chỉ chứa ký tự có dấu, phải kèm `latin`), `display: 'swap'`, tự host trên Cloudflare.
 

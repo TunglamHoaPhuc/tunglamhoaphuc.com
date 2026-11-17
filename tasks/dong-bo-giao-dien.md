@@ -152,11 +152,11 @@ Mỗi trang đã được máy đo ở cả bốn cỡ và xem ảnh chụp ở 
 ### Đợt E – Kiểm tra và bàn giao
 
 - [x] E1. `tsc --noEmit` sạch, lint 0 lỗi (72 cảnh báo có từ trước), 187 unit test xanh.
-- [~] E2. E2E trên máy chủ dev (17/11): lượt đầy đủ máy tính 284 xanh, di động 257 xanh, mỗi bản 1 đỏ ở test bộ lọc Bảo tượng (bấm trước khi trang kịp chạy JavaScript trên dev; thử tay chạy đúng). Trên bản build (`npm run build`, cổng 4175), máy tính lượt đầu: 307 xanh, 2 đỏ do chính đợt này và đã sửa (đếm phông tải trước nay là 11 vì có UTM Niagara; test cỡ ảnh trang tượng đọc phải địa chỉ ấn tròn). Lượt chạy lại đầy đủ trên bản build cho cả hai bản đang chạy, chưa có kết quả. Test `visual` chưa chạy.
+- [x] E2. E2E trên bản build (`npm run build`, cổng 4175, 17/11), cả máy tính và di động, trừ `visual`: 590 xanh, 1 đỏ, 59 bỏ qua theo thiết kế của bộ test. Test đỏ là test cỡ ảnh trang tượng ở bản di động: ảnh chân dung không tải kịp một lần nên hiện ấn tròn và test đọc phải địa chỉ ấn tròn; đã cho test đọc địa chỉ đã xin (`data-tlhp-src`), chạy lại 3 lần ở mỗi bản đều xanh. Test bộ lọc Bảo tượng và test phân trang Dòng Chảy (từng đỏ trên máy chủ dev) đều xanh trên bản build. Test `visual` chưa chạy (xem E3).
 - [x] E2b. Ngân sách phông 200 KB: thêm UTM Niagara làm trang chủ tải 206 KB. Dòng khẩu hiệu ở footer là chỗ duy nhất dùng Noto Serif nghiêng và kéo theo 64,6 KB trên mọi trang; đổi sang chữ không chân nghiêng như web cũ. Trang chủ nay tải 141,3 KB phông.
-- [ ] E3. Chụp lại ảnh mẫu `visual.spec.ts` (chỉ khi chủ site duyệt giao diện)
-- [ ] E4. Cập nhật `BRAND-GUIDELINES.md`, quyết định 9 trong `tasks/plan.md`, bảng khảo sát (Q1, TH-03)
-- [ ] E5. Đưa lên `v2.` (chỉ khi chủ site bảo)
+- [x] E3. Chủ site duyệt giao diện ngày 17/11. Chụp lại 14 ảnh mẫu `visual.spec.ts` (7 trang × máy tính, di động) trên bản build cổng 4175; chạy lại lần hai 14/14 khớp. Ảnh mẫu nằm ngoài git theo `.gitignore`, chỉ có trên máy này.
+- [x] E4. `BRAND-GUIDELINES.md` lên bản 1.1.0 (mục 0 mới, sửa mục 1.2, 3.3, 4.1); `tasks/plan.md`: thêm dòng quyết định của chủ dự án, viết lại quyết định 9, thêm dòng lịch sử số 11; `khao-sat/khao-sat-yeu-cau-v2.csv`: cập nhật TH-01 và TH-03. Bảng Google Sheets gốc chưa sửa; TH-03 vẫn ghi "Chờ xác nhận" cho phông nội dung Be Vietnam Pro.
+- [x] E5. Đưa lên `v2.`: chủ site bảo ngày 17/11. Worker `tlhp-web` phiên bản `737859aa-9cc3-4b29-99f9-f61b018642ad` (9.800 KiB, nén 1.246 KiB, khởi động 2 ms). 11 trang chính trả 200, trang lạ trả 404, còn header noindex. 85 test (`theme`, `performance`, `home`, `bao-tuong`, cả máy tính và di động) chạy thẳng vào `v2.` đều xanh. Đường lùi: phiên bản trước `fce3f5db-7d60-4992-90b0-2287846e27a2` (giao diện sáng, deploy 13/11), đưa lại bằng `cf workers deployments create`. Lưu ý: deploy từ nhánh `chore/khoi-tao-du-an` sẽ đưa `v2.` về giao diện sáng cho tới khi nhánh này được gộp.
 
 ## 4. Kết quả máy đo (web mới, trước khi sửa)
 
@@ -191,3 +191,35 @@ Không ảnh nào trong 6.050 ảnh mang cờ xoay EXIF. 76 ảnh nặng trên 3
 - [?] P3. Logo Mộc Ấn treo dưới header như web cũ.
 - [?] P4. Gỡ 7 trang mẫu Bexon còn mở công khai (`/contact`, `/blogs`, `/services`, `/team`, `/history`, `/our-gallery`, `/portfolios`).
 - [?] P5. Thanh điều hướng chấm bên trái trang chủ của web cũ: không đưa sang vì che nội dung trên điện thoại.
+
+## 7. Việc còn lại và skill sẽ dùng (tra ngày 17/11/2026)
+
+Skill đã cài, lấy theo bảng trong `CLAUDE.md`:
+
+| Việc còn lại | Skill đã cài |
+|---|---|
+| E3 chụp lại ảnh mẫu `visual.spec.ts` | `ecc:e2e-testing`, `superpowers:verification-before-completion` |
+| E4 cập nhật `BRAND-GUIDELINES.md`, quyết định 9, bảng khảo sát | `agent-skills:documentation-and-adrs`, `ui-ux-pro-max:brand`, `xlsx` |
+| I5, I6, P1–P5 (menu, mạng xã hội, logo treo, gỡ trang mẫu) | `agent-skills:frontend-ui-engineering`, `ui-ux-pro-max`, `web-design-guidelines` |
+| Gộp nhánh `feat/chu-de-toi-web-cu` sau khi duyệt | `/code-review`, `superpowers:finishing-a-development-branch`, `agent-skills:git-workflow-and-versioning` |
+| T1b kho GitHub và CI | `agent-skills:ci-cd-and-automation`, `ecc:github-ops` |
+| T17b hai phòng đọc của Trí Tuệ | `agent-skills:spec-driven-development`, `agent-skills:frontend-ui-engineering` |
+| T19 đọc thẳng từ B2 (chờ khóa chỉ đọc) | `workers-best-practices`, `wrangler` |
+| T20 SEO trước ra mắt | `ecc:seo`, `web-perf` |
+| T21 admin cũ sang `quantri.` sau Access | `cloudflare-one`, `cf-cli` |
+| T41 phần còn lại, giới hạn CPU của Workers Free | `web-perf`, `workers-profiling`, `agent-skills:performance-optimization` |
+| T22 kiểm thử và chuyển `www` | `agent-skills:shipping-and-launch`, `ecc:canary-watch`, `/security-review` |
+| T23–T26 D1, lượt xem, đăng ký khóa tu | `cloudflare`, `ecc:database-migrations`, `agent-skills:test-driven-development`, `turnstile-spin` |
+| T27–T38 trang quản trị mới | `cloudflare-one`, `agent-skills:security-and-hardening`, `agent-skills:api-and-interface-design`, `ecc:dashboard-builder` |
+| T38b sao lưu, T39 chuyển hẳn sang D1 | `agent-skills:deprecation-and-migration`, `ecc:database-migrations` |
+| T40 khối "Hỏi AI Hòa Phúc" | `claude-api`, `agents-sdk` |
+
+Skill bên ngoài tìm bằng `skills find`, **chưa cài**, cần chủ site đồng ý và đọc nguồn trước khi dùng:
+
+| Việc | Skill gợi ý | Lượt cài |
+|---|---|---|
+| T23–T24 schema D1 | `jezweb/claude-skills@d1-drizzle-schema` | 1,7K |
+| T20 SEO | `coreyhaines31/marketingskills@seo-audit` | 256,8K |
+| T31 trình soạn thảo bài viết | `jezweb/claude-skills@tiptap` | 478 |
+| T1b CI | `callstackincubator/agent-skills@github-actions` | 12,4K |
+| E3 ảnh mẫu | `codeatcode/oss-ai-skills@playwright-visual-regression` | 24 (ít người dùng, `ecc:e2e-testing` đã đủ) |
