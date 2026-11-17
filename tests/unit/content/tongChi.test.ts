@@ -88,7 +88,7 @@ describe("Tông Chỉ bodies in Markdown", () => {
 			"tam-quy",
 		);
 		expect(out).toBe(
-			'<h2>Ý NGHĨA TAM QUY</h2>\n<blockquote><p>Quy là quay về, y là nương tựa.<br>— Vô Trí – Tâm Hòa</p></blockquote>\n<figure><img src="https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/09/image.png" alt="" loading="lazy" decoding="async"></figure>',
+			'<h2>Ý NGHĨA TAM QUY</h2>\n<blockquote><p>Quy là quay về, y là nương tựa.<br>— Vô Trí – Tâm Hòa</p></blockquote>\n<figure><img src="/anh-goc/wordpress/2026/09/image.png" alt="" loading="lazy" decoding="async"></figure>',
 		);
 		expect(notes).toEqual(["ảnh chưa có: https://admin.tunglamhoaphuc.com/wp-content/uploads/niem-phat.jpg", "[INFOGRAPHIC_TAM_BAO_TU_THAN]"]);
 	});
@@ -164,7 +164,7 @@ describe("Tông Chỉ file", () => {
 		expect(full.video).toEqual({ id: "MKt_sLwxmNU", url: "https://www.youtube.com/watch?v=MKt_sLwxmNU", title: "KHÓA LỄ NIỆM PHẬT", description: "Kinh hành niệm Phật." });
 		expect(full.featured).toEqual({ label: "Phương Pháp Hành Trì", title: "Pháp Môn Niệm Phật", author: "Vô Trí", href: null });
 		expect(full.book).toMatchObject({ title: "Niệm Phật & Tịnh Độ", cover: null, href: "/tri-tue-phat-phap/di-qua-kho-vui-cuoc-doi" });
-		expect(full.gallery).toEqual([{ src: "https://s2-cnv03.s3.us-east-005.backblazeb2.com/a.webp", title: "HÀNH GIẢ", caption: "Đạo tràng – Đại chúng trì niệm." }]);
+		expect(full.gallery).toEqual([{ src: "/anh-goc/s2-cnv03/a.webp", title: "HÀNH GIẢ", caption: "Đạo tràng – Đại chúng trì niệm." }]);
 		expect(full.keywords).toEqual([{ keyword: "Niệm Phật", title: "Phương Pháp Niệm Phật", description: "Trì danh hiệu." }]);
 		expect([empty.video, empty.book, empty.featured, empty.gallery]).toEqual([null, null, null, []]);
 		expect(issues).toEqual([{ kind: "unsaved-image", id: "niem-phat", message: "https://admin.tunglamhoaphuc.com/wp-content/uploads/niem-phat.jpg" }]);

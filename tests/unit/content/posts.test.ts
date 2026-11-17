@@ -69,7 +69,7 @@ describe("parsePosts", () => {
 		const post = bySlug("cong-tu-thang-10");
 		expect(post.gallery).toEqual([
 			{ src: `${MEDIA_BASE}/tunglamhoaphuc-com/wp-content/uploads/2026/10/1.jpg`, title: "Ảnh #1", caption: "Chư Tăng" },
-			{ src: "https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/10/2.jfif", title: "Ảnh #2", caption: "" },
+			{ src: "/anh-goc/wordpress/2026/10/2.jfif", title: "Ảnh #2", caption: "" },
 		]);
 		expect(post.galleryCount).toBe(2);
 		expect(kinds("emoji-image")).toEqual(["post-101"]);
@@ -196,8 +196,9 @@ describe.skipIf(!existsSync("data/snapshot/posts.json"))("real snapshot", () => 
 			...post.gallery.map((photo) => photo.src),
 			...[...post.contentHtml.matchAll(/src="([^"]+)"/g)].map((match) => match[1]),
 		];
-		const hosts = new Set(posts.flatMap(pictures).filter(Boolean).map((src) => new URL(src!).host));
-		expect([...hosts].sort()).toEqual([new URL(MEDIA_BASE).host, "admin.tunglamhoaphuc.com"].sort());
+		const hosts = new Set(posts.flatMap(pictures).filter(Boolean).map((src) => new URL(src!, "https://this-site.invalid").host));
+		// Pictures all come through this site's /anh-goc/ route: no B2 or WordPress address in a page.
+		expect([...hosts]).toEqual(["this-site.invalid"]);
 		for (const post of posts) {
 			expect(post.contentHtml, post.id).not.toMatch(/<script|<iframe|<style|javascript:/i);
 			expect(post.contentHtml, post.id).not.toMatch(/<[^>]+\son[a-z]+\s*=/i);

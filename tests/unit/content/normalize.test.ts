@@ -34,14 +34,15 @@ describe("mediaUrl", () => {
 		}
 	});
 
-	it("keeps WordPress uploads on WordPress, also when linked through the domain the new site takes over", () => {
+	it("sends WordPress pictures through /anh-goc/wordpress/, also when linked through the domain the new site takes over", () => {
 		const wp = "https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/10/65.jfif";
-		expect(mediaUrl(wp)).toBe(wp);
+		expect(mediaUrl(wp)).toBe("/anh-goc/wordpress/2026/10/65.jfif");
 		expect(mediaKey(wp)).toBeNull();
+		expect(mediaUrl("/anh-goc/wordpress/2026/10/65.jfif")).toBe("/anh-goc/wordpress/2026/10/65.jfif");
 		expect(mediaUrl("https://tunglamhoaphuc.com/wp-content/uploads/2024/06/a.mp3")).toBe(
 			"https://admin.tunglamhoaphuc.com/wp-content/uploads/2024/06/a.mp3",
 		);
-		expect(mediaUrl("http://www.tunglamhoaphuc.com/wp-content/uploads/x.jpg")).toBe("https://admin.tunglamhoaphuc.com/wp-content/uploads/x.jpg");
+		expect(mediaUrl("http://www.tunglamhoaphuc.com/wp-content/uploads/x.jpg")).toBe("/anh-goc/wordpress/x.jpg");
 		// Pages of the site itself stay where they are.
 		expect(mediaUrl("https://www.tunglamhoaphuc.com/lich-tu-hoc")).toBe("https://www.tunglamhoaphuc.com/lich-tu-hoc");
 	});

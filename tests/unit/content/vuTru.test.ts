@@ -67,7 +67,7 @@ describe("Vũ Trụ Phật Giáo file", () => {
 			["Đức Phật Pháp Hải Lôi Âm Như Lai", true, "/bao-tuong/duc_phat_phap_hai_loi_am_nhu_lai"],
 			["Đức Phật Thích Ca Mâu Ni", true, "/bao-tuong/sai_duoi"],
 		]);
-		expect(statues[0].image).toEqual({ src: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/a.webp", position: "center 20%" });
+		expect(statues[0].image).toEqual({ src: "/anh-goc/media-tunglamhoaphuc/a.webp", position: "center 20%" });
 		expect(issues.map((issue) => issue.message)).toEqual(['slug "sai_duoi" không kết thúc bằng mã TP0009', "Đức Phật Pháp Hải Lôi Âm Như Lai"]);
 	});
 });

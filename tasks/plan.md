@@ -299,6 +299,11 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [ ] T39: Chuyển hẳn sang D1 và admin mới
 - [ ] T40: Khối "Hỏi AI Hòa Phúc"
 - [x] T41b: Đo toàn site, ngân sách ảnh và Lighthouse CI (xong 13/11; mục tiêu LCP đổi sang số của người dùng thật, xem Câu hỏi mở #6)
+- [x] T42a: Kiểm kê chỗ v2 còn dùng chung với web cũ (xong 17/11: 21.424 ảnh, ≈ 3,65 GB; xem docs/van-hanh/tach-du-lieu.md)
+- [x] T42b: Chép ảnh sang bucket R2 riêng `tlhp-media` (xong 17/11: 20.912 ảnh, 2,95 GB, 558 ảnh lỗi đã liệt kê)
+- [x] T42c: `/anh-goc/` đọc từ R2, chuyển nguồn ảnh (mã xong 17/11, kiểm cục bộ; chờ deploy để kiểm trên `v2.`; phải xong trước khi tắt B2 và WordPress)
+- [ ] T42d: Bản sao JSON riêng của v2 (bucket `tlhp-data`, nguồn `r2`; chờ T19 và khóa B2)
+- [ ] T42e: Gỡ phụ thuộc cuối (sau T39, trước Checkpoint J)
 - [ ] **Checkpoint J** – hoàn tất, tắt admin cũ và WordPress theo kế hoạch Cloudflare
 
 ## Làm song song

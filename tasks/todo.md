@@ -2241,7 +2241,7 @@
 
 **Tiêu chí nghiệm thu:**
 - [x] `docs/van-hanh/tach-du-lieu.md` có sơ đồ và bảng host, bucket, số ảnh, dung lượng
-- [ ] Chủ dự án duyệt dung lượng và chi phí R2 (miễn phí 10 GB đầu; quá thì tính theo GB): dung lượng ≈ 3,65 GB, chờ duyệt
+- [x] Chủ dự án duyệt dung lượng và chi phí R2 (miễn phí 10 GB đầu; quá thì tính theo GB): dung lượng ≈ 3,65 GB; chủ dự án cho làm T42b ngày 17/11
 
 **Phụ thuộc:** không. **Quy mô:** S
 
@@ -2272,6 +2272,12 @@
 
 ### T42c: `/anh-goc/` đọc từ R2, chuyển nguồn ảnh
 
+**Kết quả 17/11/2026:** mã xong, kiểm cục bộ (workerd); **chưa deploy**, còn hai việc chỉ làm được trên `v2.` (xem ô tiêu chí).
+- Binding R2 `MEDIA` → `tlhp-media` trong `cloudflare.config.ts`. Route `/anh-goc/<bucket>/<key>` (`src/libs/content/mediaRoute.ts`, `serveMedia`) đọc R2 trước, rơi về B2 / WordPress khi R2 chưa có hoặc lỗi. Khóa R2: `<bucket>/<key>` cho B2, `wordpress/<đường dẫn sau uploads/>` cho WordPress. Chỉ ảnh (đuôi ảnh và `Content-Type: image/*`), chỉ `s2-cnv03`, `media-tunglamhoaphuc`, `wordpress`; từ chối khóa rỗng, `.`, `..`. `Cache-Control` 7 ngày giữ nguyên.
+- `mediaUrl()` nay cho ảnh B2 và WordPress ra `/anh-goc/<bucket>/<key>` và `/anh-goc/wordpress/<đường dẫn>` (`MEDIA_BASE` thành `/anh-goc/s2-cnv03`); `imageAt()` biến đổi các địa chỉ này; `topImagePriority` coi `/anh-goc/` là "low" như ảnh cũ. File không phải ảnh (mp3, pdf) vẫn giữ địa chỉ gốc, vì route chỉ phục vụ ảnh.
+- Test: `tests/unit/content/mediaRoute.test.ts` (ảnh có trong R2, thiếu → B2/WordPress, R2 lỗi, khóa lạ), `media.test.ts` (mediaUrl, mediaSource), `tests/e2e/image-origin.spec.ts` (test canh gác); sửa các kỳ vọng cũ về địa chỉ ảnh. `image-budget` xanh (desktop, 26 test).
+- Phần rơi về B2/WordPress **còn giữ**: bỏ ở T42e khi đã kiểm R2 đủ ảnh trên `v2.`. Ảnh lỗi 404 ở T42b (558) vẫn 404.
+
 **Mô tả:** Route `/anh-goc/<bucket>/<key>` (đã có ở T41d) đọc R2 trước, rơi về B2 / WordPress khi chưa có. Khi R2 đủ ảnh thì bỏ phần rơi về, và `mediaUrl()` không còn trả địa chỉ B2 hay WordPress.
 
 - Thêm binding R2 vào `cloudflare.config.ts`; giữ `Cache-Control` 7 ngày và chỉ ảnh.
@@ -2279,8 +2285,9 @@
 - Kiểm không còn request nào tới `admin.tunglamhoaphuc.com` hay bucket B2 từ trang công khai.
 
 **Tiêu chí nghiệm thu:**
-- [ ] Trang chủ, Dòng Chảy, Lịch, Bảo Tượng: không có request ảnh tới B2, WordPress, `www` cũ (test canh gác)
-- [ ] Ảnh Image Transformations vẫn qua `/cdn-cgi/image` và đạt ngân sách của T41c
+- [x] Trang chủ, Dòng Chảy, Lịch, Bảo Tượng (và Giới Thiệu, Tông Chỉ, Vũ Trụ): không có request ảnh tới B2, WordPress, `www` cũ (test canh gác `image-origin.spec.ts`, kiểm cục bộ; chạy lại trên `v2.` sau deploy)
+- [x] Ngân sách ảnh của T41c: `image-budget.spec.ts` xanh (cục bộ)
+- [ ] Sau deploy: ảnh qua `/cdn-cgi/image` của zone đọc được nguồn `/anh-goc/` từ R2 (cục bộ `/cdn-cgi/image` chỉ là đường chuyển hướng); đọc thật từ R2 thay vì B2 (cục bộ R2 mô phỏng rỗng)
 
 **Phụ thuộc:** T42b. **Quy mô:** M
 

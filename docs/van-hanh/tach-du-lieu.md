@@ -113,4 +113,4 @@ npm run media:copy -- --verify           # đối chiếu số khóa, tổng dun
 ```
 
   Cần `cf auth` với profile `tlhp` và `CLOUDFLARE_ACCOUNT_ID` như trên (mặc định trong script). Báo cáo ghi ở `data/snapshot/media-copy/` (đã nằm trong `.gitignore`). Khi dữ liệu snapshot thêm ảnh mới thì chạy lại là đủ. Ảnh đã chép không bị ghi đè khi nguồn đổi; muốn thay phải xóa khóa trong R2 trước.
-- **Chưa làm:** T42c (route `/anh-goc/` đọc R2, binding) và deploy. Ảnh của 157 trang bên ngoài không chép.
+- **T42c (mã xong 17/11):** binding `MEDIA` trong `cloudflare.config.ts`, route `/anh-goc/` đọc R2 trước rồi rơi về B2/WordPress. **Chưa làm:** deploy. Ảnh của 157 trang bên ngoài không chép.

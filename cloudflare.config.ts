@@ -25,6 +25,8 @@ export default defineConfig({
     ...cache,
     env: {
       ASSETS: bindings.assets(),
+      // Original pictures (T42b, T42c): read by /anh-goc/, private, no public domain.
+      MEDIA: bindings.r2({ name: "tlhp-media" }),
       ...cache.env,
     },
     exports: { ...cache.exports },

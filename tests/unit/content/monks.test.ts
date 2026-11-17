@@ -32,7 +32,7 @@ describe("Danh Tăng", () => {
 				era: "Thời Cổ đại",
 				subEra: "Triều Đinh",
 				// Both B2 addresses become the one the site uses.
-				avatar: "https://s2-cnv03.s3.us-east-005.backblazeb2.com/a/k.webp",
+				avatar: "/anh-goc/s2-cnv03/a/k.webp",
 				dharmaQuote: "Đạo pháp và dân tộc luôn song hành.",
 				bio: "Thiền sư đời thứ 4.",
 				coordinates: { x: 48, y: 28 },

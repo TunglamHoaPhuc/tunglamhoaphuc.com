@@ -47,7 +47,7 @@ describe("schedule file", () => {
 					timeSlot1Time: "08h00 và 14h00",
 					timeSlot2Label: "",
 					timeSlot2Time: "",
-					imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/a.webp",
+					imgUrl: "https://bucket-la.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/a.webp",
 					imgPositionY: 33,
 					videoUrl: "https://www.youtube.com/watch?v=_amloxxse2c&list=PL2",
 				},

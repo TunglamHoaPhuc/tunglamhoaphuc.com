@@ -42,7 +42,7 @@ describe("Giới thiệu file", () => {
 			group: { slug: "nguoi-lien-quan", name: "Người Liên Quan" },
 			milestones: [{ label: "Năm 1901", title: "Thân thế", description: "Sinh tại Thái Bình." }],
 			quote: { title: "LỜI NHẮC NHỞ", lines: ["Hạnh phúc thật sự"], author: "Sa Môn Thích Tâm Hòa" },
-			gallery: [{ src: "https://s2-cnv03.s3.us-east-005.backblazeb2.com/a.jpg", caption: "Chân dung" }],
+			gallery: [{ src: "/anh-goc/s2-cnv03/a.jpg", caption: "Chân dung" }],
 			book: { title: "Đi Qua Khổ Vui Cuộc Đời", cover: null },
 			portrait: null,
 		});
