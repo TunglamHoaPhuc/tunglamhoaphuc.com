@@ -264,6 +264,90 @@ $faint: #a69383; // old site dates (5.9:1 on #2c1c11)
 		}
 	}
 
+	// The round gold medal where a card's picture meets its words (old site lists).
+	.tlhp-post-card .blog-content,
+	.tlhp-area-card .project-content,
+	.tlhp-statue-card .team-content {
+		position: relative;
+		padding-top: 36px;
+		&::before {
+			content: "";
+			position: absolute;
+			top: -22px;
+			inset-inline-start: 18px;
+			width: 44px;
+			height: 44px;
+			border: 1px solid var(--tlhp-gold-line-strong);
+			border-radius: 50%;
+			background: #1a120b url("/brand/icons/icon-tong-chi-tu-hoc.webp") center / 26px 26px no-repeat;
+			box-shadow: 0 0 14px rgb(242 193 78 / 0.22);
+			pointer-events: none;
+			z-index: 3;
+		}
+	}
+	.tlhp-area-card .project-content::before {
+		background-image: url("/brand/icons/icon-cac-khu-vuc-noi-bat.webp");
+	}
+	.tlhp-statue-card .team-content::before {
+		background-image: url("/brand/icons/icon-cac-bao-tuong-noi-bat.webp");
+	}
+
+	// Dates and view counts step back (old site #A69383).
+	.tlhp-post-card-meta,
+	.tlhp-article-meta {
+		color: var(--tlhp-faint);
+	}
+
+	// Inner page banner: the picture sinks into the page under a brown veil, and a small
+	// medal sits over the title, as on the old inner pages.
+	.tj-page-header {
+		background-color: #2a1d14;
+		// Bexon's banner stood 480px tall for one line of title; the old site's is compact.
+		@media (min-width: 1200px) {
+			padding-top: 104px;
+			padding-bottom: 96px;
+		}
+	}
+	.page-header-overlay {
+		background-image: linear-gradient(rgb(42 29 20 / 0.45) 0%, rgb(42 29 20 / 0.72) 50%, var(--tlhp-bg) 100%);
+		opacity: 1;
+	}
+	.tj-page-header-content::before {
+		content: "";
+		display: block;
+		width: 40px;
+		height: 40px;
+		margin: 0 auto 14px;
+		border: 1px solid var(--tlhp-gold-line-strong);
+		border-radius: 50%;
+		background: rgb(26 18 11 / 0.7) url("/brand/icons/icon-dau-an-hoang-phap.webp") center / 24px 24px no-repeat;
+		box-shadow: 0 0 14px rgb(242 193 78 / 0.22);
+	}
+
+	// Home sections with a centred title stand under a faint gold light (the old home page
+	// used blurred photographs here; a gradient costs no download).
+	.tlhp-upcoming,
+	.tlhp-area-slider,
+	.tlhp-teachers {
+		background-image: radial-gradient(ellipse 55% 320px at 50% 0, rgb(242 193 78 / 0.08), transparent 72%);
+	}
+
+	// Tông Chỉ: the opening words in one centred column with a gold initial.
+	.tlhp-tong-chi-intro {
+		.row {
+			justify-content: center;
+		}
+		.tlhp-section-lead::first-letter {
+			float: left;
+			margin: 6px 12px 0 0;
+			font-family: var(--tlhp-font-serif);
+			font-size: 3.4em;
+			font-weight: 600;
+			line-height: 0.82;
+			color: var(--tlhp-gold);
+		}
+	}
+
 	// Header: dark glass with a gold line; menu in spaced capitals.
 	.header-area .header-wrapper,
 	.header-area.sticky {
@@ -295,6 +379,38 @@ $faint: #a69383; // old site dates (5.9:1 on #2c1c11)
 		background-color: #2a1d14;
 		background-image: linear-gradient(#3d2b1f, #2a1d14);
 		border-top: 1px solid rgb(242 193 78 / 0.28);
+		// The temple's name over the columns, and a low gold swell along the foot.
+		.tlhp-footer-head {
+			padding: 48px 16px 0;
+			text-align: center;
+		}
+		.tlhp-footer-name {
+			margin: 0;
+			font-family: "UTM Niagara", "UTM Niagara Fallback", var(--tlhp-font-serif);
+			font-size: clamp(2.5rem, 1.9rem + 2.4vw, 3.75rem);
+			line-height: 1.15;
+			letter-spacing: 0.06em;
+			text-transform: uppercase;
+			color: var(--tlhp-gold);
+			text-shadow: var(--tlhp-gold-glow);
+		}
+		.tlhp-footer-head::after {
+			content: "";
+			display: block;
+			width: min(320px, 70%);
+			height: 1px;
+			margin: 18px auto 0;
+			background: linear-gradient(to right, transparent, var(--tlhp-gold-line-strong), transparent);
+		}
+		.tlhp-footer-wave {
+			position: absolute;
+			inset-inline: 0;
+			bottom: 0;
+			height: clamp(90px, 14vw, 180px);
+			background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 160' preserveAspectRatio='none'%3E%3Cpath d='M0 90C240 30 480 150 720 100S1200 20 1440 80V160H0Z' fill='%23f2c14e' fill-opacity='.07'/%3E%3Cpath d='M0 120C300 70 520 160 800 120S1260 110 1440 60V160H0Z' fill='%23f2c14e' fill-opacity='.06'/%3E%3C/svg%3E") bottom center / 100% 100% no-repeat;
+			pointer-events: none;
+			z-index: -1;
+		}
 		.footer-widget .title {
 			font-family: var(--tlhp-font-sans);
 			font-size: 14px;

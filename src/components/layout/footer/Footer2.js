@@ -24,6 +24,10 @@ const CONTACT_GROUPS = contactGroups(site.contacts);
 const Footer2 = () => {
 	return (
 		<footer className="tj-footer-section footer-2 section-gap-x tlhp-footer tlhp-dark">
+			{/* The name in the title face, as at the head of the old site's footer. */}
+			<div className="tlhp-footer-head">
+				<p className="tlhp-footer-name">{site.name}</p>
+			</div>
 			<div className="footer-main-area">
 				<div className="container">
 					<div className="row gy-5">
@@ -136,6 +140,7 @@ const Footer2 = () => {
 					</div>
 				</div>
 			</div>
+			<div className="tlhp-footer-wave" aria-hidden="true"></div>
 			<div className="bg-shape-1">
 				<img src="/images/shape/pattern-2.webp" alt="" loading="lazy" decoding="async" />
 			</div>

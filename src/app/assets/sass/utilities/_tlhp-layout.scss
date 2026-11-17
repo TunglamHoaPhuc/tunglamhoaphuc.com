@@ -211,3 +211,12 @@ img.tlhp-img-missing {
 		}
 	}
 }
+
+// ── Albums on phones ────────────────────────────────────────────────────────────────────
+// One 220px column made an album of 12 photographs 2,500px of scrolling: two to a row.
+@media (max-width: 575px) {
+	.tlhp-gallery {
+		grid-template-columns: 1fr 1fr;
+		gap: 8px;
+	}
+}
