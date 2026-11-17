@@ -2222,6 +2222,93 @@
 
 ---
 
+### T42a: Kiểm kê chỗ v2 còn dùng chung với web cũ
+
+**Mô tả:** Thêm 17/11/2026, theo phương án A của chủ dự án (tách dữ liệu dùng chung khỏi web cũ theo từng bước, giữ nguyên kiến trúc `ContentRepository`). Làm trước, vì các task sau cần số liệu thật. Chỉ đọc, không đổi code chạy.
+
+- Sơ đồ dữ liệu: nguồn (`snapshot`, `b2`, `d1`) → `createFileLoaders` → `getContentRepository()` → trang; ảnh `mediaUrl()` → `imageAt()` → `/cdn-cgi/image` → B2 / WordPress. Vẽ bằng graphify, lưu ở `docs/van-hanh/tach-du-lieu.md`.
+- Danh sách mọi host và bucket mà v2 còn gọi: `s2-cnv03`, `media-tunglamhoaphuc`, `admin.tunglamhoaphuc.com` (WordPress), `www` (Vercel; ảnh câu kệ `/images/lich-tu-hoc/quotes/…`), `www/api/admin/*` (chỉ `snapshot:fetch`).
+- Đo thật: tổng số ảnh duy nhất và tổng dung lượng gốc theo từng host (HEAD hàng loạt, có giới hạn tốc độ), để chủ dự án quyết chi phí lưu trữ. Mẫu T41c: ảnh thẻ/bìa 395 MB cho 591 ảnh; album một bài có thể gần 190 MB.
+- Đọc `normalize.ts` và `schema.ts`: ghi những quy ước chỉ đúng với dữ liệu web cũ.
+
+**Kết quả 17/11/2026:** xong phần đo; còn chờ chủ dự án duyệt chi phí. Chi tiết ở [docs/van-hanh/tach-du-lieu.md](../docs/van-hanh/tach-du-lieu.md).
+- **Số ảnh gấp hơn 3 lần dự tính:** 21.424 ảnh của chùa (B2 `s2-cnv03` 20.379, `media-tunglamhoaphuc` 133, WordPress 912), cộng 157 ảnh của trang bên ngoài (không chép được) và 12 ảnh câu kệ trên site cũ. Kế hoạch cũ ghi khoảng 6.000.
+- **Dung lượng ≈ 3,65 GB** (B2 2,94 + 0,06; WordPress 0,65), dưới hạn mức miễn phí 10 GB của R2. Ảnh album trung vị 92 KB; ảnh WordPress trung vị 549 KB, p90 5,4 MB, 45 file trên 5 MB.
+- **540 file không tìm thấy** (21 B2, 519 WordPress; mức tối đa, chưa tách 404 khỏi hết thời gian chờ). Phần lớn ở WordPress là ảnh "chưa từng tải lên" đã biết.
+- **Rủi ro:** 495 ảnh trỏ `tunglamhoaphuc.com/wp-content/…` đang được `mediaUrl()` đổi sang `admin.`; chỗ này tắt ở Checkpoint J, nên 393 ảnh WordPress còn sống phải chép sang R2.
+- **Quy ước riêng của web cũ** đã liệt kê ở mục 4 của tài liệu (3 kiểu ngày, Markdown nhẹ, ảnh emoji, album rỗng ở API danh sách, schema dễ dãi nuốt bản ghi hỏng).
+- Script đo nằm ở thư mục tạm của phiên, chưa đưa vào kho; T42b sẽ có script chép riêng.
+
+**Tiêu chí nghiệm thu:**
+- [x] `docs/van-hanh/tach-du-lieu.md` có sơ đồ và bảng host, bucket, số ảnh, dung lượng
+- [ ] Chủ dự án duyệt dung lượng và chi phí R2 (miễn phí 10 GB đầu; quá thì tính theo GB): dung lượng ≈ 3,65 GB, chờ duyệt
+
+**Phụ thuộc:** không. **Quy mô:** S
+
+---
+
+### T42b: Chép ảnh sang bucket R2 riêng của v2
+
+**Mô tả:** Giữ quyết định 8 (xử lý ảnh bằng Image Transformations, không có tên miền `media.`): bucket R2 `tlhp-media` **riêng tư**, chỉ Worker đọc qua binding. Cần chủ dự án đồng ý tạo bucket (chi phí) trước khi làm.
+
+- Script `scripts/media-copy.ts` chép ảnh của hai bucket B2 và WordPress sang R2, giữ nguyên khóa (`<bucket>/<key>`) để `mediaUrl()` không đổi. Chạy lại được, chỉ chép ảnh chưa có; báo ảnh lỗi (404, `.jfif` trả `application/octet-stream`).
+- Bỏ metadata EXIF (có thẻ GPS) khi chép; ảnh gốc quá lớn thì giữ bản ≤ 2560 px, như T30.
+- Chép cả ảnh câu kệ của lịch từ `www`/Vercel vào cùng bucket.
+
+**Tiêu chí nghiệm thu:**
+- [ ] Số ảnh trong R2 khớp danh sách của T42a; ảnh lỗi được liệt kê
+- [ ] Chạy lần hai không chép lại ảnh nào
+- [ ] Mẫu 50 ảnh: không còn EXIF
+
+**Phụ thuộc:** T42a; T1b nếu chạy bằng CI; chủ dự án duyệt chi phí. **Quy mô:** M
+
+---
+
+### T42c: `/anh-goc/` đọc từ R2, chuyển nguồn ảnh
+
+**Mô tả:** Route `/anh-goc/<bucket>/<key>` (đã có ở T41d) đọc R2 trước, rơi về B2 / WordPress khi chưa có. Khi R2 đủ ảnh thì bỏ phần rơi về, và `mediaUrl()` không còn trả địa chỉ B2 hay WordPress.
+
+- Thêm binding R2 vào `cloudflare.config.ts`; giữ `Cache-Control` 7 ngày và chỉ ảnh.
+- Test: ảnh có trong R2, ảnh thiếu (rơi về B2), ảnh lạ (từ chối); `image-budget` vẫn xanh.
+- Kiểm không còn request nào tới `admin.tunglamhoaphuc.com` hay bucket B2 từ trang công khai.
+
+**Tiêu chí nghiệm thu:**
+- [ ] Trang chủ, Dòng Chảy, Lịch, Bảo Tượng: không có request ảnh tới B2, WordPress, `www` cũ (test canh gác)
+- [ ] Ảnh Image Transformations vẫn qua `/cdn-cgi/image` và đạt ngân sách của T41c
+
+**Phụ thuộc:** T42b. **Quy mô:** M
+
+---
+
+### T42d: Bản sao JSON riêng của v2
+
+**Mô tả:** JSON chữ (13 file, ~12 MB) vẫn do admin cũ ghi cho tới T39. Thêm bước đồng bộ B2 → bucket R2 riêng `tlhp-data`; v2 đọc bucket này qua binding, không cần khóa B2 ở Worker. Nếu web cũ hay B2 hỏng, v2 vẫn có bản gần nhất.
+
+- Nguồn thứ tư `r2` cho `ContentRepository` (dùng lại `createFileLoaders`, so `ETag`). Giữ `snapshot` làm nguồn thử và `b2` làm phương án dự phòng.
+- Đồng bộ chạy theo lịch (GitHub Actions sau T1b), dùng khóa B2 chỉ đọc (chuẩn bị #4); giữ bản tốt gần nhất khi file hỏng.
+- Thay `snapshot:fetch` từ `www/api/admin/*` bằng đọc file gốc trên B2 sau khi so định dạng ở T19.
+
+**Tiêu chí nghiệm thu:**
+- [ ] Sửa bài ở admin cũ → `v2.` hiện bản mới trong ≤ 10 phút
+- [ ] Tắt khóa B2 trên Worker: trang vẫn chạy bằng bản sao
+- [ ] File JSON hỏng không làm trang đổi (log có lỗi)
+
+**Phụ thuộc:** T19 (khóa B2, so định dạng), T1b, T42a. **Quy mô:** M
+
+---
+
+### T42e: Gỡ phụ thuộc cuối
+
+**Mô tả:** Sau T39 (D1), bỏ nguồn `snapshot`, `b2` và bước đồng bộ T42d; `ContentRepository` chỉ còn `d1`. Rà `grep` toàn kho không còn `backblazeb2`, `admin.tunglamhoaphuc.com`, `www/api/admin`, `congngheviet`. Phải xong trước khi tắt B2 và WordPress ở Checkpoint J.
+
+**Tiêu chí nghiệm thu:**
+- [ ] `grep` ở trên không còn kết quả trong `src/` và `scripts/`
+- [ ] Tắt thử B2 và WordPress: toàn bộ e2e trên `v2.` vẫn xanh
+
+**Phụ thuộc:** T39, T42c, T42d. **Quy mô:** S
+
+---
+
 ### Checkpoint J: Hoàn tất
 - [ ] Mọi tiêu chí nghiệm thu đạt; 6 lệnh chuẩn xanh
 - [ ] `www` chạy D1 + admin mới ổn định 2 tuần
