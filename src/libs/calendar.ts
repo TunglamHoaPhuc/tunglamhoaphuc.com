@@ -1,7 +1,8 @@
 // The schedule page's calendar: which month and type the URL asks for (?thang=&loai=), the
 // month grid Monday → Sunday with lunar dates, and where each event stands today. Days are
 // counted in Vietnam, whatever the server's clock.
-import type { RegularProgram, ScheduleEvent } from "@/libs/content/types";
+import { categorySlug } from "@/libs/content/schedule";
+import type { RegularProgram, Schedule, ScheduleEvent } from "@/libs/content/types";
 import { formatDate } from "@/libs/format";
 import { type LunarDate, lunarDate, lunarMonthName, lunarYearName, shortLunar } from "@/libs/lunar";
 
@@ -123,7 +124,7 @@ export function regularEvents(programs: RegularProgram[], month: string): Schedu
 			if (!days.includes(lunar.day) && !(onLast && last)) continue;
 			events.push({
 				id: `${program.id}-${date}`,
-				slug: `${program.id}-${date}`,
+				slug: programSlug(program),
 				title: program.title,
 				subtitle: program.subtitle,
 				category: REGULAR,
@@ -140,6 +141,30 @@ export function regularEvents(programs: RegularProgram[], month: string): Schedu
 		}
 	}
 	return events;
+}
+
+/** A regular ceremony's page, at the old site's address: "CẦU QUỐC THÁI DÂN AN" → "cau-quoc-thai-dan-an". */
+export function programSlug(program: Pick<RegularProgram, "title">): string {
+	return categorySlug(program.title);
+}
+
+/** The page of an event, or of the regular ceremony a day belongs to. */
+export function eventPath(event: Pick<ScheduleEvent, "slug">): string {
+	return `${CALENDAR_PATH}/${event.slug}`;
+}
+
+export type ScheduleItem = { event: ScheduleEvent } | { program: RegularProgram; upcoming: ScheduleEvent[] };
+
+/** The event or the regular ceremony of a page; a ceremony comes with its days from today on (the next 12 months). */
+export function findScheduleItem(schedule: Schedule, slug: string, today: string): ScheduleItem | null {
+	const event = schedule.events.find((item) => item.slug === slug);
+	if (event) return { event };
+	const program = schedule.programs.find((item) => programSlug(item) === slug);
+	if (!program) return null;
+	const upcoming = Array.from({ length: 12 }, (_, by) => regularEvents([program], shiftMonth(today.slice(0, 7), by)))
+		.flat()
+		.filter((day) => day.start >= today);
+	return { program, upcoming };
 }
 
 export type CalendarDay = {

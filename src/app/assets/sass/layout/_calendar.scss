@@ -646,3 +646,86 @@ a.tlhp-day:focus-visible .tlhp-day-event-name {
 }
 
 /* !END: TLHP schedule page */
+
+// An event's own page: the facts as four boxes, a ceremony's next days, the advice.
+.tlhp-event-page {
+	.tlhp-event-chips {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 8px 12px;
+		margin: 16px 0 24px;
+	}
+	.tlhp-article-section {
+		margin-top: 48px;
+	}
+}
+.tlhp-event-info {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 16px;
+	margin: 0;
+	@media #{$xs} {
+		grid-template-columns: minmax(0, 1fr);
+	}
+	> div {
+		padding: 18px 20px;
+		border: 1px solid rgb(242 193 78 / 0.3);
+		border-radius: var(--tlhp-radius-lg);
+		background-color: rgb(0 0 0 / 0.3);
+	}
+	dt {
+		margin-bottom: 6px;
+		color: #ffde59;
+		font-size: var(--tlhp-text-caption);
+		font-weight: var(--tj-fw-bold);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+	dd {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		margin: 0;
+		color: #fff;
+		font-weight: var(--tj-fw-bold);
+		span {
+			color: rgb(253 230 138 / 0.85);
+			font-weight: var(--tj-fw-regular);
+		}
+	}
+}
+.tlhp-event-days {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: 12px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	a {
+		display: flex;
+		flex-direction: column;
+		min-height: 48px;
+		padding: 12px 16px;
+		border: 1px solid rgb(242 193 78 / 0.3);
+		border-radius: var(--tlhp-radius-md);
+		color: #fff;
+		&:hover {
+			border-color: #ffde59;
+		}
+	}
+	span {
+		color: rgb(253 230 138 / 0.85);
+		font-size: var(--tlhp-text-body-sm);
+	}
+}
+.tlhp-event-advice {
+	margin: 16px 0 0;
+	padding-left: 1.2em;
+	li + li {
+		margin-top: 8px;
+	}
+	strong {
+		color: #ffde59;
+	}
+}

@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
 	calendarHref,
+	eventPath,
 	eventStatus,
 	eventsInMonth,
+	findScheduleItem,
 	lunarRange,
 	lunarSpan,
 	monthGrid,
@@ -205,3 +207,22 @@ describe("regular ceremonies (khóa lễ thường kỳ)", () => {
 function lastDayAfter(date: string): string {
 	return new Date(Date.parse(`${date}T00:00:00Z`) + 86_400_000).toISOString().slice(0, 10);
 }
+
+describe("event pages", () => {
+	const ceremony = { id: "p3", title: "CẦU QUỐC THÁI DÂN AN", subtitle: "Khóa lễ", summary: "Cầu an vào sáng mùng 1 và ngày rằm 15 âm lịch.", time: "08h00", duration: "90 phút", location: "", image: null };
+	const schedule = { events: [event("phap-hoi-niem-phat-thang-9-binh-ngo-2026", "2026-11-07")], programs: [ceremony], themes: [], quotes: [] };
+
+	it("gives every event and every regular ceremony its own page, at the old addresses", () => {
+		expect(eventPath(schedule.events[0])).toBe("/lich-tu-hoc/phap-hoi-niem-phat-thang-9-binh-ngo-2026");
+		const [day] = regularEvents([ceremony], "2026-11");
+		expect(eventPath(day)).toBe("/lich-tu-hoc/cau-quoc-thai-dan-an");
+	});
+
+	it("finds an event or a ceremony by its slug, with the ceremony's next days", () => {
+		expect(findScheduleItem(schedule, "phap-hoi-niem-phat-thang-9-binh-ngo-2026", "2026-11-18")).toMatchObject({ event: { id: "phap-hoi-niem-phat-thang-9-binh-ngo-2026" } });
+		const found = findScheduleItem(schedule, "cau-quoc-thai-dan-an", "2026-11-18");
+		expect(found).toMatchObject({ program: { id: "p3" } });
+		expect(found && "upcoming" in found ? found.upcoming.slice(0, 3).map((day) => day.start) : []).toEqual(["2026-11-23", "2026-12-09", "2026-12-23"]);
+		expect(findScheduleItem(schedule, "khong-co", "2026-11-18")).toBeNull();
+	});
+});
