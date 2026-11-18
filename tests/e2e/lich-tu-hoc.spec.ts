@@ -117,16 +117,44 @@ test.describe("schedule page", () => {
 		await expect(cell(4)).not.toHaveClass(/in-range/);
 	});
 
-	test("a day with events leads the keyboard to its first event card", async ({ page }) => {
+	test("a day opens its events in a dialog: keyboard in, Esc out, the way to the event's page", async ({ page }) => {
 		await open(page);
 		const day = grid(page).getByRole("link", { name: "Thứ Bảy, ngày 7 âm lịch ngày 29 tháng Chín: PHÁP HỘI NIỆM PHẬT" });
 		await day.focus();
 		await page.keyboard.press("Enter");
-		const card = page.locator("#su-kien-phap-hoi-niem-phat-thang-9-binh-ngo-2026");
-		await expect(card).toBeFocused();
-		// Before the page's script runs, the link is followed as is (no ?thang= for this month).
-		await expect(page).toHaveURL(/#su-kien-phap-hoi-niem-phat-thang-9-binh-ngo-2026$/);
-		await expect(card).toBeInViewport();
+		const dialog = page.getByRole("dialog");
+		await expect(dialog).toBeVisible();
+		await expect(dialog.getByRole("heading", { level: 3 })).toHaveText("PHÁP HỘI NIỆM PHẬT");
+		await expect(dialog).toContainText("Âm lịch 29/9 Bính Ngọ");
+		await expect(dialog.getByRole("button", { name: "Đóng" })).toBeFocused();
+		await page.keyboard.press("Escape");
+		await expect(dialog).toBeHidden();
+		await expect(day).toBeFocused();
+
+		// A day with an event and a ceremony shows both; the event's page is one click away.
+		await grid(page).locator('a.tlhp-day[data-date="2026-11-08"]').click();
+		await expect(dialog.locator("article")).toHaveCount(2);
+		await dialog.getByRole("link", { name: /Xem chi tiết PHÁP HỘI NIỆM PHẬT/ }).click();
+		await expect(page).toHaveURL(/\/lich-tu-hoc\/phap-hoi-niem-phat-thang-9-binh-ngo-ngay-2$/);
+		await expect(page.getByRole("heading", { level: 1 })).toHaveText("PHÁP HỘI NIỆM PHẬT");
+	});
+
+	test("every event and ceremony has its page at the old addresses, made on the server", async ({ page, request }) => {
+		const html = (await (await request.get(`${PATH}/cau-quoc-thai-dan-an`)).text()).replaceAll("<!-- -->", "");
+		expect(html).toContain("Thông tin thời khóa hành trì");
+		expect(html).toContain("mùng 1 và ngày rằm âm lịch hằng tháng");
+		expect((await request.get(`${PATH}/khong-co-su-kien-nay`)).status()).toBe(404);
+
+		const response = await open(page, `${PATH}/phap-hoi-luong-hoang-sam-gieo-duyen-xuat-gia-2026`);
+		expect(response?.status()).toBe(200);
+		await expect(page.locator(".tlhp-event-info dt")).toHaveText(["Thời gian", "Khung giờ", "Địa điểm", "Đối tượng"]);
+		await expect(page.locator(".tlhp-event-info")).toContainText("09/11 – 18/11/2026");
+		await expect(page.getByRole("link", { name: /Trở về lịch tu học/ })).toHaveAttribute("href", /#su-kien-phap-hoi-luong-hoang-sam-gieo-duyen-xuat-gia-2026$/);
+
+		await open(page, `${PATH}/dai-sam-hoi`);
+		await expect(page.locator(".tlhp-event-days li")).toHaveCount(6);
+		const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+		expect(axe.violations.flatMap((v) => v.nodes.map((n) => `${v.id}: ${n.target.join(" ")}`))).toEqual([]);
 	});
 
 	test("filters by type and steps through months, announcing the change", async ({ page }) => {
@@ -197,19 +225,26 @@ test.describe("schedule page", () => {
 test.describe("schedule page with smooth scrolling on", () => {
 	test.skip(({ isMobile }) => isMobile, "smooth scrolling is checked with the mouse");
 
-	test("a day glides to its event and keeps the address", async ({ page }) => {
+	// A day opens its dialog (no glide any more); closing it leaves the calendar where it was.
+	test("a day opens its dialog in place, and the calendar stays put when it closes", async ({ page }) => {
 		await open(page);
 		const day = grid(page).getByRole("link", { name: /ngày 19 âm lịch/ });
-		// The browser shows the day by scrolling the smoothed wrapper, as Tab does; the press
-		// comes before ScrollSmoother has taken that scroll over.
-		await day.scrollIntoViewIfNeeded();
-		await day.click();
-		const card = page.locator("#su-kien-le-tien-thuong-phap-hoi-cung-duong-tang-bao-2026");
-		await expect(card).toBeFocused();
-		await expect(page).toHaveURL(/\?thang=2026-11#su-kien-le-tien-thuong/);
-		const top = () => card.evaluate((el) => Math.round(el.getBoundingClientRect().top));
-		await expect.poll(top, { timeout: 4000 }).toBeGreaterThan(100);
-		await expect.poll(top, { timeout: 4000 }).toBeLessThan(200);
+		// Focus brings the day into view with ScrollSmoother's own glide; wait for it to settle.
+		await day.focus();
+		const top = () => day.evaluate((el) => Math.round(el.getBoundingClientRect().top));
+		await expect.poll(async () => Math.abs((await top()) - (await top())), { timeout: 4000 }).toBe(0);
+		await page.waitForTimeout(1500);
+		const before = await top();
+		await page.keyboard.press("Enter");
+		const dialog = page.getByRole("dialog");
+		await expect(dialog.getByRole("heading", { level: 3 })).toHaveText(/LỄ TIÊN THƯỜNG/);
+		await expect(page).toHaveURL(/\/lich-tu-hoc\?thang=2026-11$/);
+		await page.waitForTimeout(800);
+		await dialog.getByRole("button", { name: "Đóng" }).click();
+		await expect(dialog).toBeHidden();
+		await expect(day).toBeFocused();
+		await page.waitForTimeout(800);
+		expect(Math.abs((await top()) - before)).toBeLessThan(4);
 	});
 });
 

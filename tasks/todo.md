@@ -661,6 +661,13 @@
 
 **Quy mô:** M
 
+**Đồng bộ với lịch cũ 18/11/2026** (`www/lich-tu-hoc`):
+- Khóa lễ thường kỳ (Đại sám hối, Tiểu sám hối, Cầu quốc thái dân an) hiện ở mọi tháng tới, đúng ngày âm lịch; tháng 11/2026 khớp lịch cũ (1, 8, 9, 16, 22, 23). Ô lịch theo giao diện cũ: icon theo loại, nhãn đỏ mùng 1/rằm, hôm nay phát sáng (00b5972, 7957b13, đã deploy `v2.`).
+- **Bấm một ngày mở hộp thoại** như lịch cũ (`DayDialog`, `<dialog>` gốc của trình duyệt: giữ focus bên trong, Esc đóng, trả focus về ô ngày, bấm nền đóng): ảnh, dấu loại, tên phụ và tên, ngày dương/âm, giờ, mô tả, nơi, lưu ý hành trì, nút "Xem chi tiết". Ngày có hai sự kiện xếp liền nhau, nút đóng bám mép trên khi cuộn. Không có JavaScript thì ô ngày vẫn dẫn tới thẻ sự kiện bên dưới. ScrollSmoother bỏ qua focus trong hộp thoại (trang không còn nhảy khi đóng).
+- **Trang riêng mỗi sự kiện và khóa lễ** `/lich-tu-hoc/<slug>` theo địa chỉ cũ (vd. `/lich-tu-hoc/cau-quoc-thai-dan-an`): ảnh, thông tin thời khóa (thời gian, khung giờ, địa điểm, đối tượng), ý nghĩa, các ngày sắp tới của khóa lễ, lưu ý cho Phật tử (lấy nguyên từ trang cũ), ký sự Dòng Chảy cùng chủ đề, JSON-LD cho sự kiện. ISR 5 phút như các trang bài; slug lạ trả 404.
+- Kiểm tra: lint 0 lỗi, tsc sạch, unit 258/258; e2e lịch, a11y, motion-guard, trang chủ trên bản build cục bộ: 236 đạt, 1 lỗi a11y chập chờn ở một bài Dòng Chảy (chạy lại đạt).
+- Nhánh `claude/affectionate-lumiere-e20b7e` (sửa lướt tới thẻ sự kiện, `reveal.ts`) chưa gộp: `reveal.ts` vẫn cần cho trang chủ và tab bài viết, còn 3 test lịch của nhánh đó dựa vào hành vi cũ (bấm ngày → lướt tới thẻ) nên phải viết lại khi gộp.
+
 ---
 
 ### T12: Trang chủ – khóa tu sắp tới, Lời Thầy dạy và đếm ngày trên hero

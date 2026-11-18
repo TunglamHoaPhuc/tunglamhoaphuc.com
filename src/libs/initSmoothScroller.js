@@ -19,8 +19,10 @@ const initSmoothScroller = contanerRef => {
 			// and the offcanvas sit outside the smoothed content, so leave their focus alone;
 			// otherwise opening search jumps the page and swaps in the sticky header. Targets
 			// focused by script (tabindex="-1") are scrolled by that script.
+			// A modal dialog shows above the page wherever it sits in it (the calendar's day
+			// dialog sits in the content): its focus moves nothing either.
 			onFocusIn: (self, event) =>
-				self.content().contains(event.target) && event.target.getAttribute("tabindex") !== "-1" ? undefined : false,
+				self.content().contains(event.target) && event.target.getAttribute("tabindex") !== "-1" && !event.target.closest("dialog") ? undefined : false,
 		});
 
 		// Find in page, Tab focus and anchor jumps reveal off-screen targets by scrolling

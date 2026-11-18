@@ -88,7 +88,7 @@ export default function MonthGrid({ weeks, label, hrefFor, describedBy }: Props)
 									aria-current={day.today ? "date" : undefined}
 								>
 									{day.events.length ? (
-										<a className="tlhp-day" href={hrefFor(day)}>
+										<a className="tlhp-day" href={hrefFor(day)} data-date={day.date}>
 											{content}
 										</a>
 									) : (

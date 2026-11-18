@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import EventCard from "@/components/sections/calendar/EventCard";
+import DayDialog, { type DialogEvent } from "@/components/sections/calendar/DayDialog";
 import MonthGrid, { EVENT_ICONS } from "@/components/sections/calendar/MonthGrid";
 import MonthTheme from "@/components/sections/calendar/MonthTheme";
-import RevealLinks from "@/components/sections/calendar/RevealLinks";
 import HeroInner from "@/components/sections/hero/HeroInner";
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import HeaderSpace from "@/components/shared/others/HeaderSpace";
@@ -19,6 +19,9 @@ import {
 	eventsInMonth,
 	lunarSpan,
 	monthGrid,
+	eventPath,
+	lunarRange,
+	solarRange,
 	regularEvents,
 	monthLabel,
 	readCalendarState,
@@ -78,6 +81,29 @@ export default async function LichTuHoc({ searchParams }: Props) {
 	}
 	const firstEventOf = (date: string) => shownItems.find((event) => event.start <= date && event.end >= date) as ScheduleEvent;
 
+	// What the day dialog shows: each item of the month once, and the items of each day.
+	const dialogEvents: DialogEvent[] = shownItems.map((event) => ({
+		id: event.id,
+		title: event.title,
+		subtitle: event.subtitle,
+		category: event.category,
+		solar: solarRange(event),
+		lunar: lunarRange(event),
+		times: event.times,
+		location: event.location,
+		description: event.description,
+		notes: event.notes,
+		image: event.image ? { src: imageAt(event.image.src, IMAGE_WIDTH.card), position: event.image.position } : null,
+		icon: EVENT_ICONS[event.category.slug] ?? null,
+		href: eventPath(event),
+	}));
+	const dialogDays = Object.fromEntries(
+		weeks
+			.flat()
+			.filter((day) => day && day.events.length)
+			.map((day) => [day!.date, day!.events.map((event) => event.id)]),
+	);
+
 	// The nearest month after this one that has events, for an empty month.
 	const later = schedule.events.find((event) => event.start.slice(0, 7) > state.month);
 	const status = `Tháng ${label}: ${shownItems.length ? `${shownItems.length} sự kiện` : "chưa có sự kiện"}${typeName ? ` loại ${typeName}` : ""}`;
@@ -115,7 +141,7 @@ export default async function LichTuHoc({ searchParams }: Props) {
 						{status}
 					</p>
 
-					<RevealLinks className="row row-gap-4">
+					<DayDialog className="row row-gap-4" events={dialogEvents} days={dialogDays}>
 						<div className={theme ? "col-12 col-lg-7" : "col-12"}>
 							{/* The calendar in one framed card, as the old site's: the month and its Buddhist year
 							    between two round arrows, the weekdays, the days, and what the signs mean.
@@ -179,7 +205,7 @@ export default async function LichTuHoc({ searchParams }: Props) {
 								<MonthTheme theme={theme} />
 							</div>
 						) : null}
-					</RevealLinks>
+					</DayDialog>
 				</div>
 			</section>
 
