@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import EventCard from "@/components/sections/calendar/EventCard";
-import MonthGrid from "@/components/sections/calendar/MonthGrid";
+import MonthGrid, { EVENT_ICONS } from "@/components/sections/calendar/MonthGrid";
 import MonthTheme from "@/components/sections/calendar/MonthTheme";
 import RevealLinks from "@/components/sections/calendar/RevealLinks";
 import HeroInner from "@/components/sections/hero/HeroInner";
@@ -92,30 +92,6 @@ export default async function LichTuHoc({ searchParams }: Props) {
 
 			<section className="section-gap tlhp-calendar" aria-labelledby="lich-thang">
 				<div className="container">
-					<div className="tlhp-calendar-head">
-						<div>
-							<h2 id="lich-thang" className="tlhp-calendar-title">
-								Tháng {label}
-							</h2>
-							<p className="tlhp-calendar-lunar">
-								{lunarSpan(state.month)} · Phật lịch {buddhistYear(`${state.month}-15`)}
-							</p>
-						</div>
-						<nav className="tlhp-month-nav" aria-label="Chọn tháng">
-							<Link href={href({ month: shiftMonth(state.month, -1) })} scroll={false}>
-								<i className="tji-arrow-left" aria-hidden="true"></i> Tháng {monthLabel(shiftMonth(state.month, -1))}
-							</Link>
-							{state.month !== today.slice(0, 7) ? (
-								<Link href={href({ month: today.slice(0, 7) })} scroll={false}>
-									Tháng này
-								</Link>
-							) : null}
-							<Link href={href({ month: shiftMonth(state.month, 1) })} scroll={false}>
-								Tháng {monthLabel(shiftMonth(state.month, 1))} <i className="tji-arrow-right" aria-hidden="true"></i>
-							</Link>
-						</nav>
-					</div>
-
 					{types.length > 1 ? (
 						<nav aria-label="Loại sự kiện">
 							<ul className="tlhp-pills">
@@ -141,15 +117,62 @@ export default async function LichTuHoc({ searchParams }: Props) {
 
 					<RevealLinks className="row row-gap-4">
 						<div className={theme ? "col-12 col-lg-7" : "col-12"}>
-							<MonthGrid
-								weeks={weeks}
-								label={label}
-								describedBy="lich-ghi-chu"
-								hrefFor={(day) => href({}, `#${anchors.get(firstEventOf(day.date).id)}`)}
-							/>
-							<p id="lich-ghi-chu" className="tlhp-calendar-note">
-								Số nhỏ dưới mỗi ngày là ngày âm lịch. Ngày có sự kiện dẫn tới thẻ của sự kiện; danh sách đầy đủ ở ngay dưới lịch.
-							</p>
+							{/* The calendar in one framed card, as the old site's: the month and its Buddhist year
+							    between two round arrows, the weekdays, the days, and what the signs mean.
+							    beside the month's poster and verse it stretches to their height. */}
+							<div className="tlhp-cal-card">
+								<nav className="tlhp-cal-bar" aria-label="Chọn tháng">
+									<Link className="tlhp-cal-arrow" href={href({ month: shiftMonth(state.month, -1) })} scroll={false} aria-label={`Tháng ${monthLabel(shiftMonth(state.month, -1))}`}>
+										<i className="tji-arrow-left" aria-hidden="true"></i>
+									</Link>
+									<div className="tlhp-cal-bar-mid">
+										<h2 id="lich-thang" className="tlhp-cal-pill">
+											Tháng {label}
+										</h2>
+										<p className="tlhp-cal-pill is-soft tlhp-calendar-lunar">
+											{lunarSpan(state.month)} · Phật lịch {buddhistYear(`${state.month}-15`)}
+										</p>
+										{state.month !== today.slice(0, 7) ? (
+											<Link className="tlhp-cal-pill is-link" href={href({ month: today.slice(0, 7) })} scroll={false}>
+												Tháng này
+											</Link>
+										) : null}
+									</div>
+									<Link className="tlhp-cal-arrow" href={href({ month: shiftMonth(state.month, 1) })} scroll={false} aria-label={`Tháng ${monthLabel(shiftMonth(state.month, 1))}`}>
+										<i className="tji-arrow-right" aria-hidden="true"></i>
+									</Link>
+								</nav>
+								<MonthGrid
+									weeks={weeks}
+									label={label}
+									describedBy="lich-ghi-chu"
+									hrefFor={(day) => href({}, `#${anchors.get(firstEventOf(day.date).id)}`)}
+								/>
+								<ul className="tlhp-cal-legend" aria-label="Chú thích">
+									<li className="tlhp-cal-legend-title" aria-hidden="true">
+										Chú thích
+									</li>
+									{types.map((type) => (
+										<li key={type.slug}>
+											{EVENT_ICONS[type.slug] ? <img src={EVENT_ICONS[type.slug]} alt="" width={20} height={20} loading="lazy" decoding="async" /> : <span className="tlhp-day-event-dot" aria-hidden="true" />}
+											{type.name}
+										</li>
+									))}
+									<li>
+										<span className="tlhp-cal-legend-badge" aria-hidden="true">
+											1/10
+										</span>
+										Mùng 1 và ngày Rằm
+									</li>
+									<li>
+										<span className="tlhp-cal-legend-today" aria-hidden="true"></span>
+										Hôm nay
+									</li>
+								</ul>
+								<p id="lich-ghi-chu" className="tlhp-calendar-note">
+									Số nhỏ dưới mỗi ngày là ngày âm lịch. Ngày có sự kiện dẫn tới thẻ của sự kiện; danh sách đầy đủ ở ngay dưới lịch.
+								</p>
+							</div>
 						</div>
 						{theme ? (
 							<div className="col-12 col-lg-5">

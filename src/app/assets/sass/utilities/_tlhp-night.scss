@@ -237,6 +237,32 @@ $faint: #a69383; // old site dates (5.9:1 on #2c1c11)
 		background-image: linear-gradient(to bottom, #2c1c11, #1e140c);
 	}
 
+	// The card's panel is the card's own ground: Bexon gave it a solid brown that was lighter
+	// than the lower half of the gradient, a visible box inside the frame.
+	.blog-item .blog-content {
+		background-color: transparent;
+	}
+
+	// The cards of a row end on one line (the statues' names differ in length).
+	.tlhp-statue-grid > li,
+	.tlhp-area-grid > li {
+		display: flex;
+		> .tlhp-statue-card,
+		> .tlhp-area-card {
+			flex: 1 1 auto;
+			min-width: 0;
+		}
+	}
+	.tlhp-about-card.tlhp-statue-card,
+	.team-item.tlhp-about-card {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		.team-content {
+			flex: 1 1 auto;
+		}
+	}
+
 	// These cards had no frame, so their words ran to the edge of the picture; inside the
 	// gold line they need room.
 	.tlhp-about-card {

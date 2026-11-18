@@ -3,49 +3,153 @@
 /**----------------------------------------
 START: TLHP schedule page (/lich-tu-hoc, T11)
 ----------------------------------------*/
-.tlhp-calendar-head {
-	display: flex;
-	flex-wrap: wrap;
-	align-items: flex-end;
-	justify-content: space-between;
-	gap: 16px 32px;
-	margin-bottom: 24px;
-}
-.tlhp-calendar-title {
+.tlhp-calendar-lunar {
 	margin: 0;
 }
-.tlhp-calendar-lunar {
-	margin: 6px 0 0;
-	color: var(--tj-color-text-body-3);
+
+// The calendar in one framed card (as the old site's). The bar holds the month between two
+// round arrows; the legend under the days says what the signs mean.
+.tlhp-cal-card {
+	padding: 20px;
+	border: 1px solid var(--tlhp-gold-line, var(--tj-color-border-1));
+	border-radius: var(--tlhp-radius-xl, 24px);
+	background-image: linear-gradient(to bottom, #2c1c11, #1a110a);
+	box-shadow: 0 0 28px rgb(242 193 78 / 0.08);
+	// Beside the month's poster and verse (a little taller than the days) the card stretches to
+	// their height, the weeks taking the room, so both columns end on one line.
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	.tlhp-month {
+		flex: 1 1 auto;
+	}
+	@media #{$xs} {
+		padding: 14px 10px;
+	}
 }
-.tlhp-month-nav {
+.tlhp-cal-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	margin-bottom: 16px;
+	padding: 10px 12px;
+	border: 1px solid var(--tlhp-gold-line, var(--tj-color-border-1));
+	border-radius: var(--tlhp-radius-pill);
+	background-color: rgb(0 0 0 / 0.4);
+}
+.tlhp-cal-bar-mid {
+	display: flex;
+	flex: 1 1 auto;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-width: 0;
+}
+.tlhp-cal-arrow {
+	display: inline-grid;
+	flex: 0 0 auto;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+	border: 1px solid var(--tlhp-gold-line-strong, var(--tj-color-theme-primary));
+	border-radius: 50%;
+	background-color: rgb(131 84 20 / 0.55);
+	color: var(--tlhp-gold, var(--tj-color-theme-primary));
+	transition:
+		background-color 0.3s ease,
+		color 0.3s ease;
+	&:hover,
+	&:focus-visible {
+		background-color: var(--tlhp-gold, var(--tj-color-theme-primary));
+		color: #1c0f08;
+	}
+	// Sized before the icon font arrives, so the buttons do not grow.
+	i {
+		display: inline-block;
+		width: 1em;
+		text-align: center;
+	}
+}
+.tlhp-cal-pill {
+	display: inline-flex;
+	align-items: center;
+	margin: 0;
+	padding: 6px 18px;
+	border: 1px solid var(--tlhp-gold-line-strong, var(--tj-color-theme-primary));
+	border-radius: var(--tlhp-radius-pill);
+	background-color: rgb(0 0 0 / 0.35);
+	color: var(--tlhp-gold, var(--tj-color-theme-primary));
+	font-family: var(--tlhp-font-sans);
+	font-size: var(--tlhp-text-body-sm);
+	font-weight: var(--tj-fw-bold);
+	line-height: 1.4;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	&.is-soft {
+		border-color: var(--tlhp-gold-line, var(--tj-color-border-1));
+		color: var(--tlhp-fg, var(--tj-color-text-body));
+		font-weight: var(--tj-fw-regular);
+		letter-spacing: 0;
+		text-transform: none;
+	}
+	&.is-link {
+		background-color: rgb(131 84 20 / 0.55);
+		color: var(--tlhp-gold-soft, #ffe5a3);
+		&:hover,
+		&:focus-visible {
+			background-color: var(--tlhp-gold, var(--tj-color-theme-primary));
+			color: #1c0f08;
+		}
+	}
+}
+.tlhp-cal-legend {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 8px;
-	a {
+	align-items: center;
+	justify-content: flex-end;
+	gap: 8px 22px;
+	margin: 18px 0 0;
+	padding: 14px 4px 0;
+	border-top: 1px solid var(--tlhp-gold-line, var(--tj-color-border-1));
+	list-style: none;
+	font-size: var(--tlhp-text-body-sm);
+	li {
 		display: inline-flex;
 		align-items: center;
 		gap: 8px;
-		min-height: 44px;
-		padding: 0 18px;
-		border: 1px solid var(--tj-color-border-1);
-		border-radius: var(--tlhp-radius-pill);
-		background-color: var(--tj-color-surface);
-		color: var(--tj-color-heading-primary);
-		font-weight: var(--tj-fw-sbold);
-		transition:
-			border-color 0.3s ease-in-out,
-			color 0.3s ease-in-out;
-		&:hover {
-			border-color: var(--tj-color-theme-primary);
-			color: var(--tj-color-theme-primary);
-		}
-		// Sized before the icon font arrives, so the buttons do not grow.
-		i {
-			display: inline-block;
-			width: 1em;
+		color: var(--tlhp-gold-soft, #ffe5a3);
+		img {
+			flex: 0 0 auto;
+			width: 20px;
+			height: 20px;
+			object-fit: contain;
 		}
 	}
+	.tlhp-cal-legend-title {
+		margin-inline-end: auto;
+		color: var(--tlhp-gold, var(--tj-color-theme-primary));
+		font-weight: var(--tj-fw-bold);
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+	}
+}
+.tlhp-cal-legend-badge {
+	padding: 1px 6px;
+	border-radius: var(--tlhp-radius-xs, 4px);
+	background-color: var(--tj-color-red-1, #d62828);
+	color: #fff;
+	font-size: 11px;
+	font-weight: var(--tj-fw-bold);
+	line-height: 1.4;
+}
+.tlhp-cal-legend-today {
+	width: 20px;
+	height: 20px;
+	border: 2px solid var(--tlhp-gold-bright, #ffde59);
+	border-radius: 6px;
+	box-shadow: 0 0 8px rgb(255 222 89 / 0.5);
 }
 .tlhp-calendar .tlhp-list-status {
 	margin-bottom: 16px;
@@ -326,12 +430,25 @@ a.tlhp-day:focus-visible .tlhp-day-event-name {
 	margin: 0;
 	blockquote {
 		margin: 0;
+		// Bexon's article quote (a frame, 40px of padding, 24px lines 20px apart) stays out: the
+		// verse is lines of scripture, and in a frame it made the column twice as tall as the
+		// calendar beside it.
+		padding: 0;
+		border: 0;
+		border-radius: 0;
+		background: none;
+		&::before {
+			content: none;
+		}
 		font-family: var(--tj-ff-heading);
 		font-size: var(--tlhp-text-scripture);
 		line-height: var(--tlhp-leading-scripture);
 		color: var(--tj-color-common-white);
 		p {
 			margin: 0;
+			font-size: inherit;
+			font-weight: var(--tj-fw-regular);
+			line-height: inherit;
 			color: inherit;
 		}
 		b {
@@ -370,6 +487,8 @@ a.tlhp-day:focus-visible .tlhp-day-event-name {
 }
 .blog-item.style-2.tlhp-event-card {
 	flex-direction: column;
+	// The two cards of a row end on one line, the panel filling its frame.
+	height: 100%;
 	padding: 15px;
 	border: 1px solid var(--tj-color-border-1);
 	&:focus {
@@ -391,7 +510,11 @@ a.tlhp-day:focus-visible .tlhp-day-event-name {
 		background-color: var(--tj-color-theme-bg);
 	}
 	.blog-content {
-		display: block;
+		display: flex;
+		flex: 1 1 auto;
+		flex-direction: column;
+		align-items: stretch;
+		justify-content: flex-start;
 		width: 100%;
 		padding: 24px 13px 13px;
 		@media #{$xs} {
@@ -464,7 +587,10 @@ a.tlhp-day:focus-visible .tlhp-day-event-name {
 	font-size: var(--tlhp-text-body-sm);
 }
 .tlhp-event-video {
-	margin-top: 16px;
+	// At the foot of the card, so the links of a row stand on one line.
+	align-self: flex-start;
+	margin-top: auto;
+	padding-top: 16px;
 }
 
 // Regular ceremonies and how to sign up.

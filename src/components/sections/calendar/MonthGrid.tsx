@@ -14,7 +14,7 @@ type Props = {
 const WEEKDAY_FULL = ["Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy", "Chủ Nhật"];
 
 /** The old calendar's icon of each type of event (public/brand/icons); other types get a dot. */
-const ICONS: Record<string, string> = {
+export const EVENT_ICONS: Record<string, string> = {
 	"khoa-le-truyen-thong": "/brand/icons/icon-khoa-le-truyen-thong.webp",
 	"cong-tu": "/brand/icons/icon-cong-tu.webp",
 	"dai-le-su-kien": "/brand/icons/icon-dai-le-su-kien.webp",
@@ -70,7 +70,7 @@ export default function MonthGrid({ weeks, label, hrefFor, describedBy }: Props)
 										<span className="tlhp-day-events">
 											{day.events.map((event) => (
 												<span key={event.id} className={`tlhp-day-event is-${event.category.slug}${event.start !== event.end ? " is-long" : ""}`}>
-													{ICONS[event.category.slug] ? <img src={ICONS[event.category.slug]} alt="" width={24} height={24} loading="lazy" decoding="async" /> : <span className="tlhp-day-event-dot" />}
+													{EVENT_ICONS[event.category.slug] ? <img src={EVENT_ICONS[event.category.slug]} alt="" width={24} height={24} loading="lazy" decoding="async" /> : <span className="tlhp-day-event-dot" />}
 													<span className="visually-hidden">{event.title}</span>
 													<span className="tlhp-day-event-name" aria-hidden="true">
 														{event.title}
