@@ -151,6 +151,50 @@ test.describe("self-moving content can be paused", () => {
 	}
 });
 
+// With motion allowed, wow.js reveals the blocks below the screen as they come into view. They
+// may only wait hidden once wow.js is running: on a slow phone the script arrives 4–6 s after the
+// page, and until then the page must show its blocks, not blanks (18/11/2026).
+test.describe("scroll reveals never leave blank blocks", () => {
+	test.skip(({ isMobile }) => isMobile, "the blocks below the screen are the same; one size is enough");
+
+	test("without script every block is visible", async ({ browser }) => {
+		const context = await browser.newContext({ javaScriptEnabled: false });
+		const page = await context.newPage();
+		await page.goto("/gioi-thieu/tieu-su-su-to");
+		const blank = await page.evaluate(
+			() => [...document.querySelectorAll<HTMLElement>(".wow")].filter((el) => getComputedStyle(el).opacity !== "1").length,
+		);
+		expect(blank).toBe(0);
+		await context.close();
+	});
+
+	test("a block is visible until the script has started, hidden once it waits for the scroll", async ({ page }) => {
+		// Keep wow.js from loading: the page and its other script run, only the reveal is missing.
+		// The build gives its chunk no telling name, so it is found by its `boxClass` option.
+		await page.route(/\.js(\?|$)/, async (route) => {
+			const response = await route.fetch();
+			if ((await response.text()).includes("boxClass")) await route.abort();
+			else await route.fulfill({ response });
+		});
+		await page.goto("/gioi-thieu/tieu-su-su-to");
+		await page.waitForTimeout(2500);
+		const withoutWow = await page.evaluate(
+			() => [...document.querySelectorAll<HTMLElement>(".wow")].filter((el) => getComputedStyle(el).opacity !== "1").length,
+		);
+		expect(withoutWow).toBe(0);
+	});
+
+	test("with the script running, a block below the screen waits and then reveals", async ({ page }) => {
+		await settle(page, "/gioi-thieu/tieu-su-su-to");
+		const waiting = page.locator(".wow:not([style*='visibility: visible'])");
+		expect(await waiting.count()).toBeGreaterThan(0);
+		const block = (await waiting.first().elementHandle())!;
+		expect(await block.evaluate((el) => getComputedStyle(el).opacity)).toBe("0");
+		await block.scrollIntoViewIfNeeded();
+		await expect.poll(() => block.evaluate((el) => getComputedStyle(el).opacity), { timeout: 8000 }).toBe("1");
+	});
+});
+
 test.describe("smooth scrolling keeps the page usable", () => {
 	test.skip(({ isMobile }) => isMobile, "keyboard and find-in-page are desktop interactions");
 

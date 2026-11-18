@@ -499,8 +499,11 @@ img {
 // inside out of the Tab order until the visitor scrolls there (the footer columns, for
 // one). Fade them out instead, and show a box at once when keyboard focus lands in it.
 // wow.js writes `visibility: visible` inline once it reveals a box.
+// Only once wow.js is running (ClientWrapper puts `tlhp-wow` on <html> just before it starts):
+// on a slow phone the script comes 4–6 s after the page, and until then the boxes below the
+// screen must show, not stand there blank. Without script they are never hidden.
 @media (prefers-reduced-motion: no-preference) {
-	.wow:not([style*="visibility: visible"]) {
+	.tlhp-wow .wow:not([style*="visibility: visible"]) {
 		visibility: visible !important;
 		opacity: 0;
 		&:focus-within {

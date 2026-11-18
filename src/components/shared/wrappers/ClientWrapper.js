@@ -19,9 +19,20 @@ const ClientWrapper = () => {
 		import("@/libs/pageEffects").then(({ startPageEffects }) => {
 			if (!stopped) effects = startPageEffects();
 		});
-		import("wow.js").then(({ default: WOW }) => {
-			if (!stopped) new WOW().init();
-		});
+		import("wow.js")
+			.then(({ default: WOW }) => {
+				if (stopped) return;
+				// The boxes below the screen are hidden by CSS only from here on (see .tlhp-wow
+				// in _theme.scss); the class stays on <html> so the next page's boxes wait too.
+				document.documentElement.classList.add("tlhp-wow");
+				try {
+					new WOW().init();
+				} catch (error) {
+					document.documentElement.classList.remove("tlhp-wow");
+					throw error;
+				}
+			})
+			.catch((error) => console.error("[effects] wow.js", error));
 		const cleanup = hasFinePointer() ? tjMagicCursorAnimation() : undefined;
 		return () => {
 			stopped = true;

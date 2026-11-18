@@ -1471,6 +1471,7 @@
     - `srcSet` của khung hero thêm bản 640 cho điện thoại.
 
 **Kết quả 04/11/2026:** xong, đã deploy `v2.` (phiên bản `9a3276ed`).
+- **Sửa 18/11/2026 (hiệu ứng lúc có lúc không):** khối `.wow` bị CSS ẩn (độ mờ 0) từ lần vẽ đầu, nhưng wow.js chỉ chạy sau khi trang hydrate. Giả lập CPU chậm 4 lần và 4G chậm, wow.js bắt đầu sau 4–6 s; trong lúc đó khối dưới màn hình trắng, và không có script thì trắng mãi. Nay `ClientWrapper` đặt lớp `tlhp-wow` lên `<html>` ngay trước khi chạy wow.js, và CSS chỉ ẩn khối khi có lớp này (`_theme.scss`); wow.js lỗi thì gỡ lớp. Máy bật "giảm chuyển động" vẫn chạy bản nhẹ (nguyên nhân thứ hai của hiện tượng; không đổi). Đánh đổi: trang chủ có một khối trên màn hình đầu (`.circle-text-wrap` ở desktop, `.tlhp-hero-bar` ở điện thoại) hiện sẵn rồi mới chạy hiệu ứng, nên có thể chớp một lần. Test `scroll reveals never leave blank blocks` (3 test, `motion-guard.spec.ts`): 2 test đỏ trên bản cũ ở `v2.` (12 khối trắng), xanh trên bản dựng cục bộ; toàn bộ `motion-guard` 120 qua. Chưa deploy.
 - **Font:**
   - Tự host Noto Serif và Be Vietnam Pro (`assets/css/fonts.css`, file chép từ bản next/font đã tải về), chỉ bộ chữ latin và vietnamese; bỏ `next/font`.
   - Nguyên nhân chính của 719 KB: CSS của Google khai báo latin-ext sau vietnamese, nên với ă đ ơ ư ĩ ũ trình duyệt lấy file latin-ext (Noto Serif 182–231 KB) thay cho file vietnamese (14–18 KB). Be Vietnam Pro bị cùng lỗi ở cả 4 độ đậm.
