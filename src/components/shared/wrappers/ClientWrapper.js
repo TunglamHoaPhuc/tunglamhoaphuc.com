@@ -15,6 +15,7 @@ const ClientWrapper = () => {
 		}
 		let stopped = false;
 		let effects;
+		let wow;
 		// GSAP and the scroll animations load after the page is up (libs/pageEffects, T41a).
 		import("@/libs/pageEffects").then(({ startPageEffects }) => {
 			if (!stopped) effects = startPageEffects();
@@ -26,7 +27,8 @@ const ClientWrapper = () => {
 				// in _theme.scss); the class stays on <html> so the next page's boxes wait too.
 				document.documentElement.classList.add("tlhp-wow");
 				try {
-					new WOW().init();
+					wow = new WOW();
+					wow.init();
 				} catch (error) {
 					document.documentElement.classList.remove("tlhp-wow");
 					throw error;
@@ -37,6 +39,8 @@ const ClientWrapper = () => {
 		return () => {
 			stopped = true;
 			effects?.revert();
+			// Each init() starts a 50 ms timer and scroll/resize listeners; without stop() they pile up per page.
+			wow?.stop();
 			if (cleanup) cleanup();
 		};
 	}, []);

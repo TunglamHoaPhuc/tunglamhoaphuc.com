@@ -65,12 +65,13 @@ const strings = (value: unknown) => list(value).filter((item): item is string =>
 export function shapeAnalysis(text: string, answer: Record<string, unknown> | null) {
 	const raw = answer ?? {};
 	const dictionary = obj(raw.dictionary);
-	const translation = str(raw.full_translation) || str(dictionary.vn) || (answer ? "" : "Trợ lý AI chưa trả lời được, mời thử lại sau ít phút.");
+	const translation = str(raw.full_translation) || str(dictionary.vn) || "Trợ lý AI chưa trả lời được, mời thử lại sau ít phút.";
 	const syllables: Record<string, unknown>[] = list(raw.syllables).length ? list(raw.syllables).map(obj) : syllablesOf(text).map((syllable) => ({ syllable }));
 	const usage = obj(raw.usage_context);
 	const buddhist = obj(raw.buddhist_context);
 	return {
-		status: answer ? "success" : "fallback",
+		// "{}" or a JSON with none of the fields is no answer; only a real one is kept for a month.
+		status: answer && (str(raw.full_translation) || str(dictionary.vn) || list(raw.table_rows).length || list(raw.syllables).length) ? "success" : "fallback",
 		wylie: str(raw.wylie),
 		full_translation: translation,
 		dictionary: {

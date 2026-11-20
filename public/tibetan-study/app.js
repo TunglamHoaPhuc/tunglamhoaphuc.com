@@ -919,7 +919,7 @@ function renderSliderContent(raw) {
             <tr>
                 <td class="col-tibetan">
                     <span class="tibetan-text">${escapeHtml(r.tibetan)}</span>
-                    <button class="btn-table-play" onclick="playTTS('${escapeHtml(r.tibetan)}')" title="Nghe phát âm từ này">
+                    <button class="btn-table-play" onclick="playTTS(${jsArg(r.tibetan)})" title="Nghe phát âm từ này">
                         <svg class="svg-icon" viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                     </button>
                 </td>
@@ -1029,15 +1029,15 @@ function renderSliderContent(raw) {
                     <span class="tibetan-text syllable-lg">${escapeHtml(s.syllable)}</span>
                     <div class="syllable-title-meta">
                         <span class="syllable-wylie">Wylie: <b>${escapeHtml(s.wylie)}</b></span>
-                        <button class="btn-table-play" onclick="playTTS('${escapeHtml(s.syllable)}')" title="Nghe phát âm âm tiết này">
+                        <button class="btn-table-play" onclick="playTTS(${jsArg(s.syllable)})" title="Nghe phát âm âm tiết này">
                             <svg class="svg-icon" viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
                         </button>
                     </div>
                 </div>
                 <div class="syllable-badges-grid">
-                    <span class="badge-part badge-root" style="cursor:pointer;" onclick="playTTS('${escapeHtml(s.root || s.syllable)}')" title="Bấm để nghe căn tự ${escapeHtml(s.root || '')}">Căn tự gốc: <b class="tibetan-text">${escapeHtml(s.root || '-')}</b> 🔊</span>
-                    <span class="badge-part badge-prefix" ${s.prefix && s.prefix !== '-' ? `style="cursor:pointer;" onclick="playTTS('${escapeHtml(s.prefix)}')"` : ''}>Tiền tự: <b class="tibetan-text">${escapeHtml(s.prefix || '-')}</b></span>
-                    <span class="badge-part badge-suffix" ${s.suffix && s.suffix !== '-' ? `style="cursor:pointer;" onclick="playTTS('${escapeHtml(s.suffix)}')"` : ''}>Hậu tự: <b class="tibetan-text">${escapeHtml(s.suffix || '-')}</b></span>
+                    <span class="badge-part badge-root" style="cursor:pointer;" onclick="playTTS(${jsArg(s.root || s.syllable)})" title="Bấm để nghe căn tự ${escapeHtml(s.root || '')}">Căn tự gốc: <b class="tibetan-text">${escapeHtml(s.root || '-')}</b> 🔊</span>
+                    <span class="badge-part badge-prefix" ${s.prefix && s.prefix !== '-' ? `style="cursor:pointer;" onclick="playTTS(${jsArg(s.prefix)})"` : ''}>Tiền tự: <b class="tibetan-text">${escapeHtml(s.prefix || '-')}</b></span>
+                    <span class="badge-part badge-suffix" ${s.suffix && s.suffix !== '-' ? `style="cursor:pointer;" onclick="playTTS(${jsArg(s.suffix)})"` : ''}>Hậu tự: <b class="tibetan-text">${escapeHtml(s.suffix || '-')}</b></span>
                     <span class="badge-part badge-vowel">Nguyên âm: <b>${escapeHtml(s.vowel || 'a')}</b></span>
                 </div>
                 <div class="monastery-formula-box">
@@ -1634,7 +1634,7 @@ async function openPronunciationStudio(text) {
 
 function renderStudioGuide(data) {
     document.getElementById('studioPhonetics').innerHTML = `
-        Wylie: <b>${data.wylie}</b> • Nghĩa: <b>${data.dictionary ? data.dictionary.vn : ''}</b>
+        Wylie: <b>${escapeHtml(data.wylie)}</b> • Nghĩa: <b>${escapeHtml(data.dictionary ? data.dictionary.vn : '')}</b>
     `;
 
     let html = '';
@@ -1644,10 +1644,10 @@ function renderStudioGuide(data) {
         html += `
             <div class="slider-card" style="margin-bottom:8px;">
                 <div style="font-size:16px; font-weight:700; color:var(--gold-light);">
-                    ${s.syllable} [${rg.ipa || ''}] - Thanh điệu: <b>${rg.tone || 'Chuẩn'}</b> (${rg.aspiration || 'Tự nhiên'})
+                    ${escapeHtml(s.syllable)} [${escapeHtml(rg.ipa || '')}] - Thanh điệu: <b>${escapeHtml(rg.tone || 'Chuẩn')}</b> (${escapeHtml(rg.aspiration || 'Tự nhiên')})
                 </div>
                 <div style="font-size:12px; color:var(--text-secondary); margin-top:3px;">
-                    <b>Khẩu hình:</b> ${rg.guide || 'Phát âm theo quy tắc.'}
+                    <b>Khẩu hình:</b> ${escapeHtml(rg.guide || 'Phát âm theo quy tắc.')}
                 </div>
             </div>
         `;
@@ -1727,11 +1727,16 @@ function showToast(msg) {
 // Utility: Markdown Formatter
 function formatMarkdown(txt) {
     if (!txt) return '';
-    return txt
+    return escapeHtml(String(txt))
         .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
         .replace(/\*(.*?)\*/g, '<i>$1</i>')
         .replace(/`(.*?)`/g, '<code style="background:rgba(0,0,0,0.4); padding:1px 4px; border-radius:3px; color:var(--gold);">$1</code>')
         .replace(/\n/g, '<br>');
+}
+
+// Utility: a value as a JS string literal inside an HTML attribute (onclick="playTTS(...)")
+function jsArg(value) {
+    return escapeHtml(JSON.stringify(String(value == null ? '' : value)));
 }
 
 // Utility: HTML Escaping

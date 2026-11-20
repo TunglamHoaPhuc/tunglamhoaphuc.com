@@ -4,6 +4,7 @@ import { DONG_CHAY, TRI_TUE } from "@/config/sections";
 import { site } from "@/config/site";
 import { vuTru } from "@/config/vuTru";
 import { book } from "@/config/triTue";
+import { CALENDAR_PATH, eventPath, programSlug } from "@/libs/calendar";
 import type { ContentRepository, Post, ScheduleEvent } from "@/libs/content/types";
 import { isPublicHost } from "@/libs/hosts";
 import { tongChiHref } from "@/libs/tongChiGroups";
@@ -60,6 +61,10 @@ export async function sitemapEntries(repository: ContentRepository): Promise<Sit
 	for (const article of await repository.listTongChi()) entries.push({ path: tongChiHref(article.slug) });
 	for (const area of await repository.listAreas()) entries.push({ path: areaHref(area.slug) });
 	for (const statue of await repository.listStatues()) entries.push({ path: statue.href });
+	// Each event and regular ceremony has its own page (/lich-tu-hoc/<slug>), reached only by links.
+	const schedule = await repository.getSchedule();
+	for (const event of schedule.events) entries.push({ path: eventPath(event) });
+	for (const program of schedule.programs) entries.push({ path: `${CALENDAR_PATH}/${programSlug(program)}` });
 
 	// A path once only, in the order found.
 	const seen = new Set<string>();

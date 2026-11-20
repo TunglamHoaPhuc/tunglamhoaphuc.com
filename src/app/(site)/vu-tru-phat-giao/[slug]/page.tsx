@@ -11,7 +11,7 @@ import HeaderSpace from "@/components/shared/others/HeaderSpace";
 import { site } from "@/config/site";
 import { vuTru } from "@/config/vuTru";
 import { IMAGE_WIDTH, imageAt, topImagePriority } from "@/libs/content/media";
-import { getContentRepository } from "@/libs/content/repository";
+import { getContentRepository, slugKey } from "@/libs/content/repository";
 import type { StatueSummary } from "@/libs/content/types";
 import { areaHref, type MapArea, statuesIn, templeAreas } from "@/libs/vuTru";
 
@@ -29,7 +29,7 @@ type Props = { params: Promise<{ slug: string }> };
 
 async function findArea(slug: string): Promise<{ area: MapArea; areas: MapArea[] } | null> {
 	const areas = templeAreas(await (await getContentRepository()).listAreas());
-	const area = areas.find((item) => item.slug === decodeURIComponent(slug));
+	const area = areas.find((item) => item.slug === slugKey(slug));
 	return area ? { area, areas } : null;
 }
 

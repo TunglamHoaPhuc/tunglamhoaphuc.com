@@ -10,7 +10,7 @@ import { DONG_CHAY } from "@/config/sections";
 import { site } from "@/config/site";
 import { CALENDAR_PATH, calendarHref, eventStatus, findScheduleItem, lunarRange, programDays, solarRange, todayInVietnam } from "@/libs/calendar";
 import { IMAGE_WIDTH, imageAt, topImagePriority } from "@/libs/content/media";
-import { getContentRepository } from "@/libs/content/repository";
+import { getContentRepository, slugKey } from "@/libs/content/repository";
 import { listHref } from "@/libs/postList";
 import { eventJsonLd } from "@/libs/seo";
 
@@ -37,7 +37,7 @@ type Props = { params: Promise<{ slug: string }> };
 
 async function find(slug: string) {
 	const schedule = await (await getContentRepository()).getSchedule();
-	return findScheduleItem(schedule, decodeURIComponent(slug), todayInVietnam());
+	return findScheduleItem(schedule, slugKey(slug), todayInVietnam());
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

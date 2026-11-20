@@ -14,5 +14,9 @@ export async function GET(request: Request) {
 		const remote = source.replace(/^https?:\/+/, "https://");
 		return remote.startsWith(WORDPRESS) ? Response.redirect(remote, 302) : new Response("Not found", { status: 404 });
 	}
-	return Response.redirect(new URL(`/${source}`, url.origin).toString(), 302);
+	// "w=1//evil.example/x" leaves source "/evil.example/x"; "/" + that is protocol-relative. Drop the
+	// leading slashes and keep the answer on this site.
+	const target = new URL(`/${source.replace(/^[/\\]+/, "")}`, url.origin);
+	if (target.origin !== url.origin) return new Response("Not found", { status: 404 });
+	return Response.redirect(target.toString(), 302);
 }

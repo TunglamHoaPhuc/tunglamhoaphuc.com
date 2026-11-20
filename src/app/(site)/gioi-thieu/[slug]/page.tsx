@@ -11,7 +11,7 @@ import HeroInner from "@/components/sections/hero/HeroInner";
 import HeaderSpace from "@/components/shared/others/HeaderSpace";
 import { site } from "@/config/site";
 import { IMAGE_WIDTH, imageAt, topImagePriority } from "@/libs/content/media";
-import { getContentRepository } from "@/libs/content/repository";
+import { getContentRepository, slugKey } from "@/libs/content/repository";
 import type { AboutTopic } from "@/libs/content/types";
 import { formatNumber, titleCase } from "@/libs/format";
 
@@ -29,7 +29,7 @@ type Props = { params: Promise<{ slug: string }> };
 
 async function findTopic(slug: string): Promise<{ topic: AboutTopic; topics: AboutTopic[] } | null> {
 	const topics = await (await getContentRepository()).listAboutTopics();
-	const topic = topics.find((item) => item.slug === decodeURIComponent(slug));
+	const topic = topics.find((item) => item.slug === slugKey(slug));
 	return topic ? { topic, topics } : null;
 }
 
