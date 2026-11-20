@@ -13,9 +13,10 @@ export default defineConfig({
       ACCESS_TEAM_DOMAIN: bindings.text("https://lingering-heart-cb52.cloudflareaccess.com"),
       ACCESS_AUD: bindings.text("132420dfd3a001eb302b1545c9c347c40006c6354281c083869d58c9f919070a"),
     },
-    triggers: [
-      triggers.fetch({ pattern: "www.tunglamhoaphuc.com/api/*", zone: "tunglamhoaphuc.com" }),
-    ],
+    // T22: route www.tunglamhoaphuc.com/api/* removed when www moved to the new site
+    // (docs/van-hanh/chuyen-www.md). Restore it with the line below to roll back to Vercel:
+    // triggers.fetch({ pattern: "www.tunglamhoaphuc.com/api/*", zone: "tunglamhoaphuc.com" }),
+    triggers: [],
     workersDev: false,
     observability: { enabled: true },
   },
