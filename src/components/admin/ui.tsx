@@ -3,7 +3,7 @@
 // The few building blocks the admin pages share. Feedback is always a block in the page flow (no pop-ups,
 // no toasts): the brand rule of design-system/tokens.css applies here too.
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
-import { useId } from "react";
+import { useId, useSyncExternalStore } from "react";
 import { ApiClientError } from "./api";
 
 export const errorText = (error: unknown) => (error instanceof ApiClientError ? error.message : error instanceof Error ? error.message : "Có lỗi xảy ra. Hãy thử lại.");
@@ -43,9 +43,15 @@ export function TextArea({ label, error, hint, ...area }: { label: string; error
 	return <Field label={label} error={error} hint={hint}>{(a11y) => <textarea className="tq-input" rows={3} {...a11y} {...area} />}</Field>;
 }
 
+/** False while the page is still server-rendered HTML, true once React runs in the browser. */
+const useHydrated = () => useSyncExternalStore(() => () => undefined, () => true, () => false);
+
 export function Button({ variant = "primary", busy, children, ...button }: { variant?: "primary" | "secondary" | "danger" | "link"; busy?: boolean } & ButtonHTMLAttributes<HTMLButtonElement>) {
+	// A submit button stays off until React has taken the page over: before that, its form would be sent by the
+	// browser itself (a GET with the typed fields, passwords included, in the address).
+	const waiting = !useHydrated() && button.type === "submit";
 	return (
-		<button type="button" className={`tq-btn tq-btn--${variant}`} disabled={busy || button.disabled} aria-busy={busy || undefined} {...button}>
+		<button type="button" className={`tq-btn tq-btn--${variant}`} aria-busy={busy || undefined} {...button} disabled={busy || button.disabled || waiting}>
 			{busy ? "Đang xử lý…" : children}
 		</button>
 	);
