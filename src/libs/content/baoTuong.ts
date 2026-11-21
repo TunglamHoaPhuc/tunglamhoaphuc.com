@@ -2,6 +2,7 @@
 // for lists and area pages, and Statue for a statue's own page. Lenient like the other
 // adapters: a statue without a slug is reported and left out, the rest falls back to empty
 // values. The text is turned into HTML only when its page is asked for.
+import { cleanBodyHtml } from "../../admin/special/html";
 import { z } from "zod";
 import { titleCase } from "../format";
 import { mediaUrl } from "./media";
@@ -128,5 +129,7 @@ export function statueSummary({ id, code, slug, name, subtitle, areaCode, main, 
 /** The statue with its text as safe HTML. */
 export function statueArticle(entry: StatueEntry): Statue {
 	const { text: body, ...statue } = entry;
-	return { ...statue, contentHtml: renderContent(body) };
+	// A body the admin saved is HTML (already cleaned when saved; cleaned again here, since this is the public page); the old
+	// admin's text is plain paragraphs, which renderContent turns into HTML.
+	return { ...statue, contentHtml: body.trimStart().startsWith("<") ? cleanBodyHtml(body) : renderContent(body) };
 }
