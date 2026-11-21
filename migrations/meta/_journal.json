@@ -8,6 +8,20 @@
       "when": 1794899790649,
       "tag": "0000_khoi-tao",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1795248132258,
+      "tag": "0001_admin-tai-khoan",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1795248333826,
+      "tag": "0002_admin-nhat-ky",
+      "breakpoints": true
     }
   ]
 }

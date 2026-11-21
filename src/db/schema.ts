@@ -24,15 +24,123 @@ const STATUS = ["draft", "review", "published", "archived"] as const;
 
 // ---------------------------------------------------------------- users (referenced by media and the log)
 
+/** A role an admin can give people; the four system roles are made by the seed (scripts/seed-admin.ts). */
+export const role = sqliteTable("role", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull().unique(),
+	description: text("description").notNull().default(""),
+	/** A system role cannot be deleted. */
+	isSystem: boolean("is_system").notNull().default(false),
+	createdAt: text("created_at"),
+	updatedAt: text("updated_at"),
+	deletedAt: text("deleted_at"),
+});
+
+/** What a role may do: one row per module and action; `scope` "own" limits update and delete to what the person created. */
+export const rolePermission = sqliteTable(
+	"role_permission",
+	{
+		roleId: text("role_id")
+			.notNull()
+			.references(() => role.id, { onDelete: "cascade" }),
+		module: text("module").notNull(),
+		action: text("action").notNull(),
+		scope: text("scope", { enum: ["all", "own"] })
+			.notNull()
+			.default("all"),
+	},
+	(table) => [primaryKey({ columns: [table.roleId, table.module, table.action] })],
+);
+
 export const user = sqliteTable("user", {
 	id: text("id").primaryKey(),
 	email: text("email").notNull().unique(),
 	name: text("name").notNull().default(""),
+	/** The old fixed role; kept so old rows read, no longer used to decide anything (see `roleId`). */
 	role: text("role", { enum: ["super_admin", "editor", "coordinator", "viewer"] })
 		.notNull()
 		.default("viewer"),
 	active: boolean("active").notNull().default(true),
 	lastLoginAt: text("last_login_at"),
+	/** Argon2id, PHC string. Null: the account cannot sign in with a password yet. */
+	passwordHash: text("password_hash"),
+	passwordChangedAt: text("password_changed_at"),
+	mustChangePassword: boolean("must_change_password").notNull().default(false),
+	roleId: text("role_id").references(() => role.id),
+	lockedAt: text("locked_at"),
+	lockedReason: text("locked_reason"),
+	failedLogins: integer("failed_logins").notNull().default(0),
+	avatarMediaId: text("avatar_media_id"),
+	createdAt: text("created_at"),
+	updatedAt: text("updated_at"),
+	deletedAt: text("deleted_at"),
+	deletedBy: text("deleted_by"),
+});
+
+/** A sign-in. The access token names it by `id`; every request checks the row, so ending it takes effect at once. */
+export const session = sqliteTable(
+	"session",
+	{
+		id: text("id").primaryKey(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		/** SHA-256 of the refresh token; the token itself is only ever in the person's cookie. */
+		refreshHash: text("refresh_hash").unique(),
+		/** The token before the last refresh, still accepted for a short while (two tabs refreshing together). */
+		prevRefreshHash: text("prev_refresh_hash"),
+		rotatedAt: text("rotated_at"),
+		createdAt: text("created_at").notNull(),
+		lastUsedAt: text("last_used_at").notNull(),
+		expiresAt: text("expires_at").notNull(),
+		revokedAt: text("revoked_at"),
+		ip: text("ip").notNull().default(""),
+		userAgent: text("user_agent").notNull().default(""),
+		/** False while the person has given the password but not yet the 2FA code. */
+		mfaPassed: boolean("mfa_passed").notNull().default(false),
+		/** Wrong 2FA codes given on this session. */
+		mfaFailures: integer("mfa_failures").notNull().default(0),
+	},
+	(table) => [index("session_user").on(table.userId, table.revokedAt)],
+);
+
+export const passwordReset = sqliteTable(
+	"password_reset",
+	{
+		id: text("id").primaryKey(),
+		userId: text("user_id")
+			.notNull()
+			.references(() => user.id, { onDelete: "cascade" }),
+		/** SHA-256 of the token mailed to the person. */
+		tokenHash: text("token_hash").notNull().unique(),
+		createdAt: text("created_at").notNull(),
+		expiresAt: text("expires_at").notNull(),
+		usedAt: text("used_at"),
+		requestedIp: text("requested_ip").notNull().default(""),
+	},
+	(table) => [index("password_reset_user").on(table.userId)],
+);
+
+export const userTotp = sqliteTable("user_totp", {
+	userId: text("user_id")
+		.primaryKey()
+		.references(() => user.id, { onDelete: "cascade" }),
+	/** The shared secret, encrypted with ADMIN_ENC_KEY. */
+	secretEnc: text("secret_enc").notNull(),
+	/** Null until the person has typed a first valid code. */
+	enabledAt: text("enabled_at"),
+	/** SHA-256 of the one-time recovery codes. */
+	recoveryHashes: json<string[]>("recovery_hashes").notNull().default(EMPTY_LIST),
+	/** The last 30-second step accepted, so a code cannot be used twice. */
+	lastUsedStep: integer("last_used_step").notNull().default(0),
+});
+
+/** Counters that slow down guessing: sign-in, 2FA codes, password-reset requests. */
+export const authThrottle = sqliteTable("auth_throttle", {
+	key: text("key").primaryKey(),
+	windowStart: text("window_start").notNull(),
+	count: integer("count").notNull().default(0),
+	lockedUntil: text("locked_until"),
 });
 
 // ---------------------------------------------------------------- pictures
@@ -465,8 +573,21 @@ export const auditLog = sqliteTable(
 		entityId: text("entity_id").notNull(),
 		diff: json<unknown>("diff"),
 		createdAt: text("created_at").notNull(),
+		/** Kept even if the account is later deleted. */
+		userEmail: text("user_email").notNull().default(""),
+		/** The fields that changed, before and after; secrets blanked, long text cut (src/admin/audit/log.ts). */
+		dataBefore: json<unknown>("data_before"),
+		dataAfter: json<unknown>("data_after"),
+		ip: text("ip").notNull().default(""),
+		userAgent: text("user_agent").notNull().default(""),
+		requestId: text("request_id").notNull().default(""),
 	},
-	(table) => [index("audit_entity").on(table.entityType, table.entityId), index("audit_time").on(table.createdAt)],
+	(table) => [
+		index("audit_entity").on(table.entityType, table.entityId),
+		index("audit_time").on(table.createdAt),
+		index("audit_user_time").on(table.userId, table.createdAt),
+		index("audit_action_time").on(table.action, table.createdAt),
+	],
 );
 
 export const redirect = sqliteTable("redirect", {
