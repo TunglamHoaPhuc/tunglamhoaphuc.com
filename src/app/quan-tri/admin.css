@@ -1,0 +1,582 @@
+/* The admin's look: light "Ngà" ground and the brand browns of design-system/tokens.css, set apart from the
+   public site's dark theme. Everything lives under .tq so none of it leaks out, and the site's global
+   heading and link styles (gold, glow, UTM Niagara) are switched off inside it. */
+.tq {
+	--tq-ground: #faf5ee; /* moc-50 */
+	--tq-card: #ffffff;
+	--tq-ink: #2c1c11; /* moc-900 */
+	--tq-muted: #6b5a4b;
+	--tq-line: #e3cba8; /* moc-200 */
+	--tq-line-soft: #f2e6d5; /* moc-100 */
+	--tq-accent: #835414; /* moc-600 */
+	--tq-accent-ink: #ffffff;
+	--tq-accent-soft: #f8ecda; /* hoaisac-100 */
+	--tq-danger: #a1261b;
+	--tq-danger-soft: #fbe9e6;
+	--tq-ok: #2e6b3c;
+	--tq-ok-soft: #e6f2e8;
+	--tq-warn-soft: #fdf1d6;
+	--tq-radius: 10px;
+	--tq-font: var(--tlhp-font-sans, "Be Vietnam Pro", system-ui, sans-serif);
+
+	min-height: 100vh;
+	background: var(--tq-ground);
+	color: var(--tq-ink);
+	font-family: var(--tq-font);
+	font-size: 16px;
+	line-height: 1.55;
+	color-scheme: light;
+}
+.tq *,
+.tq *::before,
+.tq *::after {
+	box-sizing: border-box;
+}
+.tq h1,
+.tq h2,
+.tq h3,
+.tq h4 {
+	font-family: var(--tq-font);
+	color: var(--tq-ink);
+	text-shadow: none;
+	letter-spacing: 0;
+	text-transform: none;
+	margin: 0;
+}
+.tq a {
+	color: var(--tq-accent);
+}
+.tq a:hover {
+	color: #523417;
+}
+.tq :focus-visible {
+	outline: 3px solid #b48446;
+	outline-offset: 2px;
+}
+.tq-h1 {
+	font-size: 1.6rem;
+	font-weight: 700;
+	line-height: 1.25;
+}
+.tq-h2 {
+	font-size: 1.15rem;
+	font-weight: 600;
+	margin-bottom: 0.75rem;
+}
+.tq-muted {
+	color: var(--tq-muted);
+}
+.tq-hint {
+	color: var(--tq-muted);
+	font-size: 0.875rem;
+	margin: 0.25rem 0 0;
+}
+
+/* ---- pages without the shell (sign-in, reset) ---- */
+.tq-center {
+	min-height: 100vh;
+	display: grid;
+	place-items: center;
+	padding: 24px 16px;
+}
+.tq-card {
+	background: var(--tq-card);
+	border: 1px solid var(--tq-line);
+	border-radius: var(--tq-radius);
+	padding: 24px;
+	width: 100%;
+}
+.tq-card--narrow {
+	max-width: 420px;
+}
+.tq-brand {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin-bottom: 20px;
+}
+.tq-brand img {
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	/* the seal is drawn for dark grounds */
+	background: #2c1c11;
+}
+.tq-brand strong {
+	display: block;
+	line-height: 1.2;
+}
+.tq-brand span {
+	color: var(--tq-muted);
+	font-size: 0.875rem;
+}
+
+/* ---- the shell ---- */
+.tq-shell {
+	display: grid;
+	grid-template-columns: 250px minmax(0, 1fr);
+	min-height: 100vh;
+}
+.tq-side {
+	background: #2c1c11;
+	color: #f2e6d5;
+	padding: 20px 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+	position: sticky;
+	top: 0;
+	height: 100vh;
+	overflow-y: auto;
+}
+.tq-side .tq-brand {
+	margin: 0 6px;
+}
+.tq-side .tq-brand span {
+	color: #cfa874;
+}
+.tq-nav {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.tq-nav a {
+	display: block;
+	padding: 9px 12px;
+	border-radius: 8px;
+	color: #f2e6d5;
+	text-decoration: none;
+}
+.tq-nav a:hover {
+	background: rgba(255, 255, 255, 0.08);
+	color: #fff;
+}
+.tq-nav a[aria-current="page"] {
+	background: #835414;
+	color: #fff;
+}
+.tq-nav-group {
+	margin: 14px 12px 4px;
+	font-size: 0.75rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: #cfa874;
+}
+.tq-side-foot {
+	margin-top: auto;
+	padding: 10px 12px;
+	border-top: 1px solid rgba(255, 255, 255, 0.15);
+	font-size: 0.875rem;
+}
+.tq-side-foot .tq-btn {
+	margin-top: 8px;
+	width: 100%;
+}
+.tq-main {
+	padding: 28px clamp(16px, 3vw, 40px) 48px;
+	min-width: 0;
+}
+.tq-topbar {
+	display: none;
+}
+
+@media (max-width: 900px) {
+	.tq-shell {
+		grid-template-columns: minmax(0, 1fr);
+	}
+	.tq-side {
+		position: static;
+		height: auto;
+		display: none;
+	}
+	.tq-side[data-open="true"] {
+		display: flex;
+	}
+	.tq-topbar {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		background: #2c1c11;
+		color: #f2e6d5;
+		padding: 10px 16px;
+	}
+	.tq-topbar .tq-btn {
+		background: transparent;
+		color: #f2e6d5;
+		border-color: #cfa874;
+	}
+}
+
+/* ---- content blocks ---- */
+.tq-page-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 16px;
+	flex-wrap: wrap;
+	margin-bottom: 20px;
+}
+.tq-actions {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+.tq-panel {
+	background: var(--tq-card);
+	border: 1px solid var(--tq-line);
+	border-radius: var(--tq-radius);
+	padding: 20px;
+	margin-bottom: 20px;
+}
+.tq-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+	gap: 14px;
+}
+.tq-grid .tq-panel {
+	margin: 0;
+}
+.tq-back {
+	display: inline-block;
+	margin-bottom: 6px;
+	font-size: 0.9rem;
+}
+.tq-empty {
+	border: 1px dashed var(--tq-line);
+	border-radius: var(--tq-radius);
+	padding: 32px 16px;
+	text-align: center;
+	color: var(--tq-muted);
+}
+
+/* ---- forms ---- */
+.tq-field {
+	margin-bottom: 14px;
+}
+.tq-label {
+	display: block;
+	font-weight: 600;
+	margin-bottom: 4px;
+}
+.tq-input {
+	width: 100%;
+	min-height: 44px;
+	padding: 9px 12px;
+	border: 1px solid #b9a07f;
+	border-radius: 8px;
+	background: #fff;
+	color: var(--tq-ink);
+	font: inherit;
+}
+/* The public site styles inputs for its dark theme, also on focus and autofill: set ours back at higher weight. */
+.tq input.tq-input,
+.tq select.tq-input,
+.tq textarea.tq-input,
+.tq input.tq-input:focus,
+.tq select.tq-input:focus,
+.tq textarea.tq-input:focus {
+	background-color: #fff;
+	color: var(--tq-ink);
+	box-shadow: none;
+}
+.tq input.tq-input:focus,
+.tq select.tq-input:focus,
+.tq textarea.tq-input:focus {
+	border-color: var(--tq-accent);
+	outline: 3px solid #b48446;
+	outline-offset: 1px;
+}
+.tq input.tq-input:-webkit-autofill {
+	-webkit-text-fill-color: var(--tq-ink);
+	box-shadow: 0 0 0 40px #fff inset;
+}
+.tq-input[aria-invalid="true"] {
+	border-color: var(--tq-danger);
+}
+textarea.tq-input {
+	min-height: 90px;
+}
+.tq-field-error {
+	color: var(--tq-danger);
+	font-size: 0.875rem;
+	margin: 4px 0 0;
+}
+.tq-check {
+	display: flex;
+	align-items: flex-start;
+	gap: 8px;
+	margin-bottom: 8px;
+}
+.tq-check input {
+	width: 20px;
+	height: 20px;
+	margin-top: 2px;
+	accent-color: var(--tq-accent);
+}
+
+.tq-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 44px;
+	padding: 8px 18px;
+	border-radius: 8px;
+	border: 1px solid var(--tq-accent);
+	background: var(--tq-accent);
+	color: var(--tq-accent-ink);
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+	text-decoration: none;
+}
+.tq-btn:hover:not(:disabled) {
+	background: #6b4413;
+	color: #fff;
+}
+.tq-btn:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+.tq-btn--secondary {
+	background: #fff;
+	color: var(--tq-accent);
+}
+.tq-btn--secondary:hover:not(:disabled) {
+	background: var(--tq-accent-soft);
+	color: #523417;
+}
+.tq-btn--danger {
+	background: var(--tq-danger);
+	border-color: var(--tq-danger);
+}
+.tq-btn--danger:hover:not(:disabled) {
+	background: #7d1c14;
+}
+.tq-btn--link {
+	background: none;
+	border-color: transparent;
+	color: var(--tq-accent);
+	padding: 8px 6px;
+	text-decoration: underline;
+}
+.tq-btn--link:hover:not(:disabled) {
+	background: none;
+	color: #523417;
+}
+.tq-btn--small {
+	min-height: 36px;
+	padding: 4px 12px;
+	font-size: 0.9rem;
+}
+
+/* ---- alerts, badges ---- */
+.tq-alert {
+	border-radius: 8px;
+	padding: 10px 14px;
+	margin: 0 0 14px;
+	border: 1px solid var(--tq-line);
+	background: var(--tq-accent-soft);
+}
+.tq-alert--error {
+	background: var(--tq-danger-soft);
+	border-color: #e7b3ac;
+	color: #6f1a11;
+}
+.tq-alert--success {
+	background: var(--tq-ok-soft);
+	border-color: #b6d6bd;
+	color: #1f4a29;
+}
+.tq-alert--warning {
+	background: var(--tq-warn-soft);
+	border-color: #ecd08a;
+}
+.tq-badge {
+	display: inline-block;
+	padding: 1px 10px;
+	border-radius: 999px;
+	font-size: 0.8125rem;
+	font-weight: 600;
+	background: var(--tq-line-soft);
+	color: var(--tq-ink);
+	white-space: nowrap;
+}
+.tq-badge--ok {
+	background: var(--tq-ok-soft);
+	color: #1f4a29;
+}
+.tq-badge--warn {
+	background: var(--tq-warn-soft);
+	color: #6a4a00;
+}
+.tq-badge--danger {
+	background: var(--tq-danger-soft);
+	color: #6f1a11;
+}
+
+/* ---- tables ---- */
+.tq-table-wrap {
+	overflow-x: auto;
+	border: 1px solid var(--tq-line);
+	border-radius: var(--tq-radius);
+	background: var(--tq-card);
+}
+.tq-table {
+	width: 100%;
+	border-collapse: collapse;
+	min-width: 640px;
+}
+.tq-table th,
+.tq-table td {
+	text-align: left;
+	padding: 10px 14px;
+	border-bottom: 1px solid var(--tq-line-soft);
+	vertical-align: middle;
+}
+.tq-table th {
+	font-size: 0.8125rem;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--tq-muted);
+	background: var(--tq-ground);
+}
+.tq-table tr:last-child td {
+	border-bottom: 0;
+}
+.tq-toolbar {
+	display: flex;
+	gap: 10px;
+	flex-wrap: wrap;
+	align-items: flex-end;
+	margin-bottom: 14px;
+}
+.tq-toolbar .tq-field {
+	margin: 0;
+	min-width: 180px;
+}
+.tq-pager {
+	display: flex;
+	gap: 12px;
+	align-items: center;
+	justify-content: center;
+	margin-top: 16px;
+	flex-wrap: wrap;
+}
+.tq-kv {
+	display: grid;
+	grid-template-columns: 160px minmax(0, 1fr);
+	gap: 6px 14px;
+	margin: 0;
+}
+.tq-kv dt {
+	color: var(--tq-muted);
+}
+.tq-kv dd {
+	margin: 0;
+	word-break: break-word;
+}
+.tq .tq-code {
+	color: var(--tq-ink);
+	font-size: 0.95rem;
+	font-family: ui-monospace, "SFMono-Regular", Consolas, monospace;
+	background: var(--tq-line-soft);
+	padding: 2px 6px;
+	border-radius: 4px;
+	word-break: break-all;
+}
+.tq-codes {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+	gap: 6px;
+	list-style: none;
+	padding: 0;
+	margin: 8px 0 14px;
+}
+
+/* ---- permission matrix ---- */
+.tq-matrix td,
+.tq-matrix th {
+	text-align: center;
+}
+.tq-matrix td:first-child,
+.tq-matrix th:first-child {
+	text-align: left;
+}
+.tq-matrix select {
+	min-width: 104px;
+	min-height: 36px;
+	padding: 2px 6px;
+	border: 1px solid #b9a07f;
+	border-radius: 6px;
+	background: #fff;
+	font: inherit;
+}
+.tq-matrix input[type="checkbox"] {
+	width: 20px;
+	height: 20px;
+	accent-color: var(--tq-accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.tq * {
+		scroll-behavior: auto !important;
+		transition: none !important;
+		animation: none !important;
+	}
+}
+
+/* Links that look like buttons keep the button's colours (the plain `.tq a` rule would win otherwise). */
+.tq a.tq-btn,
+.tq a.tq-btn:hover {
+	color: var(--tq-accent-ink);
+	text-decoration: none;
+}
+.tq a.tq-btn--secondary,
+.tq a.tq-btn--secondary:hover {
+	color: var(--tq-accent);
+}
+.tq a.tq-btn--secondary:hover {
+	color: #523417;
+}
+.tq a.tq-btn--link {
+	text-decoration: underline;
+}
+.tq .tq-input::placeholder {
+	color: #8a7766;
+	opacity: 1;
+}
+/* A table's caption names it for screen readers; it is not shown. */
+.tq-table caption {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+
+/* The public site styles input[type=email|password|search…] for its dark theme with more weight than a class; inside
+   the admin the form controls keep one look, so these are marked important (the rules stay scoped to .tq). */
+.tq .tq-input {
+	border: 1px solid #b9a07f !important;
+	border-radius: 8px !important;
+	padding: 9px 12px !important;
+	font-size: 1rem !important;
+	font-family: var(--tq-font) !important;
+	line-height: 1.4 !important;
+	min-height: 44px;
+	background-color: #fff !important;
+	color: var(--tq-ink) !important;
+}
+.tq .tq-input[aria-invalid="true"] {
+	border-color: var(--tq-danger) !important;
+}
+.tq .tq-input:focus {
+	border-color: var(--tq-accent) !important;
+}
+.tq .tq-panel > .tq-kv {
+	margin-bottom: 18px;
+}

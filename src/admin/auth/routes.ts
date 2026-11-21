@@ -101,7 +101,7 @@ registerRoutes(
 		handler: async (call) => {
 			const { user, session, permissions } = call.authed!;
 			return {
-				user: { id: user.id, email: user.email, name: user.name, role: user.roleName },
+				user: { id: user.id, email: user.email, name: user.name, role: user.roleName, roleId: user.roleId },
 				permissions: [...permissions].map(([key, scope]) => (scope === "own" ? `${key}:own` : key)),
 				mustChangePassword: user.mustChangePassword,
 				mfaEnabled: await hasTotp(call.ctx.db, user.id),

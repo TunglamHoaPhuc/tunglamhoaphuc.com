@@ -63,7 +63,7 @@ async function main() {
 			console.log(`applied ${name}`);
 		} catch (error) {
 			raw.exec("ROLLBACK");
-			throw new Error(`${name} failed: ${(error as Error).message}`);
+			throw new Error(`${name} failed: ${(error as Error).message}`, { cause: error });
 		}
 	}
 	if (!todo.length) console.log("migrations up to date");
