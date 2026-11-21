@@ -52,6 +52,14 @@ const category = (row: Row, prefix = "cat") => ({ slug: text(row[`${prefix}_slug
 const viewsOf = (entityType: string) =>
 	`left join (select entity_id, sum(count) as n from page_view where entity_type = '${entityType}' group by entity_id) v on v.entity_id = `;
 
+/**
+ * What the public site may show (docs/admin-architecture.md 5.4): not in the trash, and published, or scheduled with its time come.
+ * Statues and events have no schedule: only "published" shows.
+ */
+const NOW = "strftime('%Y-%m-%dT%H:%M:%fZ', 'now')";
+const live = (alias: string) => `${alias}.deleted_at is null and (${alias}.status = 'published' or (${alias}.status = 'scheduled' and ${alias}.publish_at <= ${NOW}))`;
+const livePlain = (alias: string) => `${alias}.deleted_at is null and ${alias}.status = 'published'`;
+
 const POST_SUMMARY = `
 select p.id, p.slug, p.title, p.subtitle, p.section, p.author, p.published_date, p.summary, p.gallery_count,
   p.legacy_views + coalesce(v.n, 0) as views, p.thumbnail_position, p.banner_position,
@@ -62,7 +70,7 @@ left join category c on c.id = p.category_id
 left join media t on t.id = p.thumbnail_media_id
 left join media b on b.id = p.banner_media_id
 ${viewsOf("post")}p.id
-where p.status = 'published'
+where ${live("p")}
 order by p.rowid`;
 
 /** The albums of one kind of owner ("page", "teaching"): album id → pictures, in order. */
@@ -139,6 +147,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 		const events = await all(
 			`select e.*, c.slug as cat_slug, c.name as cat_name, m.r2_key as img_key, m.url as img_url
 			from calendar_event e left join category c on c.id = e.category_id left join media m on m.id = e.image_media_id
+			where ${livePlain("e")}
 			order by e.start_date, e.end_date, e.position, e.id`,
 		);
 		const programs = await all(`select f.*, m.r2_key as img_key, m.url as img_url from featured_program f left join media m on m.id = f.image_media_id order by f.position, f.id`);
@@ -185,7 +194,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 		const pages = await all(
 			`select p.*, c.slug as cat_slug, c.name as cat_name, b.r2_key as banner_key, b.url as banner_url, o.r2_key as portrait_key, o.url as portrait_url
 			from page p left join category c on c.id = p.group_id left join media b on b.id = p.banner_media_id left join media o on o.id = p.portrait_media_id
-			where p.status = 'published' order by p.position, p.id`,
+			where ${live("p")} order by p.position, p.id`,
 		);
 		const milestones = await all("select page_id, label, title, description from milestone order by page_id, position");
 		const photos = await galleries(all, "page");
@@ -212,7 +221,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 			`select a.*, a.legacy_views + coalesce(v.n, 0) as views, c.slug as cat_slug, c.name as cat_name, b.r2_key as banner_key, b.url as banner_url
 			from teaching_article a left join category c on c.id = a.group_id left join media b on b.id = a.banner_media_id
 			${viewsOf("tong-chi")}a.id
-			where a.status = 'published' order by a.position, a.id`,
+			where ${live("a")} order by a.position, a.id`,
 		);
 		const photos = await galleries(all, "teaching");
 		return rows.map((row) => ({
@@ -238,7 +247,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 	}
 
 	async function loadAreas(): Promise<Area[]> {
-		const rows = await all(`select a.*, m.r2_key as cover_key, m.url as cover_url from area a left join media m on m.id = a.cover_media_id where a.visible = 1 order by a.position, a.id`);
+		const rows = await all(`select a.*, m.r2_key as cover_key, m.url as cover_url from area a left join media m on m.id = a.cover_media_id where a.visible = 1 and a.deleted_at is null order by a.position, a.id`);
 		return rows.map((row) => ({
 			id: text(row.id),
 			slug: text(row.slug),
@@ -256,6 +265,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 		const rows = await all(
 			`select s.*, g.slug as cat_slug, g.name as cat_name, k.name as cluster_name, m.r2_key as img_key, m.url as img_url
 			from statue s left join category g on g.id = s.assembly_id left join statue_cluster k on k.id = s.cluster_id left join media m on m.id = s.image_media_id
+			where ${livePlain("s")}
 			order by s.position, s.id`,
 		);
 		const variations = await all(

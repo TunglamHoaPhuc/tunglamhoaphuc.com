@@ -2,3 +2,7 @@
 import "./auth/routes";
 import "./users/routes";
 import "./media/routes";
+import "./content/routes";
+import "./taxonomy/routes";
+import "./special/routes";
+import "./ops/routes";
