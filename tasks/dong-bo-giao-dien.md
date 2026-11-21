@@ -265,3 +265,7 @@ Chưa đổi: icon mục bài (`cong-tu`, `khoa-le-truyen-thong`, `dai-le-su-kie
 - **Thumbnail:** các sự kiện 19/11 và 20/11 (và nhiều sự kiện khác) dùng chung áp phích chủ đề tháng, không phải ảnh riêng của sự kiện; đó là dữ liệu của admin cũ, không tự đoán được ảnh đúng. Cần Ban Biên Tập chọn ảnh riêng. Áp phích cắt 16:9 mất dòng chữ dưới, nên khó đọc là áp phích của tháng nào.
 - **Chưa làm:** ngày vía Phật và Bồ Tát trên lịch (cần Ban Biên Tập xác nhận danh sách); `bao-tuong.spec.ts:56` hỏng ổn định trên máy chủ dev (bấm "Lọc" trước khi trang nạp xong, URL có tham số rỗng), không liên quan thay đổi này (qua trên `v2.`).
 - **Phiên khác:** phiên "Agent Skills" đang sửa cùng kho (trang chi tiết sự kiện `lich-tu-hoc/[slug]`, `DayDialog`, `calendar.ts`, `MonthGrid`, `initSmoothScroller`). Không ghi đè; mã của hai bên cùng nằm trong `page.tsx` và `_calendar.scss`, `tsc`, 258 test đơn vị và lint vẫn sạch. Chưa commit để không gộp việc của phiên kia.
+
+- **Ảnh đại diện sự kiện:** danh sách và cách gửi ảnh cho Ban Biên Tập ở `docs/anh-su-kien.md`.
+
+- **Mục chưa có ảnh (18/11):** thẻ không có ảnh hiện logo tròn của chùa trên nền thẻ thay cho ô trống (`.tlhp-post-card-noimage`, `_blog.scss`): thẻ sự kiện, khóa lễ, bài, khu vực, tượng, Giới thiệu. Chưa deploy.

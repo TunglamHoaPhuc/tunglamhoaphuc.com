@@ -680,3 +680,13 @@ TLHP post lists (T7, BRAND-GUIDELINES 5.2)
 }
 
 /* !END: Blog CSS */
+
+// A card whose picture is missing shows the temple's round logo on the card's dark ground,
+// not an empty box (decided 18/11/2026). Only the image is set here: each card keeps the
+// colour and size it gives its own placeholder.
+.tlhp-post-card-noimage {
+	background-image: url("/brand/logo-tung-lam-hoa-phuc-tron-nga.webp");
+	background-repeat: no-repeat;
+	background-position: center;
+	background-size: min(42%, 150px) auto;
+}
