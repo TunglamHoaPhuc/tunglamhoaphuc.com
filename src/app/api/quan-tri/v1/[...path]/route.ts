@@ -2,6 +2,7 @@ import "@/admin/routes";
 import { dispatch } from "@/admin/http/api";
 import type { AdminEnv } from "@/admin/db";
 import type { MailMessage } from "@/admin/mail/send";
+import { r2Store, type R2Like } from "@/admin/media/store";
 
 // The admin API (docs/admin-architecture.md 7). Never cached, never indexed; one address only (dispatch checks).
 export const dynamic = "force-dynamic";
@@ -39,6 +40,7 @@ async function handle(request: Request, { params }: Context): Promise<Response> 
 	return dispatch(request, path.join("/"), {
 		env: env as AdminEnv,
 		defer: (work) => void waitUntil(work),
+		media: env.MEDIA ? r2Store(env.MEDIA as R2Like) : undefined,
 		// The real mailer arrives with the settings module (SMTP); until then a reset mail cannot be sent.
 		mailer: async (message: MailMessage) => {
 			throw new Error(`SMTP chưa được cấu hình (thư tới ${message.to.length} ký tự bị bỏ)`);

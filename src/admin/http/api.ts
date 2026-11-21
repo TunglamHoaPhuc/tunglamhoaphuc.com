@@ -8,6 +8,7 @@ import { authenticate, type AuthContext, type Authed } from "../auth/service";
 import { csrfToken, timingSafeEqual } from "../auth/tokens";
 import type { AdminEnv } from "../db";
 import type { Mailer } from "../mail/send";
+import type { MediaStore } from "../media/store";
 import { can } from "../rbac/check";
 import type { Action } from "../rbac/catalog";
 import { ApiError, forbidden, notFound, unauthorized } from "./errors";
@@ -17,6 +18,8 @@ export type Deps = {
 	env: AdminEnv;
 	now?: () => Date;
 	mailer: Mailer;
+	/** The library's file store (R2); absent where there is no bucket. */
+	media?: MediaStore;
 	/** Runs work after the response is sent (`waitUntil` on a Worker). */
 	defer: (work: Promise<unknown>) => void;
 	passwordParams?: AuthContext["passwordParams"];

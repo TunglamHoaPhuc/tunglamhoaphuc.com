@@ -145,6 +145,20 @@ export const authThrottle = sqliteTable("auth_throttle", {
 
 // ---------------------------------------------------------------- pictures
 
+/** A folder of the media library; a tree, three levels deep at most (the admin checks). */
+export const mediaFolder = sqliteTable(
+	"media_folder",
+	{
+		id: text("id").primaryKey(),
+		parentId: text("parent_id"),
+		name: text("name").notNull(),
+		slug: text("slug").notNull(),
+		position: position(),
+		createdAt: text("created_at"),
+	},
+	(table) => [index("media_folder_parent").on(table.parentId, table.position)],
+);
+
 export const media = sqliteTable(
 	"media",
 	{
@@ -164,8 +178,63 @@ export const media = sqliteTable(
 		caption: text("caption").notNull().default(""),
 		uploadedBy: text("uploaded_by").references(() => user.id),
 		createdAt: text("created_at"),
+		/** The library folder; null for what was imported from the old admin (it keeps its text `folder`). */
+		folderId: text("folder_id").references(() => mediaFolder.id),
+		title: text("title").notNull().default(""),
+		/** Goes up by one each time the file is replaced; the file's path carries it, so a new picture is a new address. */
+		version: integer("version").notNull().default(1),
+		originalFilename: text("original_filename").notNull().default(""),
+		/** SHA-256 of the file as stored, to spot a picture uploaded twice. */
+		checksum: text("checksum"),
+		updatedAt: text("updated_at"),
+		updatedBy: text("updated_by"),
+		deletedAt: text("deleted_at"),
+		deletedBy: text("deleted_by"),
 	},
-	(table) => [index("media_r2_key").on(table.r2Key), check("media_has_place", sql`${table.r2Key} is not null or ${table.url} is not null`)],
+	(table) => [
+		index("media_r2_key").on(table.r2Key),
+		index("media_folder_id").on(table.folderId),
+		index("media_created").on(table.createdAt),
+		index("media_deleted").on(table.deletedAt),
+		check("media_has_place", sql`${table.r2Key} is not null or ${table.url} is not null`),
+	],
+);
+
+/** A crop of a picture for one frame shape: where it was cut (in % of the picture) and the cut file. */
+export const mediaCrop = sqliteTable(
+	"media_crop",
+	{
+		mediaId: text("media_id")
+			.notNull()
+			.references(() => media.id, { onDelete: "cascade" }),
+		/** "16:9", "4:3", "3:4", "16:10" or "1:1". */
+		ratio: text("ratio").notNull(),
+		x: real("x").notNull(),
+		y: real("y").notNull(),
+		width: real("width").notNull(),
+		height: real("height").notNull(),
+		/** The cut file's key, in the same form as `media.r2_key`. */
+		r2Key: text("r2_key").notNull(),
+		updatedAt: text("updated_at"),
+	},
+	(table) => [primaryKey({ columns: [table.mediaId, table.ratio] })],
+);
+
+/** Where a picture is used: one row per place. Kept up to date whenever the thing that uses it is saved. */
+export const mediaUsage = sqliteTable(
+	"media_usage",
+	{
+		mediaId: text("media_id")
+			.notNull()
+			.references(() => media.id, { onDelete: "cascade" }),
+		entityType: text("entity_type").notNull(),
+		entityId: text("entity_id").notNull(),
+		field: text("field").notNull(),
+	},
+	(table) => [
+		primaryKey({ columns: [table.mediaId, table.entityType, table.entityId, table.field] }),
+		index("media_usage_entity").on(table.entityType, table.entityId),
+	],
 );
 
 export const album = sqliteTable("album", {
