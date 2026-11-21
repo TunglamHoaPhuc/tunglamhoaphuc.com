@@ -254,11 +254,11 @@ Trang công khai đọc cấu hình từ `setting`; khi khóa chưa có thì dù
 |---|---|
 | `0001_admin-tai-khoan.sql` | `role`, `role_permission`, `session`, `password_reset`, `user_totp`, `auth_throttle`; cột mới của `user` |
 | `0002_admin-nhat-ky.sql` | cột mới, index và trigger chống sửa của `audit_log` (cột `data_before`, `data_after`; **đã làm**) |
-| `0003_admin-ban-ghi.sql` | `revision`; cột kiểm toán, phiên bản và xóa mềm trên các bảng nội dung (đánh số lại các tệp sau thành 0004–0007) |
-| `0003_admin-media.sql` | `media_folder`, `media_crop`, `media_usage`; cột mới của `media` |
-| `0004_admin-chi-muc.sql` | `menu`, `menu_item`; cột mới của `category` |
-| `0005_admin-noi-dung.sql` | cột mới của `post`, `teaching_article`, `page`; `post_related`; `content_fts`; chuyển trạng thái cũ; xử lý slug trùng |
-| `0006_admin-dac-thu.sql` | `quote`, `statue_image`, `statue_related`; cột mới của `statue`, `area`, `calendar_event`, `redirect` |
+| `0003_admin-ban-ghi.sql` | `revision`; cột kiểm toán, phiên bản và xóa mềm trên các bảng nội dung  |
+| `0004_admin-media.sql` | `media_folder`, `media_crop`, `media_usage`; cột mới của `media` |
+| `0005_admin-chi-muc.sql` | `menu`, `menu_item`; cột mới của `category` |
+| `0006_admin-noi-dung.sql` | cột mới của `post`, `teaching_article`, `page`; `post_related`; `content_fts`; chuyển trạng thái cũ; xử lý slug trùng |
+| `0007_admin-dac-thu.sql` | `quote`, `statue_image`, `statue_related`; cột mới của `statue`, `area`, `calendar_event`, `redirect` |
 
 Mỗi migration chỉ thêm (bảng, cột, index), nên trang công khai đang chạy không bị ảnh hưởng khi áp dụng. D1 thật được sao lưu trước khi chạy migration bằng Time Travel của D1 (ghi lại mốc khôi phục), và việc chạy trên D1 thật chỉ làm khi anh đồng ý.
 
@@ -275,12 +275,12 @@ Các điểm dưới đây đến từ lượt rà soát CSDL; chúng quyết đ
 | Tối đa 100 tham số mỗi câu lệnh; mỗi giá trị tối đa khoảng 2 MB | Chèn nhiều dòng theo khúc 25 dòng. Kiểm kích thước bản ghi trước khi lưu và báo lỗi rõ ràng khi bài quá lớn. Chỉ dùng tham số ràng buộc, không nhúng nội dung vào câu SQL |
 | Cột thêm sau nằm cuối dòng, sau thân bài lớn | Truy vấn danh sách không chọn cột nội dung. Thêm index `post(section, status, published_date)`, `post(created_by)`, index một phần `WHERE deleted_at IS NOT NULL` cho thùng rác và `post(publish_at) WHERE status = 'scheduled'` cho bài hẹn giờ |
 | Điều kiện "đang hiển thị" dùng ở nhiều nơi | Một hàm dùng chung (`visibleNow`) cho trang công khai, sitemap, tìm kiếm và bài liên quan |
-| `media_usage` rỗng sau khi tạo, nên mọi ảnh sẽ bị coi là không dùng | Migration `0003` nạp sẵn từ mọi cột khóa ngoại tới `media`. `scripts/backfill-admin.ts` quét ảnh trong thân bài cũ. Ảnh dùng trong `setting` (hero, lời chào), `album_item`, `month_theme`, `quote_image`, `statue_image` cũng được ghi vào `media_usage`. **Xóa vĩnh viễn media bị khóa cho tới khi lượt nạp này chạy xong** |
+| `media_usage` rỗng sau khi tạo, nên mọi ảnh sẽ bị coi là không dùng | Migration `0004` nạp sẵn từ mọi cột khóa ngoại tới `media`. `scripts/backfill-admin.ts` quét ảnh trong thân bài cũ. Ảnh dùng trong `setting` (hero, lời chào), `album_item`, `month_theme`, `quote_image`, `statue_image` cũng được ghi vào `media_usage`. **Xóa vĩnh viễn media bị khóa cho tới khi lượt nạp này chạy xong** |
 | Bảng không có khóa ngoại tới bản ghi gốc (`revision`, `media_usage`, `content_fts`) | Xóa vĩnh viễn một bản ghi xóa luôn các dòng này trong cùng lô. `post_related`, `statue_image`, `statue_related` dùng `ON DELETE CASCADE` |
 | Trigger chặn sửa `audit_log` | Trong `0002`: thêm cột, điền dữ liệu cũ, rồi mới tạo trigger. Kiểm thử dùng CSDL mới cho mỗi lượt thay vì xóa bảng này |
 | Xuất toàn bộ CSDL trong một request có thể vượt bộ nhớ của Worker | Bản xuất ghi từng bảng theo trang thẳng vào R2; `revision` và `audit_log` xuất theo khúc |
 
-Trước khi viết migration `0004`–`0006`, tôi sẽ truy vấn dữ liệu hiện có để tìm bản ghi trùng ở `category(kind, section, slug)`, `calendar_event.slug` và `statue.code`; tài liệu hiện mới xác nhận trùng ở `post.slug`.
+Trước khi viết migration `0005`–`0007`, tôi sẽ truy vấn dữ liệu hiện có để tìm bản ghi trùng ở `category(kind, section, slug)`, `calendar_event.slug` và `statue.code`; tài liệu hiện mới xác nhận trùng ở `post.slug`.
 
 ## 6. Xác thực và bảo mật
 
