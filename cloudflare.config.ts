@@ -45,6 +45,8 @@ export default defineConfig({
             ADMIN_JWT_SECRET: bindings.secret(),
             ADMIN_ENC_KEY: bindings.secret(),
             ADMIN_BASE_URL: bindings.text(process.env.ADMIN_BASE_URL ?? "http://localhost:3001"),
+            // Backups of the database (docs/van-hanh/sao-luu.md): private, no route reads it.
+            BACKUP: bindings.r2({ name: "tlhp-backup" }),
           }
         : {}),
       ...cache.env,

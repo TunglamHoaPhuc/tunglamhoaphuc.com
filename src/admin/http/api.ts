@@ -9,6 +9,7 @@ import { csrfToken, timingSafeEqual } from "../auth/tokens";
 import type { AdminEnv } from "../db";
 import type { Mailer } from "../mail/send";
 import type { MediaStore } from "../media/store";
+import type { BackupBucket } from "../ops/backup";
 import { can } from "../rbac/check";
 import type { Action } from "../rbac/catalog";
 import { ApiError, forbidden, notFound, unauthorized } from "./errors";
@@ -20,6 +21,8 @@ export type Deps = {
 	mailer: Mailer;
 	/** The library's file store (R2); absent where there is no bucket. */
 	media?: MediaStore;
+	/** The private bucket the backups go to (R2 tlhp-backup); absent where there is none. */
+	backup?: BackupBucket;
 	/** Runs work after the response is sent (`waitUntil` on a Worker). */
 	defer: (work: Promise<unknown>) => void;
 	passwordParams?: AuthContext["passwordParams"];
