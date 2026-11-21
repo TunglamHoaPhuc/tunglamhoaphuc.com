@@ -2,6 +2,7 @@
 // → TongChiSummary and TongChiArticle. Lenient like about.ts: an article without a slug or
 // title is reported and left out, the rest falls back to empty values. The bodies are
 // turned into HTML only when a page asks for one (tongChiBody.ts says why they need work).
+import { parseSafe, serialize } from "../../admin/content/html";
 import { z } from "zod";
 import { isUnsavedUpload, mediaUrl } from "./media";
 import { bare, cleanText, renderContent, toIsoDate } from "./normalize";
@@ -42,7 +43,7 @@ const tongChiFileSchema = z.union([
 ]);
 
 /** An article as read, its body still the editors' text. */
-export type TongChiEntry = Omit<TongChiArticle, "contentHtml"> & { body: string };
+export type TongChiEntry = Omit<TongChiArticle, "contentHtml"> & { body: string; /** HTML the admin's editor saved; when present the page shows it instead of converting `body`. */ html?: string };
 
 export type ParsedTongChi = { entries: TongChiEntry[]; issues: ContentIssue[] };
 
@@ -134,7 +135,9 @@ export function tongChiSummary({ id, slug, title, name, subtitle, group, banner,
 /** The article with its body as safe HTML; `notes` collects what the body's conversion dropped. */
 export function tongChiArticle(entry: TongChiEntry, entries: TongChiEntry[], notes: string[] = []): TongChiArticle {
 	const targets: BodyTarget[] = entries.map((other) => ({ slug: other.slug, title: other.title, group: other.group.slug }));
-	const { body, ...article } = entry;
+	const { body, html, ...article } = entry;
+	// HTML the admin saved is cleaned once more here, on the public side, before it is shown.
+	if (html?.trim()) return { ...article, contentHtml: serialize(parseSafe(html)) };
 	const { markdown, notes: dropped } = tongChiMarkdown(body, { title: entry.title, slug: entry.slug, targets });
 	notes.push(...dropped);
 	return { ...article, contentHtml: renderContent(markdown) };

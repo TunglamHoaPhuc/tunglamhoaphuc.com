@@ -1,0 +1,1 @@
+ALTER TABLE `teaching_article` ADD `content_html` text DEFAULT '' NOT NULL;

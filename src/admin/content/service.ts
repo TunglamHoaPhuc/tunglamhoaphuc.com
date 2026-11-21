@@ -106,7 +106,8 @@ async function stateOf(db: AdminDb, kind: Kind, row: Row): Promise<State> {
 	state.slug = text(row.slug);
 	if (kind.hasSection) state.section = text(row.section);
 	state.categoryId = text(row[kind.categoryColumn]) || null;
-	state.contentHtml = kind.bodyColumn === "body" ? await teachingHtml(db, row) : text(row.content_html);
+	// A Tông Chỉ article the editor has saved keeps its HTML in content_html; one it has not is read back from its Markdown.
+	state.contentHtml = kind.bodyColumn === "body" ? text(row.content_html) || (await teachingHtml(db, row)) : text(row.content_html);
 	state.contentJson = parseJson(row.content_json, null);
 	if (kind.hasExtra) state.extra = parseJson(row.extra, {});
 	if (kind.hasMilestones) state.milestones = await milestonesOf(db, text(row.id));
@@ -600,9 +601,14 @@ async function prepare(db: AdminDb, kind: Kind, current: State | null, input: St
 		contentIds = mediaIdsIn(tree).filter((id) => id in known);
 		const stored = kind.bodyColumn === "body" ? markdownOf(tree) : html;
 		const before = currentRow ? text(currentRow[kind.bodyColumn]) : null;
+		// A Tông Chỉ article keeps the editor's HTML as well as the Markdown: the Markdown cannot hold tables, video, sound or
+		// captions, so the site shows the HTML when it is there and falls back to the Markdown otherwise.
+		const keepsHtmlToo = kind.bodyColumn === "body";
+		const htmlChanged = keepsHtmlToo && (currentRow ? text(currentRow.content_html) : "") !== html;
 		next.contentHtml = html;
-		if (before === null || before !== stored) {
+		if (before === null || before !== stored || htmlChanged) {
 			columns.set(kind.bodyColumn, stored);
+			if (keepsHtmlToo) columns.set("content_html", html);
 			if (current) mark("contentHtml");
 		}
 	} else {

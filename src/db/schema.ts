@@ -381,6 +381,8 @@ export const teachingArticle = sqliteTable(
 		excerpt: text("excerpt").notNull().default(""),
 		/** The editors' text (light Markdown); turned into HTML when a page is shown. */
 		body: text("body").notNull().default(""),
+		/** What the admin's editor saved, as cleaned HTML; empty for an article not saved there yet (the site then reads `body`). */
+		contentHtml: text("content_html").notNull().default(""),
 		author: text("author").notNull().default(""),
 		authorHref: text("author_href"),
 		publishedDate: text("published_date").notNull().default(""),

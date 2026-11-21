@@ -243,6 +243,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 			book: json(row.book, null),
 			keywords: json(row.keywords, []),
 			body: text(row.body),
+			html: text(row.content_html),
 		}));
 	}
 

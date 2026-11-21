@@ -350,7 +350,28 @@ describe("Tông Chỉ articles", () => {
 		const saved = await editor.call("PATCH", "teachings/tc-1", { version: 1, contentHtml: "<h2>Niệm Phật</h2><p>Nhất tâm <strong>niệm</strong>.</p><blockquote class=\"kinh\"><p>Nam mô</p></blockquote>", excerpt: "Pháp môn" });
 		expect(saved.status, JSON.stringify(saved.json)).toBe(200);
 		expect(row(w, "SELECT body, excerpt FROM teaching_article WHERE id = 'tc-1'")).toEqual({ body: "## Niệm Phật\n\nNhất tâm **niệm**.\n\n> Nam mô", excerpt: "Pháp môn" });
-		expect(saved.data.contentHtml).toContain("<blockquote><p>Nam mô</p></blockquote>");
+		expect(saved.data.contentHtml).toContain('<blockquote class="kinh"><p>Nam mô</p></blockquote>'); // the sutra variant now survives (it did not in Markdown)
+	});
+
+	it("keeps what Markdown cannot hold (a table, a sound, a caption) by saving the HTML too, and the page shows that HTML", async () => {
+		const w = await contentWorld();
+		const editor = await w.as("editor@example.test");
+		const html = '<h2>Bảng</h2><table><tbody><tr><td>Một</td><td>Hai</td></tr></tbody></table><figure><img src="/anh-goc/s2-cnv03/cms/media-a/v2/sen.webp" alt="Sen"><figcaption>Hoa sen</figcaption></figure><audio controls src="https://example.test/phap-am.mp3"></audio>';
+		const saved = await editor.call("PATCH", "teachings/tc-1", { version: 1, contentHtml: html });
+		expect(saved.status, JSON.stringify(saved.json)).toBe(200);
+		const stored = row(w, "SELECT body, content_html FROM teaching_article WHERE id = 'tc-1'") as { body: string; content_html: string };
+		expect(stored.content_html).toContain("<table>");
+		expect(stored.content_html).toContain("<figcaption>Hoa sen</figcaption>");
+		expect(stored.content_html).toContain("<audio");
+		expect(stored.body).toContain("## Bảng"); // the Markdown stays, for the sources that read it
+		// opening it again gives the HTML back as saved, not a Markdown round trip
+		expect((await editor.call("GET", "teachings/tc-1")).data.contentHtml).toContain("<table>");
+
+		const { tongChiArticle } = await import("../../../src/libs/content/tongChi");
+		const entry = { id: "tc-1", slug: "x", title: "X", name: "X", subtitle: "", group: { slug: "nen-tang", name: "Nền tảng" }, banner: null, excerpt: "", author: "", authorHref: null, publishedDate: "", views: 0, video: null, featured: null, gallery: [], book: null, keywords: [], body: stored.body, html: stored.content_html } as never;
+		expect(tongChiArticle(entry, []).contentHtml).toContain("<table>");
+		const plain = tongChiArticle({ ...(entry as object), html: "" } as never, []).contentHtml;
+		expect(plain).not.toContain("<table>");
 	});
 
 	it("creates in a group, keeps slugs unique, refuses a group of another kind, and applies the author rules", async () => {

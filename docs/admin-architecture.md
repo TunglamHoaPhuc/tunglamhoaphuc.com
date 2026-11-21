@@ -255,6 +255,7 @@ Trang công khai đọc cấu hình từ `setting`; khi khóa chưa có thì dù
 | `0001_admin-tai-khoan.sql` | `role`, `role_permission`, `session`, `password_reset`, `user_totp`, `auth_throttle`; cột mới của `user` |
 | `0002_admin-nhat-ky.sql` | cột mới, index và trigger chống sửa của `audit_log` (cột `data_before`, `data_after`; **đã làm**) |
 | `0003_admin-ban-ghi.sql` | `revision`; cột kiểm toán, phiên bản và xóa mềm trên các bảng nội dung  |
+| `0005_admin-tong-chi-html.sql` | thêm `teaching_article.content_html` (HTML do trình soạn lưu; trang công khai ưu tiên nó, rỗng thì đọc Markdown trong `body`) — **đã làm** |
 | `0004_admin-media.sql` | `media_folder`, `media_crop`, `media_usage`; cột mới của `media` |
 | `0005_admin-chi-muc.sql` | `menu`, `menu_item`; cột mới của `category` |
 | `0006_admin-noi-dung.sql` | cột mới của `post`, `teaching_article`, `page`; `post_related`; `content_fts`; chuyển trạng thái cũ; xử lý slug trùng |
