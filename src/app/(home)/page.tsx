@@ -13,6 +13,7 @@ import Testimonials2 from "@/components/sections/testimonials/Testimonials2";
 import { site } from "@/config/site";
 import { getContentRepository } from "@/libs/content/repository";
 import { type HomeData, loadHomeData } from "@/libs/home";
+import { getHomeExtras } from "@/libs/homeData";
 import { organizationJsonLd } from "@/libs/seo";
 import JsonLd from "@/components/shared/others/JsonLd";
 
@@ -40,12 +41,12 @@ const BLOCKS: Block[] = [
 	{ id: "tong-chi", render: (data) => <Services2 groups={data.tongChi} /> },
 	{ id: "khu-vuc", render: (data) => <Portfolios2 areas={data.areas} /> },
 	{ id: "lo-trinh", render: (data) => <Process group={data.paths ?? undefined} /> },
-	{ id: "loi-thay-day", render: (data) => <Testimonials2 verses={data.verses} /> },
+	{ id: "loi-thay-day", render: (data) => <Testimonials2 verses={data.verses} quotes={data.quotes} /> },
 	{ id: "chu-ton-duc", render: (data) => <Team1 members={data.teachers} /> },
 ];
 
 export default async function Home() {
-	const data = await loadHomeData(await getContentRepository());
+	const data = await loadHomeData(await getContentRepository(), new Date(), await getHomeExtras());
 	return (
 		<main>
 			<JsonLd data={organizationJsonLd()} />

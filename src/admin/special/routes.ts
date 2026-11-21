@@ -1,2 +1,6 @@
-// Routes of this module register here (see src/admin/routes.ts).
-export {};
+// The routes of the site-specific content (events, statues, areas, quotes, home blocks) register here (see src/admin/routes.ts).
+import "./eventsRoutes";
+import "./statuesRoutes";
+import "./areasRoutes";
+import "./quotesRoutes";
+import "./homeRoutes";

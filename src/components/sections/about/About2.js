@@ -57,7 +57,7 @@ const About2 = ({ welcome }) => {
 								</div>
 								{welcome.text ? <p className="tlhp-welcome-text">{welcome.text}</p> : null}
 								<div className="wow fadeInUp" data-wow-delay=".3s">
-									<ButtonPrimary text="Tìm hiểu Bổn tự" url={welcome.href} isTextBtn={true} />
+									<ButtonPrimary text={welcome.linkLabel || "Tìm hiểu Bổn tự"} url={welcome.href} isTextBtn={true} />
 								</div>
 							</div>
 							<div className="video-img wow fadeInRight" data-wow-delay=".7s">
@@ -65,7 +65,7 @@ const About2 = ({ welcome }) => {
 									<img src={imageAt(welcome.image.src, IMAGE_WIDTH.card)} alt="" width={120} height={320} loading="lazy" decoding="async" style={{ objectPosition: welcome.image.position }} />
 								) : null}
 								<PopupVideo>
-									<a className="video-btn video-popup glightbox" href={youtubeEmbed(site.introVideo.id)} data-type="external">
+									<a className="video-btn video-popup glightbox" href={youtubeEmbed(welcome.videoId || site.introVideo.id)} data-type="external">
 										<span aria-hidden="true">
 											<i className="tji-play"></i>
 										</span>
