@@ -168,7 +168,7 @@ describe("cropping for the frame shapes", () => {
 		expect(saved.data.crops).toHaveLength(1);
 		expect(saved.data.crops[0]).toMatchObject({ ratio: "4:3", x: 10, y: 5, width: 50, height: 60 });
 		const firstUrl = saved.data.crops[0].url as string;
-		expect(firstUrl).toMatch(new RegExp(`^/anh-goc/s2-cnv03/cms/${item.id}/v1/crop-4x3-[a-z0-9]+\.webp$`));
+		expect(firstUrl).toMatch(new RegExp(`^/anh-goc/s2-cnv03/cms/${item.id}/v1/crop-4x3-[a-z0-9]+[.]webp$`));
 		const keyOf = (url: string) => url.replace("/anh-goc/s2-cnv03/", "");
 		expect(w.files.has(keyOf(firstUrl))).toBe(true);
 		await new Promise((resolve) => setTimeout(resolve, 5));
