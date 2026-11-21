@@ -15,10 +15,14 @@ test("upload a picture, replace it in place, cut it, and see the new picture whe
 
 	// 1. upload through the page (the browser turns it into WebP)
 	const name = `e2e-${Date.now().toString(36)}`;
-	const first = await pngBuffer(page, 1280, 720, "#7a4e28");
+	// A colour of its own each run: the library refuses a picture it already holds, and a run that stopped half-way
+	// leaves its pictures behind.
+	const tint = () => `#${Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, "0")}`;
+	const first = await pngBuffer(page, 1280, 720, tint());
 	await page.locator('input[type="file"]').first().setInputFiles({ name: `${name}.png`, mimeType: "image/png", buffer: first });
 	await expect(page.getByText(`${name}.png`).first()).toBeVisible();
-	await expect(page.getByText("xong").first()).toBeVisible();
+	// uploads go through the browser-side compression and R2: slow on a busy dev server
+	await expect(page.getByText("xong").first()).toBeVisible({ timeout: 30_000 });
 
 	const find = async () => {
 		const list = (await api.call("GET", `media?q=${name}`)).json as { data: Item[] };
@@ -35,9 +39,9 @@ test("upload a picture, replace it in place, cut it, and see the new picture whe
 	// 2. open it, replace the file
 	await page.getByRole("button", { name: new RegExp(name) }).first().click();
 	await expect(page.getByRole("heading", { name: "Chi tiết ảnh" })).toBeVisible();
-	const second = await pngBuffer(page, 800, 800, "#204060");
-	await page.locator('input[type="file"]').last().setInputFiles({ name: `${name}-moi.png`, mimeType: "image/png", buffer: second });
-	await expect(page.getByText("Đã thay ảnh")).toBeVisible();
+	const second = await pngBuffer(page, 800, 800, tint());
+	await page.getByLabel("Thay ảnh", { exact: true }).setInputFiles({ name: `${name}-moi.png`, mimeType: "image/png", buffer: second });
+	await expect(page.getByText("Đã thay ảnh")).toBeVisible({ timeout: 30_000 });
 
 	const after = await find();
 	expect(after.id).toBe(before.id);

@@ -69,6 +69,8 @@ export async function makeAccount(admin: AdminApi, baseURL: string, roleId: stri
 
 export async function signInOnPage(page: Page, email: string, password: string) {
 	await page.goto("/quan-tri/dang-nhap");
+	// Typed before React has taken the form over, the fields are emptied again when it does (a slow dev server).
+	await page.waitForFunction(() => (window as unknown as { __tqReady?: boolean }).__tqReady === true);
 	await page.getByLabel("Email").fill(email);
 	await page.getByLabel("Mật khẩu").fill(password);
 	await page.getByRole("button", { name: "Đăng nhập" }).click();

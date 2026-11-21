@@ -627,3 +627,16 @@ textarea.tq-input {
 .tq .tq-panel > .tq-kv {
 	margin-bottom: 18px;
 }
+
+/* The site paints scroll bars for a light track and sets <legend> large (Bootstrap): inside the admin both follow
+   the dark grounds and the size of a label. */
+html:has(.tq-shell),
+html:has(.tq-center),
+.tq * {
+	scrollbar-color: #6b5334 #1a120b;
+}
+.tq legend.tq-label,
+.tq legend.tq-h2 {
+	font-size: 1rem;
+	line-height: 1.4;
+}
