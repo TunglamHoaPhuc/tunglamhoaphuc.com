@@ -471,11 +471,11 @@ Ba loại `posts`, `teachings`, `pages` có cùng bộ endpoint; bảng dưới 
 
 **Tải lên.** Trình duyệt nén ảnh sang WebP (cạnh dài tối đa 2560 px, chất lượng 82) và tạo các bản cắt theo tỷ lệ bằng canvas, rồi gửi lên Worker. Worker kiểm chữ ký tệp, kích thước, ghi vào R2 và tạo dòng `media`. Ảnh nhỏ theo chiều rộng (360, 640, 1280, 1920) tiếp tục do Cloudflare Image Resizing sinh như hiện nay.
 
-**Thay ảnh giữ ID.** Tệp mới ghi vào khóa R2 mới `cms/<id>/v<n>.<đuôi>`; dòng `media` giữ nguyên `id`, đổi `r2_key` và tăng `version`; tệp cũ bị xóa sau khi ghi thành công. Mọi nơi dùng ảnh đều trỏ theo `media.id`, nên đều nhận ảnh mới:
+**Thay ảnh giữ ID.** Tệp mới ghi vào khóa R2 mới `cms/<id>/v<n>/<tên>.<đuôi>` (đã làm theo cách này, thay cho `v<n>.<đuôi>` ban đầu); dòng `media` giữ nguyên `id`, đổi `r2_key` và tăng `version`; tệp cũ bị xóa sau khi ghi thành công. Mọi nơi dùng ảnh đều trỏ theo `media.id`, nên đều nhận ảnh mới:
 
 - Trường ảnh của bản ghi (bìa, thumbnail…) vốn đã là khóa ngoại tới `media`.
 - Ảnh trong thân bài được lưu kèm `data-media-id`; khi render, `src` được dựng lại từ dòng `media` hiện tại.
-- URL công khai có dạng `/anh-goc/cms/<id>/<tên-tệp>?v=<version>`. Tham số `v` đổi nên trình duyệt và bộ nhớ đệm 7 ngày không giữ ảnh cũ.
+- **Đã thay đổi so với bản đầu:** địa chỉ công khai là `/anh-goc/s2-cnv03/cms/<id>/v<n>/<tên>.<đuôi>`, tức số phiên bản nằm ngay trong đường dẫn thay vì `?v=`. Lý do: trang công khai đã dựng địa chỉ ảnh từ cột `r2_key` ở mọi truy vấn D1, nên ảnh mới hiện ở mọi nơi mà không phải sửa từng truy vấn, và đường dẫn đổi nên bộ nhớ đệm 7 ngày không giữ ảnh cũ. Đổi lại, **đường dẫn ảnh đổi sau mỗi lần thay**; liên kết cũ tới ảnh (ví dụ đã dán lên Facebook) sẽ trả 404. `id` vẫn giữ nguyên. Nếu cần giữ liên kết cũ, có thể thêm chuyển hướng từ đường dẫn cũ sang phiên bản hiện tại.
 - Sau khi thay, các trang đang dùng ảnh (tra từ `media_usage`) được làm mới cache.
 
 Các bản cắt cũ của ảnh bị xóa khi thay tệp; giao diện nhắc cắt lại.
