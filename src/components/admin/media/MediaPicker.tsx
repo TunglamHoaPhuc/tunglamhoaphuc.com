@@ -17,6 +17,7 @@ export function MediaGrid({ items, selectedId, onOpen, busy }: { items: MediaIte
 						<button
 							type="button"
 							onClick={() => onOpen(item)}
+							aria-label={`${item.title || item.filename}${item.usageCount ? `, đang dùng ${item.usageCount} chỗ` : ""}`}
 							aria-pressed={selectedId === undefined ? undefined : active}
 							style={{
 								display: "block",
