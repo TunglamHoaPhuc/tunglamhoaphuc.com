@@ -1,23 +1,31 @@
-/* The admin's look: light "Ngà" ground and the brand browns of design-system/tokens.css, set apart from the
-   public site's dark theme. Everything lives under .tq so none of it leaks out, and the site's global
-   heading and link styles (gold, glow, UTM Niagara) are switched off inside it. */
+/* The admin follows the look of the public site (the old site, _tlhp-classic.scss): brown-black grounds,
+   gold, parchment text, UTM Avo for text and UTM Niagara for page titles, gold-lined cards, pill buttons.
+   Text stays at 16px (the 14px of the site is too small for long editing sessions). Everything lives under .tq
+   so none of it leaks out; the rules of the site for headings, links, paragraphs and inputs are set back here. */
 .tq {
-	--tq-ground: #faf5ee; /* moc-50 */
-	--tq-card: #ffffff;
-	--tq-ink: #2c1c11; /* moc-900 */
-	--tq-muted: #6b5a4b;
-	--tq-line: #e3cba8; /* moc-200 */
-	--tq-line-soft: #f2e6d5; /* moc-100 */
-	--tq-accent: #835414; /* moc-600 */
-	--tq-accent-ink: #ffffff;
-	--tq-accent-soft: #f8ecda; /* hoaisac-100 */
-	--tq-danger: #a1261b;
-	--tq-danger-soft: #fbe9e6;
-	--tq-ok: #2e6b3c;
-	--tq-ok-soft: #e6f2e8;
-	--tq-warn-soft: #fdf1d6;
-	--tq-radius: 10px;
-	--tq-font: var(--tlhp-font-sans, "Be Vietnam Pro", system-ui, sans-serif);
+	--tq-ground: #281e15; /* the ground of the inner pages of the site */
+	--tq-deep: #1a120b; /* den mun: side bar, inputs */
+	--tq-card: #2d1c12;
+	--tq-ink: #e3d2c1; /* parchment */
+	--tq-heading: #ffe5a3;
+	--tq-gold: #f2c14e;
+	--tq-gold-bright: #ffde59;
+	--tq-amber: #e5a93c;
+	--tq-muted: #c9b896;
+	--tq-line: rgb(242 193 78 / 0.3);
+	--tq-line-strong: rgb(242 193 78 / 0.6);
+	--tq-line-soft: rgb(242 193 78 / 0.12);
+	--tq-accent: #f2c14e;
+	--tq-accent-ink: #1a120b;
+	--tq-accent-soft: rgb(242 193 78 / 0.14);
+	--tq-danger: #e08a77;
+	--tq-danger-soft: rgb(217 122 102 / 0.18);
+	--tq-ok: #8fc79a;
+	--tq-ok-soft: rgb(143 199 154 / 0.16);
+	--tq-warn-soft: rgb(229 169 60 / 0.18);
+	--tq-radius: 14px;
+	--tq-font: var(--tlhp-font-sans, "UTM Avo", Arial, system-ui, sans-serif);
+	--tq-font-display: var(--tlhp-font-display, "UTM Niagara", Georgia, serif);
 
 	min-height: 100vh;
 	background: var(--tq-ground);
@@ -25,7 +33,8 @@
 	font-family: var(--tq-font);
 	font-size: 16px;
 	line-height: 1.55;
-	color-scheme: light;
+	color-scheme: dark;
+	scrollbar-color: #6b5334 #1a120b;
 }
 .tq *,
 .tq *::before,
@@ -37,7 +46,7 @@
 .tq h3,
 .tq h4 {
 	font-family: var(--tq-font);
-	color: var(--tq-ink);
+	color: var(--tq-heading);
 	text-shadow: none;
 	letter-spacing: 0;
 	text-transform: none;
@@ -47,20 +56,40 @@
 	color: var(--tq-accent);
 }
 .tq a:hover {
-	color: #523417;
+	color: var(--tq-gold-bright);
+}
+/* The site sets every paragraph to 14px with more weight than a class; the admin keeps its own sizes. */
+:root[data-theme] .tq p {
+	font-size: inherit;
+	line-height: inherit;
+}
+:root[data-theme] .tq .tq-hint,
+:root[data-theme] .tq .tq-field-error {
+	font-size: 0.875rem;
+}
+:root[data-theme] .tq .tq-nav-group {
+	font-size: 0.75rem;
 }
 .tq :focus-visible {
-	outline: 3px solid #b48446;
+	outline: 3px solid var(--tq-gold-bright);
 	outline-offset: 2px;
 }
-.tq-h1 {
-	font-size: 1.6rem;
-	font-weight: 700;
-	line-height: 1.25;
+/* Page titles as on the site: UTM Niagara, capitals, gold with a soft glow. */
+.tq .tq-h1 {
+	font-family: var(--tq-font-display);
+	font-size: clamp(2.25rem, 1.9rem + 1.4vw, 3rem);
+	font-weight: 400;
+	line-height: 1.1;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	color: var(--tq-gold);
+	text-shadow: 0 0 24px rgb(242 193 78 / 0.35);
 }
-.tq-h2 {
-	font-size: 1.15rem;
-	font-weight: 600;
+.tq .tq-h2 {
+	font-size: 1rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
 	margin-bottom: 0.75rem;
 }
 .tq-muted {
@@ -80,7 +109,7 @@
 	padding: 24px 16px;
 }
 .tq-card {
-	background: var(--tq-card);
+	background: linear-gradient(180deg, var(--tq-card), #1e130c);
 	border: 1px solid var(--tq-line);
 	border-radius: var(--tq-radius);
 	padding: 24px;
@@ -99,12 +128,16 @@
 	width: 44px;
 	height: 44px;
 	border-radius: 50%;
-	/* the seal is drawn for dark grounds */
-	background: #2c1c11;
 }
 .tq-brand strong {
 	display: block;
-	line-height: 1.2;
+	font-family: var(--tq-font-display);
+	font-size: 1.6rem;
+	font-weight: 400;
+	letter-spacing: 0.03em;
+	text-transform: uppercase;
+	line-height: 1.1;
+	color: var(--tq-gold);
 }
 .tq-brand span {
 	color: var(--tq-muted);
@@ -118,8 +151,9 @@
 	min-height: 100vh;
 }
 .tq-side {
-	background: #2c1c11;
-	color: #f2e6d5;
+	background: var(--tq-deep);
+	border-right: 1px solid var(--tq-line);
+	color: var(--tq-ink);
 	padding: 20px 14px;
 	display: flex;
 	flex-direction: column;
@@ -133,7 +167,7 @@
 	margin: 0 6px;
 }
 .tq-side .tq-brand span {
-	color: #cfa874;
+	color: var(--tq-muted);
 }
 .tq-nav {
 	display: flex;
@@ -147,28 +181,30 @@
 	display: block;
 	padding: 9px 12px;
 	border-radius: 8px;
-	color: #f2e6d5;
+	color: var(--tq-ink);
 	text-decoration: none;
 }
-.tq-nav a:hover {
-	background: rgba(255, 255, 255, 0.08);
-	color: #fff;
+.tq .tq-nav a:hover {
+	background: rgb(242 193 78 / 0.08);
+	color: var(--tq-heading);
 }
-.tq-nav a[aria-current="page"] {
-	background: #835414;
-	color: #fff;
+.tq .tq-nav a[aria-current="page"] {
+	background: rgb(242 193 78 / 0.16);
+	box-shadow: inset 3px 0 0 var(--tq-gold);
+	color: var(--tq-gold-bright);
+	font-weight: 700;
 }
 .tq-nav-group {
 	margin: 14px 12px 4px;
 	font-size: 0.75rem;
 	letter-spacing: 0.06em;
 	text-transform: uppercase;
-	color: #cfa874;
+	color: var(--tq-amber);
 }
 .tq-side-foot {
 	margin-top: auto;
 	padding: 10px 12px;
-	border-top: 1px solid rgba(255, 255, 255, 0.15);
+	border-top: 1px solid var(--tq-line);
 	font-size: 0.875rem;
 }
 .tq-side-foot .tq-btn {
@@ -199,14 +235,15 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		background: #2c1c11;
-		color: #f2e6d5;
+		background: var(--tq-deep);
+		border-bottom: 1px solid var(--tq-line);
+		color: var(--tq-ink);
 		padding: 10px 16px;
 	}
 	.tq-topbar .tq-btn {
 		background: transparent;
-		color: #f2e6d5;
-		border-color: #cfa874;
+		color: var(--tq-heading);
+		border-color: var(--tq-line-strong);
 	}
 }
 
@@ -258,16 +295,17 @@
 }
 .tq-label {
 	display: block;
-	font-weight: 600;
+	font-weight: 700;
+	color: var(--tq-heading);
 	margin-bottom: 4px;
 }
 .tq-input {
 	width: 100%;
 	min-height: 44px;
 	padding: 9px 12px;
-	border: 1px solid #b9a07f;
+	border: 1px solid var(--tq-line-strong);
 	border-radius: 8px;
-	background: #fff;
+	background: var(--tq-deep);
 	color: var(--tq-ink);
 	font: inherit;
 }
@@ -278,7 +316,7 @@
 .tq input.tq-input:focus,
 .tq select.tq-input:focus,
 .tq textarea.tq-input:focus {
-	background-color: #fff;
+	background-color: var(--tq-deep);
 	color: var(--tq-ink);
 	box-shadow: none;
 }
@@ -286,12 +324,12 @@
 .tq select.tq-input:focus,
 .tq textarea.tq-input:focus {
 	border-color: var(--tq-accent);
-	outline: 3px solid #b48446;
+	outline: 3px solid var(--tq-gold-bright);
 	outline-offset: 1px;
 }
 .tq input.tq-input:-webkit-autofill {
 	-webkit-text-fill-color: var(--tq-ink);
-	box-shadow: 0 0 0 40px #fff inset;
+	box-shadow: 0 0 0 40px #1a120b inset;
 }
 .tq-input[aria-invalid="true"] {
 	border-color: var(--tq-danger);
@@ -317,43 +355,48 @@ textarea.tq-input {
 	accent-color: var(--tq-accent);
 }
 
+/* Buttons as on the site: a gold pill for the main action, a brown pill with a gold line for the others. */
 .tq-btn {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 	min-height: 44px;
-	padding: 8px 18px;
-	border-radius: 8px;
-	border: 1px solid var(--tq-accent);
-	background: var(--tq-accent);
+	padding: 8px 22px;
+	border-radius: 999px;
+	border: 1px solid var(--tq-gold);
+	background: linear-gradient(180deg, #f2c14e, #e5a93c);
 	color: var(--tq-accent-ink);
 	font: inherit;
-	font-weight: 600;
+	font-weight: 700;
 	cursor: pointer;
 	text-decoration: none;
 }
 .tq-btn:hover:not(:disabled) {
-	background: #6b4413;
-	color: #fff;
+	background: linear-gradient(180deg, #ffde59, #f2c14e);
+	color: var(--tq-accent-ink);
 }
 .tq-btn:disabled {
 	opacity: 0.55;
 	cursor: not-allowed;
 }
 .tq-btn--secondary {
-	background: #fff;
-	color: var(--tq-accent);
+	background: linear-gradient(180deg, #4a3728, #3d2b1f);
+	border-color: var(--tq-line-strong);
+	color: var(--tq-heading);
 }
 .tq-btn--secondary:hover:not(:disabled) {
-	background: var(--tq-accent-soft);
-	color: #523417;
+	background: linear-gradient(180deg, #5a4331, #4a3728);
+	border-color: var(--tq-gold);
+	color: var(--tq-gold-bright);
 }
 .tq-btn--danger {
-	background: var(--tq-danger);
-	border-color: var(--tq-danger);
+	background: #d97a66;
+	border-color: #d97a66;
+	color: #1a120b;
 }
 .tq-btn--danger:hover:not(:disabled) {
-	background: #7d1c14;
+	background: #e89583;
+	color: #1a120b;
 }
 .tq-btn--link {
 	background: none;
@@ -364,11 +407,11 @@ textarea.tq-input {
 }
 .tq-btn--link:hover:not(:disabled) {
 	background: none;
-	color: #523417;
+	color: var(--tq-gold-bright);
 }
 .tq-btn--small {
 	min-height: 36px;
-	padding: 4px 12px;
+	padding: 4px 14px;
 	font-size: 0.9rem;
 }
 
@@ -382,17 +425,17 @@ textarea.tq-input {
 }
 .tq-alert--error {
 	background: var(--tq-danger-soft);
-	border-color: #e7b3ac;
-	color: #6f1a11;
+	border-color: rgb(217 122 102 / 0.55);
+	color: #f6c9be;
 }
 .tq-alert--success {
 	background: var(--tq-ok-soft);
-	border-color: #b6d6bd;
-	color: #1f4a29;
+	border-color: rgb(143 199 154 / 0.5);
+	color: #c7e8cd;
 }
 .tq-alert--warning {
 	background: var(--tq-warn-soft);
-	border-color: #ecd08a;
+	border-color: rgb(229 169 60 / 0.55);
 }
 .tq-badge {
 	display: inline-block;
@@ -406,15 +449,15 @@ textarea.tq-input {
 }
 .tq-badge--ok {
 	background: var(--tq-ok-soft);
-	color: #1f4a29;
+	color: #c7e8cd;
 }
 .tq-badge--warn {
 	background: var(--tq-warn-soft);
-	color: #6a4a00;
+	color: #ffde59;
 }
 .tq-badge--danger {
 	background: var(--tq-danger-soft);
-	color: #6f1a11;
+	color: #f6c9be;
 }
 
 /* ---- tables ---- */
@@ -440,8 +483,8 @@ textarea.tq-input {
 	font-size: 0.8125rem;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
-	color: var(--tq-muted);
-	background: var(--tq-ground);
+	color: var(--tq-amber);
+	background: rgb(26 18 11 / 0.6);
 }
 .tq-table tr:last-child td {
 	border-bottom: 0;
@@ -509,9 +552,10 @@ textarea.tq-input {
 	min-width: 104px;
 	min-height: 36px;
 	padding: 2px 6px;
-	border: 1px solid #b9a07f;
+	border: 1px solid var(--tq-line-strong);
 	border-radius: 6px;
-	background: #fff;
+	background: var(--tq-deep);
+	color: var(--tq-ink);
 	font: inherit;
 }
 .tq-matrix input[type="checkbox"] {
@@ -528,24 +572,27 @@ textarea.tq-input {
 	}
 }
 
-/* Links that look like buttons keep the button's colours (the plain `.tq a` rule would win otherwise). */
+/* Links that look like buttons keep the colours of the button (the plain `.tq a` rule would win otherwise). */
 .tq a.tq-btn,
 .tq a.tq-btn:hover {
 	color: var(--tq-accent-ink);
 	text-decoration: none;
 }
-.tq a.tq-btn--secondary,
-.tq a.tq-btn--secondary:hover {
-	color: var(--tq-accent);
+.tq a.tq-btn--secondary {
+	color: var(--tq-heading);
 }
 .tq a.tq-btn--secondary:hover {
-	color: #523417;
+	color: var(--tq-gold-bright);
 }
 .tq a.tq-btn--link {
+	color: var(--tq-accent);
 	text-decoration: underline;
 }
+.tq a.tq-btn--link:hover {
+	color: var(--tq-gold-bright);
+}
 .tq .tq-input::placeholder {
-	color: #8a7766;
+	color: #a69383;
 	opacity: 1;
 }
 /* A table's caption names it for screen readers; it is not shown. */
@@ -561,14 +608,14 @@ textarea.tq-input {
 /* The public site styles input[type=email|password|search…] for its dark theme with more weight than a class; inside
    the admin the form controls keep one look, so these are marked important (the rules stay scoped to .tq). */
 .tq .tq-input {
-	border: 1px solid #b9a07f !important;
+	border: 1px solid var(--tq-line-strong) !important;
 	border-radius: 8px !important;
 	padding: 9px 12px !important;
 	font-size: 1rem !important;
 	font-family: var(--tq-font) !important;
 	line-height: 1.4 !important;
 	min-height: 44px;
-	background-color: #fff !important;
+	background-color: var(--tq-deep) !important;
 	color: var(--tq-ink) !important;
 }
 .tq .tq-input[aria-invalid="true"] {

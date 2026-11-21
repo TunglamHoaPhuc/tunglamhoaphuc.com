@@ -230,7 +230,7 @@ const CONTENT_CSS = `
 .tq-rich-content blockquote { margin: 0; padding: 8px 16px; border-left: 4px solid var(--tq-line); color: var(--tq-muted); }
 .tq-rich-content blockquote.kinh { border-left-color: var(--tq-accent); background: var(--tq-accent-soft); color: var(--tq-ink); font-style: italic; }
 .tq-rich-content blockquote.kinh::before { content: "Trích kinh"; display: block; font-size: 12px; font-style: normal; font-weight: 700; color: var(--tq-accent); }
-.tq-rich-content blockquote.tho { border-left-color: #6b5a4b; text-align: center; font-style: italic; color: var(--tq-ink); }
+.tq-rich-content blockquote.tho { border-left-color: var(--tq-muted); text-align: center; font-style: italic; color: var(--tq-ink); }
 .tq-rich-content blockquote.tho::before { content: "Thơ, kệ"; display: block; font-size: 12px; font-style: normal; font-weight: 700; color: var(--tq-muted); }
 .tq-rich-content figure { margin: 1em 0; text-align: center; }
 .tq-rich-content figure img { max-width: 100%; height: auto; border-radius: 6px; }
