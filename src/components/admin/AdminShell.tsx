@@ -12,6 +12,7 @@ type NavItem = { href: string; label: string; needs?: [string, string] };
 // Only what exists is listed; each module adds its links here when it lands.
 const NAV: { group?: string; items: NavItem[] }[] = [
 	{ items: [{ href: "/quan-tri", label: "Tổng quan" }] },
+	{ group: "Nội dung", items: [{ href: "/quan-tri/media", label: "Thư viện Media", needs: ["media", "view"] }] },
 	{
 		group: "Hệ thống",
 		items: [

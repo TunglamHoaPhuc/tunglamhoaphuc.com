@@ -3,6 +3,7 @@
 // these loaders turn the files into content for the repository. A file is turned into
 // content again only when its version changes, and a new version left with nothing in it
 // (a file cut short, a format the adapters no longer know) does not wipe the site out.
+import { uniqueSlugs } from "../slugs";
 import { parseAbout } from "../about";
 import { parseStatues, type StatueEntry } from "../baoTuong";
 import { parseMonks } from "../monks";
@@ -65,7 +66,7 @@ export function createFileLoaders(read: ReadFile, log: Log = console): FileLoade
 	}
 
 	return {
-		posts: () => load("posts", (data) => (data === null ? [] : parsePosts(data).posts), (posts) => posts.length),
+		posts: () => load("posts", (data) => (data === null ? [] : uniqueSlugs(parsePosts(data, { keepDuplicateSlugs: true }).posts)), (posts) => posts.length),
 		albums: () => load("post-albums", albumsFrom, (albums) => albums.size),
 		schedule: () => load("schedule", (data) => parseSchedule(data ?? {}).schedule, scheduleSize),
 		about: () => load("gioi-thieu", (data) => parseAbout(data ?? []).topics, (topics) => topics.length),

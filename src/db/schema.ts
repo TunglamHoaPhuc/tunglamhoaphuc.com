@@ -13,14 +13,25 @@
 //   and the host in front of it is one setting, MEDIA_BASE); only a file that is not on B2
 //   (WordPress) keeps its `url`.
 import { sql } from "drizzle-orm";
-import { check, index, integer, primaryKey, real, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { check, index, integer, primaryKey, real, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 /** A column that holds JSON as text. */
 const json = <T>(name: string) => text(name, { mode: "json" }).$type<T>();
 const position = () => integer("position").notNull().default(0);
 const boolean = (name: string) => integer(name, { mode: "boolean" });
 const EMPTY_LIST = sql`'[]'`;
-const STATUS = ["draft", "review", "published", "archived"] as const;
+const EMPTY_OBJECT = sql`'{}'`;
+/** draft = Bản nháp, pending = Chờ duyệt, published = Đã xuất bản, scheduled = Hẹn giờ đăng (shows once publish_at has come), hidden = Tạm ẩn. */
+const STATUS = ["draft", "pending", "published", "scheduled", "hidden"] as const;
+
+/** Who made and last changed a row, when it was moved to the trash, and a counter that stops two editors overwriting each other. */
+const audited = () => ({
+	createdBy: text("created_by"),
+	updatedBy: text("updated_by"),
+	deletedAt: text("deleted_at"),
+	deletedBy: text("deleted_by"),
+	version: integer("version").notNull().default(1),
+});
 
 // ---------------------------------------------------------------- users (referenced by media and the log)
 
@@ -274,6 +285,26 @@ export const category = sqliteTable(
 		name: text("name").notNull(),
 		position: position(),
 		colorToken: text("color_token"),
+		parentId: text("parent_id"),
+		description: text("description").notNull().default(""),
+		/** "none", "library" (a name from the icon library), "svg" (cleaned SVG text), "image" (a media picture or a site path). */
+		iconType: text("icon_type", { enum: ["none", "library", "svg", "image"] }).notNull().default("none"),
+		iconName: text("icon_name").notNull().default(""),
+		iconSvg: text("icon_svg").notNull().default(""),
+		iconMediaId: text("icon_media_id").references(() => media.id),
+		/** A site path, for the icons that ship with the site (/brand/icons/…). */
+		iconUrl: text("icon_url").notNull().default(""),
+		iconColor: text("icon_color").notNull().default(""),
+		/** How the section looks: "tin-tuc", "thu-vien-bao-tuong", "trang-tinh", "lich", "tong-chi". */
+		template: text("template").notNull().default(""),
+		visible: boolean("visible").notNull().default(true),
+		seoTitle: text("seo_title"),
+		seoDescription: text("seo_description"),
+		ogMediaId: text("og_media_id").references(() => media.id),
+		updatedAt: text("updated_at"),
+		updatedBy: text("updated_by"),
+		deletedAt: text("deleted_at"),
+		deletedBy: text("deleted_by"),
 	},
 	(table) => [index("category_kind").on(table.kind, table.section)],
 );
@@ -314,6 +345,17 @@ export const post = sqliteTable(
 		seoDescription: text("seo_description"),
 		createdAt: text("created_at"),
 		updatedAt: text("updated_at"),
+		...audited(),
+		/** When a "scheduled" post goes live (ISO, UTC). */
+		publishAt: text("publish_at"),
+		pinned: boolean("pinned").notNull().default(false),
+		ogMediaId: text("og_media_id").references(() => media.id),
+		/** The editor's document (TipTap JSON); `contentHtml` is what the site shows, made from it. */
+		contentJson: json<unknown>("content_json"),
+		/** Fields that belong to one category (Pháp Âm: audio, Video: YouTube id, Ấn phẩm: book). */
+		extra: json<Record<string, unknown>>("extra").notNull().default(EMPTY_OBJECT),
+		/** Title, summary and text without accents and tags, for the admin's search. */
+		searchText: text("search_text").notNull().default(""),
 	},
 	(table) => [
 		index("post_slug").on(table.slug),
@@ -351,6 +393,13 @@ export const teachingArticle = sqliteTable(
 		position: position(),
 		status: text("status", { enum: STATUS }).notNull().default("published"),
 		updatedAt: text("updated_at"),
+		...audited(),
+		publishAt: text("publish_at"),
+		contentJson: json<unknown>("content_json"),
+		seoTitle: text("seo_title"),
+		seoDescription: text("seo_description"),
+		ogMediaId: text("og_media_id").references(() => media.id),
+		searchText: text("search_text").notNull().default(""),
 	},
 	(table) => [index("teaching_group").on(table.groupId, table.position)],
 );
@@ -379,6 +428,13 @@ export const page = sqliteTable(
 		position: position(),
 		status: text("status", { enum: STATUS }).notNull().default("published"),
 		updatedAt: text("updated_at"),
+		...audited(),
+		publishAt: text("publish_at"),
+		contentJson: json<unknown>("content_json"),
+		seoTitle: text("seo_title"),
+		seoDescription: text("seo_description"),
+		ogMediaId: text("og_media_id").references(() => media.id),
+		searchText: text("search_text").notNull().default(""),
 	},
 	(table) => [index("page_group").on(table.groupId, table.position)],
 );
@@ -418,6 +474,10 @@ export const area = sqliteTable("area", {
 	/** Whether the area shows on the site (T36). */
 	visible: boolean("visible").notNull().default(true),
 	updatedAt: text("updated_at"),
+	...audited(),
+	/** Shown in the home page's "Khu vực nổi bật" slider, in `featuredPosition` order. */
+	featured: boolean("featured").notNull().default(false),
+	featuredPosition: integer("featured_position").notNull().default(0),
 });
 
 /** A group of statues that stand together ("Hoa Nghiêm Tam Thánh"), inside an assembly (a `category` of kind "assembly"). */
@@ -457,6 +517,14 @@ export const statue = sqliteTable(
 		body: text("body").notNull().default(""),
 		position: position(),
 		updatedAt: text("updated_at"),
+		...audited(),
+		/** "Ban biên tập" of the statue's article. */
+		editorialBoard: text("editorial_board").notNull().default(""),
+		/** Material, size, age, origin… as the editors list them. */
+		specs: json<Record<string, string>>("specs").notNull().default(EMPTY_OBJECT),
+		status: text("status", { enum: STATUS }).notNull().default("published"),
+		seoTitle: text("seo_title"),
+		seoDescription: text("seo_description"),
 	},
 	(table) => [index("statue_area").on(table.areaId, table.position), index("statue_code").on(table.code)],
 );
@@ -536,6 +604,16 @@ export const calendarEvent = sqliteTable(
 		/** Whether people can register for it (T26, T32). */
 		registrationOpen: boolean("registration_open").notNull().default(false),
 		updatedAt: text("updated_at"),
+		...audited(),
+		/** The lunar date of the start day; filled from the solar date unless an editor typed it (`lunarManual`). */
+		lunarDay: integer("lunar_day"),
+		lunarMonth: integer("lunar_month"),
+		lunarYear: integer("lunar_year"),
+		lunarLeap: boolean("lunar_leap").notNull().default(false),
+		lunarManual: boolean("lunar_manual").notNull().default(false),
+		/** "closed", "open" or "full". */
+		registrationStatus: text("registration_status", { enum: ["closed", "open", "full"] }).notNull().default("closed"),
+		status: text("status", { enum: STATUS }).notNull().default("published"),
 	},
 	(table) => [index("event_dates").on(table.startDate, table.endDate)],
 );
@@ -663,4 +741,130 @@ export const redirect = sqliteTable("redirect", {
 	fromPath: text("from_path").primaryKey(),
 	toPath: text("to_path").notNull(),
 	code: integer("code").notNull().default(301),
+	note: text("note").notNull().default(""),
+	hits: integer("hits").notNull().default(0),
+	active: boolean("active").notNull().default(true),
+	createdBy: text("created_by"),
+	createdAt: text("created_at"),
+});
+
+// ---------------------------------------------------------------- admin: history, menus, related things, quotes
+
+/** A copy of a row each time it is saved, so an editor can compare and go back. */
+export const revision = sqliteTable(
+	"revision",
+	{
+		id: integer("id").primaryKey({ autoIncrement: true }),
+		entityType: text("entity_type").notNull(),
+		entityId: text("entity_id").notNull(),
+		version: integer("version").notNull(),
+		/** The row and its small child rows as JSON (the editor's document, not the HTML made from it). */
+		snapshot: json<unknown>("snapshot").notNull(),
+		summary: text("summary").notNull().default(""),
+		createdBy: text("created_by").references(() => user.id),
+		createdAt: text("created_at").notNull(),
+	},
+	(table) => [uniqueIndex("revision_entity_version").on(table.entityType, table.entityId, table.version)],
+);
+
+/** A menu: "header", "footer" or "sidebar". */
+export const menu = sqliteTable("menu", {
+	id: text("id").primaryKey(),
+	name: text("name").notNull(),
+});
+
+export const menuItem = sqliteTable(
+	"menu_item",
+	{
+		id: text("id").primaryKey(),
+		menuId: text("menu_id")
+			.notNull()
+			.references(() => menu.id),
+		parentId: text("parent_id"),
+		position: position(),
+		label: text("label").notNull(),
+		/** "category" (links to a category's page), "page" or "url". */
+		linkType: text("link_type", { enum: ["category", "page", "url"] }).notNull().default("url"),
+		categoryId: text("category_id").references(() => category.id),
+		href: text("href").notNull().default(""),
+		openNewTab: boolean("open_new_tab").notNull().default(false),
+		visible: boolean("visible").notNull().default(true),
+		iconType: text("icon_type", { enum: ["none", "library", "svg", "image"] }).notNull().default("none"),
+		iconName: text("icon_name").notNull().default(""),
+		iconSvg: text("icon_svg").notNull().default(""),
+		iconMediaId: text("icon_media_id").references(() => media.id),
+		iconUrl: text("icon_url").notNull().default(""),
+		iconColor: text("icon_color").notNull().default(""),
+		updatedAt: text("updated_at"),
+		updatedBy: text("updated_by"),
+		deletedAt: text("deleted_at"),
+		deletedBy: text("deleted_by"),
+	},
+	(table) => [index("menu_item_tree").on(table.menuId, table.parentId, table.position)],
+);
+
+/** Things an editor chose to show next to a post: other posts or statues. */
+export const postRelated = sqliteTable(
+	"post_related",
+	{
+		postId: text("post_id")
+			.notNull()
+			.references(() => post.id, { onDelete: "cascade" }),
+		/** "post" or "statue". */
+		targetType: text("target_type").notNull(),
+		targetId: text("target_id").notNull(),
+		position: integer("position").notNull().default(0),
+	},
+	(table) => [primaryKey({ columns: [table.postId, table.targetType, table.targetId] })],
+);
+
+/** The pictures of a statue from several angles. */
+export const statueImage = sqliteTable(
+	"statue_image",
+	{
+		statueId: text("statue_id")
+			.notNull()
+			.references(() => statue.id, { onDelete: "cascade" }),
+		position: integer("position").notNull(),
+		mediaId: text("media_id")
+			.notNull()
+			.references(() => media.id),
+		/** "Chính diện", "Bên trái"… */
+		label: text("label").notNull().default(""),
+		imagePosition: text("image_position").notNull().default("center 50%"),
+	},
+	(table) => [primaryKey({ columns: [table.statueId, table.position] })],
+);
+
+/** Related statues chosen by hand; when a statue has none, the site keeps picking them from its cluster and assembly. */
+export const statueRelated = sqliteTable(
+	"statue_related",
+	{
+		statueId: text("statue_id")
+			.notNull()
+			.references(() => statue.id, { onDelete: "cascade" }),
+		relatedId: text("related_id")
+			.notNull()
+			.references(() => statue.id, { onDelete: "cascade" }),
+		position: integer("position").notNull().default(0),
+	},
+	(table) => [primaryKey({ columns: [table.statueId, table.relatedId] })],
+);
+
+/** A saying shown in "Lời Thầy dạy". */
+export const quote = sqliteTable("quote", {
+	id: text("id").primaryKey(),
+	text: text("text").notNull(),
+	author: text("author").notNull().default(""),
+	/** The sutra or talk it comes from. */
+	source: text("source").notNull().default(""),
+	sourceUrl: text("source_url").notNull().default(""),
+	position: position(),
+	active: boolean("active").notNull().default(true),
+	createdBy: text("created_by"),
+	updatedBy: text("updated_by"),
+	createdAt: text("created_at"),
+	updatedAt: text("updated_at"),
+	deletedAt: text("deleted_at"),
+	deletedBy: text("deleted_by"),
 });

@@ -145,13 +145,13 @@ describe("the d1 source", () => {
 		expect(await repo.listAreas()).toEqual([]);
 	});
 
-	it("serves a shared slug to the post that had it first and keeps the other out of the lists", async () => {
-		const db = database({ posts: [smallPost("1", { slug: "phap-hoi" }), smallPost("2", { slug: "phap-hoi" })] });
-		const repo = createD1Repository(asD1(db));
-		expect((await repo.getPostBySlug("phap-hoi"))?.id).toBe("1");
-		expect((await repo.listPosts()).items.map((item) => item.id)).toEqual(["1"]);
-		// It is still in D1, for the admin to give it a slug of its own.
-		expect(db.prepare("select count(*) as n from post").get()).toEqual({ n: 2 });
+	it("refuses a second live post with the same slug in a section, while a trashed one does not block a new one", () => {
+		// Migration 0004: a slug is unique among posts that are not in the trash (the import renames the later one to -2, see slugs.ts).
+		expect(() => database({ posts: [smallPost("1", { slug: "phap-hoi" }), smallPost("2", { slug: "phap-hoi" })] })).toThrow(/UNIQUE/);
+		const db = database({ posts: [smallPost("1", { slug: "phap-hoi" })] });
+		db.exec("update post set deleted_at = '2026-11-21' where id = '1'");
+		db.exec("insert into post (id, slug, title, section, published_date) select '9', slug, 'Mới', section, published_date from post where id = '1'");
+		expect(db.prepare("select count(*) as n from post where slug = 'phap-hoi'").get()).toEqual({ n: 2 });
 	});
 
 	it("sees a post an admin saved after the import", async () => {

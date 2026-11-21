@@ -8,6 +8,7 @@
 // (page_view, registration) and the admin's (user, audit_log, setting, notice, redirect) are
 // never touched. It runs in Node (scripts/import.ts), not in the Worker.
 import { createHash } from "node:crypto";
+import { uniqueSlugs } from "../libs/content/slugs";
 import { eq, getTableColumns, getTableName, notInArray, sql } from "drizzle-orm";
 import type { AnySQLiteTable } from "drizzle-orm/sqlite-core";
 import { drizzle } from "drizzle-orm/sqlite-proxy";
@@ -74,7 +75,7 @@ export async function loadContent(read: ReadFile, log: Pick<Console, "error"> = 
 		loaders.statues(),
 		loaders.monks(),
 	]);
-	const posts = postsFile ? parsePosts(postsFile.data, { keepDuplicateSlugs: true }).posts : [];
+	const posts = postsFile ? uniqueSlugs(parsePosts(postsFile.data, { keepDuplicateSlugs: true }).posts) : [];
 	return { posts, albums, schedule, about, tongChi, areas, statues, monks };
 }
 

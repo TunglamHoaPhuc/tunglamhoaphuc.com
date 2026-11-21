@@ -128,7 +128,8 @@ function checkFile(bytes: Uint8Array): Sniffed {
 }
 
 const fileKey = (id: string, version: number, name: string, ext: string) => `cms/${id}/v${version}/${slugify(name, 60) || "anh"}.${ext}`;
-const cropKey = (id: string, version: number, ratio: string, ext: string) => `cms/${id}/v${version}/crop-${ratio.replace(":", "x")}.${ext}`;
+/** A cut file gets a new address each time it is cut again (`stamp`), so no cache holds the old cut. */
+const cropKey = (id: string, version: number, ratio: string, ext: string, stamp: number) => `cms/${id}/v${version}/crop-${ratio.replace(":", "x")}-${stamp.toString(36)}.${ext}`;
 const baseName = (filename: string) => filename.replace(/\.[A-Za-z0-9]{1,5}$/, "");
 
 async function checkFolder(ctx: AuthContext, folderId: string | null | undefined): Promise<string | null> {
@@ -249,7 +250,7 @@ export async function saveCrop(ctx: AuthContext, by: Authed, store: MediaStore, 
 	const kind = checkFile(input.bytes);
 	if (Math.abs(kind.width / kind.height / want - 1) > 0.03) throw new ApiError(400, "invalid_input", `Ảnh đã cắt không đúng tỷ lệ ${ratio}.`, { file: `Ảnh đã cắt không đúng tỷ lệ ${ratio}.` });
 	const version = num(row.version) || 1;
-	const key = cropKey(id, version, ratio, kind.ext);
+	const key = cropKey(id, version, ratio, kind.ext, ctx.now().getTime());
 	const previous = await ctx.db.prepare("SELECT r2_key FROM media_crop WHERE media_id = ? AND ratio = ?").bind(id, ratio).first();
 	await store.put(key, input.bytes, kind.mime);
 	try {

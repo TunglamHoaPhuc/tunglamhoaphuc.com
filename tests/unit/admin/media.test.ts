@@ -167,12 +167,20 @@ describe("cropping for the frame shapes", () => {
 		expect(saved.status).toBe(200);
 		expect(saved.data.crops).toHaveLength(1);
 		expect(saved.data.crops[0]).toMatchObject({ ratio: "4:3", x: 10, y: 5, width: 50, height: 60 });
-		expect(saved.data.crops[0].url).toBe(`/anh-goc/s2-cnv03/cms/${item.id}/v1/crop-4x3.webp`);
-		expect(w.files.has(`cms/${item.id}/v1/crop-4x3.webp`)).toBe(true);
+		const firstUrl = saved.data.crops[0].url as string;
+		expect(firstUrl).toMatch(new RegExp(`^/anh-goc/s2-cnv03/cms/${item.id}/v1/crop-4x3-[a-z0-9]+\.webp$`));
+		const keyOf = (url: string) => url.replace("/anh-goc/s2-cnv03/", "");
+		expect(w.files.has(keyOf(firstUrl))).toBe(true);
+		await new Promise((resolve) => setTimeout(resolve, 5));
 		const again = await editor.form("PUT", `media/${item.id}/crops/4%3A3`, { bytes: await picture(800, 600, "webp", 3), name: "c.webp" }, { region });
 		expect(again.data.crops).toHaveLength(1);
+		// cut again: a new address (no cache can hold the old cut) and the old file is gone
+		const secondUrl = again.data.crops[0].url as string;
+		expect(secondUrl).not.toBe(firstUrl);
+		expect(w.files.has(keyOf(firstUrl))).toBe(false);
+		expect(w.files.has(keyOf(secondUrl))).toBe(true);
 		expect((await editor.call("DELETE", `media/${item.id}/crops/4%3A3`)).status).toBe(204);
-		expect(w.files.has(`cms/${item.id}/v1/crop-4x3.webp`)).toBe(false);
+		expect(w.files.has(keyOf(secondUrl))).toBe(false);
 		expect((await editor.call("DELETE", `media/${item.id}/crops/4%3A3`)).status).toBe(404);
 	});
 
