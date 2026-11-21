@@ -56,6 +56,30 @@ function onToolbarFocus(event: FocusEvent<HTMLDivElement>) {
 	if (buttons.includes(target)) buttons.forEach((button) => (button.tabIndex = button === target ? 0 : -1));
 }
 
+function readToolbarState(current: Editor | null) {
+	if (!current) return null;
+	return {
+		bold: current.isActive("bold"),
+		italic: current.isActive("italic"),
+		underline: current.isActive("underline"),
+		strike: current.isActive("strike"),
+		h2: current.isActive("heading", { level: 2 }),
+		h3: current.isActive("heading", { level: 3 }),
+		h4: current.isActive("heading", { level: 4 }),
+		paragraph: current.isActive("paragraph"),
+		bullet: current.isActive("bulletList"),
+		ordered: current.isActive("orderedList"),
+		quote: current.isActive("blockquote", { variant: null }),
+		kinh: current.isActive("blockquote", { variant: "kinh" }),
+		tho: current.isActive("blockquote", { variant: "tho" }),
+		link: current.isActive("link"),
+		table: current.isActive("table"),
+		figure: current.isActive("figureImage"),
+		canUndo: current.can().undo(),
+		canRedo: current.can().redo(),
+	};
+}
+
 export function RichEditor({ initial, onChange, label = "Nội dung bài", readOnly = false }: { initial: JSONContent | string; onChange: (value: EditorValue) => void; label?: string; readOnly?: boolean }) {
 	const [panel, setPanel] = useState<Panel>(null);
 	const onChangeRef = useRef(onChange);
@@ -80,32 +104,10 @@ export function RichEditor({ initial, onChange, label = "Nội dung bài", readO
 		onUpdate: ({ editor: current }) => onChangeRef.current({ html: current.getHTML(), json: current.getJSON() }),
 	});
 
-	const state = useEditorState({
-		editor,
-		selector: ({ editor: current }) =>
-			current
-				? {
-						bold: current.isActive("bold"),
-						italic: current.isActive("italic"),
-						underline: current.isActive("underline"),
-						strike: current.isActive("strike"),
-						h2: current.isActive("heading", { level: 2 }),
-						h3: current.isActive("heading", { level: 3 }),
-						h4: current.isActive("heading", { level: 4 }),
-						paragraph: current.isActive("paragraph"),
-						bullet: current.isActive("bulletList"),
-						ordered: current.isActive("orderedList"),
-						quote: current.isActive("blockquote", { variant: null }),
-						kinh: current.isActive("blockquote", { variant: "kinh" }),
-						tho: current.isActive("blockquote", { variant: "tho" }),
-						link: current.isActive("link"),
-						table: current.isActive("table"),
-						figure: current.isActive("figureImage"),
-						canUndo: current.can().undo(),
-						canRedo: current.can().redo(),
-					}
-				: null,
-	});
+	// useEditorState only re-reads after a transaction, and a freshly mounted editor has had none: until then read the state directly,
+	// or the toolbar would wait for the first keystroke and the editor would never appear.
+	const live = useEditorState({ editor, selector: ({ editor: current }) => readToolbarState(current) });
+	const state = live ?? readToolbarState(editor);
 
 	if (!editor || !state) return <p className="tq-muted" role="status">Đang mở trình soạn thảo…</p>;
 
