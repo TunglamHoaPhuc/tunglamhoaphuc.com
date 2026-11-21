@@ -1,9 +1,11 @@
 "use client";
-import { site } from "@/config/site";
 import { ariaCurrent, isCurrentItem, isCurrentLink } from "@/libs/nav";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
+import { useHeaderNav } from "./HeaderMenuContext";
+import MenuIcon from "./MenuIcon";
+import { isInlineSvg } from "./menuNav";
 
 // Desktop menu (from 1280px). Dropdowns follow the disclosure pattern: the parent is a
 // button, Enter/Space/click or a tap opens it, Esc closes and returns focus to it, and the
@@ -12,8 +14,12 @@ import { useEffect, useId, useRef, useState } from "react";
 // a diagonal move to the panel does not close it. aria-expanded follows what is shown.
 const HOVER_CLOSE_MS = 180;
 
+// An item the admin set to open in a new tab.
+const newTabProps = (item) => (item.newTab ? { target: "_blank", rel: "noopener noreferrer" } : {});
+
 const Navbar = () => {
 	const pathname = usePathname();
+	const nav = useHeaderNav();
 	const [openIndex, setOpenIndex] = useState(null);
 	const navRef = useRef(null);
 	const toggleRefs = useRef([]);
@@ -57,12 +63,12 @@ const Navbar = () => {
 		<div className="menu-area tlhp-desktop-only align-items-center">
 			<nav ref={navRef} className="mainmenu" aria-label="Menu chính">
 				<ul>
-					{site.nav.map((item, index) => {
+					{nav.map((item, index) => {
 						const isCurrent = isCurrentItem(pathname, item);
 						if (!item.children) {
 							return (
-								<li key={item.href} className={isCurrent ? "current-menu-ancestor" : ""}>
-									<Link href={item.href} aria-current={ariaCurrent(pathname, item)}>
+								<li key={item.id ?? item.href} className={isCurrent ? "current-menu-ancestor" : ""}>
+									<Link href={item.href} aria-current={ariaCurrent(pathname, item)} {...newTabProps(item)}>
 										{item.label}
 									</Link>
 								</li>
@@ -72,7 +78,7 @@ const Navbar = () => {
 						const panelId = `${baseId}-menu-${index}`;
 						return (
 							<li
-								key={item.href}
+								key={item.id ?? item.href}
 								className={`has-dropdown tlhp-dropdown ${isOpen ? "is-open" : ""} ${isCurrent ? "current-menu-ancestor" : ""}`}
 								onKeyDown={(event) => {
 									if (event.key === "Escape" && isOpen) {
@@ -109,14 +115,15 @@ const Navbar = () => {
 									{item.children.map((child) => {
 										const isChildCurrent = isCurrentLink(pathname, child);
 										return (
-											<li key={child.href} className={isChildCurrent ? "current-menu-item" : ""}>
+											<li key={child.id ?? child.href} className={isChildCurrent ? "current-menu-item" : ""}>
 												<Link
 													className="mega-menu-service-single"
 													href={child.href}
 													aria-current={ariaCurrent(pathname, child)}
+													{...newTabProps(child)}
 												>
-													<span className={`mega-menu-service-icon tlhp-brand-icon ${child.image ? "" : "tlhp-brand-dot"}`} aria-hidden="true">
-														{child.image ? <img src={child.image} alt="" width={128} height={128} loading="lazy" /> : null}
+													<span className={`mega-menu-service-icon tlhp-brand-icon ${child.image || isInlineSvg(child.svg) ? "" : "tlhp-brand-dot"}`} aria-hidden="true">
+														<MenuIcon item={child} />
 													</span>
 													<span className="mega-menu-service-title">{child.label}</span>
 													<span className="mega-menu-service-nav" aria-hidden="true">

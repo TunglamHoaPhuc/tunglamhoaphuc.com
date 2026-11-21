@@ -24,8 +24,8 @@ const MobileMenuItem = ({ item, isCurrent, pathname }) => {
 			</button>
 			<ul id={panelId} className="sub-menu" hidden={!isOpen}>
 				{item.children.map((child) => (
-					<li key={child.href} className={isCurrentLink(pathname, child) ? "current-menu-item" : ""}>
-						<Link href={child.href} aria-current={ariaCurrent(pathname, child)}>
+					<li key={child.id ?? child.href} className={isCurrentLink(pathname, child) ? "current-menu-item" : ""}>
+						<Link href={child.href} aria-current={ariaCurrent(pathname, child)} {...(child.newTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
 							{child.label}
 						</Link>
 					</li>
