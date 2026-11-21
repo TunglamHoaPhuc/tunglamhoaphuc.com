@@ -17,7 +17,8 @@
 		"check:urls": "tsx scripts/check-urls.ts",
 		"import": "tsx scripts/import.ts",
 		"media:copy": "tsx scripts/media-copy.ts",
-		"db:generate": "drizzle-kit generate"
+		"db:generate": "drizzle-kit generate",
+		"dev:db": "tsx scripts/dev-db.ts"
 	},
 	"browserslist": [
 		">0.3%",

@@ -29,9 +29,12 @@ async function waitUntil(work: Promise<unknown>): Promise<void> {
 
 async function handle(request: Request, { params }: Context): Promise<Response> {
 	const env = await workerEnv();
-	if (!env?.DB || !env.ADMIN_JWT_SECRET || !env.ADMIN_ENC_KEY || !env.ADMIN_BASE_URL) {
-		return Response.json({ error: { code: "not_configured", message: "Quản trị chưa được cấu hình trên máy chủ này." } }, { status: 503, headers: { "Cache-Control": "no-store" } });
+	const missing = ["DB", "ADMIN_JWT_SECRET", "ADMIN_ENC_KEY", "ADMIN_BASE_URL"].filter((name) => !env?.[name]);
+	if (missing.length) {
+		// Names only, never values: they tell whoever sets the server up what is still to configure.
+		return Response.json({ error: { code: "not_configured", message: `Quản trị chưa được cấu hình trên máy chủ này (thiếu: ${missing.join(", ")}).` } }, { status: 503, headers: { "Cache-Control": "no-store" } });
 	}
+	if (!env) return new Response(null, { status: 503 });
 	const { path } = await params;
 	return dispatch(request, path.join("/"), {
 		env: env as AdminEnv,
