@@ -18,7 +18,8 @@
 		"import": "tsx scripts/import.ts",
 		"media:copy": "tsx scripts/media-copy.ts",
 		"db:generate": "drizzle-kit generate",
-		"dev:db": "tsx scripts/dev-db.ts"
+		"dev:db": "tsx scripts/dev-db.ts",
+		"backfill:admin": "tsx scripts/backfill-admin.ts"
 	},
 	"browserslist": [
 		">0.3%",
