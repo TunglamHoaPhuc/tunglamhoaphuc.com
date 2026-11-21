@@ -6,6 +6,7 @@
 import { existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { backfillContentUsage } from "../src/db/mediaBackfill";
+import { fillSearchText } from "../src/db/searchBackfill";
 import { openDatabase } from "../src/db/nodeSqlite";
 
 const STATE_DIR = ".cloudflare/state/v3/d1/miniflare-D1DatabaseObject";
@@ -23,6 +24,7 @@ try {
 	const db = openDatabase(findFile());
 	const result = backfillContentUsage(db);
 	console.log(`pictures found in texts: ${result.found}, usage rows added: ${result.added}`);
+	console.log(`search_text filled for ${fillSearchText(db)} rows`);
 	db.close();
 } catch (error) {
 	console.error((error as Error).message);
