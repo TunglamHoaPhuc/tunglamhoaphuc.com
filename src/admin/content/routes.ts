@@ -90,6 +90,7 @@ function routesOf(kind: Kind): RouteSpec[] {
 		method: "POST",
 		path: `${base}/:id/${action}`,
 		needs: needs(action === "submit" ? "update" : "publish"),
+		own: action === "submit", // submit checks the owner (changeStatus); publish, hide and unpublish need scope "all"
 		handler: async (call) => {
 			const body = await optionalBody(call, z.object({ version: z.number().int().min(1).optional(), publishAt: z.string().max(40).nullable().optional() }));
 			return changeStatus(call.ctx, call.authed!, kind, call.params.id, action, body);
@@ -155,6 +156,7 @@ function routesOf(kind: Kind): RouteSpec[] {
 			method: "PATCH",
 			path: `${base}/:id`,
 			needs: needs("update"),
+			own: true,
 			handler: async (call) => {
 				const body = (await call.body(updateSchema)) as Record<string, unknown> & { version: number };
 				return updateItem(call.ctx, call.authed!, kind, call.params.id, body);
@@ -164,6 +166,7 @@ function routesOf(kind: Kind): RouteSpec[] {
 			method: "DELETE",
 			path: `${base}/:id`,
 			needs: needs("delete"),
+			own: true,
 			handler: async (call) => {
 				await trashItem(call.ctx, call.authed!, kind, call.params.id);
 			},
@@ -185,18 +188,20 @@ function routesOf(kind: Kind): RouteSpec[] {
 			method: "POST",
 			path: `${base}/:id/revisions/:version/restore`,
 			needs: needs("update"),
+			own: true,
 			handler: async (call) => {
 				const body = await optionalBody(call, z.object({ version: z.number().int().min(1).optional() }));
 				return restoreRevision(call.ctx, call.authed!, kind, call.params.id, versionParam(call.params.version), body.version);
 			},
 		},
-		{ method: "POST", path: `${base}/:id/preview-token`, needs: needs("update"), handler: async (call) => previewLink(call.ctx, kind, call.params.id) },
+		{ method: "POST", path: `${base}/:id/preview-token`, needs: needs("update"), own: true, handler: async (call) => previewLink(call.ctx, call.authed!, kind, call.params.id) },
 		...(kind.hasRelated
 			? [
 					{
 						method: "PUT",
 						path: `${base}/:id/related`,
 						needs: needs("update"),
+						own: true,
 						handler: async (call) => {
 							const body = await call.body(z.object({ items: z.array(z.object({ type: z.enum(["post", "statue"]), id: z.string().min(1).max(120) })).max(20, "Tối đa 20 mục liên quan.") }));
 							return setRelated(call.ctx, call.authed!, call.params.id, body.items);

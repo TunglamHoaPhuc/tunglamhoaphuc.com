@@ -8,10 +8,11 @@ import { hashPassword } from "../auth/password";
 import type { AuthContext, Authed } from "../auth/service";
 import { randomToken } from "../auth/tokens";
 import { num, text, type AdminStmt, type Row } from "../db";
+import { listSessions } from "../auth/service";
 import { ApiError, forbidden, notFound } from "../http/errors";
 import { likeWord, type Page } from "../http/paging";
 import { newId } from "../ids";
-import { isKnownPermission, SUPER_ADMIN_ROLE_ID, type Permissions, type Scope } from "../rbac/catalog";
+import { isKnownPermission, isOwnable, SUPER_ADMIN_ROLE_ID, type Permissions, type Scope } from "../rbac/catalog";
 import { can, covers, loadPermissions } from "../rbac/check";
 
 const stamp = (ctx: AuthContext) => ctx.now().toISOString();
@@ -81,8 +82,8 @@ async function superAdminsLeft(ctx: AuthContext, except: string): Promise<number
 	return num(row?.n);
 }
 
-/** Throws unless `by` may act on `target`: not oneself, and nothing beyond their own rights. */
-async function mayManage(ctx: AuthContext, by: Authed, target: UserRow, opts: { self?: "allow" | "refuse" } = {}): Promise<void> {
+/** Throws unless `by` may act on `target`: not oneself, and nothing beyond their own rights. Exported for the trash, which acts on accounts too. */
+export async function mayManage(ctx: AuthContext, by: Authed, target: Pick<UserRow, "id" | "roleId">, opts: { self?: "allow" | "refuse" } = {}): Promise<void> {
 	if (target.id === by.user.id) {
 		if (opts.self === "allow") return;
 		throw new ApiError(403, "forbidden_self", "Bạn không thể làm điều này với chính tài khoản của mình.");
@@ -194,6 +195,8 @@ export async function forcePasswordChange(ctx: AuthContext, by: Authed, id: stri
 
 export async function resetTwoFactor(ctx: AuthContext, by: Authed, id: string): Promise<void> {
 	if (by.user.roleId !== SUPER_ADMIN_ROLE_ID) throw new ApiError(403, "forbidden_super", "Chỉ Super Admin mới gỡ xác thực hai bước của người khác.");
+	// Switching one's own 2FA off takes the password (docs 6.3): that is `me/2fa/disable`, not this.
+	if (id === by.user.id) throw new ApiError(403, "forbidden_self", "Muốn tắt xác thực hai bước của chính mình, hãy dùng mục Bảo mật và nhập mật khẩu.");
 	const target = await findUser(ctx, id);
 	await ctx.db.batch([ctx.db.prepare("DELETE FROM user_totp WHERE user_id = ?").bind(id), audit(ctx, by, { action: "user.reset_2fa", entityType: "user", entityId: target.id })]);
 }
@@ -209,6 +212,13 @@ export async function deleteUser(ctx: AuthContext, by: Authed, id: string): Prom
 		ctx.db.prepare("UPDATE session SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL").bind(now, id),
 		audit(ctx, by, { action: "user.delete", entityType: "user", entityId: id, before: { email: target.email, name: target.name } }),
 	]);
+}
+
+/** The live sessions (and their addresses) of an account: the same "not above your rights" rule as changing it; one's own are always visible. */
+export async function sessionsOf(ctx: AuthContext, by: Authed, id: string) {
+	const target = await findUser(ctx, id);
+	await mayManage(ctx, by, target, { self: "allow" });
+	return listSessions(ctx, id, by.user.id === id ? by.session.id : undefined);
 }
 
 export async function revokeUserSessions(ctx: AuthContext, by: Authed, id: string): Promise<number> {
@@ -247,7 +257,7 @@ function parsePermissions(list: string[]): Map<string, Scope> {
 		const key = own ? entry.slice(0, -4) : entry;
 		const [module, action] = key.split(".");
 		if (!module || !action || !isKnownPermission(module, action)) throw new ApiError(400, "invalid_input", `Quyền "${entry}" không có trong danh mục.`, { permissions: `Quyền "${entry}" không có trong danh mục.` });
-		if (own && action !== "update" && action !== "delete" && action !== "view") throw new ApiError(400, "invalid_input", `Quyền "${entry}" không có phạm vi "của mình".`, { permissions: "Phạm vi “của mình” chỉ dùng cho xem, sửa, xóa." });
+		if (own && !isOwnable(module, action)) throw new ApiError(400, "invalid_input", `Quyền "${entry}" không có phạm vi "của mình".`, { permissions: `Quyền “${entry}” không có phạm vi “của mình”: mục này không xét người tạo.` });
 		out.set(key, own ? "own" : "all");
 	}
 	return out;

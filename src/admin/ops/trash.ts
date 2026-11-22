@@ -5,7 +5,8 @@ import { num, text, type AdminStmt } from "../db";
 import { ApiError, forbidden, notFound } from "../http/errors";
 import type { Page } from "../http/paging";
 import type { MediaStore } from "../media/store";
-import { can } from "../rbac/check";
+import { can, covers, loadPermissions } from "../rbac/check";
+import { mayManage } from "../users/service";
 import { registerTrashable, trashableOf, trashables, type Trashable } from "../trash";
 import { audit, isForeignKeyError, isUniqueError, stamp } from "./common";
 
@@ -27,6 +28,11 @@ registerTrashable({
 	titleSql: "name || ' <' || email || '>'",
 	module: "users",
 	hasCreatedBy: false,
+	// The hard rule of users/service.ts: nobody acts on an account holding rights beyond their own (or on their own).
+	guard: async (ctx, by, id) => {
+		const row = await ctx.db.prepare("SELECT role_id FROM user WHERE id = ?").bind(id).first();
+		await mayManage(ctx, by, { id, roleId: text(row?.role_id) || null });
+	},
 	purge: (ctx, _by, id) => [
 		ctx.db.prepare("DELETE FROM session WHERE user_id = ?").bind(id),
 		ctx.db.prepare("DELETE FROM password_reset WHERE user_id = ?").bind(id),
@@ -40,6 +46,9 @@ registerTrashable({
 	titleSql: "name",
 	module: "roles",
 	hasCreatedBy: false,
+	guard: async (ctx, by, id) => {
+		if (!covers(by.permissions, await loadPermissions(ctx.db, id))) throw new ApiError(403, "forbidden_higher", "Vai trò này có quyền cao hơn quyền của bạn.");
+	},
 	purge: (ctx, _by, id) => [ctx.db.prepare("DELETE FROM role_permission WHERE role_id = ?").bind(id)],
 });
 
@@ -55,7 +64,14 @@ function safe(item: Trashable): Trashable {
 	return item;
 }
 
-export const trashTypes = () => trashables().map(({ type, label }) => ({ type, label })).sort((a, b) => a.label.localeCompare(b.label, "vi"));
+/** What the person may look at in the trash: a kind is theirs to see only with `<module>.view` (scope all: no module's "view own" filters its rows). */
+const viewable = (by: Authed, item: Trashable) => can(by.permissions, item.module, "view");
+
+export const trashTypes = (by: Authed) =>
+	trashables()
+		.filter((item) => viewable(by, item))
+		.map(({ type, label }) => ({ type, label }))
+		.sort((a, b) => a.label.localeCompare(b.label, "vi"));
 
 // ------------------------------------------------------------------ listing
 
@@ -69,6 +85,8 @@ export async function listTrash(ctx: AuthContext, by: Authed, filter: { type?: s
 		if (!trashableOf(filter.type)) throw new ApiError(400, "invalid_input", "Loại nội dung không có trong thùng rác.", { type: "Loại nội dung không có trong thùng rác." });
 		items = items.filter((item) => item.type === filter.type);
 	}
+	// Only the kinds whose module the person may view: trash.view alone never shows accounts, roles, posts…
+	items = items.filter((item) => viewable(by, item));
 	if (ownOnly) items = items.filter((item) => ownerColumn(item));
 
 	let total = 0;
@@ -115,14 +133,19 @@ async function findTrashed(ctx: AuthContext, type: string, id: string): Promise<
 	return { item, title: text(row.title), owner: owner ? text(row.owner) || null : null };
 }
 
-/** With "own" rights the action is allowed only on a row the person owns (rows of kinds without an owner are never theirs). */
-function mayAct(by: Authed, action: "update" | "delete", owner: string | null) {
-	if (!can(by.permissions, "trash", action, { userId: by.user.id, ownerId: owner ?? "" })) throw forbidden();
+/**
+ * Restoring needs `trash.update` and the module's `update`; removing for good needs `trash.delete` and the module's `delete`.
+ * With "own" rights an action is allowed only on a row the person owns (rows of kinds without an owner are never theirs).
+ */
+async function mayAct(ctx: AuthContext, by: Authed, item: Trashable, action: "update" | "delete", id: string, owner: string | null) {
+	const who = { userId: by.user.id, ownerId: owner ?? "" };
+	if (!can(by.permissions, "trash", action, who) || !can(by.permissions, item.module, action, who)) throw forbidden();
+	await item.guard?.(ctx, by, id, action);
 }
 
 export async function restoreTrashed(ctx: AuthContext, by: Authed, type: string, id: string): Promise<{ type: string; id: string; title: string }> {
 	const { item, title, owner } = await findTrashed(ctx, type, id);
-	mayAct(by, "update", owner);
+	await mayAct(ctx, by, item, "update", id, owner);
 	const clear = WITHOUT_DELETED_BY.has(item.table) ? "deleted_at = NULL" : "deleted_at = NULL, deleted_by = NULL";
 	try {
 		await ctx.db.batch([
@@ -147,7 +170,7 @@ async function mediaKeys(ctx: AuthContext, id: string): Promise<string[]> {
 
 export async function purgeTrashed(ctx: AuthContext, by: Authed, type: string, id: string, store?: MediaStore): Promise<void> {
 	const { item, title, owner } = await findTrashed(ctx, type, id);
-	mayAct(by, "delete", owner);
+	await mayAct(ctx, by, item, "delete", id, owner);
 	const keys = item.type === "media" ? await mediaKeys(ctx, id) : [];
 	const statements: AdminStmt[] = [
 		...item.purge(ctx, by, id),

@@ -121,13 +121,13 @@ registerRoutes(
 	{
 		method: "GET",
 		path: "me/sessions",
-		needs: "session-any",
+		needs: "session",
 		handler: async (call) => ({ sessions: await listSessions(call.ctx, call.authed!.user.id, call.authed!.session.id) }),
 	},
 	{
 		method: "DELETE",
 		path: "me/sessions/:id",
-		needs: "session-any",
+		needs: "session",
 		handler: async (call) => {
 			const ended = await revokeSessions(call.ctx, call.authed!.user.id, { sessionId: call.params.id });
 			if (!ended) throw new ApiError(404, "not_found", "Phiên này không còn.");
@@ -136,14 +136,14 @@ registerRoutes(
 	{
 		method: "DELETE",
 		path: "me/sessions",
-		needs: "session-any",
+		needs: "session",
 		handler: async (call) => ({ ended: await revokeSessions(call.ctx, call.authed!.user.id, { exceptId: call.authed!.session.id }) }),
 	},
-	{ method: "POST", path: "me/2fa/setup", needs: "session-any", handler: async (call) => setupTotp(call.ctx, call.authed!) },
+	{ method: "POST", path: "me/2fa/setup", needs: "session", handler: async (call) => setupTotp(call.ctx, call.authed!) },
 	{
 		method: "POST",
 		path: "me/2fa/enable",
-		needs: "session-any",
+		needs: "session",
 		handler: async (call) => {
 			const input = await call.body(z.object({ code: z.string().trim().min(6).max(10) }));
 			return { recoveryCodes: await enableTotp(call.ctx, call.authed!, input.code) };
@@ -152,7 +152,7 @@ registerRoutes(
 	{
 		method: "POST",
 		path: "me/2fa/disable",
-		needs: "session-any",
+		needs: "session",
 		handler: async (call) => {
 			const input = await call.body(z.object({ password }));
 			await disableTotp(call.ctx, call.authed!, input.password);

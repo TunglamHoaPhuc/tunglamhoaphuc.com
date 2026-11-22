@@ -42,22 +42,24 @@ registerRoutes(
 	{ method: "GET", path: "audit/:id", needs: { module: "audit", action: "view" }, handler: async (call) => getAudit(call.ctx, call.params.id) },
 
 	// ---------------------------------------------------------------- trash
-	{ method: "GET", path: "trash/types", needs: { module: "trash", action: "view" }, handler: async () => ({ types: trashTypes() }) },
+	{ method: "GET", path: "trash/types", needs: { module: "trash", action: "view" }, own: true, handler: async (call) => ({ types: trashTypes(call.authed!) }) },
 	{
 		method: "GET",
 		path: "trash",
 		needs: { module: "trash", action: "view" },
+		own: true,
 		handler: async (call) => {
 			const page = pageOf(call.query, 25, 100);
 			const { rows, total } = await listTrash(call.ctx, call.authed!, { type: call.query.get("type") || undefined }, page);
 			return listResponse(rows, page, total);
 		},
 	},
-	{ method: "POST", path: "trash/:type/:id/restore", needs: { module: "trash", action: "update" }, handler: async (call) => restoreTrashed(call.ctx, call.authed!, call.params.type, call.params.id) },
+	{ method: "POST", path: "trash/:type/:id/restore", needs: { module: "trash", action: "update" }, own: true, handler: async (call) => restoreTrashed(call.ctx, call.authed!, call.params.type, call.params.id) },
 	{
 		method: "DELETE",
 		path: "trash/:type/:id",
 		needs: { module: "trash", action: "delete" },
+		own: true,
 		handler: async (call) => {
 			await purgeTrashed(call.ctx, call.authed!, call.params.type, call.params.id, call.deps.media);
 		},

@@ -12,8 +12,14 @@ export type Trashable = {
 	table: string;
 	/** An SQL expression for the row's title, over the table's own columns, e.g. "title" or "name". */
 	titleSql: string;
-	/** The module whose rights govern it (for "own" rights: rows are owned through `created_by`). */
+	/**
+	 * The module whose rights govern it, on top of `trash.*`: the trash screen lists a kind only to people who may
+	 * `view` the module, restores with `update` and removes for good with `delete` (for "own" rights: rows are owned
+	 * through `created_by`, or `uploaded_by` for media).
+	 */
 	module: string;
+	/** A rule beyond the module's rights, run before a restore or removal (accounts and roles: never above one's own rights). */
+	guard?: (ctx: AuthContext, by: Authed, id: string, action: "update" | "delete") => Promise<void>;
 	/** Whether the table has `created_by` (so a person with "own" rights may restore their own). */
 	hasCreatedBy: boolean;
 	/** Statements that remove what hangs off a row (revisions, usage rows, child tables) before the row itself goes for good. */

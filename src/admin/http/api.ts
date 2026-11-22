@@ -14,6 +14,7 @@ import { can } from "../rbac/check";
 import type { Action } from "../rbac/catalog";
 import { ApiError, forbidden, notFound, unauthorized } from "./errors";
 import { clientIp, cookieHeader, readCookie, COOKIES } from "./cookies";
+import { isAdminHost, isAdminOrigin } from "./origin";
 
 export type Deps = {
 	env: AdminEnv;
@@ -51,10 +52,22 @@ export type Needs =
 	| "session"
 	| { module: string; action: Action };
 
-export type RouteSpec = { method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE"; path: string; needs: Needs; handler: (call: Call) => Promise<unknown> };
+export type RouteSpec = {
+	method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+	path: string;
+	needs: Needs;
+	/**
+	 * Lets a role whose scope for `needs` is "own" through the gate. Say it only when the handler itself compares the
+	 * row's owner with the caller (and the pair is in OWNABLE, rbac/catalog.ts); without it the gate demands scope "all".
+	 */
+	own?: boolean;
+	handler: (call: Call) => Promise<unknown>;
+};
 
 const routes: RouteSpec[] = [];
 export const registerRoutes = (...specs: RouteSpec[]) => void routes.push(...specs);
+/** Every route the dispatcher knows (a copy): the permission-matrix test walks it, so a new route cannot escape the matrix. */
+export const registeredRoutes = (): readonly RouteSpec[] => [...routes];
 
 const JSON_HEADERS = { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" };
 
@@ -70,8 +83,13 @@ function match(path: string, pattern: string): Record<string, string> | null {
 	if (a.length !== b.length) return null;
 	const params: Record<string, string> = {};
 	for (let i = 0; i < b.length; i++) {
-		if (b[i].startsWith(":")) params[b[i].slice(1)] = decodeURIComponent(a[i]);
-		else if (a[i] !== b[i]) return null;
+		if (b[i].startsWith(":")) {
+			try {
+				params[b[i].slice(1)] = decodeURIComponent(a[i]);
+			} catch {
+				return null; // a broken % escape names nothing: the path simply does not exist
+			}
+		} else if (a[i] !== b[i]) return null;
 	}
 	return params;
 }
@@ -81,9 +99,8 @@ const WRITE = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 /** `path` is what follows /api/quan-tri/v1/. */
 export async function dispatch(request: Request, path: string, deps: Deps): Promise<Response> {
 	const url = new URL(request.url);
-	const baseHost = new URL(deps.env.ADMIN_BASE_URL).host;
 	// The admin exists on one address only: on the bare domain and preview hosts it is not there.
-	if (url.host !== baseHost) return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+	if (!isAdminHost(url.host, deps.env.ADMIN_BASE_URL)) return new Response(null, { status: 404, headers: { "Cache-Control": "no-store" } });
 
 	const method = request.method.toUpperCase();
 	let spec: RouteSpec | undefined;
@@ -106,8 +123,8 @@ export async function dispatch(request: Request, path: string, deps: Deps): Prom
 	const setCookies: string[] = [];
 	try {
 		if (WRITE.has(method)) {
-			const origin = request.headers.get("origin");
-			if (!origin || new URL(origin).host !== baseHost) throw new ApiError(403, "bad_origin", "Yêu cầu không hợp lệ.");
+			// Scheme, host and port must all match ("null", junk and another scheme are refused, not crashes).
+			if (!isAdminOrigin(request.headers.get("origin"), deps.env.ADMIN_BASE_URL)) throw new ApiError(403, "bad_origin", "Yêu cầu không hợp lệ.");
 		}
 
 		let authed: Authed | null = null;
@@ -122,7 +139,8 @@ export async function dispatch(request: Request, path: string, deps: Deps): Prom
 				const given = request.headers.get("x-tlhp-csrf") ?? "";
 				if (!timingSafeEqual(given, await csrfToken(authed.session.id, deps.env.ADMIN_JWT_SECRET))) throw new ApiError(403, "bad_csrf", "Yêu cầu không hợp lệ.");
 			}
-			if (typeof needs === "object" && !can(authed.permissions, needs.module, needs.action, { userId: authed.user.id, anyOwner: true })) throw forbidden();
+			// Scope "own" passes only on a route that checks the owner itself (`own: true`); every other route wants "all".
+			if (typeof needs === "object" && !can(authed.permissions, needs.module, needs.action, spec.own ? { userId: authed.user.id, anyOwner: true } : undefined)) throw forbidden();
 		}
 
 		let parsed: unknown;

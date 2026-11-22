@@ -146,7 +146,7 @@ function mayEditLive(by: Authed, kind: Kind, row: Row) {
 
 const rightsOn = (by: Authed, kind: Kind, row: Row) => ({
 	canUpdate: can(by.permissions, kind.module, "update", { userId: by.user.id, ownerId: ownerOf(row) }) && (!["published", "scheduled"].includes(text(row.status)) || can(by.permissions, kind.module, "publish")),
-	canDelete: can(by.permissions, kind.module, "delete", { userId: by.user.id, ownerId: ownerOf(row) }),
+	canDelete: can(by.permissions, kind.module, "delete", { userId: by.user.id, ownerId: ownerOf(row) }) && (!["published", "scheduled"].includes(text(row.status)) || can(by.permissions, kind.module, "publish")),
 	canPublish: can(by.permissions, kind.module, "publish"),
 	canSubmit: can(by.permissions, kind.module, "update", { userId: by.user.id, ownerId: ownerOf(row) }),
 });
@@ -816,6 +816,7 @@ export async function changeStatus(ctx: AuthContext, by: Authed, kind: Kind, id:
 export async function trashItem(ctx: AuthContext, by: Authed, kind: Kind, id: string): Promise<void> {
 	const row = await findRow(ctx, kind, id);
 	mayChange(by, kind, "delete", row);
+	mayEditLive(by, kind, row); // trashing a live article takes it off the site, as unreviewed as an edit would
 	await ctx.db.batch([trashStatement(ctx, by, kind.table, id), audit(ctx, by, { action: `${kind.entityType}.delete`, entityType: kind.entityType, entityId: id, before: { title: row.title, slug: row.slug, status: row.status } })]);
 }
 
@@ -902,8 +903,9 @@ export async function relatedCandidates(ctx: AuthContext, q: string, excludeId: 
 
 // ------------------------------------------------------------------ preview
 
-export async function previewLink(ctx: AuthContext, kind: Kind, id: string): Promise<{ url: string; expiresAt: string; version: number }> {
+export async function previewLink(ctx: AuthContext, by: Authed, kind: Kind, id: string): Promise<{ url: string; expiresAt: string; version: number }> {
 	const row = await findRow(ctx, kind, id);
+	mayChange(by, kind, "update", row); // a link shows the draft to anyone who holds it: only for who may edit it
 	const version = num(row.version) || 1;
 	const { token, expiresAt } = await signPreview({ kind: kind.name, id, version }, ctx.env.ADMIN_JWT_SECRET, ctx.now());
 	return { url: `/quan-tri/xem-truoc/${kind.path}/${encodeURIComponent(id)}?token=${encodeURIComponent(token)}`, expiresAt, version };

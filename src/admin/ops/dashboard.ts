@@ -20,10 +20,11 @@ export async function dashboard(ctx: AuthContext, by: Authed): Promise<Dashboard
 	const out: Dashboard = {};
 	const now = ctx.now();
 	const { date: today } = vietnamParts(now);
+	// Only the post counts can honour "view own" (below); every other panel needs scope all, so a stored `:own` there shows nothing.
 	const who = { userId: by.user.id, anyOwner: true };
 
 	if (can(by.permissions, "posts", "view", who)) {
-		// With "own" rights only the person's own posts are counted and listed.
+		// With "own" rights only the person's own posts are counted and listed (new roles cannot be given posts.view:own any more; old rows are still read safely).
 		const own = by.permissions.get("posts.view") === "own";
 		const scope = own ? " AND created_by = ?" : "";
 		const args = own ? [by.user.id] : [];
@@ -48,7 +49,7 @@ export async function dashboard(ctx: AuthContext, by: Authed): Promise<Dashboard
 		};
 	}
 
-	if (can(by.permissions, "events", "view", who)) {
+	if (can(by.permissions, "events", "view")) {
 		const { results } = await ctx.db
 			.prepare("SELECT id, slug, title, start_date, end_date, location FROM calendar_event WHERE deleted_at IS NULL AND status = 'published' AND end_date >= ? ORDER BY start_date, position LIMIT 5")
 			.bind(today)
@@ -56,7 +57,7 @@ export async function dashboard(ctx: AuthContext, by: Authed): Promise<Dashboard
 		out.events = results.map((row) => ({ id: text(row.id), slug: text(row.slug), title: text(row.title), startDate: text(row.start_date), endDate: text(row.end_date), location: text(row.location) }));
 	}
 
-	if (can(by.permissions, "audit", "view", who)) {
+	if (can(by.permissions, "audit", "view")) {
 		// Thirty days of Vietnam time, today last; days without activity count zero.
 		const since = new Date(now.getTime() - (DAYS - 1) * 24 * 3600_000);
 		const first = vietnamParts(since).date;
@@ -72,9 +73,9 @@ export async function dashboard(ctx: AuthContext, by: Authed): Promise<Dashboard
 		out.activity = { days, total: days.reduce((sum, day) => sum + day.count, 0) };
 	}
 
-	if (can(by.permissions, "media", "view", who)) out.media = await mediaStats(ctx);
+	if (can(by.permissions, "media", "view")) out.media = await mediaStats(ctx);
 
-	if (can(by.permissions, "users", "view", who)) {
+	if (can(by.permissions, "users", "view")) {
 		const row = await ctx.db.prepare("SELECT COUNT(*) AS total, COALESCE(SUM(locked_at IS NOT NULL), 0) AS locked FROM user WHERE deleted_at IS NULL").first();
 		out.users = { total: num(row?.total), locked: num(row?.locked) };
 	}

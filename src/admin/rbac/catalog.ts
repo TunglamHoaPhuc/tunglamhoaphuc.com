@@ -40,6 +40,29 @@ export function isKnownPermission(module: string, action: string): boolean {
 	return module in MODULES && (ACTIONS as readonly string[]).includes(action);
 }
 
+/**
+ * The only `module.action` pairs that may be given with scope "own", because the handlers behind them really compare
+ * the row's owner (`created_by`, or `uploaded_by` for media) with the caller. A pair not listed here is all-or-nothing:
+ * the role editor refuses `:own` on it, and a route lets "own" through the gate only when its spec says `own: true`.
+ * Add a pair only together with the owner check in the handler (and a test in tests/unit/admin/permissions.test.ts).
+ *
+ * - posts, teachings, pages, events, statues, areas, quotes: update and delete (`mayChange` on the row).
+ * - media: update and delete (`mayChange` on `uploaded_by`); folders have no owner and need scope all.
+ * - trash: view (own rows only), update and delete (own rows, of kinds that have an owner).
+ * `view:own` is deliberately absent for every content module: the lists, counts, options, revisions and previews of
+ * posts, teachings and pages do not filter by owner, so "view own" would be a full "view".
+ */
+const OWNABLE_MODULES = ["posts", "teachings", "pages", "events", "statues", "areas", "quotes"] as const;
+export const OWNABLE: ReadonlySet<string> = new Set([
+	...OWNABLE_MODULES.flatMap((module) => [permissionKey(module, "update"), permissionKey(module, "delete")]),
+	permissionKey("media", "update"),
+	permissionKey("media", "delete"),
+	permissionKey("trash", "view"),
+	permissionKey("trash", "update"),
+	permissionKey("trash", "delete"),
+]);
+export const isOwnable = (module: string, action: string) => OWNABLE.has(permissionKey(module, action));
+
 type Grant = Partial<Record<ModuleKey, (Action | `${Action}:own`)[]>>;
 
 const ALL: Action[] = [...ACTIONS];

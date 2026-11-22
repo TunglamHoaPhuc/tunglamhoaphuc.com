@@ -32,6 +32,7 @@ registerRoutes(
 		method: "PATCH",
 		path: "areas/:id",
 		needs: { module: "areas", action: "update" },
+		own: true,
 		handler: async (call) => {
 			const { version, ...patch } = await call.body(updateSchema);
 			return updateArea(call.ctx, call.authed!, call.params.id, version, patch as Partial<AreaModel>);
@@ -41,6 +42,7 @@ registerRoutes(
 		method: "DELETE",
 		path: "areas/:id",
 		needs: { module: "areas", action: "delete" },
+		own: true,
 		handler: async (call) => {
 			await deleteArea(call.ctx, call.authed!, call.params.id);
 		},

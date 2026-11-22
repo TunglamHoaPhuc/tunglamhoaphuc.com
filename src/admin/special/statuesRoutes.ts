@@ -107,6 +107,7 @@ registerRoutes(
 		method: "PATCH",
 		path: "statues/:id",
 		needs: { module: "statues", action: "update" },
+		own: true,
 		handler: async (call) => {
 			const { version: given, ...patch } = await call.body(updateSchema);
 			return updateStatue(call.ctx, call.authed!, call.params.id, given, patch);
@@ -116,6 +117,7 @@ registerRoutes(
 		method: "PUT",
 		path: "statues/:id/images",
 		needs: { module: "statues", action: "update" },
+		own: true,
 		handler: async (call) => {
 			const input = await call.body(imagesSchema);
 			return setStatueImages(call.ctx, call.authed!, call.params.id, input.version, input.images);
@@ -125,6 +127,7 @@ registerRoutes(
 		method: "PUT",
 		path: "statues/:id/related",
 		needs: { module: "statues", action: "update" },
+		own: true,
 		handler: async (call) => {
 			const input = await call.body(relatedSchema);
 			return setStatueRelated(call.ctx, call.authed!, call.params.id, input.version, input.related);
@@ -134,6 +137,7 @@ registerRoutes(
 		method: "PUT",
 		path: "statues/:id/variations",
 		needs: { module: "statues", action: "update" },
+		own: true,
 		handler: async (call) => {
 			const input = await call.body(variationsSchema);
 			return setStatueVariations(call.ctx, call.authed!, call.params.id, input.version, input.variations);
@@ -143,6 +147,7 @@ registerRoutes(
 		method: "DELETE",
 		path: "statues/:id",
 		needs: { module: "statues", action: "delete" },
+		own: true,
 		handler: async (call) => {
 			await deleteStatue(call.ctx, call.authed!, call.params.id);
 		},

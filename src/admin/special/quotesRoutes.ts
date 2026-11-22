@@ -33,12 +33,14 @@ registerRoutes(
 		method: "PATCH",
 		path: "quotes/:id",
 		needs: { module: "quotes", action: "update" },
+		own: true,
 		handler: async (call) => updateQuote(call.ctx, call.authed!, call.params.id, await call.body(z.object(fields).partial())),
 	},
 	{
 		method: "DELETE",
 		path: "quotes/:id",
 		needs: { module: "quotes", action: "delete" },
+		own: true,
 		handler: async (call) => {
 			await deleteQuote(call.ctx, call.authed!, call.params.id);
 		},

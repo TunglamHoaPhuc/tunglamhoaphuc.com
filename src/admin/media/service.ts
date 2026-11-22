@@ -326,7 +326,17 @@ async function depthOf(ctx: AuthContext, folderId: string | null): Promise<numbe
 	return depth;
 }
 
+/**
+ * Folders have no owner, so "own" cannot apply: the gate already wants scope all on create / update / delete (the routes
+ * do not say `own: true`). Docs 7.5 puts folder management under `media.update`; the code used create / update / delete.
+ * Both stay: folder writes need `media.update` with scope all as well as their own action (the stricter of the two).
+ */
+function mayManageFolders(by: Authed) {
+	if (!can(by.permissions, "media", "update")) throw forbidden();
+}
+
 export async function createFolder(ctx: AuthContext, by: Authed, input: { name: string; parentId?: string | null }): Promise<FolderItem> {
+	mayManageFolders(by);
 	const name = input.name.trim();
 	const slug = slugify(name, 60);
 	if (!slug) throw new ApiError(400, "invalid_input", "Tên thư mục chưa hợp lệ.", { name: "Tên thư mục cần có chữ hoặc số." });
@@ -342,6 +352,7 @@ export async function createFolder(ctx: AuthContext, by: Authed, input: { name: 
 }
 
 export async function updateFolder(ctx: AuthContext, by: Authed, id: string, input: { name?: string; parentId?: string | null }): Promise<void> {
+	mayManageFolders(by);
 	const row = await ctx.db.prepare("SELECT id, parent_id, name, slug FROM media_folder WHERE id = ?").bind(id).first();
 	if (!row) throw notFound("Thư mục");
 	const name = input.name === undefined ? text(row.name) : input.name.trim();
@@ -366,6 +377,7 @@ export async function updateFolder(ctx: AuthContext, by: Authed, id: string, inp
 }
 
 export async function deleteFolder(ctx: AuthContext, by: Authed, id: string): Promise<void> {
+	mayManageFolders(by);
 	const row = await ctx.db.prepare("SELECT name FROM media_folder WHERE id = ?").bind(id).first();
 	if (!row) throw notFound("Thư mục");
 	if (await ctx.db.prepare("SELECT 1 AS yes FROM media_folder WHERE parent_id = ?").bind(id).first()) throw new ApiError(409, "folder_not_empty", "Thư mục còn thư mục con.");
