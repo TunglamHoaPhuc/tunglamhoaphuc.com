@@ -353,6 +353,7 @@ test("an editor body: a table, a list, a http link, an audio tag, sub and sup, a
 		'<p><a href="https://example.test/an-toan">Liên kết https</a> <a href="http://example.test/khong-an-toan">Liên kết http</a> <a href="tel:0123456789">Gọi</a></p>',
 		'<p>H<sub>2</sub>O và x<sup>2</sup></p>',
 		'<audio controls src="https://example.test/am-thanh.mp3"></audio>',
+		'<audio controls src="/anh-goc/media/cms/am-thanh-thu/v1/am-thanh.mp3"></audio>',
 		'<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>',
 		'<script>alert(1)</script><p onclick="x()">Chữ</p>',
 	].join("");
@@ -366,7 +367,8 @@ test("an editor body: a table, a list, a http link, an audio tag, sub and sup, a
 	expect(stored).not.toContain("<script");
 	expect(stored).not.toContain("onclick");
 	expect(stored).not.toContain("http://example.test");
-	expect(stored, "the audio tag is kept").toContain("<audio");
+	expect(stored, "audio from the library is kept").toContain("/anh-goc/media/cms/am-thanh-thu/v1/am-thanh.mp3");
+	expect(stored, "audio from another site is dropped").not.toContain("example.test/am-thanh.mp3");
 	expect(stored, "an /embed/ YouTube address is kept as a video").toContain("dQw4w9WgXcQ");
 	// the server says when its cleaning changed the body (the editor then reloads what is stored), and the next save changes nothing
 	expect(detail.bodyChanged, "the cleaning removed script, onclick and the http link").toBe(true);
