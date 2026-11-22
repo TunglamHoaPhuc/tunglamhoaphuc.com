@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import Header from '@/components/public/layout/Header';
 import Footer from '@/components/public/layout/Footer';
-import type { UniverseArea } from '@/data/universe-data';
-import { OFFICIAL_TUONG_CHINH_LIST, OFFICIAL_NTPG_LIST } from '@/data/statue-data';
+import type { V3Area } from '@/lib/v3-data';
+import type { StatueItem } from '@/lib/statue-types';
+import { TAM_BAO_VIDEOS } from '@/data/tam-bao-detail-data';
 import { SubNavbar } from '@/components/tong-chi-tu-hoc/SubNavbar';
 import { SidebarNav } from '@/components/tong-chi-tu-hoc/SidebarNav';
 import { HeroBanner } from '@/components/tong-chi-tu-hoc/HeroBanner';
@@ -22,6 +23,9 @@ import { CongTamQuanSection } from '@/features/universe/components/CongTamQuanSe
 import { ChayDuongSection } from '@/features/universe/components/ChayDuongSection';
 import { ThapBatLaHanGrid } from '@/features/universe/components/ThapBatLaHanGrid';
 import { ThapDaiDeTuCards } from '@/features/universe/components/ThapDaiDeTuCards';
+import { GiangDuongPhapThoai } from '@/features/universe/components/GiangDuongPhapThoai';
+import { DanhTangMap } from '@/features/universe/components/DanhTangMap';
+import { TuAnFlipbook } from '@/features/universe/components/TuAnFlipbook';
 import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { areaBodyHtml } from '@/lib/area-body';
 
@@ -42,7 +46,19 @@ function matchesArea(itemAreaSlug: string, pageSlug: string, areaSlug: string): 
 
 // Khu vực do máy chủ lấy từ D1 (page.tsx): khu vực bị ẩn hay xóa là 404, không còn khu vực dựng từ slug.
 // `slug` là slug của D1 (địa chỉ cũ đã được đổi về slug này), nên các khối riêng của từng khu vực chọn theo nó.
-export default function AreaDetailClient({ area }: { area: UniverseArea }) {
+// `statues` và `artItems`: tượng chính và tác phẩm nghệ thuật đang hiển thị (D1), mỗi khối tự lọc theo khu vực.
+// `areas`: các khu vực đang hiển thị (D1), cho khối "Khám phá khu vực khác".
+export default function AreaDetailClient({
+  area,
+  statues,
+  artItems,
+  areas,
+}: {
+  area: V3Area;
+  statues: StatueItem[];
+  artItems: StatueItem[];
+  areas: V3Area[];
+}) {
   const slug = area.slug;
 
   const [activeSection, setActiveSection] = useState('gioi-thieu');
@@ -164,7 +180,7 @@ export default function AreaDetailClient({ area }: { area: UniverseArea }) {
           {slug !== 'bao-thap' && slug !== 'bao-thap-van-phat-xa-loi' && (
             <section id="bo-suu-tap-bao-tuong" className="w-full scroll-mt-24 pt-4">
               <StatueCollectionGrid
-                statues={OFFICIAL_TUONG_CHINH_LIST}
+                statues={statues}
                 areaTitle={area.name}
                 areaSlug={area.slug || slug}
               />
@@ -177,7 +193,7 @@ export default function AreaDetailClient({ area }: { area: UniverseArea }) {
               <ArtisticStatueSection
                 areaTitle={area.name}
                 areaSlug={area.slug || slug}
-                items={OFFICIAL_NTPG_LIST}
+                items={artItems}
               />
             </section>
           )}
@@ -187,7 +203,23 @@ export default function AreaDetailClient({ area }: { area: UniverseArea }) {
             {slug === 'thu-vien' || slug === 'tang-kinh-cac' ? (
               <ThuVienGrid />
             ) : slug === 'tu-an' || slug === 'tu-an-duong' || slug === 'vang-sinh-duong' ? (
-              <TuAnVangSinhSystem />
+              <>
+                <TuAnVangSinhSystem />
+                <div className="max-w-6xl mx-auto px-2 sm:px-4 mt-16">
+                  <div className="text-center mb-6">
+                    <span className="text-xs text-[#F2C14E] font-bold uppercase tracking-widest" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                      ❖ TƯ LIỆU LỊCH SỬ TÙNG LÂM HÒA PHÚC ❖
+                    </span>
+                    <h2 className="text-3xl sm:text-4xl text-[#FFE5A3] font-normal uppercase mt-1" style={{ fontFamily: "'UTM Niagara', serif" }}>
+                      KỶ YẾU QUÁ TRÌNH PHỤC DỰNG NHÀ TỨ ÂN
+                    </h2>
+                    <p className="text-xs text-[#c9b896] max-w-xl mx-auto mt-1" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                      Cuốn sách điện tử lật trang lưu giữ toàn bộ hình ảnh, bản vẽ và quá trình đại trùng tu Nhà Tứ Ân.
+                    </p>
+                  </div>
+                  <TuAnFlipbook />
+                </div>
+              </>
             ) : slug === 'bao-thap-van-phat-xa-loi' || slug === 'bao-thap' ? (
               <BaoThapGrid />
             ) : slug === 'bao-tang' || slug === 'bao-tang-phat-giao' ? (
@@ -202,16 +234,28 @@ export default function AreaDetailClient({ area }: { area: UniverseArea }) {
               <ThapBatLaHanGrid />
             ) : slug === 'ho-phong-sinh' ? (
               <ThapDaiDeTuCards />
+            ) : slug === 'giang-duong' ? (
+              <div className="max-w-4xl mx-auto px-4">
+                <GiangDuongPhapThoai />
+              </div>
+            ) : slug === 'to-duong' ? (
+              <DanhTangMap />
             ) : (
               <div className="max-w-4xl mx-auto px-4">
                 <RelatedStoriesSection
                   areaTitle={area.name}
-                  stories={area.stories && area.stories.length > 0 ? area.stories.map((st, i) => ({
-                    id: `st-story-${i}`,
-                    title: st.title || `CÂU CHUYỆN LIÊN QUAN TẠI ${area.name}`,
-                    summary: st.summary || `Khám phá câu chuyện ý nghĩa lịch sử tại ${area.name}.`,
-                    thumbnailUrl: st.imgUrl || area.imgUrl,
-                  })) : undefined}
+                  stories={
+                    slug === 'tam-bao'
+                      ? TAM_BAO_VIDEOS.map((v) => ({
+                          id: v.id,
+                          title: v.title,
+                          subtitle: 'Tùng Lâm Hòa Phúc',
+                          summary: v.summary,
+                          thumbnailUrl: v.thumbnailUrl,
+                          videoUrl: v.videoUrl,
+                        }))
+                      : undefined
+                  }
                 />
               </div>
             )}
@@ -228,7 +272,7 @@ export default function AreaDetailClient({ area }: { area: UniverseArea }) {
 
           {/* SECTION 5 — KHÁM PHÁ KHU VỰC KHÁC */}
           <section id="khu-vuc-khac" className="max-w-4xl mx-auto px-4 scroll-mt-24">
-            <OtherAreasSection currentSlug={area.slug} />
+            <OtherAreasSection currentSlug={area.slug} areas={areas} />
           </section>
 
           {/* SECTION 6 — HỎI ĐÁP AI */}

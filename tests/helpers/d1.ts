@@ -37,6 +37,17 @@ create table calendar_event (
 create table featured_program (id text primary key, title text, subtitle text default '', summary text default '', time text default '', duration text default '', location text default '', image_media_id text, image_position text default '', position integer default 0);
 create table month_theme (month integer primary key, title text, poster_media_id text, lines text, author text default '');
 create table quote_image (id text primary key, title text default '', media_id text, position integer default 0);
+create table statue_cluster (id text primary key, name text, assembly_id text, area_id text, description text default '');
+create table statue (
+  id text primary key, code text default '', slug text, name text, subtitle text default '', area_id text, area_code text default '', cluster_id text, assembly_id text,
+  is_main integer default 0, image_media_id text, image_position text default 'center 50%', quote_text text, quote_author text, body text default '', position integer default 0,
+  updated_at text, created_by text, updated_by text, deleted_at text, deleted_by text, version integer default 1, editorial_board text default '', specs text default '{}',
+  status text default 'published', seo_title text, seo_description text);
+create table art_variation (
+  id text primary key, statue_id text, position integer, variation_id text default '', art_statue_id text, title text default '', location text default '', meaning text default '',
+  image_media_id text, image_position text default 'center 50%');
+create table statue_image (statue_id text, position integer, media_id text, label text default '', image_position text default 'center 50%', primary key (statue_id, position));
+create table statue_related (statue_id text, related_id text, position integer default 0, primary key (statue_id, related_id));
 `;
 
 export type FakeD1 = D1Like & { exec(sql: string): void; insert(table: string, row: Record<string, unknown>): void };

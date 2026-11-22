@@ -3,12 +3,25 @@
 import { FC, useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Play, ArrowRight, Video, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
-import { StatueItem, OFFICIAL_STATUE_DATASET, OFFICIAL_NTPG_LIST, STATUE_LIST } from "@/data/statue-data";
+import type { StatueItem } from "@/lib/statue-types";
 import { ThatPhatDuocSuSection } from "@/features/universe/components/ThatPhatDuocSuSection";
 import { BatBoKimCangSection } from "@/features/universe/components/BatBoKimCangSection";
 
+export interface StatueArtWork {
+  id: string;
+  title: string;
+  subtitle?: string;
+  imgUrl: string;
+  areaName: string;
+  meaning: string;
+}
+
+// Tượng và những gì quanh nó do máy chủ dựng từ D1 (lib/v3-statues.ts): cụm tượng, tác phẩm nghệ thuật, tượng liên quan.
 interface StatueDetailCoreLayoutProps {
   statue: StatueItem;
+  clusterMembers: Array<{ name: string; slug: string; imgUrl: string }>;
+  artisticWorks: StatueArtWork[];
+  relatedStatues: StatueItem[];
 }
 
 function formatAreaTitleCase(str?: string): string {
@@ -20,7 +33,7 @@ function formatAreaTitleCase(str?: string): string {
     .join(' ');
 }
 
-export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue }) => {
+export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue, clusterMembers, artisticWorks, relatedStatues }) => {
   const [expandedSummary, setExpandedSummary] = useState(false);
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
@@ -79,74 +92,12 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
     }
   }, [statue.slug, statue.id, statue.code]);
 
-  // ── 1. TÌM CÁC TƯỢNG TRONG CÙNG CỤM TƯỢNG (GROUP) ──
-  const clusterMembers = useMemo(() => {
-    const groupName = statue.group || statue.clusterName;
-    if (groupName) {
-      const sameGroup = OFFICIAL_STATUE_DATASET.filter(
-        (s) => (s.group === groupName || s.clusterName === groupName) && s.id !== statue.id && s.categoryType === 'TƯỢNG CHÍNH'
-      );
-      if (sameGroup.length > 0) {
-        return sameGroup.map((s) => ({
-          name: s.name,
-          slug: s.slug || s.id,
-          imgUrl: s.avatarUrl || s.imgUrl,
-        }));
-      }
-    }
-    if (statue.clusterMembers && statue.clusterMembers.length > 0) {
-      return statue.clusterMembers;
-    }
-    return [
-      { name: 'BỒ TÁT VĂN THÙ', slug: 'bo_tat_van_thu', imgUrl: '/images/bao_tuong_phat_giao/thanh_tinh_dai_hai_chung/BO_TAT_VAN_THU/bo_tat_van_thu.JPG' },
-      { name: 'BỒ TÁT PHỔ HIỀN', slug: 'bo_tat_pho_hien', imgUrl: '/images/bao_tuong_phat_giao/thanh_tinh_dai_hai_chung/BO_TAT_PHO_HIEN/bo_tat_pho_hien.JPG' },
-    ];
-  }, [statue]);
-
-  // ── 2. TỰ ĐỘNG LẤY TÁC PHẨM NGHỆ THUẬT PHẬT GIÁO LIÊN QUAN ĐẾN TƯỢNG CHÍNH ──
-  const artisticWorks = useMemo(() => {
-    const stGroup = (statue.characterGroup || statue.slug || '').toLowerCase().replace(/[-_]/g, '');
-    const stCode = (statue.code || '').toUpperCase();
-
-    let matches = OFFICIAL_NTPG_LIST.filter((item) => {
-      const itemGroup = (item.characterGroup || item.slug || '').toLowerCase().replace(/[-_]/g, '');
-      const itemParent = ((item as any).parentId || '').toUpperCase();
-      if (itemGroup && stGroup && (itemGroup.includes(stGroup) || stGroup.includes(itemGroup))) return true;
-      if (itemParent && stCode && itemParent === stCode) return true;
-      if (item.name?.toLowerCase().includes(statue.name?.toLowerCase().slice(0, 10))) return true;
-      return false;
-    });
-
-    if (matches.length < 3) {
-      const general = OFFICIAL_NTPG_LIST.slice(0, 6);
-      matches = Array.from(new Set([...matches, ...general]));
-    }
-
-    return matches.map((m, idx) => ({
-      id: m.id || `ntpg-${idx}`,
-      title: m.title || m.name || statue.name || 'TÁC PHẨM NGHỆ THUẬT PHẬT GIÁO',
-      subtitle: m.subtitle || m.caption || 'Đản Sinh cưỡi tòa Cửu Long',
-      imgUrl: m.imgUrl || statue.imgUrl,
-      areaName: formatAreaTitleCase(m.areaName || m.location || 'Tam Bảo'),
-      meaning: m.description || m.quote || (m as any).meaning || 'Bảo vật di sản văn hóa tâm linh Phật giáo truyền thống.',
-    }));
-  }, [statue]);
-
-  // ── 3. BẢO TƯỢNG LIÊN QUAN Ở CHÂN TRANG (ĐÚNG 2 BẢO TƯỢNG) ──
-  const relatedStatues = useMemo(() => {
-    const sameAssembly = STATUE_LIST.filter(
-      (s) => s.id !== statue.id && (s.assemblyId === statue.assemblyId || s.assembly === statue.assembly)
-    ).slice(0, 2);
-
-    if (sameAssembly.length >= 2) return sameAssembly;
-    return STATUE_LIST.filter((s) => s.id !== statue.id).slice(0, 2);
-  }, [statue]);
-
-  // Video fallback
-  const videoTitle = statue.video?.title || `CUỘC ĐỜI ${statue.name || 'ĐỨC PHẬT THÍCH CA'}`;
-  const videoSummary = statue.video?.summary || 'Phật có phải một đấng quyền năng, một đấng thần linh để cứu rỗi, đáp ứng những nguyện vọng, ham muốn của chúng ta hay không?';
-  const videoUrl = statue.video?.videoUrl || 'https://www.youtube.com/embed/dQw4w9WgXcQ';
-  const videoThumbnail = statue.video?.thumbnailUrl || statue.imgUrl;
+  // Video: D1 không có trường video cho tượng, nên khối video chỉ hiện khi tượng có video (hiện chưa tượng nào).
+  const video = statue.video;
+  const videoTitle = video?.title || '';
+  const videoSummary = video?.summary || '';
+  const videoUrl = video?.videoUrl || '';
+  const videoThumbnail = video?.thumbnailUrl || statue.imgUrl;
 
   const currentLightboxItem = lightboxIndex !== null ? artisticWorks[lightboxIndex] : null;
 
@@ -233,7 +184,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
               style={{ fontFamily: "var(--font-playfair), 'Playfair Display', serif" }}
               className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-[#FFE5A3] uppercase tracking-normal drop-shadow-[0_4px_30px_rgba(242,193,78,0.95)] leading-tight py-1"
             >
-              {statue.name || "ĐỨC PHẬT THÍCH CA MÂU NI"}
+              {statue.name}
             </h1>
 
             {/* Dấu gạch ngang vàng phân định có chóp kim cương ◇ ở giữa */}
@@ -248,7 +199,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
               style={{ fontFamily: "'UTM ClassizismAntiqua', 'UTM Classic Antiqua', serif" }}
               className="text-sm sm:text-lg md:text-xl tracking-[0.25em] text-[#FFE5A3] uppercase font-normal max-w-3xl mx-auto px-4 leading-relaxed text-center drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]"
             >
-              {statue.subtitle || "VÔ THƯỢNG NĂNG NHÂN"}
+              {statue.subtitle}
             </p>
           </div>
 
@@ -295,7 +246,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                     className="text-xl sm:text-2xl font-bold uppercase text-[#FFE5A3] tracking-wide"
                     style={{ fontFamily: "var(--font-playfair), 'Playfair Display', serif" }}
                   >
-                    {statue.group || statue.clusterName || "HOA NGHIÊM TAM THÁNH"}
+                    {statue.group || statue.clusterName || statue.assemblyName}
                   </h3>
                 </div>
 
@@ -384,19 +335,23 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
               </div>
 
               {/* Nội dung Quote */}
-              <p
-                className="text-sm sm:text-base md:text-lg leading-relaxed text-[#FFE5A3] font-normal mb-2.5 italic text-justify sm:text-center"
-                style={{ fontFamily: "'UTM Avo', sans-serif" }}
-              >
-                &ldquo;{statue.quote || "Ngài sinh ở thế gian nhưng không nhiễm thế gian. Vì Ngài đã rõ giáo lý duyên khởi, đã đoạn trừ mầm mống dẫn đến sinh tử luân hồi; đã đoạn trừ lậu hoặc, phiền não, nhiễm ô. Thế nên, cùng tột bờ sinh tử, cho nên gọi là Phật.”"}&rdquo;
-              </p>
-              
-              <h4
-                className="text-2xl sm:text-3xl font-normal uppercase tracking-wider text-[#FFE5A3]"
-                style={{ fontFamily: "'UTM Niagara', serif" }}
-              >
-                {statue.quoteAuthor || "VÔ TRÍ - TÂM HÒA"}
-              </h4>
+              {statue.quote && (
+                <p
+                  className="text-sm sm:text-base md:text-lg leading-relaxed text-[#FFE5A3] font-normal mb-2.5 italic text-justify sm:text-center"
+                  style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                >
+                  &ldquo;{statue.quote}&rdquo;
+                </p>
+              )}
+
+              {statue.quote && statue.quoteAuthor && (
+                <h4
+                  className="text-2xl sm:text-3xl font-normal uppercase tracking-wider text-[#FFE5A3]"
+                  style={{ fontFamily: "'UTM Niagara', serif" }}
+                >
+                  {statue.quoteAuthor}
+                </h4>
+              )}
             </div>
 
             {/* Card 2: Khối Lịch Sử / Tóm Tắt Chi Tiết (flex-1 để kéo đều đáy bằng 2 cột bên) */}
@@ -427,7 +382,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                     [&>p:first-of-type::first-letter]:leading-none
                   "
                   dangerouslySetInnerHTML={{
-                    __html: statue.fullHistoryHtml || statue.description || `<p>Dưới chân dãy Himalaya, nơi một vương quốc nhỏ được dựng nên và một dòng giống mang tên Śākya - "dòng dõi anh hùng" - lưu truyền qua bao đời, có một vầng sáng âm thầm lớn lên trong cung điện. Người đời gọi Ngài là bậc xuất thân dòng dõi Thái Dương, nhưng Ngài chọn rời hết "ba tòa Cung Vui" để đi thẳng vào con đường tỉnh thức. Và từ bước chân ấy, thế gian bắt đầu học lại một điều tưởng như đã quên: không phải quyền lực làm người cao quý, mà là trí tuệ và từ bi. Một đời Ngài đi qua, như một vầng nhật nguyệt soi đường cho muôn nẻo.</p>`
+                    __html: statue.fullHistoryHtml || statue.description || ''
                   }}
                 />
               </div>
@@ -473,7 +428,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                   className="text-xl sm:text-2xl font-bold uppercase text-[#FFE5A3] group-hover:text-white transition-colors leading-tight"
                   style={{ fontFamily: "var(--font-playfair), 'Playfair Display', serif" }}
                 >
-                  {statue.assemblyName || statue.assembly || "CHƯ PHẬT HẢI HỘI"}
+                  {statue.assemblyName || statue.assembly}
                 </h3>
               </div>
             </Link>
@@ -483,7 +438,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
               {/* Background Photo - focus [center 28%] */}
               <img
                 src={statue.areaImgUrl || statue.avatarUrl || statue.imgUrl}
-                alt={statue.areaName || "Khu Vực Tam Bảo"}
+                alt={statue.areaName || "Khu vực"}
                 className="absolute inset-0 w-full h-full object-cover object-[center_28%] opacity-60"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#1C130D] via-[#1C130D]/40 to-transparent" />
@@ -504,7 +459,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
 
               {/* Bottom Info Bar - Khu vực căn giữa + Khoang Logo To bên phải có hover nhẹ */}
               <Link
-                href={`/vu-tru-phat-giao/${statue.areaSlug || 'tam-bao'}`}
+                href={statue.areaSlug ? `/vu-tru-phat-giao/${statue.areaSlug}` : '/vu-tru-phat-giao'}
                 className="relative z-10 p-3 bg-gradient-to-r from-[#3A2718]/95 via-[#1C130D]/95 to-[#3A2718]/95 border-t border-[#F2C14E]/50 flex items-center justify-between hover:brightness-125 transition-all cursor-pointer group/area gap-3 shrink-0"
               >
                 {/* Chữ Khu vực & Tên khu vực căn chính giữa */}
@@ -516,7 +471,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                     className="text-xl sm:text-2xl text-[#FFE5A3] font-bold uppercase leading-tight block mt-0.5"
                     style={{ fontFamily: "var(--font-playfair), 'Playfair Display', serif" }}
                   >
-                    {statue.areaName || "TAM BẢO"}
+                    {statue.areaName || "VŨ TRỤ PHẬT GIÁO"}
                   </span>
                 </div>
 
@@ -566,6 +521,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
       {/* ══════════════════════════════════════════════════════════════
           3. SECTION NGHỆ THUẬT PHẬT GIÁO (HOVER CARD CHUẨN VŨ TRỤ PHẬT GIÁO)
       ══════════════════════════════════════════════════════════════ */}
+      {artisticWorks.length > 0 && (
       <section className="max-w-[1280px] mx-auto px-4 sm:px-6 md:px-10 pb-16">
         
         {/* Header Section căn giữa đồng bộ với nghệ thuật Phật giáo các khu vực */}
@@ -615,15 +571,15 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
           {/* Cột 1: 2 ảnh xếp chồng bên trái - focus [center 28%] */}
           <div className="md:col-span-4 flex flex-col gap-4">
             <BentoCard
-              item={artisticWorks[0]}
-              idx={0}
+              item={artisticWorks[0 % artisticWorks.length]}
+              idx={0 % artisticWorks.length}
               openLightbox={setLightboxIndex}
               focusPosition="object-[center_28%]"
               heightClass="h-[240px]"
             />
             <BentoCard
-              item={artisticWorks[1]}
-              idx={1}
+              item={artisticWorks[1 % artisticWorks.length]}
+              idx={1 % artisticWorks.length}
               openLightbox={setLightboxIndex}
               focusPosition="object-[center_28%]"
               heightClass="h-[240px]"
@@ -633,8 +589,8 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
           {/* Cột 2: Khám thờ / tượng đứng giữa cao - focus [center 28%] */}
           <div className="md:col-span-4 h-[496px]">
             <BentoCard
-              item={artisticWorks[2]}
-              idx={2}
+              item={artisticWorks[2 % artisticWorks.length]}
+              idx={2 % artisticWorks.length}
               openLightbox={setLightboxIndex}
               focusPosition="object-[center_28%]"
               heightClass="h-full"
@@ -644,8 +600,8 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
           {/* Cột 3: Tượng đứng cao bên phải - focus [center 28%] */}
           <div className="md:col-span-4 h-[496px]">
             <BentoCard
-              item={artisticWorks[3]}
-              idx={3}
+              item={artisticWorks[3 % artisticWorks.length]}
+              idx={3 % artisticWorks.length}
               openLightbox={setLightboxIndex}
               focusPosition="object-[center_28%]"
               heightClass="h-full"
@@ -655,8 +611,8 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
           {/* Hàng Dưới: Banner ngang lớn */}
           <div className="col-span-1 md:col-span-12 h-[240px]">
             <BentoCard
-              item={artisticWorks[4] || artisticWorks[0]}
-              idx={4}
+              item={artisticWorks[4 % artisticWorks.length]}
+              idx={4 % artisticWorks.length}
               openLightbox={setLightboxIndex}
               focusPosition="object-[center_28%]"
               heightClass="h-full"
@@ -664,6 +620,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
           </div>
         </div>
       </section>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════
           4. POP-UP MODAL NGHỆ THUẬT PHẬT GIÁO (HỖ TRỢ ZOOM, DRAG PAN & KHÔNG LĂN TRANG)
@@ -888,6 +845,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
       {/* ══════════════════════════════════════════════════════════════
           5. SECTION VIDEO MINH HỌA
       ══════════════════════════════════════════════════════════════ */}
+      {video && (
       <section className="max-w-[1280px] mx-auto px-4 sm:px-6 md:px-10 pb-16">
         <div className="flex items-center justify-center gap-4 my-6">
           <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/50 to-[#F2C14E]" />
@@ -953,6 +911,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
           </div>
         </div>
       </section>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════
           6. BANNER BÀI VIẾT & TRUYỆN NGẮN FULL WIDTH
@@ -979,19 +938,21 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
             style={{ fontFamily: "'UTM Niagara', serif" }}
             className="text-4xl sm:text-6xl lg:text-7xl font-normal text-[#FFE5A3] uppercase tracking-normal drop-shadow-[0_2px_20px_rgba(242,193,78,0.7)] py-1"
           >
-            {statue.article?.title || `ĐỨC PHẬT LÀ AI?`}
+            {statue.article?.title || statue.name}
           </h2>
 
-          <p
-            style={{ fontFamily: "'UTM ClassizismAntiqua', serif" }}
-            className="text-base sm:text-xl font-normal text-[#FFE5A3] tracking-widest uppercase py-0.5"
-          >
-            {statue.article?.author || "VÔ TRÍ - TÂM HÒA"}
-          </p>
+          {statue.article?.author && (
+            <p
+              style={{ fontFamily: "'UTM ClassizismAntiqua', serif" }}
+              className="text-base sm:text-xl font-normal text-[#FFE5A3] tracking-widest uppercase py-0.5"
+            >
+              {statue.article.author}
+            </p>
+          )}
 
           <div className="pt-3 sm:pt-4">
             <Link
-              href={statue.article?.url || `/bao-tuong-phat-giao/${statue.slug}`}
+              href={statue.article?.url || `/bao-tuong/${statue.slug}`}
               className="inline-flex items-center justify-center gap-2 px-8 sm:px-10 py-2 sm:py-2.5 rounded-full border border-[#F2C14E] bg-[#3A2718]/80 hover:bg-[#F2C14E] text-[#FFE5A3] hover:text-[#1C130D] text-xs sm:text-sm font-bold tracking-widest uppercase transition-all duration-300 shadow-[0_0_15px_rgba(242,193,78,0.3)] hover:shadow-[0_0_25px_rgba(242,193,78,0.6)] cursor-pointer"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
@@ -1005,6 +966,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
       {/* ══════════════════════════════════════════════════════════════
           7. SECTION BẢO TƯỢNG LIÊN QUAN (CHỈ 2 BẢO TƯỢNG - TRÊN VÀNG NIAGARA, DƯỚI TRẮNG CLASSIC ANTIQUA)
       ══════════════════════════════════════════════════════════════ */}
+      {relatedStatues.length > 0 && (
       <section className="max-w-[1000px] mx-auto px-4 sm:px-6 md:px-10 py-16">
         {/* Header Bảo Tượng Liên Quan */}
         <div className="flex flex-col items-center text-center mb-10">
@@ -1065,6 +1027,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
           })}
         </div>
       </section>
+      )}
 
       {/* ══════════════════════════════════════════════════════════════
           8. CHUYÊN ĐỀ DƯỢC SƯ / BÁT BỘ KIM CANG NẾU CÓ

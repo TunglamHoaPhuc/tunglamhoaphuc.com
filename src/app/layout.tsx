@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { SiteChromeProvider } from "@/components/public/SiteChrome";
+import { loadSiteChrome } from "@/lib/v3-chrome";
 // ZenAudioPlayer tạm tắt theo yêu cầu (sẽ bật lại sau)
 
 // Sửa lại thông tin SEO chuẩn cho Cổng thông tin của Chùa
@@ -14,11 +16,12 @@ export const metadata: Metadata = {
     "Kênh thông tin chính thức của Chùa Tùng Lâm Hòa Phúc - Lịch tu học, lễ hội, bài giảng Phật pháp và hoạt động Phật sự.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const chrome = await loadSiteChrome();
   return (
     <html lang="vi" className="h-full antialiased" suppressHydrationWarning>
       <head>
@@ -39,7 +42,7 @@ export default function RootLayout({
         </noscript>
       </head>
       <body className="min-h-full flex flex-col m-0 p-0 font-sans relative" suppressHydrationWarning>
-        {children}
+        <SiteChromeProvider value={chrome}>{children}</SiteChromeProvider>
         {/* <ZenAudioPlayer /> - Tắt tạm thời */}
       </body>
     </html>

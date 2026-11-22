@@ -3,7 +3,7 @@
 import React, { FC, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, Compass, ArrowRight } from 'lucide-react';
-import { THAT_PHAT_DUOC_SU_DATA, ThatPhatDuocSuItem } from '@/data/statue-data';
+import { THAT_PHAT_DUOC_SU_DATA, ThatPhatDuocSuItem } from '@/data/that-phat-duoc-su-data';
 
 export const ThatPhatDuocSuSection: FC = () => {
   const [selectedStatue, setSelectedStatue] = useState<ThatPhatDuocSuItem | null>(null);

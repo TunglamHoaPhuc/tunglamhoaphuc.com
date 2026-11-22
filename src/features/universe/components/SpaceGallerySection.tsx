@@ -16,6 +16,7 @@ import {
   SpaceGalleryItem,
 } from '@/data/bao-tang-space-data';
 import { OtherAreasSection } from './OtherAreasSection';
+import type { V3Area } from '@/lib/v3-data';
 
 interface SpaceGallerySectionProps {
   areaTitle?: string;
@@ -24,6 +25,8 @@ interface SpaceGallerySectionProps {
   currentSlug?: string;
   /** Cho phép hiển thị hoặc ẩn phần "Khám Phá Khu Vực Khác" đi kèm */
   showOtherAreas?: boolean;
+  /** Khu vực đang hiển thị (D1) cho khối "Khám Phá Khu Vực Khác" đi kèm. */
+  otherAreas?: V3Area[];
 }
 
 export const SpaceGallerySection: FC<SpaceGallerySectionProps> = ({
@@ -31,6 +34,7 @@ export const SpaceGallerySection: FC<SpaceGallerySectionProps> = ({
   spaces,
   currentSlug = 'tam-bao',
   showOtherAreas = true,
+  otherAreas = [],
 }) => {
   const isBaoTang =
     currentSlug === 'bao-tang' ||
@@ -248,7 +252,7 @@ export const SpaceGallerySection: FC<SpaceGallerySectionProps> = ({
       {/* ══════════════════════════════════════════════
           SECTION: KHÁM PHÁ KHU VỰC KHÁC (Optional)
       ══════════════════════════════════════════════ */}
-      {showOtherAreas && <OtherAreasSection currentSlug={currentSlug} />}
+      {showOtherAreas && <OtherAreasSection currentSlug={currentSlug} areas={otherAreas} />}
 
       {/* ══════════════════════════════════════════════
           INTERACTIVE ZOOMABLE & DRAGGABLE LIGHTBOX MODAL

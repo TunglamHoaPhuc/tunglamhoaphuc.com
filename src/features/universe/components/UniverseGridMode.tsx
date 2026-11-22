@@ -4,10 +4,12 @@
 import React, { FC, useState, useMemo } from "react";
 import Link from "next/link";
 import { Map as MapIcon, LayoutGrid } from "lucide-react";
-import { UNIVERSE_AREAS, UniverseArea } from "@/data/universe-data";
+import type { V3Area } from "@/lib/v3-data";
 import { CategoryFilter, SortOption } from "@/components/common/CategoryFilter";
 
 interface UniverseGridModeProps {
+  /** Các khu vực đang hiển thị (D1), theo thứ tự biên tập. */
+  areas: V3Area[];
   viewMode: "grid" | "2d" | "map";
   onToggleViewMode: (mode: "grid" | "2d") => void;
 }
@@ -19,11 +21,6 @@ function toSentenceCase(str?: string): string {
   return lower.charAt(0).toUpperCase() + lower.slice(1);
 }
 
-const UNIVERSE_CATEGORIES = [
-  { id: "all", label: "Tất cả" },
-  { id: "tung-lam-hoa-phuc", label: "Tùng Lâm Hòa Phúc" },
-  { id: "quynh-nhai-cam-lo-tu", label: "Quỳnh Nhai Cam Lộ Tự" },
-];
 
 const SORT_OPTIONS: SortOption[] = [
   { id: "newest", label: "Mới nhất" },
@@ -53,7 +50,7 @@ export function formatTitleWithSmartPairs(title: string): React.ReactNode {
 
 // ── Memoized Card Subcomponent with Hardware-Accelerated Smooth Hover & Golden Subtitle ──
 interface UniverseAreaCardProps {
-  area: UniverseArea;
+  area: V3Area;
 }
 
 const UniverseAreaCard = React.memo(({ area }: UniverseAreaCardProps) => {
@@ -116,14 +113,14 @@ const UniverseAreaCard = React.memo(({ area }: UniverseAreaCardProps) => {
 
 UniverseAreaCard.displayName = "UniverseAreaCard";
 
-export const UniverseGridMode: FC<UniverseGridModeProps> = ({ viewMode, onToggleViewMode }) => {
+export const UniverseGridMode: FC<UniverseGridModeProps> = ({ areas, viewMode, onToggleViewMode }) => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [currentSort, setCurrentSort] = useState("newest");
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Filter & sort logic with useMemo
   const filteredAreas = useMemo(() => {
-    let result = UNIVERSE_AREAS.filter((area) => {
+    let result = areas.filter((area) => {
       if (activeCategory === "all") return true;
       return area.temple === activeCategory;
     });
@@ -137,11 +134,18 @@ export const UniverseGridMode: FC<UniverseGridModeProps> = ({ viewMode, onToggle
     });
 
     return result;
-  }, [activeCategory, currentSort]);
+  }, [areas, activeCategory, currentSort]);
 
   const visibleAreas = useMemo(() => {
     return isExpanded ? filteredAreas : filteredAreas.slice(0, 12);
   }, [filteredAreas, isExpanded]);
+
+  // Danh mục theo các chùa có khu vực đang hiển thị trong D1 (tên chùa lấy từ slug).
+  const categories = useMemo(() => {
+    const temples = new Map<string, string>();
+    for (const area of areas) if (!temples.has(area.temple)) temples.set(area.temple, area.templeName);
+    return [{ id: "all", label: "Tất cả" }, ...[...temples].map(([id, label]) => ({ id, label }))];
+  }, [areas]);
 
   const is2dActive = viewMode === "2d" || viewMode === "map";
 
@@ -201,7 +205,7 @@ export const UniverseGridMode: FC<UniverseGridModeProps> = ({ viewMode, onToggle
         </div>
 
         <CategoryFilter
-          categories={UNIVERSE_CATEGORIES}
+          categories={categories}
           activeCategory={activeCategory}
           onSelectCategory={(cat) => {
             setActiveCategory(cat);

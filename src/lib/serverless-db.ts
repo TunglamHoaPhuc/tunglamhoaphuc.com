@@ -2,6 +2,7 @@
 // v3-data.ts, or from the copies bundled in src/data for the sets www does not hold.
 // Read only: there is nothing here that writes (edit in www's /quan-tri).
 import { allAbout, allAreas, allPostRecords, allTongChi } from './v3-data';
+import { liveStatueRecords } from './v3-statues';
 
 export interface ServerlessDbOptions<T> {
   fileName: string;
@@ -15,10 +16,10 @@ const fromD1: Record<string, () => Promise<unknown>> = {
   'tong-chi-data.json': () => allTongChi(),
   'gioi-thieu-database.json': () => allAbout(),
   'universe-database.json': () => allAreas(),
+  'statues-database.json': () => liveStatueRecords(),
 };
 
 const bundled: Record<string, () => Promise<{ default: unknown }>> = {
-  'statues-database.json': () => import('@/data/statues-database.json'),
   'danh-tang-database.json': () => import('@/data/danh-tang-database.json'),
   'reference-books-data.json': () => import('@/data/reference-books-data.json'),
   'memorial-data.json': () => import('@/data/memorial-data.json'),
