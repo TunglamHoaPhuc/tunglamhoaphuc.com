@@ -98,6 +98,33 @@ async function mayAssign(ctx: AuthContext, by: Authed, roleId: string): Promise<
 	if (!covers(by.permissions, await loadPermissions(ctx.db, roleId))) throw new ApiError(403, "forbidden_higher", "Bạn không thể cấp vai trò có quyền vượt quá quyền của bạn.");
 }
 
+/** Whether `by` may give `roleId` (the server's own answer, for the account screens to grey out what it would refuse). */
+async function maySetRole(ctx: AuthContext, by: Authed, roleId: string): Promise<boolean> {
+	try {
+		await mayAssign(ctx, by, roleId);
+		return true;
+	} catch (error) {
+		if (error instanceof ApiError) return false;
+		throw error;
+	}
+}
+
+/** Each role with `assignable`: whether the caller may give it to an account. */
+export async function withAssignable(ctx: AuthContext, by: Authed, roles: RoleRow[]): Promise<(RoleRow & { assignable: boolean })[]> {
+	return Promise.all(roles.map(async (role) => ({ ...role, assignable: await maySetRole(ctx, by, role.id) })));
+}
+
+/** An account with `manageable`: whether the caller may change, lock, delete or re-role it (not oneself, nothing above their own rights). */
+export async function withManageable(ctx: AuthContext, by: Authed, user: UserRow): Promise<UserRow & { manageable: boolean }> {
+	try {
+		await mayManage(ctx, by, user);
+		return { ...user, manageable: true };
+	} catch (error) {
+		if (error instanceof ApiError) return { ...user, manageable: false };
+		throw error;
+	}
+}
+
 export async function createUser(ctx: AuthContext, by: Authed, input: { email: string; name: string; roleId: string }): Promise<{ user: UserRow; temporaryPassword: string }> {
 	const email = input.email.trim().toLowerCase();
 	await mayAssign(ctx, by, input.roleId);

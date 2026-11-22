@@ -5,7 +5,7 @@ import { listResponse, pageOf } from "../http/paging";
 import { ACTIONS, MODULES } from "../rbac/catalog";
 import {
 	createRole, createUser, deleteRole, deleteUser, forcePasswordChange, getRole, getUser, listRoles, listUsers, resetTwoFactor, revokeUserSessions,
-	sessionsOf, setLocked, updateRole, updateUser,
+	sessionsOf, setLocked, updateRole, updateUser, withAssignable, withManageable,
 } from "./service";
 
 const email = z.string().trim().min(3, "Nhập email.").max(200).includes("@", { message: "Email chưa đúng." });
@@ -23,7 +23,7 @@ registerRoutes(
 			return listResponse(rows, page, total);
 		},
 	},
-	{ method: "GET", path: "users/:id", needs: { module: "users", action: "view" }, handler: async (call) => getUser(call.ctx, call.params.id) },
+	{ method: "GET", path: "users/:id", needs: { module: "users", action: "view" }, handler: async (call) => withManageable(call.ctx, call.authed!, await getUser(call.ctx, call.params.id)) },
 	{
 		method: "POST",
 		path: "users",
@@ -85,7 +85,7 @@ registerRoutes(
 		},
 	},
 
-	{ method: "GET", path: "roles", needs: { module: "roles", action: "view" }, handler: async (call) => ({ roles: await listRoles(call.ctx) }) },
+	{ method: "GET", path: "roles", needs: { module: "roles", action: "view" }, handler: async (call) => ({ roles: await withAssignable(call.ctx, call.authed!, await listRoles(call.ctx)) }) },
 	{ method: "GET", path: "roles/:id", needs: { module: "roles", action: "view" }, handler: async (call) => getRole(call.ctx, call.params.id) },
 	{
 		method: "GET",
