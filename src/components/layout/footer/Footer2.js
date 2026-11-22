@@ -72,6 +72,10 @@ const Footer2 = () => {
 								<h2 className="title">Thời khóa tu học</h2>
 								<p className="tlhp-footer-label">Giờ mở cửa</p>
 								<p className="tlhp-footer-value">{site.openingHours}</p>
+								<p className="tlhp-footer-label">Sám hối</p>
+								<p className="tlhp-footer-value">
+									{site.repentance.time} · {site.repentance.days}
+								</p>
 								{/* Regular cộng tu sessions join here once the schedule data arrives (T12). */}
 								<ButtonPrimary text="Xem lịch tu học" url="/lich-tu-hoc" isTextBtn className="tlhp-footer-more" />
 							</div>

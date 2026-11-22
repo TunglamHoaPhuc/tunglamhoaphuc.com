@@ -82,6 +82,8 @@ export const site = {
 		{ role: "Hỗ trợ thông tin", name: "Liên Phúc Huyền", phone: "0328812922" },
 	] satisfies Contact[],
 	openingHours: "Sáng 7:30 – 10:30 · Chiều 13:30 – 17:30 (ngày thường)",
+	// The evening repentance (sám hối) service, shown in the footer.
+	repentance: { time: "19:00", days: "ngày 8, 14, 23 và 29 (hoặc 30) âm lịch" },
 
 	// The Google Maps place link the project owner gave (GD-06): the place "Chùa Hòa Phúc",
 	// 20.9535019, 105.5713597 (xóm Hòa Trúc, xã Phú Cát, Hà Nội).
