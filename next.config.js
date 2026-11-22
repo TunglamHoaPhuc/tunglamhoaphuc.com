@@ -23,6 +23,13 @@ const SECURITY_HEADERS = [
 	{ key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
 ];
 
+// Stricter than the above, for /quan-tri and /api/quan-tri only (no Content-Security-Policy yet: it needs a nonce
+// for the editor's inline styles and would break the screens if wrong).
+const ADMIN_HEADERS = [
+	{ key: "X-Frame-Options", value: "DENY" },
+	{ key: "Referrer-Policy", value: "same-origin" },
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	reactStrictMode: false,
@@ -45,6 +52,11 @@ const nextConfig = {
 				headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
 			},
 			{ source: "/:path*", headers: SECURITY_HEADERS },
+			// The admin and its API are never framed, even by this site, and send no referrer to other sites (docs 6.5).
+			// Listed after the rule above: for the same header the later rule wins.
+			{ source: "/quan-tri/:path*", headers: ADMIN_HEADERS },
+			{ source: "/quan-tri", headers: ADMIN_HEADERS },
+			{ source: "/api/quan-tri/:path*", headers: ADMIN_HEADERS },
 		];
 	},
 };
