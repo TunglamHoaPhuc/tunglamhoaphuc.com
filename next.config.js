@@ -11,6 +11,18 @@ const oldAdminRedirects = OLD_ADMIN_PATHS.flatMap((path) => [
 	{ source: `${path}/:rest*`, has: [{ type: "host", value: PUBLIC_HOST }], destination: `https://quantri.tunglamhoaphuc.com${path}/:rest*`, permanent: false },
 ]);
 
+// Safe defaults for every page and API (PageSpeed 22/11/2026, best practices): HTTPS only
+// (this host, not the subdomains), no framing by other sites, a browsing context group of
+// its own. No Content-Security-Policy: the site and the admin run inline scripts and outside
+// embeds (maps, YouTube), and a wrong policy would break them.
+const SECURITY_HEADERS = [
+	{ key: "Strict-Transport-Security", value: "max-age=31536000" },
+	{ key: "X-Frame-Options", value: "SAMEORIGIN" },
+	{ key: "Cross-Origin-Opener-Policy", value: "same-origin" },
+	{ key: "X-Content-Type-Options", value: "nosniff" },
+	{ key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+];
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
 	reactStrictMode: false,
@@ -23,15 +35,16 @@ const nextConfig = {
 			...oldAdminRedirects,
 		];
 	},
-	// Only the public site may be indexed (T20): every other host (v2., quantri., local) says
-	// noindex.
 	async headers() {
 		return [
+			// Only the public site may be indexed (T20): every other host (v2., quantri., local)
+			// says noindex.
 			{
 				source: "/:path*",
 				missing: [{ type: "host", value: PUBLIC_HOST }],
 				headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
 			},
+			{ source: "/:path*", headers: SECURITY_HEADERS },
 		];
 	},
 };

@@ -59,6 +59,10 @@ export const site = {
 		src: "/brand/logo-moc-an.webp",
 		width: 400,
 		height: 297,
+		// The header shows it 40–48 px high (54–65 px wide), 104 px high from 1280px wide
+		// (_header.scss, _tlhp-layout.scss): phones take the 200 px copy, 8 KB not 21 KB.
+		srcSet: "/brand/logo-moc-an-200.webp 200w, /brand/logo-moc-an.webp 400w",
+		sizes: "(min-width: 1280px) 140px, (max-width: 767.98px) 54px, 65px",
 	},
 	// The round seal (bo-nhan-dien/09-icon-minh-hoa) redrawn in ivory for dark grounds.
 	sealLight: {

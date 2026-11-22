@@ -6,14 +6,17 @@
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
 
-# The site's own pictures keep their name when replaced: a day in the browser cache, then
-# served from it while the browser checks for a new copy (T41c). Before, every visit asked
-# again (max-age=0).
+# The site's own pictures keep their name when replaced, but they change only with a deploy
+# (the admin's uploads live in R2, not here): 30 days in the browser cache, then served from
+# it for another week while the browser checks for a new copy. A picture replaced under the
+# same name can show old for up to 30 days to a returning visitor: give it a new name
+# instead (logo-moc-an-200.webp…). T41c had a day; PageSpeed 22/11/2026 counted 140 KB
+# fetched again on a second visit.
 /images/*
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=604800
 
 /brand/*
-  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+  Cache-Control: public, max-age=2592000, stale-while-revalidate=604800
 
 # The Tibetan course of the old site, moved as it was (T17b): page pictures, sounds and data
 # keep their names, like the site's pictures.

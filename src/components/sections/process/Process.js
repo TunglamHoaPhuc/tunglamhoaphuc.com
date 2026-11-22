@@ -45,10 +45,10 @@ const Process = ({ group }) => {
 				</div>
 			</div>
 			<div className="bg-shape-1" aria-hidden="true">
-				<img src="/images/shape/pattern-2.webp" alt="" loading="lazy" />
+				<img src="/images/shape/pattern-2.webp" alt="" width={740} height={1180} loading="lazy" />
 			</div>
 			<div className="bg-shape-2" aria-hidden="true">
-				<img src="/images/shape/pattern-3.webp" alt="" loading="lazy" />
+				<img src="/images/shape/pattern-3.webp" alt="" width={740} height={1180} loading="lazy" />
 			</div>
 		</section>
 	);

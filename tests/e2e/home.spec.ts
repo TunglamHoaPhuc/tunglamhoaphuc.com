@@ -354,9 +354,9 @@ test.describe("home sliders with motion allowed", () => {
 	test("Lời chào counts up to the real figures when scrolled to", async ({ page }) => {
 		await open(page);
 		const block = page.locator(".tlhp-welcome");
-		// Once the script runs, the figures drop to 0 and wait out of view.
-		await expect(block.locator(".odometer-digit").first()).toBeAttached();
+		// The odometer comes a screen before the figures, then they drop to 0 and count up in view.
 		await block.locator(".countup-item").last().scrollIntoViewIfNeeded();
+		await expect(block.locator(".odometer-digit").first()).toBeAttached();
 		// The digits the odometer settles on (each digit also holds a hidden "8" for its width).
 		const shown = (idx: number) =>
 			block

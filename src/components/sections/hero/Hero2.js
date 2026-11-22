@@ -27,7 +27,15 @@ const HeroPicture = ({ image, first }) => (
 		{/* React moves these into <head>, so the first picture is asked for before the CSS and
 		    fonts are in; each screen fetches only the one its <source> will pick. */}
 		{first && image.portrait ? (
-			<link rel="preload" as="image" href={image.portrait} media={PORTRAIT} fetchPriority="high" />
+			<link
+				rel="preload"
+				as="image"
+				href={image.portrait}
+				imageSrcSet={image.portraitSrcSet}
+				imageSizes={image.portraitSrcSet ? "100vw" : undefined}
+				media={PORTRAIT}
+				fetchPriority="high"
+			/>
 		) : null}
 		{first ? (
 			<link
@@ -40,7 +48,9 @@ const HeroPicture = ({ image, first }) => (
 				fetchPriority="high"
 			/>
 		) : null}
-		{image.portrait ? <source media={PORTRAIT} srcSet={image.portrait} /> : null}
+		{image.portrait ? (
+			<source media={PORTRAIT} srcSet={image.portraitSrcSet ?? image.portrait} sizes={image.portraitSrcSet ? "100vw" : undefined} />
+		) : null}
 		<img
 			src={image.src}
 			srcSet={image.srcSet}

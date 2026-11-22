@@ -21,7 +21,7 @@ describe("serveMedia", () => {
 		expect(response.status).toBe(200);
 		expect(await response.text()).toBe("r2-bytes");
 		expect(response.headers.get("Content-Type")).toBe("image/jpeg");
-		expect(response.headers.get("Cache-Control")).toBe("public, max-age=604800");
+		expect(response.headers.get("Cache-Control")).toBe("public, max-age=2592000, stale-while-revalidate=604800");
 		expect(response.headers.get("X-Content-Type-Options")).toBe("nosniff");
 		expect(origin).not.toHaveBeenCalled();
 	});
@@ -40,7 +40,7 @@ describe("serveMedia", () => {
 		expect(origin).toHaveBeenCalledWith("https://s2-cnv03.s3.us-east-005.backblazeb2.com/a/b.png");
 		expect(response.status).toBe(200);
 		expect(response.headers.get("Content-Type")).toBe("image/png");
-		expect(response.headers.get("Cache-Control")).toBe("public, max-age=604800");
+		expect(response.headers.get("Cache-Control")).toBe("public, max-age=2592000, stale-while-revalidate=604800");
 	});
 
 	it("falls back to WordPress, and when there is no R2 binding at all (dev)", async () => {

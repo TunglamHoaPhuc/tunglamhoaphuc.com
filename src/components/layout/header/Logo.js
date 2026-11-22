@@ -7,7 +7,15 @@ const Logo = () => {
 	return (
 		<div className="site_logo tlhp-logo">
 			<Link className="logo" href="/">
-				<img src={site.logo.src} alt="" width={site.logo.width} height={site.logo.height} className="tlhp-logo-seal" />
+				<img
+					src={site.logo.src}
+					srcSet={site.logo.srcSet}
+					sizes={site.logo.sizes}
+					alt=""
+					width={site.logo.width}
+					height={site.logo.height}
+					className="tlhp-logo-seal"
+				/>
 				<span className="tlhp-logo-name">{site.name}</span>
 			</Link>
 		</div>

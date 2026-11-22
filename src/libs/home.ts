@@ -3,7 +3,7 @@
 import { site } from "@/config/site";
 import { tongChi } from "@/config/tongChi";
 import { calendarHref, type EventStatus, eventStatus, lunarRange, solarRange, todayInVietnam } from "@/libs/calendar";
-import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
+import { IMAGE_WIDTH, imageAt, imageSrcSet } from "@/libs/content/media";
 import type { AboutTopic, ContentRepository, MediaImage, MonthTheme, PostSummary, ScheduleEvent } from "@/libs/content/types";
 import { countdownLabel, daysUntil } from "@/libs/countdown";
 import { formatDate } from "@/libs/format";
@@ -48,6 +48,8 @@ export type HeroImage = {
 	srcSet?: string;
 	/** An upright crop for phones held upright. */
 	portrait?: string;
+	/** Sizes of the upright crop, when it is an editor's picture. */
+	portraitSrcSet?: string;
 	/** For the row of small pictures under the hero. */
 	thumb: string;
 	/** CSS object-position. */
@@ -150,11 +152,23 @@ function welcomeSlide(): HeroSlide {
 	return { id: "noi-de-tro-ve", ...hero, text: site.intro };
 }
 
-/** An editor's picture as a frame: 1280 and 1920 px copies, and a small one for the row under the hero. */
+/**
+ * An editor's picture as a frame: 640, 960, 1280 and 1920 px copies, and a small one for the
+ * row under the hero. A phone like PageSpeed's (412 px at 1.75, so 721 device pixels) takes
+ * the 960 copy, where it got the 1280 one before (PageSpeed 22/11/2026: 60–70 KB more than
+ * the frame needs); smaller phones take 640, phones at 3x still take 1280. The thumbnails are
+ * 65–80 px: the 360 copy, not the 640 one. HERO_PHONE is the one width only the hero asks
+ * for: a handful of frames, so a handful of transformations more in the monthly quota.
+ */
+const HERO_PHONE = 960;
+
 function framePicture({ src, position }: MediaImage): HeroImage {
-	const wide = imageAt(src, IMAGE_WIDTH.wide);
-	const full = imageAt(src, IMAGE_WIDTH.full);
-	return { src: full, srcSet: wide === full ? undefined : `${wide} 1280w, ${full} 1920w`, thumb: imageAt(src, IMAGE_WIDTH.card), position };
+	return {
+		src: imageAt(src, IMAGE_WIDTH.full),
+		srcSet: imageSrcSet(src, [IMAGE_WIDTH.card, HERO_PHONE, IMAGE_WIDTH.wide, IMAGE_WIDTH.full]),
+		thumb: imageAt(src, IMAGE_WIDTH.small),
+		position,
+	};
 }
 
 /** The newest post with a picture, as the hero's "pháp sự mới nhất" frame. */
@@ -229,7 +243,11 @@ function customSlides(slides: HeroSlideSetting[], media: Record<string, string>)
 		const src = slide.imageMediaId ? media[slide.imageMediaId] : undefined;
 		const portrait = slide.portraitMediaId ? media[slide.portraitMediaId] : undefined;
 		const image: HeroImage = src
-			? { ...framePicture({ src, position: slide.imagePosition || "center 50%" }), portrait: portrait ? imageAt(portrait, IMAGE_WIDTH.wide) : undefined }
+			? {
+					...framePicture({ src, position: slide.imagePosition || "center 50%" }),
+					portrait: portrait ? imageAt(portrait, IMAGE_WIDTH.wide) : undefined,
+					portraitSrcSet: portrait ? imageSrcSet(portrait, [IMAGE_WIDTH.card, HERO_PHONE, IMAGE_WIDTH.wide]) : undefined,
+				}
 			: { ...site.hero.image };
 		return {
 			id: `tuy-chinh-${slide.id}`,
