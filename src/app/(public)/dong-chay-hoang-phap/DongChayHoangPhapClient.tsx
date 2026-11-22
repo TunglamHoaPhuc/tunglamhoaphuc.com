@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { HOANG_PHAP_CATEGORIES, HoangPhapArticle } from '@/data/dong-chay-hoang-phap-data';
+import type { DongChayPage } from '@/lib/dong-chay';
 import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { CategoryFilter } from '@/components/common/CategoryFilter';
 import { PostCard } from '@/components/common/PostCard';
@@ -18,97 +19,77 @@ const SORT_OPTIONS: { id: SortOption; label: string }[] = [
   { id: 'z-a', label: 'Từ Z đến A' },
 ];
 
-export default function DongChayHoangPhapClient({
-  initialArticles,
-}: {
-  initialArticles: HoangPhapArticle[];
-}) {
-  const [articles, setArticles] = useState<HoangPhapArticle[]>(initialArticles);
-  const [activeCategory, setActiveCategory] = useState<string>('all');
-  const [currentSort, setCurrentSort] = useState<SortOption>('newest');
-  const [isExpanded, setIsExpanded] = useState(false);
+type View = { page: number; category: string; sort: SortOption };
 
-  // Cập nhật state nếu server props thay đổi
-  useEffect(() => {
-    if (initialArticles && initialArticles.length > 0) {
-      setArticles(initialArticles);
-    }
-  }, [initialArticles]);
+const DEFAULT_VIEW: View = { page: 1, category: 'all', sort: 'newest' };
 
-  // Dynamic Backend Sync ngầm (để cập nhật view count hoặc bài mới nếu có)
-  useEffect(() => {
-    async function fetchDynamicPosts() {
-      try {
-        const res = await fetch(`/api/admin/posts?category=dong-chay-hoang-phap&t=${Date.now()}`, { cache: 'no-store' });
-        if (res.ok) {
-          const json = await res.json();
-          if (json.success && Array.isArray(json.posts) && json.posts.length > 0) {
-            const mapped: HoangPhapArticle[] = json.posts.map((p: any) => ({
-              id: p.id,
-              slug: p.slug,
-              title: p.title,
-              subtitle: p.subtitle || '',
-              date: p.publishedDate || p.date || '',
-              author: p.author || 'Ban Văn Hóa Tùng Lâm',
-              category: p.subCategory || 'cong-tu',
-              subCategory: p.subtitle || p.categoryName || 'Dòng Chảy Hoằng Pháp',
-              subCategoryIcon: '',
-              templeLogo: (p.templeLogo || 'tung-lam-hoa-phuc') as 'tung-lam-hoa-phuc' | 'quynh-nhai-cam-lo-tu',
-              templeName: p.templeName || 'Tùng Lâm Hòa Phúc',
-              views: typeof p.viewsCount === 'number' ? p.viewsCount : (parseInt(p.viewsCount, 10) || 0),
-              thumbnailUrl: p.thumbnailUrl || '/images/toan-canh-chua.jpg',
-              thumbnailPosition: p.thumbnailPosition || p.imagePosition || 'center 20%',
-              bannerUrl: p.bannerUrl || '/images/toan-canh-chua.jpg',
-              summary:
-                p.summary && !p.summary.includes('Tóm tắt')
-                  ? p.summary
-                  : p.content
-                    ? p.content.replace(/!\[.*?\]\(.*?\)/g, '').replace(/<[^>]+>/g, '').replace(/[#*`_>]/g, '').trim().slice(0, 180) + '...'
-                    : p.contentHtml
-                      ? p.contentHtml.replace(/<[^>]+>/g, '').trim().slice(0, 180) + '...'
-                      : '',
-              contentHtml: p.contentHtml || '',
-            }));
-            setArticles(mapped);
-          }
-        }
-      } catch (err) {
-        console.log('Dynamic posts load fallback to static dataset:', err);
-      }
+function viewFromLocation(): View {
+  const q = new URLSearchParams(window.location.search);
+  const page = Number(q.get('trang'));
+  const sort = q.get('sap-xep') as SortOption | null;
+  return {
+    page: Number.isFinite(page) && page >= 1 ? Math.floor(page) : 1,
+    category: q.get('danh-muc') || 'all',
+    sort: sort && SORT_OPTIONS.some((o) => o.id === sort) ? sort : 'newest',
+  };
+}
+
+function viewToQuery(v: View): string {
+  const q = new URLSearchParams();
+  if (v.page > 1) q.set('trang', String(v.page));
+  if (v.category !== 'all') q.set('danh-muc', v.category);
+  if (v.sort !== 'newest') q.set('sap-xep', v.sort);
+  const s = q.toString();
+  return s ? `?${s}` : '';
+}
+
+const sameView = (a: View, b: View) => a.page === b.page && a.category === b.category && a.sort === b.sort;
+
+export default function DongChayHoangPhapClient({ initial }: { initial: DongChayPage }) {
+  const [data, setData] = useState<DongChayPage>(initial);
+  const [view, setView] = useState<View>({ page: initial.page, category: initial.category, sort: initial.sort });
+  const [loading, setLoading] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const gridTopRef = useRef<HTMLDivElement>(null);
+  const requestRef = useRef(0);
+
+  const load = useCallback(async (next: View) => {
+    const id = ++requestRef.current;
+    setView(next);
+    setLoading(true);
+    setFailed(false);
+    try {
+      const res = await fetch(`/api/public/dong-chay${viewToQuery(next) || '?trang=1'}`);
+      if (!res.ok) throw new Error(String(res.status));
+      const json = (await res.json()) as DongChayPage;
+      if (id !== requestRef.current) return;
+      setData(json);
+      setView({ page: json.page, category: json.category, sort: json.sort });
+    } catch {
+      if (id === requestRef.current) setFailed(true);
+    } finally {
+      if (id === requestRef.current) setLoading(false);
     }
-    fetchDynamicPosts();
   }, []);
 
-  // 1. Lọc bài viết theo danh mục
-  let filteredArticles = articles.filter((art) => {
-    if (activeCategory === 'all' || activeCategory === 'moi-nhat') return true;
-    const cat = art.category || 'cong-tu';
-    return cat === activeCategory;
-  });
+  // Mở trang bằng một địa chỉ có ?trang=…, và nút Lùi/Tiến của trình duyệt.
+  useEffect(() => {
+    const fromUrl = viewFromLocation();
+    if (!sameView(fromUrl, DEFAULT_VIEW)) load(fromUrl);
+    const onPop = () => load(viewFromLocation());
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [load]);
 
-  // 2. Sắp xếp bài viết
-  filteredArticles = [...filteredArticles].sort((a, b) => {
-    if (currentSort === 'newest') {
-      const timeA = a.date ? new Date(a.date).getTime() : 0;
-      const timeB = b.date ? new Date(b.date).getTime() : 0;
-      return timeB - timeA;
-    }
-    if (currentSort === 'oldest') {
-      const timeA = a.date ? new Date(a.date).getTime() : 0;
-      const timeB = b.date ? new Date(b.date).getTime() : 0;
-      return timeA - timeB;
-    }
-    if (currentSort === 'a-z') {
-      return a.title.localeCompare(b.title, 'vi');
-    }
-    if (currentSort === 'z-a') {
-      return b.title.localeCompare(a.title, 'vi');
-    }
-    return 0;
-  });
+  const go = (next: View) => {
+    if (sameView(next, view)) return;
+    window.history.pushState(null, '', `${window.location.pathname}${viewToQuery(next)}`);
+    load(next);
+    gridTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
 
-  // Lấy ảnh bài viết tiêu biểu cho Header (ưu tiên bài đầu tiên của danh sách)
-  const featuredArticle = articles[0] || initialArticles[0];
+  // Ảnh nền đầu trang: bài mới nhất (cố định, không đổi theo trang đang xem).
+  const featuredArticle = initial.items[0];
   const headerBgImage = getImageUrl(
     featuredArticle?.bannerUrl ||
     featuredArticle?.thumbnailUrl ||
@@ -119,7 +100,6 @@ export default function DongChayHoangPhapClient({
     <div className="min-h-screen bg-[#2A1D14] text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black">
       {/* ── HEADER VỚI BACKGROUND WATERMARK TÔNG PHONG TRUYỀN THỪA ── */}
       <div className="relative w-full overflow-hidden bg-[#2A1D14] pt-28 pb-10">
-        {/* Ảnh nền đằng sau mờ phủ gradient hòa quyện như Tông Phong Truyền Thừa */}
         {headerBgImage && (
           <div
             className="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none mix-blend-luminosity [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]"
@@ -129,16 +109,13 @@ export default function DongChayHoangPhapClient({
             }}
           />
         )}
-        {/* Hiệu ứng gradient mờ mềm mại hòa vào nền nâu */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#2A1D14]/40 via-[#2A1D14]/70 to-[#2A1D14] pointer-events-none" />
 
         <div className="relative z-10 max-w-[1280px] mx-auto px-4 md:px-10 flex flex-col items-center justify-center text-center">
-          {/* Biểu tượng bánh xe Pháp Chuyển */}
           <div className="w-10 h-10 rounded-full bg-[#3a2718] border border-[#f2cc8f]/40 flex items-center justify-center text-[#ffde59] mb-2 shadow-md">
             <span className="text-xl">☸</span>
           </div>
 
-          {/* 1. KHUNG FLEXBOX CĂN ĐƯỜNG KẺ HAI BÊN ĐÂM TỪ TIM TIÊU ĐỀ */}
           <div className="flex items-center justify-center w-full my-4 gap-4 md:gap-8">
             <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/50 to-[#F2C14E]" />
             <h1
@@ -150,7 +127,6 @@ export default function DongChayHoangPhapClient({
             <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-[#F2C14E]/50 to-[#F2C14E]" />
           </div>
 
-          {/* 2. Subtitle: UTM Avo, Sentence case (Chữ thường), Text-balance */}
           <p
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
             className="text-xs sm:text-sm md:text-base text-[#e3d2c1] tracking-wide font-normal max-w-2xl mx-auto px-4 leading-relaxed text-balance"
@@ -161,9 +137,8 @@ export default function DongChayHoangPhapClient({
       </div>
 
       <main className="pb-20 px-4 md:px-10 max-w-[1280px] mx-auto">
-        {/* ── 2. THANH LỰA CHỌN DANH MỤC CHỮ THƯỜNG & SẮP XẾP ── */}
-        <div className="mb-12">
-          {/* 1. Tiêu đề lớn LỰA CHỌN DANH MỤC */}
+        {/* ── THANH LỰA CHỌN DANH MỤC & SẮP XẾP ── */}
+        <div className="mb-12 scroll-mt-24" ref={gridTopRef}>
           <div className="mb-4">
             <h2
               style={{ fontFamily: "'UTM Classic Antiqua', 'UTM ClassizismAntiqua', serif" }}
@@ -173,59 +148,113 @@ export default function DongChayHoangPhapClient({
             </h2>
           </div>
 
-          {/* Component CategoryFilter */}
           <CategoryFilter
             categories={HOANG_PHAP_CATEGORIES}
-            activeCategory={activeCategory}
-            onSelectCategory={setActiveCategory}
+            activeCategory={view.category}
+            onSelectCategory={(category) => go({ ...view, category, page: 1 })}
             sortOptions={SORT_OPTIONS}
-            currentSort={currentSort}
-            onSelectSort={(sortId) => setCurrentSort(sortId as SortOption)}
+            currentSort={view.sort}
+            onSelectSort={(sortId) => go({ ...view, sort: sortId as SortOption, page: 1 })}
             sortLabel="Phân loại"
           />
         </div>
 
-        {/* ── 3. KHUNG GRID CARD BÀI VIẾT TỶ LỆ VÀNG ── */}
-        <div className="relative mb-12">
-          <div
-            className={`relative transition-all duration-500 overflow-hidden ${
-              !isExpanded && filteredArticles.length > 6 ? 'max-h-[1550px] md:max-h-[1650px]' : 'max-h-[10000px] pb-8'
-            }`}
-          >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
-              {filteredArticles.map((art) => (
-                <PostCard key={art.id} post={mapArticleToPostItem(art)} variant="golden" />
-              ))}
-            </div>
-
-            {/* Lớp dải mờ Gradient Mask Overlay khi số bài > 6 */}
-            {!isExpanded && filteredArticles.length > 6 && (
-              <div className="absolute bottom-0 inset-x-0 h-48 md:h-64 bg-gradient-to-t from-[#2C1C11] via-[#2C1C11]/85 to-transparent pointer-events-none z-10" />
-            )}
-          </div>
-
-          {/* Nút Tìm Hiểu Thêm */}
-          {!isExpanded && filteredArticles.length > 6 && (
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 w-full flex justify-center px-4">
+        {/* ── LƯỚI BÀI VIẾT (12 bài mỗi trang) ── */}
+        <div className="mb-12" aria-busy={loading}>
+          {failed && (
+            <div role="alert" className="mb-8 rounded-xl border border-[#F2C14E]/50 bg-[#3a2718] px-5 py-4 text-sm flex flex-wrap items-center gap-3">
+              <span>Không tải được danh sách bài. Kiểm tra kết nối rồi thử lại.</span>
               <button
                 type="button"
-                onClick={() => setIsExpanded(true)}
-                className="px-8 py-3 md:px-10 md:py-3.5 bg-[#6B4B2A] hover:bg-[#8B6439] border border-[#F2C14E] text-[#F2C14E] hover:text-[#FFE5A3] font-bold text-sm md:text-base rounded-xl transition-all duration-300 shadow-[0_10px_25px_rgba(0,0,0,0.7)] flex items-center gap-2 cursor-pointer uppercase tracking-wider"
-                style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                onClick={() => load(view)}
+                className="px-4 py-1.5 rounded-lg border border-[#F2C14E] text-[#F2C14E] hover:bg-[#6B4B2A] font-bold"
               >
-                <span>TÌM HIỂU THÊM</span>
-                <ChevronDown className="w-5 h-5" />
+                Thử lại
               </button>
             </div>
           )}
+
+          {data.items.length === 0 ? (
+            <p className="text-center py-16 text-[#e3d2c1]/80">Danh mục này chưa có bài viết.</p>
+          ) : (
+            <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 transition-opacity duration-300 ${loading ? 'opacity-50' : ''}`}>
+              {data.items.map((art) => (
+                <PostCard key={art.id} post={mapArticleToPostItem(art)} variant="golden" />
+              ))}
+            </div>
+          )}
+
+          <Pagination page={data.page} pageCount={data.pageCount} total={data.total} disabled={loading} onPage={(page) => go({ ...view, page })} />
         </div>
 
-        {/* ── 4. KHUNG TRỢ LÝ AI PHẬT HỌC ── */}
+        {/* ── KHUNG TRỢ LÝ AI PHẬT HỌC ── */}
         <div className="mt-8 mb-12">
           <SmartSearchAIBar contextTitle="Dòng Chảy Hoằng Pháp & Hoạt Động Tự Viện" />
         </div>
       </main>
     </div>
+  );
+}
+
+/** Các số trang cần hiện: trang đầu, trang cuối và hai trang quanh trang đang xem; "…" cho khoảng bị bỏ. */
+function pageList(page: number, pageCount: number): (number | '…')[] {
+  const keep = new Set([1, pageCount, page - 1, page, page + 1].filter((p) => p >= 1 && p <= pageCount));
+  const sorted = [...keep].sort((a, b) => a - b);
+  const out: (number | '…')[] = [];
+  sorted.forEach((p, i) => {
+    if (i > 0 && p - sorted[i - 1] > 1) out.push('…');
+    out.push(p);
+  });
+  return out;
+}
+
+function Pagination({
+  page,
+  pageCount,
+  total,
+  disabled,
+  onPage,
+}: {
+  page: number;
+  pageCount: number;
+  total: number;
+  disabled: boolean;
+  onPage: (page: number) => void;
+}) {
+  if (pageCount <= 1) return null;
+  const base =
+    'min-w-10 h-10 px-3 rounded-lg border text-sm font-bold flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed';
+  const idle = 'border-[#F2C14E]/40 text-[#e3d2c1] hover:border-[#F2C14E] hover:text-[#F2C14E]';
+  return (
+    <nav aria-label="Phân trang" className="mt-12 flex flex-col items-center gap-3" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+      <div className="flex flex-wrap items-center justify-center gap-2">
+        <button type="button" className={`${base} ${idle}`} disabled={disabled || page <= 1} onClick={() => onPage(page - 1)} aria-label="Trang trước">
+          <ChevronLeft className="w-4 h-4" />
+        </button>
+        {pageList(page, pageCount).map((p, i) =>
+          p === '…' ? (
+            <span key={`gap-${i}`} className="px-1 text-[#e3d2c1]/60" aria-hidden="true">…</span>
+          ) : (
+            <button
+              key={p}
+              type="button"
+              className={`${base} ${p === page ? 'bg-[#6B4B2A] border-[#F2C14E] text-[#F2C14E]' : idle}`}
+              aria-current={p === page ? 'page' : undefined}
+              disabled={disabled && p !== page}
+              onClick={() => onPage(p)}
+            >
+              {p}
+            </button>
+          )
+        )}
+        <button type="button" className={`${base} ${idle}`} disabled={disabled || page >= pageCount} onClick={() => onPage(page + 1)} aria-label="Trang sau">
+          <ChevronRight className="w-4 h-4" />
+        </button>
+      </div>
+      <p className="text-xs text-[#e3d2c1]/70">
+        Trang {page}/{pageCount} · {total} bài
+      </p>
+    </nav>
   );
 }
 

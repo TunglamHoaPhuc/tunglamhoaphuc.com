@@ -1,52 +1,11 @@
-import { loadServerlessJsonAsync } from '@/lib/serverless-db';
 import DongChayHoangPhapClient from './DongChayHoangPhapClient';
-import { HOANG_PHAP_ARTICLES, HoangPhapArticle } from '@/data/dong-chay-hoang-phap-data';
+import { dongChayPage } from '@/lib/dong-chay';
 
-// Cache ở edge 5 phút: danh sách 472 bài không cần dựng lại ở mỗi lượt xem.
+// Cache ở edge 5 phút. Trang chỉ dựng 12 bài mới nhất; các trang sau, danh mục và cách sắp xếp
+// lấy qua /api/public/dong-chay (không đọc searchParams ở đây, vì đọc là mất cache).
 export const revalidate = 300;
 
-const DB_CONFIG = {
-  fileName: 'posts-database.json',
-  localRelativePath: 'src/data/posts-database.json',
-  s3Key: 'tunglamhoaphuc2/database/posts-database.json',
-  defaultData: [] as any[],
-};
-
 export default async function DongChayHoangPhapPage() {
-  const allPosts = await loadServerlessJsonAsync<any[]>(DB_CONFIG);
-
-  const initialArticles: HoangPhapArticle[] = (allPosts || [])
-    .filter((p) => p.mainCategory === 'dong-chay-hoang-phap')
-    .map((p: any) => ({
-      id: p.id,
-      slug: p.slug,
-      title: p.title,
-      subtitle: p.subtitle || '',
-      date: p.publishedDate || p.date || '',
-      author: p.author || 'Ban Văn Hóa Tùng Lâm',
-      category: p.subCategory || 'cong-tu',
-      subCategory: p.subtitle || p.categoryName || 'Dòng Chảy Hoằng Pháp',
-      subCategoryIcon: '',
-      templeLogo: (p.templeLogo || 'tung-lam-hoa-phuc') as 'tung-lam-hoa-phuc' | 'quynh-nhai-cam-lo-tu',
-      templeName: p.templeName || 'Tùng Lâm Hòa Phúc',
-      views: typeof p.viewsCount === 'number' ? p.viewsCount : (parseInt(p.viewsCount, 10) || 0),
-      thumbnailUrl: p.thumbnailUrl || '/images/toan-canh-chua.jpg',
-      thumbnailPosition: p.thumbnailPosition || 'center center',
-      bannerUrl: p.bannerUrl || '/images/toan-canh-chua.jpg',
-      summary:
-        p.summary && !p.summary.includes('Tóm tắt')
-          ? (p.summary.length > 200 ? p.summary.slice(0, 200).trimEnd() + '…' : p.summary)
-          : p.content
-            ? p.content.replace(/!\[.*?\]\(.*?\)/g, '').replace(/<[^>]+>/g, '').replace(/[#*`_>]/g, '').trim().slice(0, 180) + '...'
-            : p.contentHtml
-              ? p.contentHtml.replace(/<[^>]+>/g, '').trim().slice(0, 180) + '...'
-              : '',
-      contentHtml: p.contentHtml || '',
-    }));
-
-  return (
-    <DongChayHoangPhapClient
-      initialArticles={initialArticles.length > 0 ? initialArticles : HOANG_PHAP_ARTICLES}
-    />
-  );
+  const first = await dongChayPage({ page: 1 });
+  return <DongChayHoangPhapClient initial={first} />;
 }
