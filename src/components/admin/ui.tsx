@@ -2,6 +2,7 @@
 
 // The few building blocks the admin pages share. Feedback is always a block in the page flow (no pop-ups,
 // no toasts): the brand rule of design-system/tokens.css applies here too.
+import Link from "next/link";
 import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { useId, useSyncExternalStore } from "react";
 import { ApiClientError } from "./api";
@@ -66,6 +67,19 @@ export function PageHeader({ title, children, back }: { title: string; children?
 			</div>
 			{children ? <div className="tq-actions">{children}</div> : null}
 		</header>
+	);
+}
+
+/** The page a person may not open: the menu's own words, in the page flow (no pop-up), with the way back. */
+export function NoAccess({ action = "view" }: { action?: string }) {
+	return (
+		<>
+			<PageHeader title="Không có quyền truy cập" />
+			<Alert kind="warning">{action === "create" ? "Bạn không có quyền tạo mục này." : "Bạn không có quyền xem mục này."} Nếu cần, hãy nhờ quản trị viên cấp quyền cho vai trò của bạn.</Alert>
+			<p>
+				<Link href="/quan-tri">Về trang Tổng quan</Link>
+			</p>
+		</>
 	);
 }
 
