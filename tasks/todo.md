@@ -2357,6 +2357,8 @@ Phương án:
 
 **Mô tả (đã chốt 22/11/2026, chủ dự án chọn phương án (a) "chỉ thêm dòng mới" làm trước):** nhập B2 → D1 bằng `npm run import -- --from=b2 --merge`, **chỉ đọc B2, không ghi gì vào B2**, chạy lại được, có `--dry-run`. Bài đã có mà admin cũ sửa tiếp **không** sang v2 (chấp nhận). Bỏ `tlhp-data` và nguồn `r2`. Nâng lên (c) khi Ban Biên Tập vẫn cần sửa bài cũ ở admin cũ; chuyển (b) nếu T39 gần.
 
+**Mốc T39:** chủ dự án dự kiến cuối tháng 12/2026 (còn khoảng 5 tuần kể từ 22/11), nên giữ (a) làm đường chính trong thời gian này, chưa chuyển (b). Xét nâng lên (c) nếu tới giữa tháng 12 Ban Biên Tập vẫn sửa nhiều bài cũ ở admin cũ; xét (b) (đóng băng B2) từ khoảng đầu tháng 12 nếu Ban Biên Tập đã quen admin mới.
+
 **Tiêu chí nghiệm thu:**
 - [x] Chủ dự án chọn phương án: (a) trước (22/11/2026)
 - [x] Bài đã sửa, đã tạo hoặc đã xóa mềm bằng admin mới không bị ghi đè, không bị xóa sau khi nhập; con admin đã xóa không quay lại (`importMerge`, `importMergeGaps`, `importFlags`; đột biến đã thử)
