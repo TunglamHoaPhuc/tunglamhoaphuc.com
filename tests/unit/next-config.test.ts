@@ -41,6 +41,17 @@ describe("next.config headers", () => {
 		}
 	});
 
+	it("sends the security headers on every host, and no Content-Security-Policy", async () => {
+		const rules = ((await nextConfig.headers?.()) ?? []) as Rule[];
+		const everywhere = rules.filter((rule) => rule.source === "/:path*" && !rule.missing);
+		const headers = Object.fromEntries(everywhere.flatMap((rule) => rule.headers).map(({ key, value }) => [key, value]));
+		expect(headers["Strict-Transport-Security"]).toBe("max-age=31536000");
+		expect(headers["X-Frame-Options"]).toBe("SAMEORIGIN");
+		expect(headers["Cross-Origin-Opener-Policy"]).toBe("same-origin");
+		expect(headers["X-Content-Type-Options"]).toBe("nosniff");
+		expect(headers["Content-Security-Policy"]).toBeUndefined();
+	});
+
 	it("names the same public hosts as the code that hides internal pages", () => {
 		for (const host of ["www.tunglamhoaphuc.com", "tunglamhoaphuc.com"]) expect(isPublicHost(host)).toBe(true);
 	});

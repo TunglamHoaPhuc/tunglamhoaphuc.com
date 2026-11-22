@@ -38,7 +38,16 @@ const MobileMenu = ({ id, isOpen, onClose, showSearch = false }) => {
 						<div className="hamburger_top d-flex align-items-center justify-content-between">
 							<div className="hamburger_logo">
 								<Link href="/" className="mobile_logo tlhp-logo">
-									<img src={site.logo.src} alt="" width={site.logo.width} height={site.logo.height} className="tlhp-logo-seal" />
+									<img
+										src={site.logo.src}
+										srcSet={site.logo.srcSet}
+										sizes="(max-width: 767.98px) 54px, 65px"
+										alt=""
+										width={site.logo.width}
+										height={site.logo.height}
+										className="tlhp-logo-seal"
+										loading="lazy"
+									/>
 									<span className="tlhp-logo-name">{site.name}</span>
 								</Link>
 							</div>

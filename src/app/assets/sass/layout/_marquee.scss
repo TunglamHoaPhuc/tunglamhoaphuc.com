@@ -60,6 +60,8 @@ START: Theme Marquee CSS
 		overflow: hidden;
 		img {
 			height: 100%;
+			// Its width and height attributes (320, the seal's) give the shape, not the width.
+			width: auto;
 		}
 		@media #{$xl, $lg} {
 			height: 75px;

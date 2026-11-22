@@ -26,12 +26,15 @@ const BackToTop = () => {
 			setScrollValue(value);
 		};
 
-		window.addEventListener("scroll", handleScroll);
+		window.addEventListener("scroll", handleScroll, { passive: true });
 		window.addEventListener("load", handleScroll);
-		// The page may have been scrolled, and loaded, before this ran.
-		handleScroll();
+		// The page may have been scrolled, and loaded, before this ran. Measured in the next
+		// frame, not here: here the sliders have just written their styles, and reading the
+		// page's height would force a layout of the whole page in the middle of hydration.
+		const frame = requestAnimationFrame(handleScroll);
 
 		return () => {
+			cancelAnimationFrame(frame);
 			window.removeEventListener("scroll", handleScroll);
 			window.removeEventListener("load", handleScroll);
 		};

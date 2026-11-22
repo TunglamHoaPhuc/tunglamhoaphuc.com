@@ -146,10 +146,10 @@ const Footer2 = () => {
 			</div>
 			<div className="tlhp-footer-wave" aria-hidden="true"></div>
 			<div className="bg-shape-1">
-				<img src="/images/shape/pattern-2.webp" alt="" loading="lazy" decoding="async" />
+				<img src="/images/shape/pattern-2.webp" alt="" width={740} height={1180} loading="lazy" decoding="async" />
 			</div>
 			<div className="bg-shape-2">
-				<img src="/images/shape/pattern-3.webp" alt="" loading="lazy" decoding="async" />
+				<img src="/images/shape/pattern-3.webp" alt="" width={740} height={1180} loading="lazy" decoding="async" />
 			</div>
 		</footer>
 	);

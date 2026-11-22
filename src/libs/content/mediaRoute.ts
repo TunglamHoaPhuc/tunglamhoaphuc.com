@@ -3,8 +3,12 @@ import { mediaSource } from "./media";
 // What /anh-goc/<bucket>/<key> answers (T42c): the picture from the private R2 bucket tlhp-media,
 // or, while R2 lacks it, from B2 / WordPress. Only pictures, only the buckets of the old admin.
 // B2 sends no Cache-Control, and a source cached for less than an hour is transformed with
-// less effort, so the files are kept a week, at the edge and in the browser.
+// less effort, so the files are kept a week at the edge. The admin puts the version in each
+// key (a new upload or crop is a new address), so browsers keep a file 30 days, and a week
+// more while they check (PageSpeed 22/11/2026 asked for longer than the week it had). An old
+// B2 file replaced under its own name can show old for that long.
 const WEEK = 604_800;
+const MONTH = 2_592_000;
 
 /** The part of an R2 bucket binding this route uses. */
 export type MediaBucket = {
@@ -18,7 +22,7 @@ const NOT_FOUND = () => new Response("Not found", { status: 404 });
 
 function pictureResponse(body: BodyInit | null, type: string): Response {
 	return new Response(body, {
-		headers: { "Content-Type": type, "Cache-Control": `public, max-age=${WEEK}`, "X-Content-Type-Options": "nosniff" },
+		headers: { "Content-Type": type, "Cache-Control": `public, max-age=${MONTH}, stale-while-revalidate=${WEEK}`, "X-Content-Type-Options": "nosniff" },
 	});
 }
 

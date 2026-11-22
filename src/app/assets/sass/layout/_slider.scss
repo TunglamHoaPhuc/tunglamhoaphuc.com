@@ -147,6 +147,9 @@ START: Theme Slider CSS
 			opacity: 0;
 			visibility: hidden;
 			transform: translateY(20px);
+			// Opacity and transform only, which the compositor runs; visibility (out of reach of
+			// keyboards on the hidden frames) changes at once (PageSpeed 22/11/2026).
+			transition-property: opacity, transform;
 			transition-duration: 0.8s;
 		}
 	}
@@ -260,7 +263,9 @@ START: Theme Slider CSS
 	justify-content: space-between;
 	padding: 0 30px;
 	margin-top: 26px;
-	@include transition(all 0.5s);
+	// Not `all`: wow.js turns visibility on as it fades the arrows in, and a transition of
+	// visibility beside the fade is one the compositor cannot run.
+	transition: opacity 0.5s;
 	.slider-next,
 	.slider-prev {
 		width: 60px;
@@ -455,7 +460,22 @@ START: Theme Slider CSS
 		opacity: 0;
 		visibility: hidden;
 		transform: translateY(20px);
+		transition-property: opacity, transform;
 		transition-duration: 0.8s;
+	}
+	// The first frame's words are in the page as it arrives, not 1–1.5 s after the slider's
+	// script has started (on a slow phone the script comes seconds later). Swiper marks that
+	// frame active in the same step as it marks itself initialised, so nothing flickers.
+	.hero-slider:not(.swiper-initialized) .swiper-slide:first-child .slider-content {
+		.tlhp-hero-overline,
+		.slider-title,
+		.slider-desc,
+		.slider-btn {
+			opacity: 1;
+			visibility: visible;
+			transform: none;
+			transition: none;
+		}
 	}
 	.swiper-slide.swiper-slide-active .slider-content .tlhp-hero-overline {
 		opacity: 1;

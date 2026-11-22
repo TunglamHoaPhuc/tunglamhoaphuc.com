@@ -51,6 +51,10 @@ START: Services CSS
 		z-index: -1;
 		mix-blend-mode: difference;
 		pointer-events: none;
+		// The pictures carry their size (740 × 1180), so the box is held before they arrive.
+		img {
+			height: auto;
+		}
 		@media #{$sm, $xs} {
 			max-width: 260px;
 		}

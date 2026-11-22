@@ -67,11 +67,11 @@ test("every card picture of the list shows, here or on Cloudflare", async ({ pag
 });
 
 test.describe("/anh-goc/", () => {
-	test("serves the old admin's B2 pictures, cached for a week", async ({ request }) => {
+	test("serves the old admin's B2 pictures, cached for a month", async ({ request }) => {
 		const response = await request.get(`/anh-goc/s2-cnv03/${B2_KEY}`);
 		expect(response.status()).toBe(200);
 		expect(response.headers()["content-type"]).toMatch(/^image\//);
-		expect(response.headers()["cache-control"]).toContain("max-age=604800");
+		expect(response.headers()["cache-control"]).toContain("max-age=2592000");
 	});
 
 	test("reads no other bucket and nothing that is not a picture", async ({ request }) => {
