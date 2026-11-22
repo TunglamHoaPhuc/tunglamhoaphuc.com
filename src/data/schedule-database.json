@@ -1,0 +1,526 @@
+{
+  "featuredPrograms": [
+    {
+      "id": "p1",
+      "title": "ĐẠI SÁM HỐI ",
+      "schedule": "19h00 ",
+      "summary": "Thời khóa sám hối trang nghiêm vào ngày 14 và cuối tháng âm lịch, nuôi dưỡng tâm bồ đề và huân tu công đức lành",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/dai-tieu-sam-hoi-va-thuong-ky.webp",
+      "subtitle": "Khóa lễ",
+      "time": "19h00 ",
+      "duration": "90 phút ",
+      "location": "Tùng lâm Hòa Phúc"
+    },
+    {
+      "id": "p2",
+      "title": "TIỂU SÁM HỐI",
+      "schedule": "19h00",
+      "summary": "Thời khóa tụng kinh sám hối vào ngày mùng 8 và 23 âm lịch, gột rửa thân tâm và tịnh hóa nghiệp chướng.",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/dai-tieu-sam-hoi-va-thuong-ky.webp",
+      "subtitle": "Khóa lễ",
+      "time": "19h00",
+      "duration": "90 phút ",
+      "location": "Tùng lâm Hòa Phúc"
+    },
+    {
+      "id": "p3",
+      "title": "CẦU QUỐC THÁI DÂN AN ",
+      "schedule": "08h00",
+      "summary": "Khóa lễ tụng kinh cầu an vào sáng mùng 1 và ngày rằm 15 âm lịch, cầu nguyện quốc thái dân an, cầu siêu chư Hương linh. ",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Cau-an-quoc-thai-dan-thuong-ky.webp",
+      "subtitle": "Khóa lễ",
+      "time": "08h00",
+      "duration": "90 phút ",
+      "location": "Tùng lâm Hòa Phúc"
+    }
+  ],
+  "monthThemes": {
+    "0": {
+      "month": 1,
+      "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-01-duc-ban-su-thanh-dao.webp",
+      "title": "Đức Bản Sư Thành Đạo",
+      "quoteLines": [
+        "<b>Hạnh phúc</b> là khi bạn<b> biết nhận diện sự có mặt</b> của niềm vui và nỗi buồn."
+      ],
+      "author": "Vô Trí - Tâm Hòa",
+      "primaryColor": "#8B3A1C",
+      "secondaryColor": "#F2C14E",
+      "themeBg": "#2A170F",
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-01-quy-y-tam-bao.png"
+    },
+    "1": {
+      "month": 2,
+      "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-02-nghinh-xuan-di-lac.webp",
+      "title": "Nghinh Xuân Di Lặc",
+      "quoteLines": [
+        "<b>Xuân về</b>",
+        "Nam mô Từ phụ Thích Ca",
+        "Xuân về khắp chốn, nhà nhà hân hoan.",
+        "Giữ lòng nếp sống thanh nhàn",
+        "<b>Hộ trì Tam bảo, xây nhà Tăng thân.</b>",
+        "Trẻ già, nam nữ xa gần",
+        "<b>Quy y hướng đạo,</b> chuyển dần mê tâm.",
+        "Chắp tay khấn nguyện âm thầm",
+        "Dân giàu, nước thịnh, thái bình thiên thu."
+      ],
+      "author": "Vô Trí - Tâm Hòa",
+      "primaryColor": "#1E4B3E",
+      "secondaryColor": "#FFDE59",
+      "themeBg": "#122620",
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-02-tu-hoc-phat-phap.jpg"
+    },
+    "2": {
+      "month": 3,
+      "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-03-huong-sen-tay-bac.webp",
+      "title": "Hương Sen Tây Bắc",
+      "quoteLines": [
+        "<b>Thử thách tạo nên sức mạnh</b>",
+        "Mỗi thử thách trong cuộc đời đều mang đến những kinh nghiệm thú vị. Người biết <b>chấp nhận</b> thử thách, <b>tìm cách</b> thích ứng và biến thử thách <b>thành động lực</b> mới là người có sức chịu đựng kiên cường."
+      ],
+      "author": "Vô Trí - Tâm Hòa",
+      "primaryColor": "#6B2D5C",
+      "secondaryColor": "#FFE5A3",
+      "themeBg": "#261121",
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-03-dung-bo-cuoc.jpg"
+    },
+    "3": {
+      "month": 4,
+      "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-04-huong-ve-coi-nguon.webp",
+      "title": "Hướng Về Cội Nguồn",
+      "quoteLines": [
+        "<b>Nắng xưa... trở về</b>",
+        "Rồi một ngày bầu trời xanh hửng nắng",
+        "Ai trở về trong manh áo bùn nâu",
+        "Tìm dư hương nơi góc nhỏ năm nào",
+        "Chờ được gọi “Con ơi” trong ký ức.",
+        "",
+        "Rồi một ngày hiên xưa chiều nhạt nắng",
+        "Ai trở về trong hoang lạnh cô liêu",
+        "Tìm gì đây bên khói bếp đìu hiu",
+        "Chờ được thấy “dáng Thầy” trong tiềm thức."
+      ],
+      "author": "Vô Trí - Tâm Hòa",
+      "primaryColor": "#B45309",
+      "secondaryColor": "#F2C14E",
+      "themeBg": "#2E1A08",
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-04-tich-cuc-nang-cao.jpg"
+    },
+    "4": {
+      "month": 5,
+      "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-05-phat-dan.webp",
+      "title": "Phật Đản",
+      "quoteLines": [
+        "<b>Phật về</b>",
+        "Phật về nắng đẹp hoan ca",
+        "Phật về già trẻ gần xa tưng bừng",
+        "Phật về sen nở thơm lừng",
+        "Phật về gió mát trong từng lá hoa.",
+        "Phật về mang đến vị tha",
+        "Phật về kết nối giữa ta và người",
+        "Phật về rạng rỡ nụ cười",
+        "Phật về tâm đạo thảnh thơi cõi lòng."
+      ],
+      "author": "Vô Trí - Tâm Hòa",
+      "primaryColor": "#854D0E",
+      "secondaryColor": "#FFDE59",
+      "themeBg": "#261504",
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-05-tu-tap-khiem-ha.jpg"
+    },
+    "5": {
+      "month": 6,
+      "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-06-uom-mam-sen-viet.webp",
+      "title": "Ươm Mầm Sen Việt",
+      "quoteLines": [
+        "<b>Tuổi trẻ đến chùa</b>",
+        "Vui thay tuổi trẻ đến chùa",
+        "Học theo hạnh Phật hơn thua mặc người",
+        "<b>Uy nghi, lễ phép, tươi cười</b>",
+        "Búp sen dâng tặng cho đời bình an."
+      ],
+      "author": "Vô Trí - Tâm Hòa",
+      "primaryColor": "#0F5132",
+      "secondaryColor": "#FFE5A3",
+      "themeBg": "#082115",
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-06-tinh-thuong-phung-su.jpg"
+    },
+    "6": {
+      "month": 7,
+      "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-07-den-on-dap-nghia.webp",
+      "title": "Đền Ơn Đáp Nghĩa",
+      "quoteLines": [
+        "Sống cho riêng mình là người chật hẹp.",
+        "<b>Sống cho muôn người</b> thì <b>rộng lớn</b> thênh thang."
+      ],
+      "author": "Vô Trí - Tâm Hòa",
+      "primaryColor": "#991B1B",
+      "secondaryColor": "#FFDE59",
+      "themeBg": "#2A0A0A",
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-07-biet-minh-biet-ta.jpg"
+    },
+    "7": {
+      "month": 8,
+      "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-08-hieu-hanh-dap-den.webp",
+      "title": "",
+      "quoteLines": [
+        "Không một tác phẩm nào đẹp và thiêng liêng bằng sự hiện hữu của <b>cha và mẹ</b>. Đó là <b>tượng đài</b> của tình thương và sự hy sinh bất tử."
+      ],
+      "author": "Vô Trí - Tâm Hòa",
+      "primaryColor": "#7C2D12",
+      "secondaryColor": "#F2C14E",
+      "themeBg": "#240E06",
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-08-ve-ben-thay.jpg"
+    },
+    "8": {
+      "month": 9,
+      "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-09-thanh-nguyet-huong-thu.webp",
+      "title": "Thanh Nguyệt Hương Thu",
+      "quoteLines": [
+        "Này bạn, dù bên ngoài bão giông nhưng đừng đánh mất <b>sự bình an</b> bên trong. Chất liệu vững chãi được tạo ra từ nội tâm an lạc sẽ không bao giờ mất nếu bạn biết an trú vào đoàn thể đẹp của <b>Tăng thân</b>."
+      ],
+      "author": "Vô Trí - Tâm Hòa",
+      "primaryColor": "#1E3A8A",
+      "secondaryColor": "#FFDE59",
+      "themeBg": "#0B1533",
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-09-nhan-moi-la-suc-manh.jpg"
+    },
+    "9": {
+      "month": 10,
+      "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-10-hanh-nguyen-quan-am.webp",
+      "title": "Học hạnh buông xả",
+      "quoteLines": [
+        "Học hạnh <b>buông xả</b> là học cách mở rộng dung lượng trái tim, để bao dung những điều chưa trọn vẹn và <b>mỉm cười</b> trước mọi đổi thay."
+      ],
+      "author": "Vô Trí - Tâm Hòa",
+      "primaryColor": "#8B3A1C",
+      "secondaryColor": "#F2C14E",
+      "themeBg": "#2A170F",
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-10-tim-ve-yen-lang.jpg"
+    },
+    "10": {
+      "month": 11,
+      "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-11-an-duc-to-thay.webp",
+      "title": "Hoằng Pháp - Kiến An mãi nhớ Thầy",
+      "quoteLines": [
+        "<b>Hoằng Pháp - Kiến An</b> mãi nhớ Thầy",
+        "<b>Hải Phòng - Phổ Chiếu</b> vẫn còn đây",
+        "Người đi năm tháng chưa phai dấu",
+        "Chánh pháp hoằng truyền khắp Đông Tây",
+        "<b>Đất Bắc</b> mở mang dòng bất tử",
+        "<b>Trời Nam</b> kết tụ giới hương bay",
+        "Dáng xưa vững chãi như tùng bách",
+        "Cháu con tiếp bước đẹp tháng ngày."
+      ],
+      "author": "Vô Trí - Tâm Hòa",
+      "primaryColor": "#9A3412",
+      "secondaryColor": "#F2C14E",
+      "themeBg": "#2B0F05",
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-11-ve-ben-thay.jpg"
+    },
+    "11": {
+      "month": 12,
+      "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-12-via-phat-di-da.webp",
+      "title": "Vía Phật Di Đà",
+      "quoteLines": [
+        "<b>Hoa sen cần bùn</b> để sống. Bạn cũng cần <b>chất liệu khổ đau</b> để vững chãi vươn lên."
+      ],
+      "author": "Vô Trí - Tâm Hòa",
+      "primaryColor": "#78350F",
+      "secondaryColor": "#FFDE59",
+      "themeBg": "#210E04",
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-12-kho-dau-la-chat-lieu.jpg"
+    }
+  },
+  "customEvents": [
+    {
+      "id": "evt-1791697379651",
+      "slug": "phap-hoi-niem-phat-04102026",
+      "solarDateStr": "04.10.2026",
+      "title": "PHÁP HỘI NIỆM PHẬT",
+      "subtitle": "Cộng tu ",
+      "category": "Khóa Lễ Truyền Thống",
+      "timeSlot1Label": "Cả ngày",
+      "timeSlot1Time": "Đến 17h00",
+      "location": "Tùng lâm Hòa Phúc",
+      "description": "Học Pháp, hành Pháp, thọ Bồ Đề Tâm giới. ",
+      "notes": "Giữ tam nghiệp thanh tịnh. ",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp",
+      "videoUrl": "https://www.youtube.com/watch?v=_amloxxse2c&list=PL2aRqXTU1nn5CAIwWSXL_ukqUGo9C-GTp&index=12"
+    },
+    {
+      "id": "evt-1791697201542",
+      "slug": "phap-hoi-niem-phat-03102026",
+      "solarDateStr": "03.10.2026",
+      "title": "PHÁP HỘI NIỆM PHẬT",
+      "subtitle": "Cộng tu ",
+      "category": "Khóa Lễ Truyền Thống",
+      "timeSlot1Label": "Buổi Sáng",
+      "timeSlot1Time": "08h00 ",
+      "location": "Tùng lâm Hòa Phúc",
+      "description": "Truyền thụ Thâp Thiện Giới, thọ Pháp Y, huân tu niệm Phật trong 2 ngày. ",
+      "notes": "Phật tử vân tập trước 07h30, y phục áo tràng lam trang nghiêm, ăn chay và giữ tâm thanh tịnh.",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp",
+      "videoUrl": "https://www.youtube.com/watch?v=_amloxxse2c&list=PL2aRqXTU1nn5CAIwWSXL_ukqUGo9C-GTp&index=12"
+    },
+    {
+      "id": "e-2026-10-23",
+      "solarDateStr": "23.10.2026",
+      "title": "HUYẾT BỒN TRAI ",
+      "subtitle": "Pháp hội (Khai đàn)",
+      "category": "Cộng Tu",
+      "timeSlot1Label": "Khai Đàn Pháp Hội",
+      "timeSlot1Time": "19h00 ",
+      "location": "Tùng Lâm Hòa Phúc",
+      "description": "Khai đàn Pháp Hội Huyết Bồn Trai - Cầu Siêu Hương Linh Thai Nhi Sản Nạn, Mẫu Nạn.",
+      "notes": "Quý Phật tử về chùa trang phục trang nghiêm áo lam hoặc áo tràng thanh tịnh.",
+      "slug": "phap-hoi-huyet-bon-trai-cau-sieu-thai-nhi-mau-nan-2026",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/phap-hoi-huyet-bon-trai-1791672108495.webp",
+      "timeSlot2Time": "90 phút"
+    },
+    {
+      "id": "e-2026-10-24",
+      "solarDateStr": "24.10.2026",
+      "title": " HUYẾT BỒN TRAI",
+      "subtitle": "Pháp hội ",
+      "category": "Cộng Tu",
+      "timeSlot1Label": "",
+      "timeSlot1Time": "",
+      "timeSlot2Label": "Thời Khóa Chiều",
+      "timeSlot2Time": "Cả ngày ",
+      "location": "Tùng Lâm Hòa Phúc",
+      "description": "Tiếp tục ngày thứ 2 Pháp Hội Huyết Bồn Trai, trì tụng kinh chú, sám hối tam nghiệp, phát Bồ Đề tâm và cúng thí thực cầu siêu. ",
+      "notes": "Chí tâm tụng niệm và cầu nguyện chư hương linh siêu sanh Tịnh Độ.",
+      "slug": "phap-hoi-huyet-bon-trai-ngay-thu-2",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/phap-hoi-huyet-bon-trai-1791672108495.webp"
+    },
+    {
+      "id": "e-2026-10-25-1",
+      "solarDateStr": "25.10.2026",
+      "title": "QUY Y TAM BẢO",
+      "subtitle": "Đại lễ ",
+      "category": "Đại Lễ Sự Kiện",
+      "timeSlot1Label": "Lễ Quy Y",
+      "timeSlot1Time": "08h00 ",
+      "location": "Tùng Lâm Hòa Phúc",
+      "description": "Lễ truyền thọ Tam Quy Ngũ Giới cho quý thiện nam tín nữ phát tâm nương tựa Ba Ngôi Báu. ",
+      "notes": "Phật tử đăng ký quy y có mặt trước 30 phút, chuẩn bị áo tràng lam và cổ tràng.",
+      "slug": "le-quy-y-tam-bao-thang-9-binh-ngo",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/dai-le-quy-y-tam-bao-1791689554247.webp",
+      "videoUrl": "https://www.youtube.com/watch?v=6XnSoXey85g&list=PL2aRqXTU1nn5CAIwWSXL_ukqUGo9C-GTp"
+    },
+    {
+      "id": "e-2026-10-25-2",
+      "solarDateStr": "25.10.2026",
+      "title": "THẮP NẾN CẦU SIÊU",
+      "subtitle": "Khóa lễ Đại sám hối",
+      "category": "Cộng Tu",
+      "timeSlot1Label": "Thắp Nến Cầu Siêu",
+      "timeSlot1Time": "19h00 ",
+      "location": "Tùng Lâm Hòa Phúc",
+      "description": "Lễ thắp nến cầu siêu thai nhi, mẫu nạn và tạ đàn Pháp Hội Huyết Bồn Trai.",
+      "notes": "Tùy tâm thỉnh nến tại chùa. ",
+      "slug": "le-thap-nen-cau-sieu-thai-nhi-mau-nan-2026",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/thap-nen-tri-an-1791700201778.webp",
+      "imgPositionY": 69
+    },
+    {
+      "id": "e-2026-10-28",
+      "solarDateStr": "28.10.2026",
+      "title": "NGŨ BÁCH DANH",
+      "subtitle": "Cộng tu ",
+      "category": "Cộng Tu",
+      "timeSlot1Label": "Cả ngày ",
+      "timeSlot1Time": "08h00 - 17h00",
+      "location": "Tùng Lâm Hòa Phúc",
+      "description": "Khánh nhật Đức Bồ Tát Quán Thế Âm Xuất Gia lạy 500 lạy.",
+      "notes": "Có thể dùng cơm tại chùa. ",
+      "slug": "cong-tu-ngu-bach-danh-via-quan-am-xuat-gia-2026",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-10-hanh-nguyen-quan-am.webp",
+      "imgPositionY": 21
+    },
+    {
+      "id": "e-2026-11-07",
+      "solarDateStr": "07.11.2026",
+      "title": "PHÁP HỘI NIỆM PHẬT",
+      "subtitle": "Cộng tu",
+      "category": "Cộng Tu",
+      "timeSlot1Label": "Khai khóa",
+      "timeSlot1Time": "07h30 ",
+      "location": "Tùng Lâm Hòa Phúc",
+      "description": "Truyền thụ Thâp Thiện Giới, thọ Pháp Y, huân tu niệm Phật trong 2 ngày.",
+      "notes": "Phật tử vân tập trước 08h00, y phục áo tràng lam trang nghiêm và giữ tâm thanh tịnh. ",
+      "slug": "phap-hoi-niem-phat-thang-9-binh-ngo-2026",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp"
+    },
+    {
+      "id": "e-2026-11-08",
+      "solarDateStr": "08.11.2026",
+      "title": "PHÁP HỘI NIỆM PHẬT",
+      "subtitle": "Cộng tu",
+      "category": "Cộng Tu",
+      "timeSlot1Label": "Cả ngày",
+      "timeSlot1Time": "Đến 17h00",
+      "location": "Tùng Lâm Hòa Phúc",
+      "description": "Học Pháp, hành Pháp, thọ Bồ Đề Tâm giới.",
+      "notes": "Giữ tam nghiệp thanh tịnh.",
+      "slug": "phap-hoi-niem-phat-thang-9-binh-ngo-ngay-2",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp",
+      "videoUrl": "https://www.youtube.com/watch?v=_amloxxse2c&list=PL2aRqXTU1nn5CAIwWSXL_ukqUGo9C-GTp&index=12"
+    },
+    {
+      "id": "e-2026-11-09",
+      "solarDateStr": "09.11.2026",
+      "title": "LƯƠNG HOÀNG SÁM",
+      "subtitle": "Pháp hội (Khai Đàn)",
+      "category": "Cộng Tu",
+      "timeSlot1Label": "Tụng kinh",
+      "timeSlot1Time": "08h00 và 14h00 ",
+      "location": "Tùng Lâm Hòa Phúc",
+      "description": "Pháp Hội Lương Hoàng Sám và Cộng tu Xuất Gia Gieo Duyên - Báo Hiếu Tổ Tiên hướng về ngày Giỗ Tổ Khai Sơn Tông Phong Hoằng Pháp Ngộ Chân Tử. ",
+      "notes": "Chuỗi đại lễ 10 ngày trang nghiêm thanh tịnh gieo duyên xuất gia và sám hối nghiệp chướng.",
+      "slug": "phap-hoi-luong-hoang-sam-gieo-duyen-xuat-gia-2026",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-11-an-duc-to-thay.webp",
+      "imgPositionY": 33,
+      "isMultiDay": true,
+      "endDateStr": "18.11.2026",
+      "continueChanting": false
+    },
+    {
+      "id": "e-2026-11-18",
+      "solarDateStr": "18.11.2026",
+      "title": "LƯƠNG HOÀNG SÁM",
+      "subtitle": "Pháp Hội (Tạ đàn - kết khóa)",
+      "category": "Cộng Tu",
+      "timeSlot1Label": "Thời gian ",
+      "timeSlot1Time": "14h00 - 16h00",
+      "location": "Tùng Lâm Hòa Phúc",
+      "description": "Hoàn mãn 10 ngày Pháp Hội Lương Hoàng Sám và cộng tu  Xuất Gia Gieo Duyên - Báo Hiếu Tổ Tiên ",
+      "notes": "Hồi hướng công đức cầu nguyện cửu huyền thất tổ siêu thăng.",
+      "slug": "ta-dan-phap-hoi-luong-hoang-sam-2026",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-11-an-duc-to-thay.webp",
+      "imgPositionY": 26,
+      "isMultiDay": true,
+      "endDateStr": "18.11.2026"
+    },
+    {
+      "id": "e-2026-11-19",
+      "solarDateStr": "19.11.2026",
+      "title": "LỄ TIÊN THƯỜNG",
+      "subtitle": "Cúng dường Trai Tăng ",
+      "category": "Đại Lễ Sự Kiện",
+      "timeSlot1Label": "Thời gian",
+      "timeSlot1Time": "07h30 - 12h00",
+      "location": "Tùng Lâm Hòa Phúc",
+      "description": "Lễ Tiên Thường - Pháp Hội Cúng Dường Tăng Bảo.",
+      "notes": "Gieo trồng ruộng phước cúng dường chư tôn đức Tăng Ni.",
+      "slug": "le-tien-thuong-phap-hoi-cung-duong-tang-bao-2026",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-11-an-duc-to-thay.webp",
+      "imgPositionY": 21,
+      "videoUrl": "https://www.youtube.com/watch?v=KyrkOTrOUbE&t=14s"
+    },
+    {
+      "id": "e-2026-11-20",
+      "solarDateStr": "20.11.2026",
+      "title": "LÃO TỔ SƯ NGỘ CHÂN TỬ",
+      "subtitle": "Lễ Tưởng niệm ",
+      "category": "Đại Lễ Sự Kiện",
+      "timeSlot1Label": "Thời gian",
+      "timeSlot1Time": "07h30 - 12h00",
+      "location": "Tùng Lâm Hòa Phúc",
+      "description": "Lễ Tưởng niệm Tổ Khai Sơn Tông Phong Hoàng Pháp - Hiệp Kỵ Lịch Đại Tổ Sư - Cầu Siêu Bách Tính Chư Hương Linh",
+      "notes": "Dùng cơm chay thân mật. ",
+      "slug": "le-chinh-ky-gio-to-khai-son-tong-phong-hoang-phap-2026",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-11-an-duc-to-thay.webp",
+      "imgPositionY": 21,
+      "videoUrl": "https://www.youtube.com/watch?v=K3i2cMRzKuU"
+    },
+    {
+      "id": "e-2026-12-05",
+      "solarDateStr": "05.12.2026",
+      "title": "PHÁP HỘI NIỆM PHẬT",
+      "subtitle": "Tháng 10 Bính Ngọ (Ngày 1 - 27/10 ÂL)",
+      "category": "Cộng Tu",
+      "timeSlot1Label": "Thời Khóa Sáng",
+      "timeSlot1Time": "07h30 SÁNG",
+      "location": "Đại Giảng Đường Tùng Lâm Hòa Phúc",
+      "description": "Cộng Tu Pháp Hội Niệm Phật (Từ 07h30 thứ Bảy ngày 05/12 - 16h00 Chủ nhật ngày 06/12/2026, nhằm ngày 27 - 28/10/Bính Ngọ). Đến chùa tham dự.",
+      "notes": "Thọ Bát Quan Trai và niệm Phật kinh hành.",
+      "slug": "cong-tu-phap-hoi-niem-phat-thang-10-binh-ngo-2026",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp"
+    },
+    {
+      "id": "e-2026-12-06",
+      "solarDateStr": "06.12.2026",
+      "title": "PHÁP HỘI NIỆM PHẬT",
+      "subtitle": "Tháng 10 Bính Ngọ (Ngày 2 - Hoàn Mãn 28/10 ÂL)",
+      "category": "Cộng Tu",
+      "timeSlot1Label": "Hoàn Mãn",
+      "timeSlot1Time": "Đến 16h00 CHIỀU",
+      "location": "Đại Giảng Đường Tùng Lâm Hòa Phúc",
+      "description": "Ngày thứ 2 thời khóa Niệm Phật và hoàn mãn xả giới.",
+      "slug": "cong-tu-phap-hoi-niem-phat-thang-10-binh-ngo-ngay-2",
+      "imgUrl": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp"
+    }
+  ],
+  "quoteGallery": [
+    {
+      "id": "quote-1",
+      "url": "/images/lich-tu-hoc/quotes/thang-01-quy-y-tam-bao.png",
+      "title": "Quy y Tam Bảo - Nguồn cội tâm linh"
+    },
+    {
+      "id": "quote-2",
+      "url": "/images/lich-tu-hoc/quotes/thang-02-tu-hoc-phat-phap.jpg",
+      "title": "Tu học Phật Pháp - Lòng biết ơn"
+    },
+    {
+      "id": "quote-3",
+      "url": "/images/lich-tu-hoc/quotes/thang-03-dung-bo-cuoc.jpg",
+      "title": "Đừng bỏ cuộc - Thử thách tạo sức mạnh"
+    },
+    {
+      "id": "quote-4",
+      "url": "/images/lich-tu-hoc/quotes/thang-04-tich-cuc-nang-cao.jpg",
+      "title": "Tích cực nâng cao - Trở về cội nguồn"
+    },
+    {
+      "id": "quote-5",
+      "url": "/images/lich-tu-hoc/quotes/thang-05-tu-tap-khiem-ha.jpg",
+      "title": "Tu tập khiêm hạ - Phật về nắng đẹp"
+    },
+    {
+      "id": "quote-6",
+      "url": "/images/lich-tu-hoc/quotes/thang-06-tinh-thuong-phung-su.jpg",
+      "title": "Tình thương phụng sự - Ươm mầm sen Việt"
+    },
+    {
+      "id": "quote-7",
+      "url": "/images/lich-tu-hoc/quotes/thang-07-biet-minh-biet-ta.jpg",
+      "title": "Biết mình biết ta - Đền ơn đáp nghĩa"
+    },
+    {
+      "id": "quote-8",
+      "url": "/images/lich-tu-hoc/quotes/thang-08-ve-ben-thay.jpg",
+      "title": "Về bên Thầy tìm thấy bình an"
+    },
+    {
+      "id": "quote-9",
+      "url": "/images/lich-tu-hoc/quotes/thang-09-nhan-moi-la-suc-manh.jpg",
+      "title": "Nhẫn mới là sức mạnh"
+    },
+    {
+      "id": "quote-10",
+      "url": "/images/lich-tu-hoc/quotes/thang-10-tim-ve-yen-lang.jpg",
+      "title": "Tìm về yên lặng - Học hạnh buông xả"
+    },
+    {
+      "id": "quote-11",
+      "url": "/images/lich-tu-hoc/quotes/thang-11-ve-ben-thay.jpg",
+      "title": "Ân đức Tổ Thầy - Hoằng Pháp Kiến An"
+    },
+    {
+      "id": "quote-12",
+      "url": "/images/lich-tu-hoc/quotes/thang-12-kho-dau-la-chat-lieu.jpg",
+      "title": "Khổ đau là chất liệu"
+    }
+  ]
+}

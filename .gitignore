@@ -1,0 +1,135 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# =========================
+# Dependencies
+# =========================
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# =========================
+# Testing
+# =========================
+/coverage
+
+# =========================
+# Next.js
+# =========================
+/.next/
+/out/
+
+# =========================
+# Production
+# =========================
+/build
+
+# =========================
+# Misc
+# =========================
+.DS_Store
+*.pem
+
+# =========================
+# Logs
+# =========================
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# Environment Variables
+# =========================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env*
+
+# =========================
+# Vercel
+# =========================
+.vercel
+
+# =========================
+# TypeScript
+# =========================
+*.tsbuildinfo
+next-env.d.ts
+
+# =========================
+# Prisma Generated Client
+# =========================
+/src/generated/prisma
+
+# =========================
+# Large Binary & Asset Files (keep out of Git)
+# =========================
+*.ai
+*.tmp
+*.psd
+*.xlsx
+*.pdf
+*.docx
+*.exe
+*.zip
+*.dmg
+*.pkg
+
+# =========================
+# S3 / Cloud Config Secrets
+# =========================
+s3_keys.json
+rclone.conf
+*.rclone*
+scripts/s3/migrate_s2_to_new_bucket.mjs
+scripts/s3/sync_uploads_folder.mjs
+scripts/s3/*.mjs
+
+# =========================
+# Scratch, Temp AI/Dev Files
+# =========================
+scratch/
+drive_download/
+generated/
+code_export.txt
+danh_sach_file_anh.txt
+
+# AI Transcript & Temp Files (auto-generated, no value in Git)
+*transcript*.txt
+*transcript*.jsonl
+*_tail.txt
+*_tail.jsonl
+temp_*.txt
+temp_*.jsonl
+recent_*.txt
+.gemini_transcript_tail.txt
+
+# =========================
+# Local Scripts & Tools
+# =========================
+*.bat
+Ket_Noi_S3_Hoa_Phuc.bat
+
+# =========================
+# Config Directories (local only)
+# =========================
+.gemini/
+.agents/
+# Database backup files (keep out of Git)
+*.bak
+*.bak_*
+*.backup.json
+src/data/backups/
+
+# Cloudflare / vinext
+.cloudflare/
+/dist/
+/data/snapshot/
+.dev.vars*

@@ -1,0 +1,358 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* 1. UTM Niagara (Tiêu đề lớn phát sáng chữ vàng) */
+@font-face {
+  font-family: 'UTM Niagara';
+  src: url('/fonts/UTMNiagara.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 2. UTM ClassizismAntiqua (Phụ đề, slogan, tiêu đề bài viết) */
+@font-face {
+  font-family: 'UTM ClassizismAntiqua';
+  src: url('/fonts/UTMClassizismAntiqua.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 3. UTM Avo Regular */
+@font-face {
+  font-family: 'UTM Avo';
+  src: url('/fonts/UTMAvo.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'UTM_Avo';
+  src: url('/fonts/UTMAvo.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 4. UTM Avo Bold */
+@font-face {
+  font-family: 'UTM Avo';
+  src: url('/fonts/UTMAvoBold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'UTM_Avo';
+  src: url('/fonts/UTMAvoBold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 5. UTM Avo Italic */
+@font-face {
+  font-family: 'UTM Avo';
+  src: url('/fonts/UTMAvoItalic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'UTM_Avo';
+  src: url('/fonts/UTMAvoItalic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* 6. UTM Avo Bold Italic */
+@font-face {
+  font-family: 'UTM Avo';
+  src: url('/fonts/UTMAvoBoldItalic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'UTM_Avo';
+  src: url('/fonts/UTMAvoBoldItalic.ttf') format('truetype');
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+}
+
+
+/* 🪷 Bắt buộc mọi phần tử trong khung soạn thảo Editor luôn dùng chuẩn font Montserrat/UTM Avo, cùng cỡ chữ, màu vàng kim & căn thẳng lề trái */
+.wysiwyg-docs-content {
+  font-family: var(--font-montserrat), 'UTM Avo', 'Montserrat', sans-serif !important;
+  font-size: 1.125rem !important;
+  line-height: 2.2rem !important;
+  color: #FFE5A3 !important;
+  text-align: left !important;
+}
+
+.wysiwyg-docs-content,
+.wysiwyg-docs-content * {
+  font-family: var(--font-montserrat), 'UTM Avo', 'Montserrat', sans-serif !important;
+}
+
+.wysiwyg-docs-content h1,
+.wysiwyg-docs-content h2,
+.wysiwyg-docs-content h3 {
+  font-family: 'UTM Niagara', var(--font-playfair), 'Playfair Display', serif !important;
+  font-weight: 700 !important;
+  color: #FFDE59 !important;
+}
+
+.wysiwyg-docs-content h4 {
+  font-family: var(--font-montserrat), 'UTM Avo', 'Montserrat', sans-serif !important;
+  font-weight: 600 !important;
+  color: #FFE5A3 !important;
+}
+
+.wysiwyg-docs-content p,
+.wysiwyg-docs-content div {
+  font-size: 1.125rem !important;
+  line-height: 2.2rem !important;
+  color: #FFE5A3 !important;
+  text-align: left !important;
+  margin-top: 0 !important;
+  margin-bottom: 1.25rem !important;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+  text-indent: 0 !important;
+}
+
+.wysiwyg-docs-content p:last-child {
+  margin-bottom: 0 !important;
+}
+
+.wysiwyg-docs-content b,
+.wysiwyg-docs-content strong {
+  font-weight: bold !important;
+  color: #FFE5A3 !important;
+}
+
+.wysiwyg-docs-content i,
+.wysiwyg-docs-content em {
+  font-style: italic !important;
+}
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-serif: 'Noto Serif', 'Playfair Display', Georgia, serif;
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-sans);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+:root {
+  /* Ép màu nền mặc định của biến --background thành màu nâu gỗ #2c1c11 */
+  --background: #2c1c11;
+  --foreground: #e3d2c1;
+  --card: #2c1c11;
+  --card-foreground: #e3d2c1;
+  --popover: #2c1c11;
+  --popover-foreground: #e3d2c1;
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.556 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.922 0 0);
+  --input: oklch(0.922 0 0);
+  --ring: oklch(0.708 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --radius: 0.625rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: #2c1c11;
+  --foreground: #e3d2c1;
+  --card: #2c1c11;
+  --card-foreground: #e3d2c1;
+  --popover: #2c1c11;
+  --popover-foreground: #e3d2c1;
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.87 0 0);
+  --chart-2: oklch(0.556 0 0);
+  --chart-3: oklch(0.439 0 0);
+  --chart-4: oklch(0.371 0 0);
+  --chart-5: oklch(0.269 0 0);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  
+  /* Cấu hình triệt tiêu màu trắng mặc định của trình duyệt */
+  html,
+  body {
+    background-color: #2c1c11 !important;
+    color: #e3d2c1;
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    @apply font-sans;
+  }
+}
+
+/* Ẩn thanh cuộn cho slider/carousel */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE và Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* 🪷 Styling Trình Soạn Thảo Google Docs WYSIWYG */
+.wysiwyg-docs-content:focus {
+  outline: none;
+}
+.wysiwyg-docs-content h3 {
+  font-size: 1.5rem !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  color: #FFDE59 !important;
+  margin-top: 1.25rem !important;
+  margin-bottom: 0.75rem !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1.3 !important;
+  text-shadow: 0 2px 10px rgba(255, 222, 89, 0.25) !important;
+}
+.wysiwyg-docs-content h4 {
+  font-size: 1.15rem !important;
+  font-weight: 600 !important;
+  font-style: italic !important;
+  color: #FFE5A3 !important;
+  margin-top: 1rem !important;
+  margin-bottom: 0.5rem !important;
+  line-height: 1.4 !important;
+}
+.wysiwyg-docs-content b,
+.wysiwyg-docs-content strong {
+  font-weight: 700 !important;
+  color: #FFFFFF !important;
+  text-decoration: underline !important;
+  text-decoration-style: dotted !important;
+  text-decoration-color: #F2C14E !important;
+  text-underline-offset: 4px !important;
+}
+.wysiwyg-docs-content i,
+.wysiwyg-docs-content em {
+  font-style: italic !important;
+  color: #FFE5A3 !important;
+}
+.wysiwyg-docs-content u {
+  text-decoration: underline !important;
+  text-decoration-color: #F2C14E !important;
+  text-underline-offset: 3px !important;
+}
+.wysiwyg-docs-content blockquote {
+  border-left: 3px solid #F2C14E !important;
+  padding-left: 1rem !important;
+  margin: 1rem 0 !important;
+  font-style: italic !important;
+  color: #FFE5A3 !important;
+  font-weight: 600 !important;
+  background: rgba(242, 193, 78, 0.05) !important;
+  padding-top: 0.25rem !important;
+  padding-bottom: 0.25rem !important;
+  border-radius: 0 0.5rem 0.5rem 0 !important;
+}
+.wysiwyg-docs-content hr {
+  border: 0 !important;
+  border-top: 1px solid rgba(242, 193, 78, 0.4) !important;
+  margin: 1.5rem 0 !important;
+}
+
+/* Native <dialog> modal scroll containment & backdrop styling */
+dialog:modal {
+  overscroll-behavior: contain;
+}
+dialog::backdrop {
+  overflow: hidden;
+  overscroll-behavior: contain;
+  background-color: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(4px);
+}

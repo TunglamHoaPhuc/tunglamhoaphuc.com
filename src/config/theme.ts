@@ -1,0 +1,17 @@
+export const C = {
+  primary: "#4A3728",
+  dark: "#2A1D14",
+  secondary: "#6B5238",
+  accent: "#F2C14E",
+  accentDeep: "#E8A94C",
+  bg: "#3A2D20",
+  surface: "#8B6F47",
+  paper: "#F3EEE2",
+  border: "rgba(212,169,74,0.35)",
+  cream: "#F0E4C8",
+  muted: "#C9B896",
+  dotRed: "#8B1E1E",
+  dotPurple: "#5C2D91",
+  dotGreen: "#2E7D32",
+  dotPink: "#D6337B",
+} as const;
