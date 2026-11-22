@@ -101,3 +101,45 @@ describe("B14: plainText keeps a < that is not a tag", () => {
 		expect(post).toMatchObject({ title: "Tuổi < 18 được miễn phí", summary: "Dưới 18 tuổi: < 18", slug: "tuoi-18-duoc-mien-phi" });
 	});
 });
+
+describe("B4: the video of a Tông Chỉ article", () => {
+	const OLD = "dQw4w9WgXcQ";
+	const NEW = "MKt_sLwxmNU";
+
+	async function withVideo() {
+		const w = await contentWorld();
+		const editor = await w.as("editor@example.test");
+		const saved = await editor.call("PATCH", "teachings/tc-1", { version: 1, video: { id: OLD, url: `https://www.youtube.com/watch?v=${OLD}`, title: "Khóa lễ", description: "" } });
+		expect(saved.status, JSON.stringify(saved.json)).toBe(200);
+		return { w, editor, version: saved.data.version as number };
+	}
+
+	it("takes the id from the new address, not from the id the form still holds", async () => {
+		const { editor, version } = await withVideo();
+		const changed = await editor.call("PATCH", "teachings/tc-1", { version, video: { id: OLD, url: `https://youtu.be/${NEW}`, title: "Khóa lễ", description: "" } });
+		expect(changed.status, JSON.stringify(changed.json)).toBe(200);
+		expect(changed.data.video).toMatchObject({ id: NEW, url: `https://youtu.be/${NEW}` });
+	});
+
+	it("falls back to the id only when there is no address (and builds the address)", async () => {
+		const { editor, version } = await withVideo();
+		const byId = await editor.call("PATCH", "teachings/tc-1", { version, video: { id: NEW, url: "", title: "", description: "" } });
+		expect(byId.data.video).toMatchObject({ id: NEW, url: `https://www.youtube.com/watch?v=${NEW}` });
+	});
+
+	it("refuses an address that is not YouTube's even when an id is there", async () => {
+		const { editor, version } = await withVideo();
+		const bad = await editor.call("PATCH", "teachings/tc-1", { version, video: { id: OLD, url: "https://example.org/v", title: "", description: "" } });
+		expect(bad.status).toBe(400);
+		expect(Object.keys(bad.error.fields).join()).toMatch(/video/);
+	});
+
+	it("removes the video when both the address and the id are empty", async () => {
+		const { w, editor, version } = await withVideo();
+		const gone = await editor.call("PATCH", "teachings/tc-1", { version, video: { id: "", url: "", title: "Khóa lễ", description: "" } });
+		expect(gone.status, JSON.stringify(gone.json)).toBe(200);
+		expect(gone.data.video).toBeNull();
+		expect((w.raw.prepare("SELECT video FROM teaching_article WHERE id = 'tc-1'").get() as Raw).video).toBeNull();
+		expect((await editor.call("PATCH", "teachings/tc-1", { version: gone.data.version, video: null })).data.version).toBe(gone.data.version);
+	});
+});

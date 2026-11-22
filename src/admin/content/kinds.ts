@@ -84,7 +84,9 @@ const TEACHING_VIDEO = z
 		description: plainItem(2000),
 	})
 	.transform((video, ctx) => {
-		const id = youtubeIdOf(video.id || video.url);
+		// Both empty: the editor took the video off. The address is the newer word: the id of the form is only read when there is none.
+		if (!video.url && !video.id) return null;
+		const id = youtubeIdOf(video.url || video.id);
 		if (!id) {
 			ctx.addIssue({ code: "custom", message: "Nhập mã hoặc địa chỉ video YouTube hợp lệ.", path: ["url"] });
 			return z.NEVER;
