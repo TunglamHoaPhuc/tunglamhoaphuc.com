@@ -8,6 +8,7 @@ import { api } from "../api";
 import { MediaPicker } from "../media/MediaPicker";
 import { useDebounced, useLoader } from "../media/imageTools";
 import { Alert, Badge, Button, errorText, Loading, TextField, when } from "../ui";
+import { youtubeId } from "./editorLogic";
 import type { Comparison, KindName, MediaPreview, Milestone, RelatedItem, Revision } from "./types";
 
 // ------------------------------------------------------------------ a picture field
@@ -132,7 +133,18 @@ export function ExtraFields({
 		return (
 			<fieldset className="tq-panel" disabled={disabled}>
 				<legend className="tq-h2">Video Phật Pháp</legend>
-				<TextField label="Video YouTube (mã hoặc địa chỉ)" value={str(extra.youtubeId)} onChange={(e) => set("youtubeId", e.target.value)} placeholder="https://www.youtube.com/watch?v=…" error={errors["extra.youtubeId"]} />
+				<TextField
+					label="Video YouTube (mã hoặc địa chỉ)"
+					value={str(extra.youtubeId)}
+					onChange={(e) => set("youtubeId", e.target.value)}
+					onBlur={(e) => {
+						// Any watch, share or embed address becomes the 11-character id the page stores.
+						const id = youtubeId(e.target.value);
+						if (id && id !== e.target.value.trim()) set("youtubeId", id);
+					}}
+					placeholder="https://www.youtube.com/watch?v=…"
+					error={errors["extra.youtubeId"]}
+				/>
 			</fieldset>
 		);
 	}
@@ -144,7 +156,7 @@ export function ExtraFields({
 			<fieldset className="tq-panel" disabled={disabled}>
 				<legend className="tq-h2">Ấn phẩm &amp; Sách</legend>
 				<TextField label="Tên sách" value={str(book.title)} onChange={(e) => setBook("title", e.target.value)} error={errors["extra.book.title"]} />
-				<TextField label="Tác giả" value={str(book.author)} onChange={(e) => setBook("author", e.target.value)} />
+				<TextField label="Tác giả" value={str(book.author)} onChange={(e) => setBook("author", e.target.value)} error={errors["extra.book.author"]} />
 				<TextField label="Liên kết đọc hoặc mua" value={str(book.link)} onChange={(e) => setBook("link", e.target.value || undefined)} placeholder="https://…" error={errors["extra.book.link"]} />
 				<MediaField
 					label="Ảnh bìa sách"
@@ -334,7 +346,7 @@ function Diff({ before, after }: { before: string; after: string }) {
 	);
 }
 
-export function RevisionPanel({ kind, id, version, canRestore, onRestored }: { kind: KindName; id: string; version: number; canRestore: boolean; onRestored: () => void }) {
+export function RevisionPanel({ kind, id, version, canRestore, guard = (go) => go(), onRestored }: { kind: KindName; id: string; version: number; canRestore: boolean; /** Runs the restore at once, or after the person agrees to drop unsaved changes. */ guard?: (go: () => void) => void; onRestored: () => void }) {
 	const list = useLoader(() => api<Revision[]>("GET", `${kind}/${encodeURIComponent(id)}/revisions`), `rev-${id}-${version}`);
 	const [pick, setPick] = useState<number[]>([]);
 	const [comparison, setComparison] = useState<Comparison | null>(null);
@@ -404,7 +416,7 @@ export function RevisionPanel({ kind, id, version, canRestore, onRestored }: { k
 									confirm === item.version ? (
 										<span role="group" aria-label={`Xác nhận khôi phục bản ${item.version}`} style={{ display: "inline-flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
 											<span>Khôi phục nội dung bản {item.version} thành phiên bản mới?</span>
-											<Button busy={busy} onClick={() => void restore(item.version)}>
+											<Button busy={busy} onClick={() => guard(() => void restore(item.version))}>
 												Khôi phục
 											</Button>
 											<Button variant="secondary" onClick={() => setConfirm(null)}>

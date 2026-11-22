@@ -12,12 +12,20 @@ export class ApiClientError extends Error {
 		readonly code: string,
 		message: string,
 		readonly fields?: Record<string, string>,
+		/** What the server added beside code, message and fields (for example `suggestion`). */
+		readonly extra?: Record<string, unknown>,
 	) {
 		super(message);
 	}
+
+	/** The free address the server offers when a slug is taken. */
+	get suggestedSlug(): string | null {
+		const suggestion = this.extra?.suggestion as { slug?: unknown } | undefined;
+		return typeof suggestion?.slug === "string" && suggestion.slug ? suggestion.slug : null;
+	}
 }
 
-type Envelope = { data?: unknown; meta?: { page: number; pageSize: number; total: number }; error?: { code: string; message: string; fields?: Record<string, string> } };
+type Envelope = { data?: unknown; meta?: { page: number; pageSize: number; total: number }; error?: { code: string; message: string; fields?: Record<string, string>; [key: string]: unknown } };
 
 function parseEnvelope(text: string): Envelope | null {
 	if (!text) return null;
@@ -60,7 +68,11 @@ async function call(method: string, path: string, body?: unknown): Promise<Envel
 	if (expired && (await refreshSession())) result = await send(method, path, body);
 	if (result.status >= 400 || result.json?.error) {
 		const error = result.json?.error;
-		throw new ApiClientError(result.status, error?.code ?? "server_error", error?.message ?? "Có lỗi ở máy chủ. Hãy thử lại sau.", error?.fields);
+		const extra: Record<string, unknown> = { ...error };
+		delete extra.code;
+		delete extra.message;
+		delete extra.fields;
+		throw new ApiClientError(result.status, error?.code ?? "server_error", error?.message ?? "Có lỗi ở máy chủ. Hãy thử lại sau.", error?.fields, Object.keys(extra).length ? extra : undefined);
 	}
 	return { ...(result.json ?? {}), status: result.status };
 }
