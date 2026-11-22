@@ -56,6 +56,13 @@ Site mới đọc 13 file JSON mà admin cũ đang ghi trên Backblaze B2, qua S
 - **Khi gặp sự cố:** B2 lỗi, mạng lỗi, JSON hỏng, hoặc bản mới không còn mục nào. Khi đó giữ bản tốt gần nhất và ghi log `[b2] …` hoặc `[nội dung] …`. Nếu chưa từng có bản tốt (Worker mới, B2 đang lỗi) thì trang báo lỗi; các trang đã cache ở edge (T41e) vẫn phục vụ bản cũ.
 - **Chi phí B2:** mỗi lần hỏi lại là một giao dịch loại B. B2 miễn phí 2.500 giao dịch loại B mỗi ngày; vượt thì 0,004 USD cho mỗi 10.000 giao dịch. Với 7 file và nhịp 1 phút, một điểm Cloudflare có lượt truy cập liên tục hỏi tối đa khoảng 10.000 lần mỗi ngày (khoảng 0,003 USD). Tải dữ liệu từ B2 sang Cloudflare không tính phí (Bandwidth Alliance).
 
+## 3b. Cập nhật 22/11/2026
+
+- Vẫn **chưa có khóa B2**: không có biến `B2_*` trong `.dev.vars` hay secret của Worker `tlhp-web`. Việc của chủ site ở mục 1 còn nguyên; đừng dò bucket công khai (đã thử 14/11, 404).
+- Nay `v2.` và `www` đọc D1, nên nguồn `b2` chỉ còn hai việc: kiểm định dạng file gốc và làm đầu vào cho `npm run import -- --from=b2`. **Đừng chạy nhập từ B2 vào D1 thật** khi chưa có quyết định ở T42d: nhập ghi đè nội dung và xóa các dòng admin mới đã tạo (xem tasks/todo.md, T42d).
+- Chỉ đọc: mã chỉ gửi `GET` (có test). Khóa B2 vẫn nên tạo ở quyền Read Only.
+- Tên file: mã đọc 8 tên (`posts`, `post-albums`, `schedule`, `gioi-thieu`, `tong-chi`, `vu-tru`, `bao-tuong`, `danh-tang`). Chủ site liệt kê đủ 13 tên thật để đối chiếu.
+
 ## 4. Chưa làm (để khi có khóa)
 
 - Trang `/van-hanh/lam-moi` có nút "Làm mới site" cho Ban Biên Tập, đặt sau Cloudflare Access; nút này phải xóa cả bản cache ở edge (T41e).

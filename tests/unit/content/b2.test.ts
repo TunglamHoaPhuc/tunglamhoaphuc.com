@@ -128,3 +128,80 @@ describe("B2 reader", () => {
 		expect(b.requests[1].headers.get("if-none-match")).toBe('"e1"');
 	});
 });
+
+describe("B2 source: mistakes and secrets (T19)", () => {
+	const VARIABLES = ["B2_ENDPOINT", "B2_BUCKET", "B2_KEY_ID", "B2_APPLICATION_KEY"] as const;
+
+	it.each(VARIABLES)("names %s alone when only it is missing", (name) => {
+		expect(() => b2Config({ ...ENV, [name]: undefined })).toThrow(`thiếu biến môi trường: ${name}`);
+		expect(() => b2Config({ ...ENV, [name]: "   " })).toThrow(name);
+	});
+
+	it("never repeats a value of the environment in what it says about a missing one", () => {
+		for (const name of VARIABLES) {
+			let message = "";
+			try {
+				b2Config({ ...ENV, [name]: undefined });
+			} catch (error) {
+				message = String(error);
+			}
+			for (const secret of [ENV.B2_APPLICATION_KEY, ENV.B2_KEY_ID, ENV.B2_BUCKET, ENV.B2_PREFIX]) expect(message).not.toContain(secret);
+		}
+	});
+
+	it("asks for B2_REGION when the endpoint does not carry one, and reads files at the root without B2_PREFIX", () => {
+		expect(() => b2Config({ ...ENV, B2_ENDPOINT: "https://minio.example.test" })).toThrow("B2_REGION");
+		expect(b2Config({ ...ENV, B2_ENDPOINT: "https://minio.example.test", B2_REGION: "ap-1" }).region).toBe("ap-1");
+		expect(b2Config({ ...ENV, B2_PREFIX: undefined }).prefix).toBe("");
+	});
+
+	it("only ever sends GET: ok, not modified, broken file and outage alike", async () => {
+		const time = clock();
+		const b = bucket([{ status: 200, body: "[1]", etag: '"e1"' }, { status: 304, etag: '"e1"' }, { status: 200, body: "{hỏng", etag: '"e2"' }, { status: 500 }, new TypeError("network")]);
+		const read = createB2Reader(b2Config(ENV), { fetch: b.fetch, now: time.now, log: { error: vi.fn() } });
+		for (let i = 0; i < 5; i++) {
+			await read("posts");
+			time.pass(61_000);
+		}
+		expect(b.requests).toHaveLength(5);
+		expect(new Set(b.requests.map((request) => request.method))).toEqual(new Set(["GET"]));
+	});
+
+	it("keeps the last good copy and logs, without the key or key id, when the JSON is broken", async () => {
+		const time = clock();
+		const log = { error: vi.fn() };
+		const b = bucket([{ status: 200, body: '{"a":1}', etag: '"e1"' }, { status: 200, body: '{"a":', etag: '"e2"' }, { status: 403 }]);
+		const read = createB2Reader(b2Config(ENV), { fetch: b.fetch, now: time.now, log });
+		await read("schedule");
+		time.pass(61_000);
+		expect(await read("schedule")).toEqual({ version: '"e1"', data: { a: 1 } });
+		time.pass(61_000);
+		expect(await read("schedule")).toEqual({ version: '"e1"', data: { a: 1 } });
+		expect(log.error).toHaveBeenCalledTimes(2);
+		for (const [line] of log.error.mock.calls) {
+			expect(String(line)).toContain("[b2]");
+			expect(String(line)).toContain("schedule.json");
+			expect(String(line)).not.toContain(ENV.B2_APPLICATION_KEY);
+			expect(String(line)).not.toContain(ENV.B2_KEY_ID);
+		}
+	});
+
+	it("does not leak the key when there is no good copy and the first read fails", async () => {
+		const b = bucket([{ status: 200, body: "<html>không phải JSON" }]);
+		const read = createB2Reader(b2Config(ENV), { fetch: b.fetch, log: { error: vi.fn() } });
+		const error = await read("posts").catch((caught: unknown) => caught);
+		expect(String(error)).toContain("posts.json");
+		expect(String(error)).not.toContain(ENV.B2_APPLICATION_KEY);
+		expect(String(error)).not.toContain(ENV.B2_KEY_ID);
+	});
+
+	it("ignores a cached copy that is not JSON and asks B2 instead", async () => {
+		const cache = memoryCache();
+		const base = "https://b2-cache.tunglamhoaphuc.internal/bucket-cu/tunglamhoaphuc2/database/posts.json";
+		await cache.put(new Request(base), new Response("{cắt dở", { headers: { etag: '"x"' } }));
+		const b = bucket([{ status: 200, body: "[7]", etag: '"e7"' }]);
+		const read = createB2Reader(b2Config(ENV), { fetch: b.fetch, cache });
+		expect(await read("posts")).toEqual({ version: '"e7"', data: [7] });
+		expect(b.requests).toHaveLength(1);
+	});
+});

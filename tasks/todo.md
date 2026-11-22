@@ -1300,6 +1300,7 @@
 - **Khác mô tả:**
   - Bộ đọc hỏi lại B2 mỗi phút thay vì "mỗi chu kỳ 5 phút". Bài sửa hiện ra sau khoảng 1 phút cộng thời gian trang ISR được làm mới (tối đa 5 phút).
   - Chưa làm KV (gói Free chỉ cho 1.000 lần ghi KV mỗi ngày, cần quyết cùng Câu hỏi mở #8) và trang `/van-hanh/lam-moi` (cần Access).
+- **22/11/2026, kiểm lại, vẫn chưa có khóa:** `.dev.vars` và secret của Worker `tlhp-web` chỉ có `ADMIN_ENC_KEY`, `ADMIN_JWT_SECRET`; không có biến `B2_*`. Chưa kiểm được tên và định dạng file thật. Lưu ý: mô tả nói 13 file nhưng `createFileLoaders` chỉ đọc 8 tên (`posts`, `post-albums`, `schedule`, `gioi-thieu`, `tong-chi`, `vu-tru`, `bao-tuong`, `danh-tang`); các file còn lại chưa có adapter, tên thật chỉ biết khi chủ site liệt kê (nguon-b2.md mục 1).
 - **Còn phải kiểm khi có khóa:** các adapter viết theo dữ liệu API công khai của site cũ, chưa chắc khớp file gốc trên B2 (tên và định dạng).
 
 **Tiêu chí nghiệm thu:**
@@ -1309,6 +1310,7 @@
 
 **Kiểm chứng:**
 - [x] `npm test -- b2 files source` (S3 giả lập): 13 test; thử đột biến 10/10 bị bắt; toàn bộ unit 187 xanh; `tsc`, eslint không lỗi
+- [x] 22/11/2026: thêm 11 test vào `b2.test.ts` (tổng 17): từng biến thiếu được gọi đúng tên và không lặp giá trị nào; chỉ gửi GET (kể cả 304, JSON hỏng, B2 lỗi); JSON hỏng hoặc 403 thì giữ bản tốt gần nhất, log có `[b2]` và tên file, không có khóa hay mã khóa; lần đọc đầu hỏng không lộ khóa; bản cache hỏng bị bỏ qua
 - [x] Không đổi hành vi với snapshot. Dựng từ worktree sạch, toàn bộ e2e: cục bộ 590 qua, 1 hỏng (test lướt trang lịch chập chờn có sẵn); trên `v2.` (phiên bản Worker `fce3f5db`) 609/609 qua
 - [ ] Thử thật trên `v2.` với `CONTENT_SOURCE=b2`
 
@@ -2334,12 +2336,32 @@
 - Đồng bộ chạy theo lịch (GitHub Actions sau T1b), dùng khóa B2 chỉ đọc (chuẩn bị #4); giữ bản tốt gần nhất khi file hỏng.
 - Thay `snapshot:fetch` từ `www/api/admin/*` bằng đọc file gốc trên B2 sau khi so định dạng ở T19.
 
-**Tiêu chí nghiệm thu:**
-- [ ] Sửa bài ở admin cũ → `v2.` hiện bản mới trong ≤ 10 phút
-- [ ] Tắt khóa B2 trên Worker: trang vẫn chạy bằng bản sao
-- [ ] File JSON hỏng không làm trang đổi (log có lỗi)
+**Xét lại phạm vi 22/11/2026 — CHỜ QUYẾT ĐỊNH của chủ dự án.** Mô tả trên viết khi `v2.` còn đọc snapshot. Nay `v2.` và `www` đọc D1 (`CONTENT_SOURCE=d1`) và Admin CMS mới ghi vào D1, nên "B2 → `tlhp-data` → nguồn `r2`" không còn là đường dữ liệu: nguồn `r2` sẽ bị D1 che. Việc còn cần làm là **B2 → D1** cho tới T39. Chưa viết mã, vì cách nhập hiện có sẽ làm mất dữ liệu của admin mới (đọc `src/db/import.ts`):
+- `upsert` ghi đè **mọi cột nội dung** của dòng đã có (tiêu đề, thân bài, ảnh…); chỉ các cột nhập không đụng tới (`version`, `created_by`, `updated_by`, `deleted_at`, `visible`, `registration_open`…) được giữ. Bài sửa bằng admin mới mất chữ, còn `version` vẫn như đã sửa.
+- `prune` **xóa** mọi dòng không có trong nguồn: bài, tượng, sự kiện, Danh Tăng… do admin mới **tạo** (không có ở B2) sẽ bị xóa; bài xóa mềm ở admin mới (còn trong B2) bị ghi đè nội dung.
+- Bảng con (`album_item`, `milestone`, `art_variation`) bị xóa hết rồi nhập lại.
+- Admin mới chạy trên `www` từ 22/11; chưa kiểm D1 thật xem đã có dòng nào `version > 1` hoặc `created_by` khác rỗng (cần lệnh đọc trên D1 thật, chưa chạy vì chưa được phép).
 
-**Phụ thuộc:** T19 (khóa B2, so định dạng), T1b, T42a. **Quy mô:** M
+Phương án:
+
+| | Cách làm | Ưu | Nhược |
+|---|---|---|---|
+| **(a)** Chỉ thêm dòng mới | Chế độ `--merge`: chỉ `INSERT … ON CONFLICT DO NOTHING`, không `prune`, không xóa bảng con | An toàn với dữ liệu admin mới; mã nhỏ, kiểm bằng S3 giả lập và SQLite | Bài đã có mà admin cũ sửa tiếp thì **không** sang v2; bài admin cũ xóa vẫn còn ở v2 |
+| **(b)** Đóng băng B2 từ ngày X | Từ ngày X chỉ soạn ở admin mới; admin cũ chỉ đọc. Nhập B2 một lần cuối trước ngày X | Không mã mới, không nguy cơ ghi đè; rút ngắn thời gian hai admin song song | Cần Ban Biên Tập đồng ý chuyển sớm; sửa nhầm ở admin cũ sau ngày X bị mất; không đồng bộ gì trong lúc chờ |
+| **(c)** Một chiều có cờ "đã sửa ở admin mới" | `ON CONFLICT DO UPDATE … WHERE version = 1 AND updated_by IS NULL AND deleted_at IS NULL`; `prune` chỉ xóa dòng `created_by IS NULL` và chưa sửa; bảng con chỉ chạy lại cho dòng được cập nhật | Admin cũ sửa tiếp vẫn sang v2 cho dòng chưa ai đụng ở admin mới; dòng admin mới tạo hay sửa được bảo vệ | Mã phức tạp nhất (mỗi bảng một điều kiện, cả bảng con); dòng bị admin mới sửa một chữ thì ngừng nhận sửa từ admin cũ (cần báo cáo dòng bị bỏ qua); lỗi ở đây là mất dữ liệu nên cần test kỹ |
+| **(d)** Giữ thiết kế `r2` | Đồng bộ B2 → `tlhp-data`, nguồn `r2` | Đúng mô tả cũ | Không còn nghĩa vì v2/www đọc D1; thêm một nơi lưu dữ liệu mà không ai đọc. **Không khuyến nghị** |
+
+**Khuyến nghị:** nếu T39 (chuyển hẳn sang admin mới) còn xa hơn vài tuần: làm **(a)** trước (ít rủi ro, làm ngay), nâng lên **(c)** nếu Ban Biên Tập vẫn cần sửa bài ở admin cũ. Nếu T39 gần (khoảng 2 tuần): **(b)**, rẻ và an toàn nhất. Dù chọn gì, trước mọi lần nhập lên D1 thật phải chạy `npm run import` vào `--db=<bản sao D1>` rồi so khác biệt, và có sao lưu (quy trình ở d1.md mục 7). Thiếu khóa B2 nên chưa chạy được bước nào trên dữ liệu thật.
+
+**Mô tả (sau xét lại, chờ quyết định):** đồng bộ B2 → D1 theo phương án được chọn, **chỉ đọc B2, không ghi gì vào B2**, chạy lại được, có `--dry-run`, giữ bản tốt gần nhất. Bỏ `tlhp-data` và nguồn `r2` (làm lại nếu chọn (d)).
+
+**Tiêu chí nghiệm thu (nháp, chốt sau khi chọn phương án):**
+- [ ] Chủ dự án chọn phương án (a), (b), (c) hoặc (d)
+- [ ] Sửa bài ở admin cũ → `v2.` hiện bản mới trong ≤ 10 phút (với (a)/(c): chỉ bài mới hoặc bài chưa sửa ở admin mới)
+- [ ] Bài đã sửa, đã tạo hoặc đã xóa mềm bằng admin mới không bị ghi đè, không bị xóa sau khi nhập (test SQLite: dòng `version > 1`, `created_by`, `deleted_at`)
+- [ ] File JSON hỏng không làm trang đổi, log có lỗi (phần đọc B2 đã có test ở T19)
+
+**Phụ thuộc:** T19 (khóa B2, so định dạng), T23/T24 (D1), T42a; quyết định của chủ dự án. T1b chỉ cần nếu chạy theo lịch. **Quy mô:** M
 
 ---
 
