@@ -181,3 +181,21 @@ describe("B7: the Tông Chỉ page metadata uses the saved SEO and share picture
 		expect(seo).toMatchObject({ title: `SEO – Tông Chỉ Tu Học – ${site.name}`, description: "Mô tả", openGraph: { title: "SEO", description: "Mô tả", images: ["/anh-goc/s2-cnv03/og.webp"] } });
 	});
 });
+
+describe("a picture position the old admin wrote with an address in front", () => {
+	it("is read as the position it names (the six old Tông Chỉ banners), by the d1 source and by the file parser", async () => {
+		const db = database();
+		db.exec("insert into media (id, r2_key, filename, mime) values ('b1', 'cms/b1/v1/b.webp', 'b.webp', 'image/webp')");
+		db.exec(`insert into teaching_article (id, slug, title, name, status, position, banner_media_id, banner_position)
+			values ('t1', 'niem-phat', 'Niệm Phật', 'Niệm Phật', 'published', 1, 'b1', 'https://admin.tunglamhoaphuc.com/center 44%'),
+			       ('t2', 'tinh-do', 'Tịnh Độ', 'Tịnh Độ', 'published', 2, 'b1', 'center 17%'),
+			       ('t3', 'thien', 'Thiền', 'Thiền', 'published', 3, 'b1', 'khong hop le <script>')`);
+		const repo = repoOf(db);
+		expect((await repo.getTongChi("niem-phat"))?.banner?.position).toBe("center 44%");
+		expect((await repo.getTongChi("tinh-do"))?.banner?.position).toBe("center 17%");
+		expect((await repo.getTongChi("thien"))?.banner?.position).toBe("center 50%");
+		const { parseTongChi } = await import("@/libs/content/tongChi");
+		const parsed = parseTongChi([{ id: 1, slug: "a", title: "A", bannerImage: "https://s2-cnv03.s3.us-east-005.backblazeb2.com/a.webp", bannerPosition: "https://admin.tunglamhoaphuc.com/center 6%", category: "g", categoryName: "G" }]);
+		expect(parsed.entries[0].banner?.position).toBe("center 6%");
+	});
+});

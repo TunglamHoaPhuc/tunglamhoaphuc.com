@@ -192,3 +192,16 @@ describe("B9: the Tông Chỉ preview shows the saved HTML the way the public pa
 		expect(page).toContain("<figcaption>Hoa sen</figcaption>");
 	});
 });
+
+describe("a picture position the old admin wrote with an address in front", () => {
+	it("opens as the position it names, and saving the article as opened works and changes nothing", async () => {
+		const w = await contentWorld();
+		w.raw.prepare("UPDATE teaching_article SET banner_position = 'https://admin.tunglamhoaphuc.com/center 44%' WHERE id = 'tc-1'").run();
+		const editor = await w.as("editor@example.test");
+		const opened = await editor.call("GET", "teachings/tc-1");
+		expect(opened.data.bannerPosition).toBe("center 44%");
+		const saved = await editor.call("PATCH", "teachings/tc-1", { version: 1, bannerPosition: opened.data.bannerPosition, title: opened.data.title });
+		expect(saved.status, JSON.stringify(saved.json)).toBe(200);
+		expect(saved.data.version).toBe(1);
+	});
+});

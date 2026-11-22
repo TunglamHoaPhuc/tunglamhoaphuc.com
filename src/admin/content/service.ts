@@ -13,7 +13,7 @@ import { can } from "../rbac/check";
 import { getRevision, listRevisions, revisionStatement } from "../revision";
 import { SLUG_MAX, slugify } from "../slug";
 import { registerTrashable, trashStatement } from "../trash";
-import { IMAGE_WIDTH, imageAt } from "../../libs/content/media";
+import { cleanPosition, IMAGE_WIDTH, imageAt } from "../../libs/content/media";
 import { renderContent } from "../../libs/content/normalize";
 import { tongChiMarkdown, type BodyTarget } from "../../libs/content/tongChiBody";
 import { extraMediaUses, parseExtra } from "./extra";
@@ -83,9 +83,10 @@ function fieldValue(spec: FieldSpec, row: Row): unknown {
 	const value = row[spec.column];
 	switch (spec.type) {
 		case "text":
-		case "position":
 		case "date":
 			return text(value);
+		case "position":
+			return cleanPosition(text(value));
 		case "nullableText":
 		case "media":
 		case "album":
@@ -710,7 +711,10 @@ async function prepare(db: AdminDb, kind: Kind, current: State | null, input: St
 	// The body: sanitised, with library pictures at their current address.
 	let bodyTree: HtmlNode[];
 	let bodyChanged = false;
-	if (has("contentHtml")) {
+	// The editor sends back the body as it was opened: nothing to sanitise, store or write again (the old site's HTML is never rewritten
+	// by a save that did not change it).
+	const bodyAsOpened = !!current && has("contentHtml") && String(input.contentHtml ?? "") === String(current.contentHtml ?? "");
+	if (has("contentHtml") && !bodyAsOpened) {
 		const firstChanges: string[] = [];
 		const secondChanges: string[] = [];
 		const firstPass = parseSafe(String(input.contentHtml ?? ""), { changes: firstChanges });

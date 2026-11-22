@@ -7,7 +7,7 @@
 // summaries apart from posts; a post is read in full when its page asks. The smaller kinds
 // (schedule, Giới thiệu, Tông Chỉ, areas, statues) are read whole, once, as the files are.
 import type { StatueEntry } from "../baoTuong";
-import { MEDIA_BASE, mediaUrl } from "../media";
+import { cleanPosition, MEDIA_BASE, mediaUrl } from "../media";
 import { countCategories, createMemoryRepository, lazy, queryPosts, sectionSlugKey, slugKey } from "../repository";
 import type { TongChiEntry } from "../tongChi";
 import type { AboutTopic, Area, ContentRepository, GalleryImage, MediaImage, Post, PostExtra, PostSummary, Schedule, Video } from "../types";
@@ -47,7 +47,7 @@ function srcOf(key: unknown, url: unknown): string | null {
 /** A picture and where the editors centred it, from the columns a joined `media` row gives (`<prefix>_key`, `<prefix>_url`). */
 function imageOf(row: Row, prefix: string, position: unknown): MediaImage | null {
 	const src = srcOf(row[`${prefix}_key`], row[`${prefix}_url`]);
-	return src ? { src, position: text(position) || "center 50%" } : null;
+	return src ? { src, position: cleanPosition(text(position)) } : null;
 }
 
 const category = (row: Row, prefix = "cat") => ({ slug: text(row[`${prefix}_slug`]), name: text(row[`${prefix}_name`]) });
