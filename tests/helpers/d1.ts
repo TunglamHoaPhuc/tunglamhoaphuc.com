@@ -10,6 +10,7 @@ create table category (id text primary key, slug text, name text, kind text);
 create table page_view (entity_type text, entity_id text, count integer);
 create table album_item (album_id text, media_id text, title text default '', caption text default '', position integer default 0);
 create table post (
+  pinned integer default 0, seo_title text, seo_description text, og_media_id text, extra text,
   id text primary key, slug text, title text, subtitle text default '', section text, author text default '', published_date text default '',
   summary text default '', gallery_count integer default 0, legacy_views integer default 0, thumbnail_position text default '', banner_position text default '',
   category_id text, thumbnail_media_id text, banner_media_id text, album_id text, intro text default '', content_html text default '', keywords text, videos text,
@@ -18,8 +19,10 @@ create table page (
   id text primary key, slug text, title text, subtitle text default '', kicker text default '', group_id text, banner_media_id text, banner_position text default '',
   portrait_media_id text, portrait_position text default '', overview text default '', quote text, content_html text default '', book text, position integer default 0,
   status text default 'published', publish_at text, deleted_at text);
+create table post_related (post_id text, target_type text, target_id text, position integer default 0);
 create table milestone (page_id text, label text, title text, description text, position integer default 0);
 create table teaching_article (
+  seo_title text, seo_description text, og_media_id text,
   id text primary key, slug text, title text, name text default '', subtitle text default '', group_id text, banner_media_id text, banner_position text default '',
   excerpt text default '', author text default '', author_href text, published_date text default '', video text, featured text, book text, keywords text,
   body text default '', content_html text default '', legacy_views integer default 0, position integer default 0,
