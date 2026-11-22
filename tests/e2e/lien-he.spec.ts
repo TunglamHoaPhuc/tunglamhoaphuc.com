@@ -3,7 +3,7 @@ import { expect, test, type Page } from "@playwright/test";
 import { site } from "../../src/config/site";
 
 // T18: /lien-he from the site's own details (src/config/site.ts): no form until it has
-// somewhere to send to, no embedded Google map.
+// somewhere to send to; the temple's Google map is embedded (a lazy iframe).
 const PATH = "/lien-he";
 
 async function open(page: Page, width = 1440) {
@@ -39,16 +39,18 @@ test.describe("Liên hệ", () => {
 		}
 	});
 
-	test("embeds no map while loading; Google Maps opens in a new tab", async ({ page }) => {
-		const maps: string[] = [];
-		page.on("request", (request) => {
-			if (/google\.[a-z.]+\/maps|maps\.google|googleapis/.test(request.url())) maps.push(request.url());
-		});
+	test("embeds the temple's Google map in a titled lazy iframe; Google Maps opens in a new tab", async ({ page }) => {
 		await open(page);
-		await expect(page.locator("iframe")).toHaveCount(0);
-		expect(maps).toEqual([]);
+		const frame = page.locator(".tlhp-contact-map iframe");
+		await expect(page.locator("iframe")).toHaveCount(1);
+		await expect(frame).toHaveAttribute("title", "Bản đồ đường đến chùa Tùng Lâm Hòa Phúc");
+		await expect(frame).toHaveAttribute("src", "https://www.google.com/maps?q=20.9535019,105.5713597&z=17&output=embed");
+		await expect(frame).toHaveAttribute("loading", "lazy");
+		const box = (await frame.boundingBox())!;
+		expect(box.height).toBeGreaterThanOrEqual(320);
+		expect(box.height).toBeLessThanOrEqual(450);
 		const button = page.locator(".tlhp-contact-map").getByRole("link", { name: /Mở Google Maps/ });
-		await expect(button).toHaveAttribute("href", site.mapsUrl);
+		await expect(button).toHaveAttribute("href", "https://maps.app.goo.gl/PSTtcjcJsaXvLCp37");
 		await expect(button).toHaveAttribute("target", "_blank");
 	});
 

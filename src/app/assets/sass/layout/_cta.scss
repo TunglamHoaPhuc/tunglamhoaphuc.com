@@ -82,26 +82,45 @@ TLHP closing block (T6)
 // Bexon pulls the block 135–320px into its light footer; one overlap for every width here,
 // matched by the footer's padding (components/_footer.scss).
 .tj-cta-section.tlhp-cta {
-	margin-bottom: -120px;
+	margin-bottom: -72px;
 	// Without :has() the footer cannot make room, so the block sits above it instead.
 	@supports not selector(:has(*)) {
-		margin-bottom: 96px;
+		margin-bottom: 72px;
+	}
+	// Compact: a closing band, not a banner. Height and type scale down together; the footer
+	// makes room for the 72px overlap (components/_footer.scss).
+	.cta-area .cta-content {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: flex-start;
+		padding: 32px 32px 36px 48px;
+		@media #{$md, $sm, $xs} {
+			padding: 28px 24px 32px;
+		}
+		.title {
+			font-size: 40px;
+			margin-bottom: 10px;
+			@media #{$sm, $xs} {
+				font-size: 32px;
+			}
+		}
 	}
 	.tlhp-cta-text {
 		max-width: 34ch;
-		margin-bottom: 28px;
+		margin-bottom: 20px;
 		color: var(--tj-color-common-white);
-		font-size: var(--tlhp-text-body-lg);
+		font-size: var(--tlhp-text-body);
 	}
 	.cta-area .tlhp-cta-art {
 		display: grid;
 		place-items: center;
-		min-height: 320px;
-		padding: 40px;
+		min-height: 0;
+		padding: 24px;
 		// A darker brown than the text half, so it does not melt into the footer below.
 		background-color: color-mix(in srgb, var(--tj-color-primary-fill) 45%, var(--tj-color-theme-dark));
 		img {
-			width: min(240px, 70%);
+			width: min(132px, 60%);
 			height: auto;
 			object-fit: contain;
 		}

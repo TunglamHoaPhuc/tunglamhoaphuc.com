@@ -156,7 +156,13 @@ export default async function LichTuHoc({ searchParams }: Props) {
 											Tháng {label}
 										</h2>
 										<p className="tlhp-cal-pill is-soft tlhp-calendar-lunar">
-											{lunarSpan(state.month)} · Phật lịch {buddhistYear(`${state.month}-15`)}
+											{/* Full wording for readers and wide screens; on a phone one short line, "Chín – Mười Bính Ngọ · PL 2570". */}
+											<span className="tlhp-lunar-full">
+												{lunarSpan(state.month)} · Phật lịch {buddhistYear(`${state.month}-15`)}
+											</span>
+											<span className="tlhp-lunar-short" aria-hidden="true">
+												{lunarSpan(state.month).replace(/tháng /g, "").replace(" âm lịch năm ", " ").replace(/ âm lịch$/, "")} · PL {buddhistYear(`${state.month}-15`)}
+											</span>
 										</p>
 										{state.month !== today.slice(0, 7) ? (
 											<Link className="tlhp-cal-pill is-link" href={href({ month: today.slice(0, 7) })} scroll={false}>

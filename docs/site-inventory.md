@@ -60,7 +60,7 @@ Footer không có menu liên kết, chỉ có 4 cột thông tin lấy từ `sit
 | Bổn tự | Dấu tròn về `/`, đoạn giới thiệu, địa chỉ "Thôn Hòa Trúc – Xã Phú Cát – TP Hà Nội" |
 | Thời khóa tu học | Giờ mở cửa "Sáng 7:30 – 10:30 · Chiều 13:30 – 17:30", nút "Xem lịch tu học" |
 | Liên hệ | 7 người theo 3 vai trò (Trưởng ban lãnh chúng, Thư ký, Hỗ trợ thông tin), mỗi người một số `tel:` |
-| Bản đồ chùa | `site.mapImage` đang `null` nên hiện địa chỉ, kèm nút "Mở Google Maps" |
+| Bản đồ chùa | khung Google Maps nhúng (`site.mapEmbed`, iframe nặng và đặt cookie của Google, chủ dự án đã chọn), kèm địa chỉ và nút "Mở Google Maps" (`site.mapsUrl`) |
 
 Dưới cùng: dải chữ chạy khẩu hiệu, dòng bản quyền (ghi cứng "Phật lịch 2570") và nút lên đầu trang.
 

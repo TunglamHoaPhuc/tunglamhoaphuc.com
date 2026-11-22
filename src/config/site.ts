@@ -83,11 +83,17 @@ export const site = {
 	] satisfies Contact[],
 	openingHours: "Sáng 7:30 – 10:30 · Chiều 13:30 – 17:30 (ngày thường)",
 
-	// Search link until the temple sends its own Google Maps place link (GD-06).
-	mapsUrl: "https://www.google.com/maps/search/?api=1&query=Ch%C3%B9a+T%C3%B9ng+L%C3%A2m+H%C3%B2a+Ph%C3%BAc+H%C3%B2a+Tr%C3%BAc+Ph%C3%BA+C%C3%A1t+H%C3%A0+N%E1%BB%99i",
-	// Static map picture for the footer, made once the exact place is known (GD-06). A
-	// picture instead of an embedded Google map, which is heavy and sets cookies.
+	// The Google Maps place link the project owner gave (GD-06): the place "Chùa Hòa Phúc",
+	// 20.9535019, 105.5713597 (xóm Hòa Trúc, xã Phú Cát, Hà Nội).
+	mapsUrl: "https://maps.app.goo.gl/PSTtcjcJsaXvLCp37",
+	// Static map picture for the footer, if one is ever made.
 	mapImage: null as { src: string; width: number; height: number } | null,
+	// The embedded Google map on /lien-he (no API key). It is heavy and sets Google cookies;
+	// the owner chose that trade-off over a static picture.
+	mapEmbed: {
+		src: "https://www.google.com/maps?q=20.9535019,105.5713597&z=17&output=embed",
+		title: "Bản đồ đường đến chùa Tùng Lâm Hòa Phúc",
+	},
 
 	// Official page links are still pending (GD-06); empty entries are not rendered.
 	social: [] as SocialLink[],

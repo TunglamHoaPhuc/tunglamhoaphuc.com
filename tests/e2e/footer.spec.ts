@@ -78,7 +78,7 @@ test.describe("footer", () => {
 		await expect(footer(page)).toContainText("Thôn Hòa Trúc – Xã Phú Cát – TP Hà Nội");
 		await expect(footer(page).getByRole("link", { name: "Xem lịch tu học" })).toHaveAttribute("href", "/lich-tu-hoc");
 		const maps = footer(page).getByRole("link", { name: /Mở Google Maps/ });
-		await expect(maps).toHaveAttribute("href", /^https:\/\/www\.google\.com\/maps\//);
+		await expect(maps).toHaveAttribute("href", /^https:[/][/](www[.]google[.]com[/]maps[/]|maps[.]app[.]goo[.]gl[/])/);
 		await expect(maps).toHaveAttribute("target", "_blank");
 		const end = footer(page).locator(".tlhp-footer-end");
 		await expect(end).toContainText("© Phật lịch 2570 – 2026 Tùng Lâm Hòa Phúc");
@@ -167,7 +167,7 @@ test.describe("closing block", () => {
 		const ctaBottom = (await cta.locator(".cta-area").boundingBox())!;
 		const footerTop = (await footer(page).boundingBox())!.y;
 		expect(ctaBottom.y + ctaBottom.height).toBeGreaterThan(footerTop);
-		expect(await footer(page).evaluate((el) => getComputedStyle(el).paddingTop)).toBe("120px");
+		expect(await footer(page).evaluate((el) => getComputedStyle(el).paddingTop)).toBe("72px");
 	});
 
 	test("is not on the home page, whose footer then starts without the overlap room", async ({ page }) => {

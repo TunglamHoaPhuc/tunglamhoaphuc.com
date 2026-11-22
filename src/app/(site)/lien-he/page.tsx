@@ -111,22 +111,7 @@ export default function LienHe() {
 						</div>
 						<div className="col-lg-6">
 							<div className="tlhp-contact-map">
-								{site.mapImage ? (
-									<img src={site.mapImage.src} alt={`Bản đồ đường đến chùa: ${site.address}`} width={site.mapImage.width} height={site.mapImage.height} loading="lazy" decoding="async" />
-								) : (
-									// Until the map picture exists (GD-06): the temple itself.
-									<img
-										src={site.hero.image.src}
-										srcSet={site.hero.image.srcSet}
-										sizes="(min-width: 992px) 50vw, 100vw"
-										alt={`Toàn cảnh chùa ${site.name}`}
-										width={1280}
-										height={720}
-										loading="lazy"
-										decoding="async"
-										style={{ objectPosition: site.hero.image.position }}
-									/>
-								)}
+								<iframe className="tlhp-contact-map-frame" src={site.mapEmbed.src} title={site.mapEmbed.title} loading="lazy" referrerPolicy="no-referrer-when-downgrade" allowFullScreen />
 								<div className="tlhp-contact-map-card">
 									<p className="tlhp-contact-map-name">Chùa {site.name}</p>
 									<p>{site.address}</p>
