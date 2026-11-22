@@ -603,8 +603,8 @@ export function ContentEditor({ kind, id }: { kind: KindName; id: string | null 
 							</SelectField>
 							{kind === "posts" ? (
 								<label className="tq-check">
-									<input type="checkbox" checked={!!form.pinned} onChange={(e) => set("pinned", e.target.checked)} />
-									<span>Ghim bài lên đầu</span>
+									<input type="checkbox" checked={!!form.pinned} onChange={(e) => set("pinned", e.target.checked)} disabled={!can("posts", "publish")} />
+									<span>Ghim bài lên đầu{can("posts", "publish") ? "" : " (cần quyền xuất bản)"}</span>
 								</label>
 							) : null}
 							{kind !== "pages" ? <TextField label="Ngày đăng" type="date" value={str(form.publishedDate)} onChange={(e) => set("publishedDate", e.target.value)} error={fields.publishedDate} /> : null}
