@@ -1,7 +1,7 @@
 // Second security pass, accounts: the last Super Admin under concurrency, peers acting on each other, deleted roles.
 import { describe, expect, it } from "vitest";
 import { world, type Seed } from "../helpers/adminWorld";
-import { barrier, customAccount } from "../helpers/sec2";
+import { barrier } from "../helpers/sec2";
 
 const SEEDS: Seed[] = [
 	{ id: "root", email: "root@example.test", roleId: "role-super-admin" },
@@ -12,12 +12,13 @@ const SEEDS: Seed[] = [
 	{ id: "author", email: "author@example.test", roleId: "role-author" },
 ];
 
+type Client = { call: (method: string, path: string, body?: unknown) => Promise<{ status: number; error?: { code: string } }> };
 const activeSuperAdmins = (raw: { prepare: (sql: string) => { get: () => unknown } }) =>
 	(raw.prepare("SELECT COUNT(*) AS n FROM user WHERE role_id = 'role-super-admin' AND locked_at IS NULL AND deleted_at IS NULL").get() as { n: number }).n;
 const auditCount = (raw: { prepare: (sql: string) => { get: (...args: string[]) => unknown } }, action: string) => (raw.prepare("SELECT COUNT(*) AS n FROM audit_log WHERE action = ?").get(action) as { n: number }).n;
 
 describe("the last Super Admin survives two requests arriving together", () => {
-	const crossings: [string, string, (a: { call: Function }, b: { call: Function }) => Promise<{ status: number; error?: { code: string } }>[], string][] = [
+	const crossings: [string, string, (a: Client, b: Client) => Promise<{ status: number; error?: { code: string } }>[], string][] = [
 		["lock", "user.lock", (a, b) => [a.call("POST", "users/root2/lock", { reason: "x" }), b.call("POST", "users/root/lock", { reason: "x" })], "user.lock"],
 		["delete", "user.delete", (a, b) => [a.call("DELETE", "users/root2"), b.call("DELETE", "users/root")], "user.delete"],
 		["demote", "user.update", (a, b) => [a.call("PATCH", "users/root2", { roleId: "role-editor" }), b.call("PATCH", "users/root", { roleId: "role-editor" })], "user.update"],

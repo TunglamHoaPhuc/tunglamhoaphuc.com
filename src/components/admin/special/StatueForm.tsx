@@ -319,7 +319,9 @@ export function StatueForm({ id }: { id: string | null }) {
 	}
 
 	const set = <K extends keyof Form>(key: K, value: Form[K]) => setForm((current) => ({ ...current, [key]: value }));
-	const canEdit = id ? can("statues", "update") : can("statues", "create");
+	// A published statue is on the site: only someone who may publish edits or trashes it (the server refuses the rest).
+	const lockedLive = Boolean(id) && detail?.status === "published" && !can("statues", "publish");
+	const canEdit = (id ? can("statues", "update") : can("statues", "create")) && !lockedLive;
 	const clusterOptions = [...(options.data?.clusters ?? []), ...clusters];
 
 	async function save(event: FormEvent) {
@@ -403,6 +405,7 @@ export function StatueForm({ id }: { id: string | null }) {
 		<>
 			<PageHeader title={id ? `Sửa bảo tượng: ${detail?.name ?? ""}` : "Thêm bảo tượng"} back={back} />
 			<form className="tq-panel" onSubmit={save} noValidate>
+				{lockedLive && can("statues", "update") ? <Alert kind="info">Mục này đang hiện trên trang công khai. Chỉ người có quyền xuất bản mới sửa hoặc xóa được; hãy nhờ biên tập viên.</Alert> : null}
 				<Feedback error={error} notice={notice} />
 				<TextField label="Tên bảo tượng" value={form.name} onChange={(e) => set("name", e.target.value)} error={fields.name} required maxLength={200} disabled={!canEdit} />
 				<div className="tq-toolbar">
@@ -500,10 +503,10 @@ export function StatueForm({ id }: { id: string | null }) {
 
 			{id && detail ? (
 				<>
-					<ImagesSection detail={detail} canEdit={can("statues", "update")} onSaved={setDetail} />
-					<RelatedSection detail={detail} canEdit={can("statues", "update")} onSaved={setDetail} />
-					<VariationsSection detail={detail} canEdit={can("statues", "update")} onSaved={setDetail} />
-					{can("statues", "delete") ? <ConfirmDelete what="bảo tượng" busy={busy === "delete"} onConfirm={() => void remove()} /> : null}
+					<ImagesSection detail={detail} canEdit={can("statues", "update") && !lockedLive} onSaved={setDetail} />
+					<RelatedSection detail={detail} canEdit={can("statues", "update") && !lockedLive} onSaved={setDetail} />
+					<VariationsSection detail={detail} canEdit={can("statues", "update") && !lockedLive} onSaved={setDetail} />
+					{can("statues", "delete") && !lockedLive ? <ConfirmDelete what="bảo tượng" busy={busy === "delete"} onConfirm={() => void remove()} /> : null}
 				</>
 			) : null}
 		</>

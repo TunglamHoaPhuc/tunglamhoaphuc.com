@@ -23,6 +23,19 @@ export function checkStatusChange(by: Authed, module: string, from: string | nul
 	if ((live(to) || live(from)) && !can(by.permissions, module, "publish")) throw new ApiError(403, "forbidden", "Bạn không có quyền xuất bản hoặc ẩn mục này.");
 }
 
+/** The one refusal for "this would go live, or is live, and you may not publish". */
+export const needsPublisher = (message: string) => new ApiError(403, "needs_publisher", message);
+
+/**
+ * An item that is shown on the site (published event or statue, visible area, active quote; month themes and featured programs always)
+ * is edited or trashed only by someone who may publish: a person with plain `update` would otherwise change the live page unreviewed.
+ * Same rule as `mayEditLive` for articles in content/service.ts. Pass the state before the change; for a switch that can also
+ * turn something ON (quote active, area visible) pass `before || after`.
+ */
+export function mayChangeLive(by: Authed, module: string, live: boolean): void {
+	if (live && !can(by.permissions, module, "publish")) throw needsPublisher("Mục này đang hiển thị trên trang. Chỉ người có quyền xuất bản mới sửa hoặc xóa được; hãy nhờ biên tập viên.");
+}
+
 /** Update/delete may be limited to what the person created ("own"). */
 export function mayChange(by: Authed, module: string, action: "update" | "delete", createdBy: string | null): void {
 	if (!can(by.permissions, module, action, { userId: by.user.id, ownerId: createdBy ?? "" })) throw forbidden();

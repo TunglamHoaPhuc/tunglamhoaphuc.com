@@ -83,7 +83,10 @@ export function AreaForm({ id }: { id: string }) {
 	}
 
 	const set = (key: keyof typeof form, value: string | boolean) => setForm((current) => ({ ...current, [key]: value }));
-	const canEdit = can("areas", "update");
+	// A visible area is on the site: only someone who may publish edits or trashes it, and only they switch visibility (the server refuses the rest).
+	const canPublish = can("areas", "publish");
+	const lockedLive = Boolean(row?.visible) && !canPublish;
+	const canEdit = can("areas", "update") && !lockedLive;
 	const num = (value: string) => (value.trim() === "" ? null : Number(value));
 	const x = num(form.mapX);
 	const y = num(form.mapY);
@@ -144,6 +147,7 @@ export function AreaForm({ id }: { id: string }) {
 		<>
 			<PageHeader title={`Sửa khu vực: ${row.name}`} back={back} />
 			<form className="tq-panel" onSubmit={save} noValidate>
+				{lockedLive && can("areas", "update") ? <Alert kind="info">Khu vực này đang hiện trên trang công khai. Chỉ người có quyền xuất bản mới sửa được; hãy nhờ biên tập viên.</Alert> : null}
 				<Feedback error={error} notice={notice} />
 				<TextField label="Tên khu vực" value={form.name} onChange={(e) => set("name", e.target.value)} error={fields.name} required maxLength={160} disabled={!canEdit} />
 				<TextField label="Tiêu đề phụ" value={form.subtitle} onChange={(e) => set("subtitle", e.target.value)} error={fields.subtitle} maxLength={300} disabled={!canEdit} />
@@ -168,8 +172,8 @@ export function AreaForm({ id }: { id: string }) {
 				</fieldset>
 
 				<label className="tq-check">
-					<input type="checkbox" checked={form.visible} onChange={(e) => set("visible", e.target.checked)} disabled={!canEdit} />
-					<span>Hiện trên trang công khai</span>
+					<input type="checkbox" checked={form.visible} onChange={(e) => set("visible", e.target.checked)} disabled={!canEdit || !canPublish} />
+					<span>Hiện trên trang công khai{canEdit && !canPublish ? " (cần quyền xuất bản để bật)" : ""}</span>
 				</label>
 				<TextField label="Thứ tự" type="number" min={0} value={form.position} onChange={(e) => set("position", e.target.value)} error={fields.position} disabled={!canEdit} />
 				{canEdit ? (
@@ -178,7 +182,7 @@ export function AreaForm({ id }: { id: string }) {
 					</Button>
 				) : null}
 			</form>
-			{can("areas", "delete") ? <ConfirmDelete what="khu vực" busy={busy === "delete"} onConfirm={() => void remove()} /> : null}
+			{can("areas", "delete") && !lockedLive ? <ConfirmDelete what="khu vực" busy={busy === "delete"} onConfirm={() => void remove()} /> : null}
 		</>
 	);
 }

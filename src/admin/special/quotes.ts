@@ -6,7 +6,7 @@ import { notFound } from "../http/errors";
 import { likeWord, type Page } from "../http/paging";
 import { newId } from "../ids";
 import { registerTrashable, trashStatement } from "../trash";
-import { asBool, audit, diffOf, invalid, mayChange, stamp } from "./common";
+import { asBool, audit, diffOf, invalid, mayChange, mayChangeLive, stamp } from "./common";
 
 export type QuoteModel = { text: string; author: string; source: string; sourceUrl: string; active: boolean };
 export type QuoteItem = QuoteModel & { id: string; position: number; createdBy: string | null; updatedAt: string | null };
@@ -59,6 +59,7 @@ function check(model: QuoteModel): QuoteModel {
 
 export async function createQuote(ctx: AuthContext, by: Authed, input: QuoteModel): Promise<QuoteItem> {
 	const model = check(input);
+	mayChangeLive(by, "quotes", model.active); // switching a quote on puts it on the home page
 	const id = newId("quote", ctx.now().getTime());
 	const now = stamp(ctx);
 	const last = await ctx.db.prepare("SELECT COALESCE(MAX(position), 0) AS p FROM quote WHERE deleted_at IS NULL").first();
@@ -77,6 +78,7 @@ export async function updateQuote(ctx: AuthContext, by: Authed, id: string, patc
 	const current = itemOf(row);
 	const before: QuoteModel = { text: current.text, author: current.author, source: current.source, sourceUrl: current.sourceUrl, active: current.active };
 	const model = check({ ...before, ...Object.fromEntries(Object.entries(patch).filter(([, value]) => value !== undefined)) });
+	mayChangeLive(by, "quotes", current.active || model.active); // editing an active quote, or switching one on
 	await ctx.db.batch([
 		ctx.db
 			.prepare("UPDATE quote SET text = ?, author = ?, source = ?, source_url = ?, active = ?, updated_by = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL")
@@ -102,6 +104,7 @@ export async function reorderQuotes(ctx: AuthContext, by: Authed, ids: string[])
 export async function deleteQuote(ctx: AuthContext, by: Authed, id: string): Promise<void> {
 	const row = await findRow(ctx, id);
 	mayChange(by, "quotes", "delete", text(row.created_by) || null);
+	mayChangeLive(by, "quotes", asBool(row.active));
 	await ctx.db.batch([trashStatement(ctx, by, "quote", id), audit(ctx, by, { action: "quote.trash", entityType: "quote", entityId: id, before: { text: row.text, author: row.author } })]);
 }
 

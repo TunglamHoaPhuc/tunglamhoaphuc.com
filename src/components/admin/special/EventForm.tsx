@@ -130,7 +130,9 @@ export function EventForm({ id, initialDate }: { id: string | null; initialDate?
 
 	const set = <K extends keyof Form>(key: K, value: Form[K]) => setForm((current) => ({ ...current, [key]: value }));
 	const canPublish = can("events", "publish");
-	const canUpdate = id ? can("events", "update") : can("events", "create");
+	// A published event is on the site: only someone who may publish edits or trashes it (the server refuses the rest).
+	const lockedLive = Boolean(id) && row?.status === "published" && !canPublish;
+	const canUpdate = (id ? can("events", "update") : can("events", "create")) && !lockedLive;
 
 	async function save(event: FormEvent) {
 		event.preventDefault();
@@ -204,6 +206,7 @@ export function EventForm({ id, initialDate }: { id: string | null; initialDate?
 		<>
 			<PageHeader title={id ? "Sửa sự kiện" : "Thêm sự kiện"} back={back} />
 			<form className="tq-panel" onSubmit={save} noValidate>
+				{lockedLive && can("events", "update") ? <Alert kind="info">Mục này đang hiện trên trang công khai. Chỉ người có quyền xuất bản mới sửa hoặc xóa được; hãy nhờ biên tập viên.</Alert> : null}
 				<Feedback error={error} notice={notice} />
 				<TextField label="Tiêu đề" value={form.title} onChange={(e) => set("title", e.target.value)} error={fields.title} required maxLength={160} />
 				<TextField label="Địa chỉ trang (slug)" value={form.slug} onChange={(e) => set("slug", e.target.value)} error={fields.slug} hint="Để trống để tự tạo từ tiêu đề." maxLength={160} />
@@ -289,7 +292,7 @@ export function EventForm({ id, initialDate }: { id: string | null; initialDate?
 					) : null}
 				</div>
 			</form>
-			{id && can("events", "delete") ? <ConfirmDelete what="sự kiện" busy={busy === "delete"} onConfirm={() => void remove()} /> : null}
+			{id && can("events", "delete") && !lockedLive ? <ConfirmDelete what="sự kiện" busy={busy === "delete"} onConfirm={() => void remove()} /> : null}
 		</>
 	);
 }
