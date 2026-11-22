@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import PostArticle from "@/components/sections/posts/PostArticle";
 import { DONG_CHAY } from "@/config/sections";
 import { findSectionPost, sectionPostMetadata } from "@/libs/sectionPosts";
+import { redirectIfMoved } from "@/libs/siteRedirect";
 
 // Served from Cloudflare's Workers Cache and made again at most every 5 minutes (T41e).
 export const revalidate = 300;
@@ -19,7 +20,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function DongChayArticle({ params }: Props) {
-	const post = await findSectionPost(DONG_CHAY, (await params).slug);
-	if (!post) notFound();
+	const { slug } = await params;
+	const post = await findSectionPost(DONG_CHAY, slug);
+	if (!post) {
+		await redirectIfMoved(`${DONG_CHAY.path}/${slug}`);
+		notFound();
+	}
 	return <PostArticle section={DONG_CHAY} post={post} />;
 }

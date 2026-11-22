@@ -154,7 +154,7 @@ export async function dispatch(request: Request, path: string, deps: Deps): Prom
 	} catch (error) {
 		if (error instanceof ApiError) {
 			const wait: Record<string, string> = error.retryAfter ? { "Retry-After": String(error.retryAfter) } : {};
-			return send(error.status, { error: { code: error.code, message: error.message, ...(error.fields ? { fields: error.fields } : {}) } }, setCookies, wait);
+			return send(error.status, { error: { code: error.code, message: error.message, ...(error.fields ? { fields: error.fields } : {}), ...(error.extra ?? {}) } }, setCookies, wait);
 		}
 		console.error("admin api", method, path, error);
 		return send(500, { error: { code: "server_error", message: "Có lỗi ở máy chủ. Hãy thử lại sau." } });

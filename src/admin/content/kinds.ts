@@ -239,6 +239,12 @@ export const PAGES: Kind = {
 };
 
 export const KINDS: Record<KindName, Kind> = { posts: POSTS, teachings: TEACHINGS, pages: PAGES };
+
+/** The address the public site serves an article at: /<section>/<slug>, /tong-chi-tu-hoc/<slug> or /gioi-thieu/<slug>. */
+export function publicPathOf(kind: Kind, section: string | null, slug: string): string {
+	if (kind.table === "post") return `/${section ?? ""}/${slug}`;
+	return `${kind.table === "teaching_article" ? "/tong-chi-tu-hoc" : "/gioi-thieu"}/${slug}`;
+}
 export const kindByPath = (path: string): Kind | undefined => Object.values(KINDS).find((kind) => kind.path === path);
 
 /** The parts of the site posts belong to (the first part of their address). */

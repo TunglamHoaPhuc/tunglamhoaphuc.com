@@ -5,6 +5,7 @@ import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import { TRI_TUE } from "@/config/sections";
 import { book } from "@/config/triTue";
 import { findSectionPost, sectionPostMetadata } from "@/libs/sectionPosts";
+import { redirectIfMoved } from "@/libs/siteRedirect";
 
 // Served from Cloudflare's Workers Cache and made again at most every 5 minutes (T41e).
 export const revalidate = 300;
@@ -24,8 +25,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // leads to the book. The data has no sound for Pháp Âm nor video for Video Phật Pháp (the
 // old pages show none either): those posts are their text and picture.
 export default async function TriTueArticle({ params }: Props) {
-	const post = await findSectionPost(TRI_TUE, (await params).slug);
-	if (!post) notFound();
+	const { slug } = await params;
+	const post = await findSectionPost(TRI_TUE, slug);
+	if (!post) {
+		await redirectIfMoved(`${TRI_TUE.path}/${slug}`);
+		notFound();
+	}
 	const extra =
 		post.slug === book.postSlug ? (
 			<div className="tlhp-article-actions">

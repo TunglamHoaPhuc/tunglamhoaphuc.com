@@ -10,14 +10,15 @@ import { newId } from "../ids";
 import { mediaPath, replaceUsageStatements } from "../media/service";
 import { can } from "../rbac/check";
 import { getRevision, listRevisions, revisionStatement } from "../revision";
-import { slugify } from "../slug";
+import { SLUG_MAX, slugify } from "../slug";
 import { registerTrashable, trashStatement } from "../trash";
 import { IMAGE_WIDTH, imageAt } from "../../libs/content/media";
 import { renderContent } from "../../libs/content/normalize";
 import { tongChiMarkdown, type BodyTarget } from "../../libs/content/tongChiBody";
 import { extraMediaUses, parseExtra } from "./extra";
 import { markdownOf, mediaIdsIn, parseSafe, plainText, serialize, textOf } from "./html";
-import { KINDS, SECTIONS, SPECIAL_LABELS, STATUS_LABELS, type FieldSpec, type Kind, type Status } from "./kinds";
+import { checkFrom, checkTo } from "../../libs/redirects";
+import { KINDS, publicPathOf, SECTIONS, SPECIAL_LABELS, STATUS_LABELS, type FieldSpec, type Kind, type Status } from "./kinds";
 import { signPreview, verifyPreview } from "./preview";
 import { searchTextOf, searchWords } from "./search";
 
@@ -431,9 +432,18 @@ async function freeSlug(db: AdminDb, kind: Kind, base: string, section: string |
 }
 
 export async function checkSlug(ctx: AuthContext, kind: Kind, input: { slug?: string; text?: string; section?: string; excludeId?: string }) {
-	const slug = slugify(input.slug || input.text || "");
+	// A slug made from a title is cut to the limit; one that is asked about is judged as it is (and one the article already has is its own).
+	const slug = input.slug ? slugify(input.slug, Number.MAX_SAFE_INTEGER) : slugify(input.text || "");
 	if (!slug) throw new ApiError(400, "invalid_input", "Đường dẫn cần có chữ hoặc số.", { slug: "Đường dẫn cần có chữ hoặc số." });
 	if (kind.hasSection && !SECTIONS.some((section) => section.slug === input.section)) throw new ApiError(400, "invalid_input", "Chọn chuyên trang.", { section: "Chọn chuyên trang." });
+	if (slug.length > SLUG_MAX) {
+		const own = input.excludeId ? await ctx.db.prepare(`SELECT slug FROM ${kind.table} WHERE id = ? AND deleted_at IS NULL`).bind(input.excludeId).first() : null;
+		if (!own || text(own.slug) !== input.slug) {
+			const message = `Đường dẫn tối đa ${SLUG_MAX} ký tự (đang có ${slug.length}). Hãy rút gọn.`;
+			throw new ApiError(400, "invalid_input", message, { slug: message });
+		}
+		return { slug: input.slug, available: true, suggestion: input.slug };
+	}
 	const taken = await slugTaken(ctx.db, kind, slug, input.section ?? null, input.excludeId || null);
 	return { slug, available: !taken, suggestion: taken ? await freeSlug(ctx.db, kind, slug, input.section ?? null, input.excludeId || null) : slug };
 }
@@ -502,7 +512,7 @@ async function categoryOf(db: AdminDb, kind: Kind, categoryId: string, section: 
  * Applies `input` over `current` and works out what to store: cleaned values, checked references, the sanitised body
  * (with library pictures pointed at their current address) and the columns that change. `current` is null on create.
  */
-async function prepare(db: AdminDb, kind: Kind, current: State | null, input: State, currentRow: Row | null, ownId: string | null): Promise<Prepared> {
+async function prepare(db: AdminDb, kind: Kind, current: State | null, input: State, currentRow: Row | null, ownId: string | null, trustSlug = false): Promise<Prepared> {
 	const next: State = { ...(current ?? {}) };
 	const columns = new Map<string, unknown>();
 	const changedKeys: string[] = [];
@@ -555,22 +565,34 @@ async function prepare(db: AdminDb, kind: Kind, current: State | null, input: St
 		}
 	}
 
-	if (has("slug")) {
-		const slug = slugify(String(input.slug ?? ""));
+	// A slug that arrives as stored is left alone (no slugify, no cutting: 87 of the old site's slugs are longer than the
+	// editor's own limit). Only a slug somebody changed is made into a slug; a new one longer than SLUG_MAX is refused, never cut.
+	const given = has("slug") ? String(input.slug ?? "") : null;
+	if (given !== null && (current || given.trim()) && given !== current?.slug) {
+		const slug = slugify(given, Number.MAX_SAFE_INTEGER);
 		if (!slug) throw new ApiError(400, "invalid_input", "Đường dẫn cần có chữ hoặc số.", { slug: "Đường dẫn cần có chữ hoặc số." });
+		if (slug.length > SLUG_MAX && !trustSlug) {
+			const message = `Đường dẫn tối đa ${SLUG_MAX} ký tự (đang có ${slug.length}). Hãy rút gọn.`;
+			throw new ApiError(400, "invalid_input", message, { slug: message });
+		}
 		if (slug !== current?.slug) {
 			next.slug = slug;
 			columns.set("slug", slug);
 			if (current) mark("slug");
 		}
 	}
+	const explicitSlug = given !== null && (!!current || !!given.trim());
 	if (!current && !next.slug) next.slug = slugify(String(next.title)) || kind.idPrefix;
 	if (!current || columns.has("slug") || sectionChanged) {
 		const slug = String(next.slug);
 		if (await slugTaken(db, kind, slug, section, ownId)) {
-			if (current || has("slug")) throw new ApiError(409, "slug_taken", "Đường dẫn này đã có bài khác dùng.", { slug: "Đường dẫn này đã có bài khác dùng. Hãy chọn đường dẫn khác." });
+			const suggestion = await freeSlug(db, kind, slug, section, ownId);
+			// A slug somebody asked for is theirs to change: the answer carries the free one, nothing is renamed behind their back.
+			if (current || explicitSlug) {
+				throw new ApiError(409, "slug_taken", "Đường dẫn này đã có bài khác dùng.", { slug: "Đường dẫn này đã có bài khác dùng. Hãy chọn đường dẫn khác." }, undefined, { suggestion: { slug: suggestion } });
+			}
 			// A new article whose slug came from its title takes the next free one.
-			next.slug = await freeSlug(db, kind, slug, section, ownId);
+			next.slug = suggestion;
 		}
 		if (!current) columns.set("slug", next.slug);
 	}
@@ -651,6 +673,28 @@ function milestoneStatements(db: AdminDb, pageId: string, milestones: { label: s
 	return out;
 }
 
+/**
+ * A live article (published or scheduled) whose address changes leaves its old address pointing at the new one, in the same
+ * batch as the save. Older redirects to the old address follow the article (no chains), and a redirect that starts at the
+ * address it now has is dropped (no loops); one row per old address.
+ */
+function redirectStatements(ctx: AuthContext, by: Authed, kind: Kind, current: State, next: State): AdminStmt[] {
+	if (!["published", "scheduled"].includes(String(current.status))) return [];
+	const from = publicPathOf(kind, (current.section as string | undefined) ?? null, String(current.slug));
+	const to = publicPathOf(kind, (next.section as string | undefined) ?? null, String(next.slug));
+	if (from === to || !checkFrom(from).ok || !checkTo(to).ok) return [];
+	return [
+		ctx.db.prepare("DELETE FROM redirect WHERE from_path = ?").bind(to),
+		ctx.db.prepare("UPDATE redirect SET to_path = ? WHERE to_path = ?").bind(to, from),
+		ctx.db
+			.prepare(
+				`INSERT INTO redirect (from_path, to_path, code, note, hits, active, created_by, created_at) VALUES (?, ?, 301, ?, 0, 1, ?, ?)
+				 ON CONFLICT(from_path) DO UPDATE SET to_path = excluded.to_path, code = 301, active = 1, note = excluded.note`,
+			)
+			.bind(from, to, "Tự động: bài đổi đường dẫn", by.user.id, iso(ctx)),
+	];
+}
+
 const snapshotOf = (kind: Kind, state: State): State => Object.fromEntries([...editableKeys(kind), "status", "publishAt"].map((key) => [key, state[key] ?? null]));
 
 const summaryOf = (kind: Kind, keys: string[]) => {
@@ -704,7 +748,7 @@ export async function updateItem(ctx: AuthContext, by: Authed, kind: Kind, id: s
 	const current = await stateOf(ctx.db, kind, row);
 	const { version: _ignored, ...changes } = input;
 	void _ignored;
-	const prepared = await prepare(ctx.db, kind, current, changes, row, id);
+	const prepared = await prepare(ctx.db, kind, current, changes, row, id, opts.action === "restore");
 	if (!prepared.changedKeys.length && !opts.summary) return detailOf(ctx, by, kind, row);
 
 	const next: State = { ...prepared.next, status: current.status, publishAt: current.publishAt };
@@ -722,6 +766,7 @@ export async function updateItem(ctx: AuthContext, by: Authed, kind: Kind, id: s
 			.bind(...names.map((name) => columns.get(name)), id, version),
 		revisionStatement(ctx, by, kind.entityType, id, version + 1, snapshotOf(kind, next), opts.summary ?? summaryOf(kind, prepared.changedKeys)),
 		...replaceUsageStatements(ctx, kind.entityType, id, mediaUses(kind, next, prepared.contentIds)),
+		...(prepared.changedKeys.includes("slug") || prepared.changedKeys.includes("section") ? redirectStatements(ctx, by, kind, current, next) : []),
 		audit(ctx, by, { action: `${kind.entityType}.${opts.action ?? "update"}`, entityType: kind.entityType, entityId: id, before, after }),
 	];
 	if (kind.hasMilestones && prepared.changedKeys.includes("milestones")) statements.push(...milestoneStatements(ctx.db, id, next.milestones as { label: string; title: string; description: string }[]));

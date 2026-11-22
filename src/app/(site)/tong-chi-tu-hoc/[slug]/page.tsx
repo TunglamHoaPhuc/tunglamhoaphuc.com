@@ -14,6 +14,7 @@ import { IMAGE_WIDTH, imageAt, topImagePriority } from "@/libs/content/media";
 import { getContentRepository } from "@/libs/content/repository";
 import type { TongChiArticle, TongChiSummary } from "@/libs/content/types";
 import { formatNumber } from "@/libs/format";
+import { redirectIfMoved } from "@/libs/siteRedirect";
 import { groupTongChi, nameInGroup, tongChiHref } from "@/libs/tongChiGroups";
 
 // Served from Cloudflare's Workers Cache and made again at most every 5 minutes (T41e).
@@ -50,8 +51,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // and beside it the other articles of its group. Rendered on the server: the old site
 // fetched it in the browser and showed "Đang tải…" (or nothing of the body at all).
 export default async function TongChiArticlePage({ params }: Props) {
-	const found = await findArticle((await params).slug);
-	if (!found) notFound();
+	const { slug } = await params;
+	const found = await findArticle(slug);
+	if (!found) {
+		await redirectIfMoved(`${PATH}/${slug}`);
+		notFound();
+	}
 	const { article, all } = found;
 	const groups = groupTongChi(all);
 	const group = groups.find((item) => item.slug === article.group.slug);
