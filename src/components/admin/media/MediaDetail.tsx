@@ -64,7 +64,7 @@ export function MediaDetail({ id, folders, onClose, onChanged, onDeleted }: { id
 type Delete = "idle" | "confirm" | "force";
 
 function Body({ detail, folders, reload, onChanged, onDeleted }: { detail: MediaDetailData; folders: Folder[]; reload: () => void; onChanged: () => void; onDeleted: () => void }) {
-	const { can } = useAdmin();
+	const { canOn } = useAdmin();
 	const fileId = useId();
 	const [title, setTitle] = useState(detail.title);
 	const [alt, setAlt] = useState(detail.alt);
@@ -80,8 +80,9 @@ function Body({ detail, folders, reload, onChanged, onDeleted }: { detail: Media
 	const [remove, setRemove] = useState<Delete>("idle");
 	const [removeError, setRemoveError] = useState("");
 
-	const canUpdate = can("media", "update");
-	const canDelete = can("media", "delete");
+	// With the scope "own" only the pictures the person uploaded can be changed or deleted; for the others the buttons are not offered.
+	const canUpdate = canOn("media", "update", detail.uploadedBy);
+	const canDelete = canOn("media", "delete", detail.uploadedBy);
 	const base = `media/${encodeURIComponent(detail.id)}`;
 	const folderOptions = flattenFolders(folders);
 	const item: MediaItem = detail;

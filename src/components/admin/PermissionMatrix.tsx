@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { isOwnable } from "@/admin/rbac/catalog";
 
 export type MatrixModule = { key: string; label: string };
 
@@ -11,15 +12,16 @@ type Props = {
 	value: string[];
 	onChange: (next: string[]) => void;
 	readOnly?: boolean;
-	/** False: the person lacks that right and so cannot hand it out. */
-	canGrant?: (module: string, action: string) => boolean;
+	/**
+	 * Whether the person can hand out `module.action` at that scope: with "own" they must hold it in any scope, with "all" they must hold it in full
+	 * (a caller who holds only "của mình" cannot give "Tất cả"). Omitted: everything can be granted.
+	 */
+	canGrant?: (module: string, action: string, scope: "all" | "own") => boolean;
 };
 
 type Scope = "none" | "all" | "own";
 
 const ACTION_LABELS: Record<string, string> = { view: "Xem", create: "Tạo", update: "Sửa", delete: "Xóa", publish: "Xuất bản" };
-const OWN_ACTIONS = new Set(["view", "update", "delete"]);
-
 const SCOPE_TEXT: Record<Scope, string> = { none: "—", all: "Tất cả", own: "Của mình" };
 
 /** Splits "module.action[:own]"; null for anything malformed. */
@@ -31,7 +33,10 @@ function parse(entry: string): { module: string; action: string; own: boolean } 
 
 const format = (module: string, action: string, own: boolean) => `${module}.${action}${own ? ":own" : ""}`;
 
-/** Drops duplicates, and a "own" entry when the same right is also granted in full. */
+/**
+ * Drops duplicates, an "own" entry when the same right is also granted in full, and an "own" entry on a right that has no such scope
+ * (the server refuses it, and it was worth nothing: only the pairs of the catalogue's OWNABLE set honour "của mình").
+ */
 export function normalizePermissions(list: string[]): string[] {
 	const scopes = new Map<string, "all" | "own">();
 	const passthrough: string[] = [];
@@ -42,8 +47,8 @@ export function normalizePermissions(list: string[]): string[] {
 			continue;
 		}
 		const key = `${parsed.module}.${parsed.action}`;
-		if (parsed.own && OWN_ACTIONS.has(parsed.action)) {
-			if (!scopes.has(key)) scopes.set(key, "own");
+		if (parsed.own) {
+			if (isOwnable(parsed.module, parsed.action) && !scopes.has(key)) scopes.set(key, "own");
 		} else {
 			scopes.set(key, "all");
 		}
@@ -58,8 +63,8 @@ export function PermissionMatrix({ modules, actions, value, onChange, readOnly =
 			const parsed = parse(entry);
 			if (!parsed) continue;
 			const key = `${parsed.module}.${parsed.action}`;
-			if (parsed.own && OWN_ACTIONS.has(parsed.action)) {
-				if (map.get(key) !== "all") map.set(key, "own");
+			if (parsed.own) {
+				if (isOwnable(parsed.module, parsed.action) && map.get(key) !== "all") map.set(key, "own");
 			} else {
 				map.set(key, "all");
 			}
@@ -95,20 +100,28 @@ export function PermissionMatrix({ modules, actions, value, onChange, readOnly =
 							{actions.map((action) => {
 								const scope = scopeOf(module.key, action);
 								const name = `${module.label} – ${ACTION_LABELS[action] ?? action}`;
-								const locked = readOnly || (canGrant ? !canGrant(module.key, action) : false);
+								const ownable = isOwnable(module.key, action);
+								const mayAll = !canGrant || canGrant(module.key, action, "all");
+								const mayOwn = ownable && (!canGrant || canGrant(module.key, action, "own"));
+								const locked = !mayAll && !mayOwn;
 								if (readOnly) {
-									return <td key={action}>{OWN_ACTIONS.has(action) ? SCOPE_TEXT[scope] : scope === "none" ? "—" : "Có"}</td>;
+									return <td key={action}>{ownable ? SCOPE_TEXT[scope] : scope === "none" ? "—" : "Có"}</td>;
 								}
 								return (
 									<td key={action}>
-										{OWN_ACTIONS.has(action) ? (
+										{ownable ? (
+											// "Của mình" only where a handler checks the owner; "Tất cả" only for a person who holds it in full. What the role already has stays shown.
 											<select aria-label={name} value={scope} disabled={locked} onChange={(event) => setScope(module.key, action, event.target.value as Scope)}>
 												<option value="none">{SCOPE_TEXT.none}</option>
-												<option value="all">{SCOPE_TEXT.all}</option>
-												<option value="own">{SCOPE_TEXT.own}</option>
+												<option value="all" disabled={!mayAll && scope !== "all"}>
+													{SCOPE_TEXT.all}
+												</option>
+												<option value="own" disabled={!mayOwn && scope !== "own"}>
+													{SCOPE_TEXT.own}
+												</option>
 											</select>
 										) : (
-											<input type="checkbox" aria-label={name} checked={scope !== "none"} disabled={locked} onChange={(event) => setScope(module.key, action, event.target.checked ? "all" : "none")} />
+											<input type="checkbox" aria-label={name} checked={scope !== "none"} disabled={!mayAll && scope === "none"} onChange={(event) => setScope(module.key, action, event.target.checked ? "all" : "none")} />
 										)}
 									</td>
 								);

@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from "next/navigation";
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { api, ApiClientError, setCsrf } from "./api";
+import { canOn, scopeOf, type Scope } from "./ownScope";
 
 export type Me = {
 	user: { id: string; email: string; name: string; role: string; roleId: string | null };
@@ -18,6 +19,10 @@ type Value = {
 	me: Me;
 	/** Whether the person may do `action` on `module` (for "own" rights: on something of theirs, which the server decides). */
 	can: (module: string, action: string) => boolean;
+	/** The widest scope held for the action: "all" (every row), "own" (only rows the person made) or null. */
+	scope: (module: string, action: string) => Scope;
+	/** Whether the person may do `action` on a thing made by `ownerId`: always with scope "all", only for their own with "own". */
+	canOn: (module: string, action: string, ownerId: string | null | undefined) => boolean;
 	reload: () => Promise<void>;
 	signOut: () => Promise<void>;
 };
@@ -64,6 +69,8 @@ export function AdminProvider({ children }: { children: ReactNode }) {
 		return {
 			me: state.me,
 			can: (module, action) => granted.has(`${module}.${action}`) || granted.has(`${module}.${action}:own`),
+			scope: (module, action) => scopeOf(state.me.permissions, module, action),
+			canOn: (module, action, ownerId) => canOn(state.me.permissions, state.me.user.id, module, action, ownerId),
 			reload: load,
 			signOut: async () => {
 				try {

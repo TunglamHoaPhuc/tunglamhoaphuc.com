@@ -63,7 +63,9 @@ export function QuotesManager() {
 	if (search) params.set("q", search);
 	if (active) params.set("active", active);
 	const list = useLoader(() => apiList<Quote>(`quotes?${params}`), `quotes-${params}`);
-	const setting = useLoader(() => api<{ blocks: { block: string; live: { source?: string; mode?: string } | null }[] }>("GET", "home"), "home-quotes");
+	// Which source the home page shows is the Trang chủ module's: without its "view" right nothing is asked and the note is left out.
+	const canHome = can("home", "view");
+	const setting = useLoader(() => (canHome ? api<{ blocks: { block: string; live: { source?: string; mode?: string } | null }[] }>("GET", "home") : Promise.resolve(null)), `home-quotes-${canHome}`);
 	const [editing, setEditing] = useState<Quote | "new" | null>(null);
 	const [asking, setAsking] = useState("");
 	const [error, setError] = useState("");
@@ -93,11 +95,13 @@ export function QuotesManager() {
 			<PageHeader title="Lời Thầy dạy">
 				{can("quotes", "create") ? <Button onClick={() => setEditing("new")}>Thêm lời dạy</Button> : null}
 			</PageHeader>
-			<Alert kind="info">
-				{live?.source === "trich-dan" ? "Trang chủ đang hiện các lời dạy đang bật dưới đây" : "Trang chủ đang hiện câu kệ của chủ đề từng tháng"}
-				{live?.source === "trich-dan" ? (live.mode === "ngau-nhien" ? ", theo thứ tự ngẫu nhiên mỗi lượt xem." : ", theo đúng thứ tự." ) : ". "}{" "}
-				Đổi nguồn tại <Link href="/quan-tri/trang-chu">Trang chủ</Link>.
-			</Alert>
+			{canHome ? (
+				<Alert kind="info">
+					{live?.source === "trich-dan" ? "Trang chủ đang hiện các lời dạy đang bật dưới đây" : "Trang chủ đang hiện câu kệ của chủ đề từng tháng"}
+					{live?.source === "trich-dan" ? (live.mode === "ngau-nhien" ? ", theo thứ tự ngẫu nhiên mỗi lượt xem." : ", theo đúng thứ tự." ) : ". "}{" "}
+					Đổi nguồn tại <Link href="/quan-tri/trang-chu">Trang chủ</Link>.
+				</Alert>
+			) : null}
 			<Feedback error={error} notice={notice} />
 			{editing ? (
 				<QuoteForm

@@ -22,7 +22,9 @@ export function MenuManager() {
 	const { can } = useAdmin();
 	const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("header");
 	const menu = useLoader(() => api<MenuData>("GET", `menus/${tab}`), tab);
-	const categories = useLoader(() => api<CategoryRow[]>("GET", "categories"), "categories");
+	// The category list (for links to a category) belongs to the Chuyên mục module: without its "view" right it is not asked for and the picker simply has none.
+	const canCategories = can("categories", "view");
+	const categories = useLoader(() => (canCategories ? api<CategoryRow[]>("GET", "categories") : Promise.resolve<CategoryRow[]>([])), `categories-${canCategories}`);
 	const [order, setOrder] = useState<TreeEntry[] | null>(null);
 	const [form, setForm] = useState<MenuItemFormMode | null>(null);
 	const [confirmId, setConfirmId] = useState<string | null>(null);

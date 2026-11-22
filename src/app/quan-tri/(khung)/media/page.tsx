@@ -24,7 +24,7 @@ export default function MediaPage() {
 }
 
 function Library() {
-	const { can } = useAdmin();
+	const { can, scope } = useAdmin();
 	const [q, setQ] = useState("");
 	const [sort, setSort] = useState("newest");
 	const [unused, setUnused] = useState(false);
@@ -87,8 +87,8 @@ function Library() {
 							list.reload();
 						}}
 						canCreate={can("media", "create")}
-						canUpdate={can("media", "update")}
-						canDelete={can("media", "delete")}
+						canUpdate={scope("media", "update") === "all"}
+						canDelete={scope("media", "delete") === "all"}
 					/>
 				</aside>
 
