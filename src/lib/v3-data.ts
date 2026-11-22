@@ -175,6 +175,8 @@ export function toAreaRecord(a: Area, index = 0) {
 	};
 }
 
+export type V3Area = ReturnType<typeof toAreaRecord>;
+
 export async function allAreas() {
 	return (await (await repo()).listAreas()).map(toAreaRecord);
 }

@@ -107,7 +107,7 @@ test("trang danh sách: nhóm hết bài thì mất, không có thẻ đóng gó
 	assert.deepEqual(sections.map((s) => s.id), ["nen-tang", "lo-trinh"]);
 	const nenTang = sections.find((s) => s.id === "nen-tang")!;
 	assert.deepEqual(nenTang.cards.map((c) => c.link).sort(), ["/tong-chi-tu-hoc/bo-de-tam", "/tong-chi-tu-hoc/chi-co-markdown", "/tong-chi-tu-hoc/hen-gio-da-toi"]);
-	for (const section of sections) for (const card of section.cards) assert.equal(card.link.includes("tiep-buoc-thay-toi"), false);
+	for (const section of sections) for (const card of section.cards) assert.equal(card.link?.includes("tiep-buoc-thay-toi"), false);
 	assert.deepEqual(tongChiNavItems(sections).map((n) => n.id), ["tong-chi-tu-hoc", "nen-tang", "lo-trinh"]);
 	assert.deepEqual(buildTongChiSections([]), [], "D1 trống: không có khối nào");
 	assert.equal(introHtml(["a < b"]), "<p>a &lt; b</p>");

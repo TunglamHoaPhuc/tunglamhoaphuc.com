@@ -1,203 +1,24 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
-import Link from 'next/link';
-import { Eye, Calendar, Play, ArrowLeft, ChevronRight, Bell, Sparkles, Video, Images, BookOpen, Clock, Landmark, ArrowRight } from 'lucide-react';
-import Header from '@/components/public/layout/Header';
-import Footer from '@/components/public/layout/Footer';
-import { WISDOM_ITEMS } from '@/data/wisdom-archive-data';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
+// Một bài Trí Tuệ Phật Pháp, đọc ở máy chủ từ D1 của www. Bài nháp, hẹn giờ chưa tới, trong thùng rác, của chuyên
+// mục khác hay không có: 404 (không còn rơi về bài đóng gói thứ 6). D1 được hỏi trước; chỉ khi D1 không có bài mới
+// xét năm ấn phẩm đóng gói (đọc song ngữ), vì ấn phẩm chưa nằm trong D1.
+import { notFound } from 'next/navigation';
 import sachAnPhamData from '@/data/sach-an-pham-data.json';
 import { BookDualReader } from '@/components/tri-tue-phat-phap/BookDualReader';
-import { HeroBanner } from '@/components/tong-chi-tu-hoc/HeroBanner';
-import { InfographicArticleRenderer } from '@/components/tong-chi-tu-hoc/chi-tiet/InfographicArticleRenderer';
-import { BookCitationSection } from '@/components/tong-chi-tu-hoc/chi-tiet/BookCitationSection';
-import { IllustrationVideo } from '@/components/tong-chi-tu-hoc/chi-tiet/IllustrationVideo';
-import { PhotoGallery } from '@/components/tong-chi-tu-hoc/chi-tiet/PhotoGallery';
-import { DiscoverMore } from '@/components/tong-chi-tu-hoc/chi-tiet/DiscoverMore';
-import { DetailModal } from '@/components/tong-chi-tu-hoc/chi-tiet/DetailModal';
+import { livePost, livePosts } from '@/lib/v3-live';
+import { relatedWisdom, TRI_TUE_SECTION } from '@/lib/wisdom';
+import TriTueDetailClient from './TriTueDetailClient';
 
-export default function WisdomDetailPage() {
-  const routeParams = useParams();
-  const rawSlug = routeParams?.slug;
-  const slug = typeof rawSlug === 'string' ? rawSlug : Array.isArray(rawSlug) ? rawSlug[0] : '';
-  const [isPlayingVideo, setIsPlayingVideo] = useState(false);
-  const [activeKeyword, setActiveKeyword] = useState<any>(null);
+export const revalidate = 60;
 
-  // Check if this slug is a Book from Publications
-  const matchedBook = sachAnPhamData.find((b) => b.slug === slug);
-
-  // Dynamic Item State
-  const initialFallback = WISDOM_ITEMS.find((w) => w.slug === slug) || WISDOM_ITEMS[5];
-  const [item, setItem] = useState<any>(initialFallback);
-
-  useEffect(() => {
-    async function loadDynamicPost() {
-      if (!slug || matchedBook) return;
-      try {
-        const res = await fetch(`/api/admin/posts/${slug}?t=${Date.now()}`, {
-          cache: 'no-store',
-          next: { revalidate: 0 },
-        });
-        if (res.ok) {
-          const json = await res.json();
-          if (json.success && json.post) {
-            setItem({
-              ...json.post,
-              primaryCategoryTag: json.post.subtitle || json.post.categoryName || 'Trí Tuệ Phật Pháp',
-              publishDate: json.post.publishedDate || '',
-              views: json.post.viewsCount || 108,
-            });
-
-            // 👁️ Tự động ghi nhận lượt xem (chống trùng lặp bằng sessionStorage)
-            const viewKey = `viewed_tt_${slug}`;
-            if (typeof window !== 'undefined' && !sessionStorage.getItem(viewKey)) {
-              sessionStorage.setItem(viewKey, '1');
-              fetch('/api/public/increment-view', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ type: 'post', idOrSlug: slug }),
-              }).catch(() => {});
-            }
-          }
-        }
-      } catch (err) {
-        console.log('Wisdom detail dynamic fetch fallback:', err);
-      }
-    }
-    loadDynamicPost();
-  }, [slug, matchedBook]);
-
-  if (matchedBook) {
-    return <BookDualReader book={matchedBook as any} />;
+export default async function WisdomDetailPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug: rawSlug } = await params;
+  const slug = decodeURIComponent(rawSlug);
+  const post = await livePost(slug, TRI_TUE_SECTION);
+  if (post) {
+    const item = { ...post, primaryCategoryTag: post.subtitle || post.categoryName || 'Trí Tuệ Phật Pháp', publishDate: post.publishedDate };
+    return <TriTueDetailClient item={item} relatedFormatted={relatedWisdom(post, await livePosts(TRI_TUE_SECTION))} />;
   }
-
-  const relatedItems = WISDOM_ITEMS.filter((w) => w.id !== item.id).slice(0, 3);
-  const relatedFormatted = relatedItems.map((r) => ({
-    category: r.primaryCategoryTag || 'Trí Tuệ Phật Pháp',
-    title: r.title,
-    url: r.thumbnailUrl,
-    link: `/tri-tue-phat-phap/${r.slug}`,
-  }));
-
-  return (
-    <div className="min-h-screen bg-[#2C1C11] text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black">
-      {/* ── 1. HERO BANNER & TIÊU ĐỀ TRANG ── */}
-      <HeroBanner
-        id="overview"
-        bannerUrl={item.bannerUrl || item.thumbnailUrl}
-        bannerPosition={item.bannerPosition || item.thumbnailPosition || 'center 25%'}
-        title={item.title}
-        subtitle={item.subtitle || 'KHO TÀNG TRÍ TUỆ PHẬT PHÁP'}
-      />
-
-      {/* ── 2. NỘI DUNG PHÁP BẢO & INFOGRAPHIC ARTICLE RENDERER ── */}
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-16">
-        <div className="max-w-4xl mx-auto">
-          {/* Back link */}
-          <div className="mb-6">
-            <Link
-              href="/tri-tue-phat-phap"
-              className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-[#F2C14E] hover:text-[#FFE5A3] transition-colors"
-              style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: 'bold' }}
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Quay Lại Kho Tàng Trí Tuệ Phật Pháp</span>
-            </Link>
-          </div>
-
-          <InfographicArticleRenderer
-            rawContent={item.content || item.contentHtml || item.excerpt || ''}
-            title={item.title}
-            subtitle={item.subtitle}
-            author={item.author}
-            popups={item.keywords}
-            onKeywordClick={(kwStr) => {
-              const kws = item.keywords || [];
-              const found = kws.find((k: any) => k.keyword.toLowerCase() === kwStr.toLowerCase());
-              if (found) {
-                setActiveKeyword(found);
-              }
-            }}
-          />
-
-          {/* Meta footer */}
-          <div
-            style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className="border-t border-[#F2C14E]/20 pt-6 mt-12 flex flex-wrap items-center justify-between gap-4 text-xs md:text-sm text-[#D3C0AD]"
-          >
-            <div className="flex items-center gap-6">
-              {(item.publishDate || item.publishedDate) && (
-                <span className="flex items-center gap-1.5">
-                  <Calendar className="w-4 h-4 text-[#F2C14E]" />
-                  <span>Ngày đăng: <strong className="text-[#F2C14E]">{item.publishDate || item.publishedDate}</strong></span>
-                </span>
-              )}
-
-              <span className="flex items-center gap-1.5">
-                <Eye className="w-4 h-4 text-[#F2C14E]" />
-                <span>Lượt xem: <strong className="text-[#F2C14E]">{item.views || item.viewsCount || 108}</strong></span>
-              </span>
-            </div>
-
-            {item.author && (
-              <div>
-                <span>Tác giả / Diễn giảng: <strong className="text-[#F2C14E]">{item.author}</strong></span>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* ── 3. BLOCK VIDEO PHÁP THOẠI / MINH HỌA ── */}
-        {(item.videoBlock?.videoUrl || item.mediaUrl) && (
-          <div className="w-full">
-            <IllustrationVideo
-              heroBanner={item.bannerUrl || item.thumbnailUrl}
-              videoBlock={item.videoBlock || {
-                videoUrl: item.mediaUrl,
-                title: item.title,
-                summary: item.excerpt || '',
-                thumbnailUrl: item.thumbnailUrl,
-              }}
-            />
-          </div>
-        )}
-
-        {/* ── 4. BLOCK BỘ SƯU TẬP ẢNH TƯ LIỆU (PHOTO GALLERY) ── */}
-        {item.photoGallery && item.photoGallery.length > 0 && (
-          <div className="w-full">
-            <PhotoGallery photoGallery={item.photoGallery} onSelectPhoto={() => {}} />
-          </div>
-        )}
-
-        {/* ── 5. BLOCK TRÍCH DẪN NGUỒN SÁCH & ẤN PHẨM ── */}
-        {item.sourceBook && (
-          <BookCitationSection sourceBook={item.sourceBook} />
-        )}
-
-        {/* ── 6. BLOCK TÌM HIỂU THÊM ── */}
-        <div className="w-full">
-          <DiscoverMore relatedArticles={relatedFormatted} />
-        </div>
-
-        {/* Smart Search AI Bar */}
-        <div className="my-10">
-          <SmartSearchAIBar contextTitle={item.title} />
-        </div>
-      </main>
-
-      {/* Detail Modal for Keyword Click */}
-      <DetailModal
-        activePhotoIndex={null}
-        photoGallery={[]}
-        onClosePhotoModal={() => {}}
-        onPrevPhoto={() => {}}
-        onNextPhoto={() => {}}
-        onSelectPhotoIndex={() => {}}
-        activeKeywordPopup={activeKeyword}
-        onCloseKeywordPopup={() => setActiveKeyword(null)}
-      />
-    </div>
-  );
+  const book = sachAnPhamData.find((b) => b.slug === slug);
+  if (book) return <BookDualReader book={book as never} />;
+  notFound();
 }

@@ -126,7 +126,7 @@ export const MediaPlayModal: FC<MediaPlayModalProps> = ({ item, onClose }) => {
 
             <div className="flex items-center gap-2 text-xs font-bold text-[#c9b896]" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
               <span className="text-[#F2C14E]">NGUỒN:</span>
-              <span className="uppercase tracking-wider">{item.originTag.label}</span>
+              <span className="uppercase tracking-wider">{item.originTag?.label ?? ''}</span>
             </div>
           </div>
 

@@ -3,7 +3,7 @@
 import React, { FC, useState, useMemo } from "react";
 import Link from "next/link";
 import { Search, Calendar, Eye, Volume2, Video as VideoIcon, BookOpen, FileText, ChevronDown, Sparkles } from "lucide-react";
-import { WISDOM_ITEMS, MEDIA_TYPE_OPTIONS } from "@/data/wisdom-archive-data";
+import { MEDIA_TYPE_OPTIONS } from "@/data/wisdom-archive-data";
 import { WisdomItem } from "@/types/wisdom-tags";
 import { MediaPlayModal } from "@/components/public/modals/MediaPlayModal";
 import { CustomDropdown } from "@/components/common/CustomDropdown";
@@ -79,10 +79,12 @@ const WisdomCard = React.memo(({ item, onClick }: WisdomCardProps) => {
               </div>
             )}
 
-            <div className="flex items-center gap-1">
-              <span>{item.views}</span>
-              <Eye className="w-3.5 h-3.5 text-[#F2C14E]" />
-            </div>
+            {item.views > 0 && (
+              <div className="flex items-center gap-1">
+                <span>{item.views}</span>
+                <Eye className="w-3.5 h-3.5 text-[#F2C14E]" />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -92,92 +94,13 @@ const WisdomCard = React.memo(({ item, onClick }: WisdomCardProps) => {
 
 WisdomCard.displayName = "WisdomCard";
 
-export const WisdomArchiveSection: FC = () => {
-  const [items, setItems] = useState<WisdomItem[]>(WISDOM_ITEMS);
+// Các bài do máy chủ lấy từ D1 (trang cha); phần này không tự lấy hay thay thế bằng bản đóng gói.
+export const WisdomArchiveSection: FC<{ items: WisdomItem[] }> = ({ items }) => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedType, setSelectedType] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("newest");
   const [activeMediaModalItem, setActiveMediaModalItem] = useState<WisdomItem | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
-
-  // Tải bài viết: Đồng bộ động từ API Quản Trị Trí Tuệ Phật Pháp (/api/admin/posts)
-  React.useEffect(() => {
-    async function loadWisdomPosts() {
-      try {
-        // 1. Gọi trực tiếp API Quản trị Trí Tuệ Phật Pháp để lấy toàn bộ 160+ bài viết thực tế
-        const res = await fetch(`/api/admin/posts?category=tri-tue-phat-phap&t=${Date.now()}`, { cache: 'no-store' });
-        if (res.ok) {
-          const json = await res.json();
-          if (json.success && Array.isArray(json.posts) && json.posts.length > 0) {
-            const mapped: WisdomItem[] = json.posts.map((p: any) => {
-              const thumbnailUrl = p.thumbnailUrl || p.bannerUrl || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
-              let mediaType: 'article' | 'audio' | 'video' | 'book' = 'article';
-              if (p.videoBlock?.videoUrl || (p.subCategory || '').includes('video')) {
-                mediaType = 'video';
-              } else if ((p.subCategory || '').includes('phap-am') || (p.title || '').toLowerCase().includes('pháp âm')) {
-                mediaType = 'audio';
-              } else if (p.sourceBook || p.subCategory === 'an-pham-sach') {
-                mediaType = 'book';
-              }
-
-              return {
-                id: String(p.id),
-                slug: p.slug || '',
-                title: p.title || '',
-                type: mediaType,
-                primaryCategoryTag: p.subtitle || p.categoryName || 'Trí Tuệ Phật Pháp',
-                publishDate: p.publishedDate ? new Date(p.publishedDate).toLocaleDateString('vi-VN') : '',
-                views: p.viewsCount || 108,
-                thumbnailUrl,
-                thumbnailPosition: p.thumbnailPosition || p.bannerPosition || 'center center',
-                excerpt: p.summary || p.subtitle || '',
-                content: p.content || '',
-                mediaUrl: p.videoBlock?.videoUrl || '',
-              };
-            });
-            setItems(mapped);
-            return;
-          }
-        }
-
-        // 2. Fallback sang WordPress API nếu cần
-        const wpRes = await fetch(
-          'https://admin.tunglamhoaphuc.com/wp-json/tunglam/v1/posts?per_page=50',
-          { cache: 'no-store' }
-        );
-        if (wpRes.ok) {
-          const wpData = await wpRes.json();
-          const posts = Array.isArray(wpData) ? wpData : (wpData?.posts || []);
-          if (posts.length > 0) {
-            const mapped: WisdomItem[] = posts.map((p: any) => {
-              const imgUrls = p.featured_image_urls || {};
-              const thumbnailUrl = imgUrls.medium || imgUrls.large || imgUrls.thumbnail || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
-              const firstCat = Array.isArray(p.categories) ? p.categories[0] : null;
-              return {
-                id: String(p.id),
-                slug: p.slug || '',
-                title: p.title?.rendered || p.title || '',
-                type: 'article' as const,
-                primaryCategoryTag: firstCat?.name || 'Trí Tuệ Phật Pháp',
-                publishDate: p.date ? new Date(p.date).toLocaleDateString('vi-VN') : '',
-                views: p.acf?.views || 108,
-                thumbnailUrl,
-                thumbnailPosition: 'center center',
-                excerpt: p.noi_dung_tom_tat || p.acf?.noi_dung_tom_tat || '',
-                content: p.content?.rendered || '',
-              };
-            });
-            setItems(mapped);
-          }
-        }
-      } catch (err) {
-        console.warn('Lỗi tải bài viết Trí Tuệ Phật Pháp:', err);
-      }
-    }
-    loadWisdomPosts();
-  }, []);
-
-
 
   const typeOptions = useMemo(() => {
     return MEDIA_TYPE_OPTIONS.map((opt) => ({ id: opt.id, name: opt.label }));
@@ -208,7 +131,7 @@ export const WisdomArchiveSection: FC = () => {
       result = [...result].sort((a, b) => b.views - a.views);
     }
     return result;
-  }, [searchQuery, selectedType, sortBy]);
+  }, [items, searchQuery, selectedType, sortBy]);
 
   // 4 Columns x 4 Rows = 16 cards per page
   const visibleItems = useMemo(() => {
