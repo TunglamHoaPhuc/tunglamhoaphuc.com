@@ -1,52 +1,31 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { ArrowLeft, ArrowRight, Calendar, Sparkles, Scroll, Landmark, User, HeartHandshake, BookOpen } from 'lucide-react';
-import { GioiThieuTopicDetail, GIOI_THIEU_DETAILS } from '@/data/gioi-thieu-data';
+import type { GioiThieuTopicDetail } from '@/data/gioi-thieu-data';
 import { InfographicArticleRenderer } from '@/components/tong-chi-tu-hoc/chi-tiet/InfographicArticleRenderer';
 
+/** Chủ đề khác đang hiển thị, đủ để vẽ một thẻ liên kết. */
+export interface OtherAboutTopic {
+  id: string;
+  slug: string;
+  title: string;
+  tag?: string;
+}
+
 interface Props {
+  /** Chủ đề đọc từ D1 (đã là chủ đề đang hiển thị). */
   detail: GioiThieuTopicDetail;
+  others: OtherAboutTopic[];
   slug?: string;
 }
 
-export function GioiThieuDetailLayout({ detail: initialDetail, slug }: Props) {
-  const [topic, setTopic] = useState<any>(initialDetail);
+export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
 
-  const topicSlug = slug || initialDetail?.slug || initialDetail?.id;
-
-  useEffect(() => {
-    if (initialDetail) {
-      setTopic(initialDetail);
-    }
-  }, [initialDetail]);
-
-  useEffect(() => {
-    let isMounted = true;
-    async function loadDynamicTopic() {
-      if (!topicSlug) return;
-      try {
-        const res = await fetch(`/api/admin/gioi-thieu/${topicSlug}?sync=true`, { cache: 'no-store' });
-        if (res.ok) {
-          const json = await res.json();
-          if (isMounted && json.success && json.topic) {
-            setTopic(json.topic);
-          }
-        }
-      } catch (err) {
-        console.log('Dynamic topic load fallback:', err);
-      }
-    }
-    loadDynamicTopic();
-    return () => {
-      isMounted = false;
-    };
-  }, [topicSlug]);
-
-  const otherTopics = Object.values(GIOI_THIEU_DETAILS).filter((t) => t.id !== topic.id && t.slug !== topic.slug);
+  const otherTopics = others;
 
   return (
     <div className="min-h-screen bg-[#2A1D14] text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black flex flex-col justify-between">

@@ -7,7 +7,7 @@
 import { getContentRepository } from "@/lib/tlhp-content/repository";
 import type { ContentRepository } from "@/lib/tlhp-content/types";
 import { findScheduleDetail, type ScheduleDetail } from "@/lib/schedule-detail";
-import { toAreaRecord, toPostRecord, toScheduleData, toTongChiRecord, type V3Area, type V3Post, type V3TongChi } from "@/lib/v3-data";
+import { toAboutRecord, toAreaRecord, toPostRecord, toScheduleData, toTongChiRecord, type V3About, type V3Area, type V3Post, type V3TongChi } from "@/lib/v3-data";
 
 const open = (repo?: ContentRepository) => repo ?? getContentRepository();
 
@@ -82,6 +82,22 @@ export async function livePost(slugOrId: string, section: string, repo?: Content
 /** Every live post of a section as list records, newest first. */
 export async function livePosts(section: string, repo?: ContentRepository): Promise<V3Post[]> {
 	return (await summariesOf(await open(repo), section)).map(toPostRecord);
+}
+
+// ── Giới thiệu ──────────────────────────────────────────────────────────────
+
+/** The live topics of Giới thiệu in the editors' order. */
+export async function liveAbout(repo?: ContentRepository): Promise<V3About[]> {
+	return (await (await open(repo)).listAboutTopics()).map(toAboutRecord);
+}
+
+/**
+ * One live topic by its slug alone, or `null`. Never by id or by position: the pages used to also match an id
+ * (`gt-02`, `gt-05`) and so showed another topic's text under su-phu-tru-tri and van-hoa-ung-xu.
+ */
+export async function liveAboutTopic(slug: string, repo?: ContentRepository): Promise<V3About | null> {
+	const key = decode(slug);
+	return (await liveAbout(repo)).find((topic) => topic.slug === key) ?? null;
 }
 
 // ── Vũ Trụ Phật Giáo ────────────────────────────────────────────────────────
