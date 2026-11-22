@@ -40,6 +40,16 @@ const statuesFileSchema = z.union([
 
 const plain = (value: string) => cleanText(value).replace(/\s+/g, " ").trim();
 
+// Raw codes the old admin stored instead of a place's name (seen on the live page as "LAM_TI_NI").
+const PLACE_NAMES: Record<string, string> = { LAM_TI_NI: "Lâm Tỳ Ni" };
+const place = (value: string) => {
+	const name = plain(value);
+	return PLACE_NAMES[name] ?? (/^[A-Z0-9]+(_[A-Z0-9]+)+$/.test(name) ? name.replace(/_/g, " ") : name);
+};
+
+// A page number sometimes ends up as the last paragraph of a story (a final "2" after "…tôn giả A Nan.").
+const withoutTrailingNumber = (body: string) => body.trim().replace(/\n+\s*\d{1,3}\s*$/, "");
+
 // Group names the editors gave to statues of no group: the section's own name, and that of
 // the works of art.
 const NO_GROUP = new Set(["bao tuong phat giao", "nghe thuat phat giao"]);
@@ -86,7 +96,7 @@ export function parseStatues(file: unknown): ParsedStatues {
 			(variation): ArtVariation => ({
 				id: variation.id.trim(),
 				title: plain(variation.title),
-				location: plain(variation.location),
+				location: place(variation.location),
 				meaning: plain(variation.meaning),
 				image: image(variation.imgUrl),
 				href: hrefOf.get(variation.id.trim()) ?? null,
@@ -107,7 +117,7 @@ export function parseStatues(file: unknown): ParsedStatues {
 			quote: quote && bare(quote) !== bare(name) && bare(quote) !== bare(statue.title) ? { text: quote, author: titleCase(plain(statue.quoteAuthor)) } : null,
 			art,
 			// The same text is stored twice, as text and as paragraphs of HTML.
-			text: statue.articleContent.trim() || paragraphsOf(statue.fullHistoryHtml),
+			text: withoutTrailingNumber(statue.articleContent) || paragraphsOf(statue.fullHistoryHtml),
 		};
 	});
 
