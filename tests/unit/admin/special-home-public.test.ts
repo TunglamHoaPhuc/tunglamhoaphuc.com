@@ -86,16 +86,16 @@ describe("the hero", () => {
 		expect(data.hero[1].image).toEqual(site.hero.image);
 	});
 
-	it("offers phones a 640 px copy of the frames and 360 px thumbnails (PageSpeed 22/11/2026)", async () => {
+	it("offers phones 640 and 960 px copies of the frames and 360 px thumbnails (PageSpeed 22/11/2026)", async () => {
 		const settings = { "home.hero": { slides: [slide({ imageMediaId: "m1", portraitMediaId: "m2" })], autoEvent: false, autoLatest: false } };
 		const data = await loadHomeData(repo(), NOW, extras(settings, { media: { m1: "/anh-goc/s2-cnv03/cms/m1/v1/a.png", m2: "/anh-goc/s2-cnv03/cms/m2/v1/b.png" } }));
 		const { image } = data.hero[0];
 		const widths = (srcSet?: string) => srcSet?.split(", ").map((candidate) => candidate.split(" ")[1]);
-		expect(widths(image.srcSet)).toEqual(["640w", "1280w", "1920w"]);
+		expect(widths(image.srcSet)).toEqual(["640w", "960w", "1280w", "1920w"]);
 		expect(image.srcSet).toContain("/cdn-cgi/image/width=640,");
 		expect(image.src).toContain("/cdn-cgi/image/width=1920,");
 		expect(image.thumb).toContain("/cdn-cgi/image/width=360,");
-		expect(widths(image.portraitSrcSet)).toEqual(["640w", "1280w"]);
+		expect(widths(image.portraitSrcSet)).toEqual(["640w", "960w", "1280w"]);
 		expect(image.portraitSrcSet).toContain("m2");
 	});
 

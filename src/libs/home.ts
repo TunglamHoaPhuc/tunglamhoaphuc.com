@@ -153,16 +153,19 @@ function welcomeSlide(): HeroSlide {
 }
 
 /**
- * An editor's picture as a frame: 640, 1280 and 1920 px copies, and a small one for the row
- * under the hero. A phone like PageSpeed's (412 px at 1.75) takes the 640 copy, where it got
- * the 1280 one before (PageSpeed 22/11/2026: 60 KB more than the frame needs); phones at 3x
- * still take 1280. The thumbnails are 65–80 px: the 360 copy, not the 640 one. Only widths
- * the site asks for elsewhere, so the frames add few transformations to the monthly quota.
+ * An editor's picture as a frame: 640, 960, 1280 and 1920 px copies, and a small one for the
+ * row under the hero. A phone like PageSpeed's (412 px at 1.75, so 721 device pixels) takes
+ * the 960 copy, where it got the 1280 one before (PageSpeed 22/11/2026: 60–70 KB more than
+ * the frame needs); smaller phones take 640, phones at 3x still take 1280. The thumbnails are
+ * 65–80 px: the 360 copy, not the 640 one. HERO_PHONE is the one width only the hero asks
+ * for: a handful of frames, so a handful of transformations more in the monthly quota.
  */
+const HERO_PHONE = 960;
+
 function framePicture({ src, position }: MediaImage): HeroImage {
 	return {
 		src: imageAt(src, IMAGE_WIDTH.full),
-		srcSet: imageSrcSet(src, [IMAGE_WIDTH.card, IMAGE_WIDTH.wide, IMAGE_WIDTH.full]),
+		srcSet: imageSrcSet(src, [IMAGE_WIDTH.card, HERO_PHONE, IMAGE_WIDTH.wide, IMAGE_WIDTH.full]),
 		thumb: imageAt(src, IMAGE_WIDTH.small),
 		position,
 	};
@@ -243,7 +246,7 @@ function customSlides(slides: HeroSlideSetting[], media: Record<string, string>)
 			? {
 					...framePicture({ src, position: slide.imagePosition || "center 50%" }),
 					portrait: portrait ? imageAt(portrait, IMAGE_WIDTH.wide) : undefined,
-					portraitSrcSet: portrait ? imageSrcSet(portrait, [IMAGE_WIDTH.card, IMAGE_WIDTH.wide]) : undefined,
+					portraitSrcSet: portrait ? imageSrcSet(portrait, [IMAGE_WIDTH.card, HERO_PHONE, IMAGE_WIDTH.wide]) : undefined,
 				}
 			: { ...site.hero.image };
 		return {
