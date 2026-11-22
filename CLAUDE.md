@@ -28,7 +28,7 @@ Chỉ tên biến, không bao giờ ghi giá trị vào repo. Cục bộ nằm t
 | `ADMIN_BASE_URL` | Địa chỉ duy nhất mà admin trả lời, ví dụ `https://www.tunglamhoaphuc.com`; ở tên miền khác admin trả 404 |
 | `ADMIN_SEED_EMAIL`, `ADMIN_SEED_PASSWORD` | Chỉ dùng khi tạo Super Admin đầu tiên (`--seed`); tài khoản đó bị buộc đổi mật khẩu ở lần đăng nhập đầu |
 
-`cloudflare.config.ts` chỉ khai báo các biến trên khi chạy `vite dev` hoặc khi build với `TLHP_ADMIN=1`; bản build dùng để deploy www không có chúng nên admin trả `503` ở đó cho tới khi được bật có chủ ý. Mật khẩu băm Argon2id mất khoảng 0,2 giây CPU: **cần gói Workers Paid** khi bật admin trên máy chủ thật (gói Free chỉ cho 10 ms).
+`cloudflare.config.ts` chỉ khai báo các biến trên khi chạy `vite dev` hoặc khi build với `TLHP_ADMIN=1`. **Admin đã bật trên www từ 22/11/2026** (xem `docs/van-hanh/d1.md` mục 7). `v2.` và `www` dùng chung một Worker `tlhp-web`, nên **mọi lần deploy phải giữ cả hai biến**, từ một worktree sạch: `TLHP_ADMIN=1 ADMIN_BASE_URL=https://www.tunglamhoaphuc.com npm run deploy:v2`. Thiếu chúng thì `/api/quan-tri` trả `503` ("thiếu: ADMIN_BASE_URL") và không đăng nhập được (đã xảy ra sau một lần deploy 22/11). Mật khẩu băm Argon2id tốn 236–605 ms CPU mỗi lần, nên admin cần gói Workers Paid, đang có hiệu lực; không đổi gói cước.
 
 ## Lệnh
 
