@@ -29,9 +29,14 @@ registerTrashable({
 	module: "users",
 	hasCreatedBy: false,
 	// The hard rule of users/service.ts: nobody acts on an account holding rights beyond their own (or on their own).
-	guard: async (ctx, by, id) => {
+	guard: async (ctx, by, id, action) => {
 		const row = await ctx.db.prepare("SELECT role_id FROM user WHERE id = ?").bind(id).first();
-		await mayManage(ctx, by, { id, roleId: text(row?.role_id) || null });
+		const roleId = text(row?.role_id) || null;
+		await mayManage(ctx, by, { id, roleId });
+		// An account comes back with its role; one whose role is in the trash itself would sign in with nothing, or with a role nobody sees.
+		if (action === "update" && roleId && !(await ctx.db.prepare("SELECT 1 AS yes FROM role WHERE id = ? AND deleted_at IS NULL").bind(roleId).first())) {
+			throw new ApiError(409, "role_deleted", "Không khôi phục được: vai trò của tài khoản này đã bị xóa. Hãy khôi phục vai trò đó trước (thùng rác, mục Vai trò).");
+		}
 	},
 	purge: (ctx, _by, id) => [
 		ctx.db.prepare("DELETE FROM session WHERE user_id = ?").bind(id),
@@ -47,7 +52,7 @@ registerTrashable({
 	module: "roles",
 	hasCreatedBy: false,
 	guard: async (ctx, by, id) => {
-		if (!covers(by.permissions, await loadPermissions(ctx.db, id))) throw new ApiError(403, "forbidden_higher", "Vai trò này có quyền cao hơn quyền của bạn.");
+		if (!covers(by.permissions, await loadPermissions(ctx.db, id, { includeDeleted: true }))) throw new ApiError(403, "forbidden_higher", "Vai trò này có quyền cao hơn quyền của bạn.");
 	},
 	purge: (ctx, _by, id) => [ctx.db.prepare("DELETE FROM role_permission WHERE role_id = ?").bind(id)],
 });
