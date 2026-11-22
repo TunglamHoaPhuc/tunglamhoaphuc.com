@@ -16,8 +16,8 @@ import { isKnownPermission, isOwnable, SUPER_ADMIN_ROLE_ID, type Permissions, ty
 import { can, covers, loadPermissions } from "../rbac/check";
 
 const stamp = (ctx: AuthContext) => ctx.now().toISOString();
-const audit = (ctx: AuthContext, by: Authed, entry: Pick<AuditEntry, "action" | "entityType" | "entityId" | "before" | "after">) =>
-	auditStatement(ctx.db, { ...entry, userId: by.user.id, userEmail: by.user.email, ip: ctx.ip, userAgent: ctx.userAgent }, ctx.now());
+const audit = (ctx: AuthContext, by: Authed, entry: Pick<AuditEntry, "action" | "entityType" | "entityId" | "before" | "after">, when?: { sql: string; args: unknown[] }) =>
+	auditStatement(ctx.db, { ...entry, userId: by.user.id, userEmail: by.user.email, ip: ctx.ip, userAgent: ctx.userAgent }, ctx.now(), when);
 
 export type UserRow = {
 	id: string;
@@ -80,6 +80,26 @@ export const getUser = findUser;
 async function superAdminsLeft(ctx: AuthContext, except: string): Promise<number> {
 	const row = await ctx.db.prepare("SELECT COUNT(*) AS n FROM user WHERE role_id = ? AND deleted_at IS NULL AND locked_at IS NULL AND id != ?").bind(SUPER_ADMIN_ROLE_ID, except).first();
 	return num(row?.n);
+}
+
+const LAST_SUPER_ADMIN = "Phải còn ít nhất một Super Admin đang hoạt động.";
+const lastSuperAdmin = () => new ApiError(409, "last_super_admin", LAST_SUPER_ADMIN);
+
+/**
+ * "One Super Admin always remains", enforced by the write itself: the counting above runs before the batch, so two requests
+ * arriving together (A locks B while B locks A) would each see "one left". Put this in the UPDATE's WHERE: it holds for the row being
+ * changed only if it is not a Super Admin, or another active Super Admin exists at the moment the UPDATE runs (D1 runs a batch alone).
+ * `args` goes after the other bound values of the statement.
+ */
+const KEEP_ONE_SUPER_ADMIN = "(role_id <> ? OR EXISTS (SELECT 1 FROM user o WHERE o.role_id = ? AND o.id <> ? AND o.locked_at IS NULL AND o.deleted_at IS NULL))";
+const keepOneArgs = (id: string) => [SUPER_ADMIN_ROLE_ID, SUPER_ADMIN_ROLE_ID, id];
+
+/** True in the batch only when the guarded UPDATE of `id` took effect: it stamped `updated_at` with this request's time. Guards the audit row and what hangs off the change. */
+const landed = (id: string, now: string) => ({ sql: "EXISTS (SELECT 1 FROM user WHERE id = ? AND updated_at = ?)", args: [id, now] });
+
+/** After the batch: a refused guarded UPDATE changed nothing and wrote no audit row; tell the caller. */
+async function mustHaveLanded(ctx: AuthContext, id: string, now: string): Promise<void> {
+	if (!(await ctx.db.prepare("SELECT 1 AS yes FROM user WHERE id = ? AND updated_at = ?").bind(id, now).first())) throw lastSuperAdmin();
 }
 
 /** Throws unless `by` may act on `target`: not oneself, and nothing beyond their own rights. Exported for the trash, which acts on accounts too. */
@@ -157,6 +177,9 @@ export async function updateUser(ctx: AuthContext, by: Authed, id: string, input
 	const before: Record<string, unknown> = {};
 	const after: Record<string, unknown> = {};
 	let oldEmail: string | null = null;
+	const now = stamp(ctx);
+	let guarded = false;
+	let sessionsToEnd = false;
 
 	if (input.name !== undefined && input.name.trim() !== target.name) {
 		set.push("name = ?");
@@ -173,14 +196,15 @@ export async function updateUser(ctx: AuthContext, by: Authed, id: string, input
 			before.email = target.email;
 			after.email = email;
 			oldEmail = target.email;
-			statements.push(ctx.db.prepare("UPDATE session SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL").bind(stamp(ctx), id));
+			sessionsToEnd = true;
 		}
 	}
 	if (input.roleId !== undefined && input.roleId !== target.roleId) {
 		await mayAssign(ctx, by, input.roleId);
 		if (target.roleId === SUPER_ADMIN_ROLE_ID) {
 			if (by.user.roleId !== SUPER_ADMIN_ROLE_ID) throw new ApiError(403, "forbidden_super", "Chỉ Super Admin mới đổi vai trò của Super Admin.");
-			if ((await superAdminsLeft(ctx, id)) < 1) throw new ApiError(409, "last_super_admin", "Phải còn ít nhất một Super Admin đang hoạt động.");
+			if ((await superAdminsLeft(ctx, id)) < 1) throw lastSuperAdmin();
+			guarded = true;
 		}
 		set.push("role_id = ?");
 		args.push(input.roleId);
@@ -190,23 +214,35 @@ export async function updateUser(ctx: AuthContext, by: Authed, id: string, input
 	if (!set.length) return { user: target, oldEmail: null };
 
 	set.push("updated_at = ?");
-	args.push(stamp(ctx), id);
-	await ctx.db.batch([ctx.db.prepare(`UPDATE user SET ${set.join(", ")} WHERE id = ?`).bind(...args), ...statements, audit(ctx, by, { action: "user.update", entityType: "user", entityId: id, before, after })]);
+	args.push(now, id);
+	const when = guarded ? landed(id, now) : undefined;
+	if (sessionsToEnd) statements.push(ctx.db.prepare(`UPDATE session SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL${when ? ` AND ${when.sql}` : ""}`).bind(now, id, ...(when?.args ?? [])));
+	await ctx.db.batch([
+		ctx.db.prepare(`UPDATE user SET ${set.join(", ")} WHERE id = ?${guarded ? ` AND ${KEEP_ONE_SUPER_ADMIN}` : ""}`).bind(...args, ...(guarded ? keepOneArgs(id) : [])),
+		...statements,
+		audit(ctx, by, { action: "user.update", entityType: "user", entityId: id, before, after }, when),
+	]);
+	if (guarded) await mustHaveLanded(ctx, id, now);
 	return { user: await findUser(ctx, id), oldEmail };
 }
 
 export async function setLocked(ctx: AuthContext, by: Authed, id: string, locked: boolean, reason = ""): Promise<UserRow> {
 	const target = await findUser(ctx, id);
 	await mayManage(ctx, by, target);
-	if (locked && target.roleId === SUPER_ADMIN_ROLE_ID && (await superAdminsLeft(ctx, id)) < 1) throw new ApiError(409, "last_super_admin", "Phải còn ít nhất một Super Admin đang hoạt động.");
+	if (locked && target.roleId === SUPER_ADMIN_ROLE_ID && (await superAdminsLeft(ctx, id)) < 1) throw lastSuperAdmin();
 	const now = stamp(ctx);
+	const entry = { action: locked ? "user.lock" : "user.unlock", entityType: "user", entityId: id, after: { reason } };
+	if (!locked) {
+		await ctx.db.batch([ctx.db.prepare("UPDATE user SET locked_at = NULL, locked_reason = NULL, failed_logins = 0, updated_at = ? WHERE id = ?").bind(now, id), audit(ctx, by, entry)]);
+		return findUser(ctx, id);
+	}
+	const when = landed(id, now);
 	await ctx.db.batch([
-		locked
-			? ctx.db.prepare("UPDATE user SET locked_at = ?, locked_reason = ?, updated_at = ? WHERE id = ?").bind(now, reason, now, id)
-			: ctx.db.prepare("UPDATE user SET locked_at = NULL, locked_reason = NULL, failed_logins = 0, updated_at = ? WHERE id = ?").bind(now, id),
-		...(locked ? [ctx.db.prepare("UPDATE session SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL").bind(now, id)] : []),
-		audit(ctx, by, { action: locked ? "user.lock" : "user.unlock", entityType: "user", entityId: id, after: { reason } }),
+		ctx.db.prepare(`UPDATE user SET locked_at = ?, locked_reason = ?, updated_at = ? WHERE id = ? AND ${KEEP_ONE_SUPER_ADMIN}`).bind(now, reason, now, id, ...keepOneArgs(id)),
+		ctx.db.prepare(`UPDATE session SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL AND ${when.sql}`).bind(now, id, ...when.args),
+		audit(ctx, by, entry, when),
 	]);
+	await mustHaveLanded(ctx, id, now);
 	return findUser(ctx, id);
 }
 
@@ -232,13 +268,15 @@ export async function resetTwoFactor(ctx: AuthContext, by: Authed, id: string): 
 export async function deleteUser(ctx: AuthContext, by: Authed, id: string): Promise<void> {
 	const target = await findUser(ctx, id);
 	await mayManage(ctx, by, target);
-	if (target.roleId === SUPER_ADMIN_ROLE_ID && (await superAdminsLeft(ctx, id)) < 1) throw new ApiError(409, "last_super_admin", "Phải còn ít nhất một Super Admin đang hoạt động.");
+	if (target.roleId === SUPER_ADMIN_ROLE_ID && (await superAdminsLeft(ctx, id)) < 1) throw lastSuperAdmin();
 	const now = stamp(ctx);
+	const when = landed(id, now);
 	await ctx.db.batch([
-		ctx.db.prepare("UPDATE user SET deleted_at = ?, deleted_by = ?, updated_at = ? WHERE id = ?").bind(now, by.user.id, now, id),
-		ctx.db.prepare("UPDATE session SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL").bind(now, id),
-		audit(ctx, by, { action: "user.delete", entityType: "user", entityId: id, before: { email: target.email, name: target.name } }),
+		ctx.db.prepare(`UPDATE user SET deleted_at = ?, deleted_by = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL AND ${KEEP_ONE_SUPER_ADMIN}`).bind(now, by.user.id, now, id, ...keepOneArgs(id)),
+		ctx.db.prepare(`UPDATE session SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL AND ${when.sql}`).bind(now, id, ...when.args),
+		audit(ctx, by, { action: "user.delete", entityType: "user", entityId: id, before: { email: target.email, name: target.name } }, when),
 	]);
+	await mustHaveLanded(ctx, id, now);
 }
 
 /** The live sessions (and their addresses) of an account: the same "not above your rights" rule as changing it; one's own are always visible. */
