@@ -9,7 +9,7 @@ import ts from "typescript";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SRC = path.join(ROOT, "src");
 const SUFFIXES = ["", ".ts", ".tsx", ".mjs", ".js", "/index.ts", "/index.tsx", "/index.js"];
-const STUBS = { "next/link": path.join(ROOT, "tests/stubs/next-link.mjs") };
+const STUBS = { "next/link": path.join(ROOT, "tests/stubs/next-link.mjs"), "next/navigation": path.join(ROOT, "tests/stubs/next-navigation.mjs") };
 
 function probe(base) {
 	for (const suffix of SUFFIXES) {
