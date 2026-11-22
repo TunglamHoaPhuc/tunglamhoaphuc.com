@@ -2355,13 +2355,17 @@ Phương án:
 
 **Đã làm 22/11/2026 (phần an toàn của phương án (a), chưa chạy trên D1 thật):** `npm run import` có `--merge` (chỉ `INSERT … ON CONFLICT DO NOTHING`; không `prune`, không xóa hay sửa dòng có sẵn; con khóa ghép chỉ thêm khi cha chưa qua tay admin), `--dry-run` (in "N sẽ thêm", cảnh báo trùng slug/mã), từ chối cờ lạ, và chặn nhập mặc định vào CSDL đã có `user`/`audit_log` trừ khi `--force`. Làm theo TDD, một reviewer độc lập tìm ra hai lỗi (con bị hồi sinh, cờ gõ sai chạy bản nguy hiểm) đã sửa; test-engineer thử 15 đột biến, mọi đột biến bị test mới bắt. `src/db/import.ts`, `scripts/import.ts`, `tests/unit/importMerge.test.ts` (+Gaps, +Flags). Kiểm: typecheck sạch, eslint sạch, `vitest tests/unit` 813/814 (hỏng đúng `taxonomyHeader`, có sẵn, của phiên khác). Giới hạn đã biết: dòng admin xóa vĩnh viễn bị nhập lại; sửa của admin cũ cho dòng đã có không sang; câu `INSERT … SELECT … VALUES … WHERE EXISTS` chưa thử trên D1 thật. Chưa có đồng bộ theo lịch.
 
-**Mô tả (sau xét lại, chờ quyết định):** đồng bộ B2 → D1 theo phương án được chọn, **chỉ đọc B2, không ghi gì vào B2**, chạy lại được, có `--dry-run`, giữ bản tốt gần nhất. Bỏ `tlhp-data` và nguồn `r2` (làm lại nếu chọn (d)).
+**Mô tả (đã chốt 22/11/2026, chủ dự án chọn phương án (a) "chỉ thêm dòng mới" làm trước):** nhập B2 → D1 bằng `npm run import -- --from=b2 --merge`, **chỉ đọc B2, không ghi gì vào B2**, chạy lại được, có `--dry-run`. Bài đã có mà admin cũ sửa tiếp **không** sang v2 (chấp nhận). Bỏ `tlhp-data` và nguồn `r2`. Nâng lên (c) khi Ban Biên Tập vẫn cần sửa bài cũ ở admin cũ; chuyển (b) nếu T39 gần.
 
-**Tiêu chí nghiệm thu (nháp, chốt sau khi chọn phương án):**
-- [ ] Chủ dự án chọn phương án (a), (b), (c) hoặc (d)
-- [ ] Sửa bài ở admin cũ → `v2.` hiện bản mới trong ≤ 10 phút (với (a)/(c): chỉ bài mới hoặc bài chưa sửa ở admin mới)
-- [ ] Bài đã sửa, đã tạo hoặc đã xóa mềm bằng admin mới không bị ghi đè, không bị xóa sau khi nhập (test SQLite: dòng `version > 1`, `created_by`, `deleted_at`)
+**Tiêu chí nghiệm thu:**
+- [x] Chủ dự án chọn phương án: (a) trước (22/11/2026)
+- [x] Bài đã sửa, đã tạo hoặc đã xóa mềm bằng admin mới không bị ghi đè, không bị xóa sau khi nhập; con admin đã xóa không quay lại (`importMerge`, `importMergeGaps`, `importFlags`; đột biến đã thử)
+- [x] Cờ gõ sai không chạy bản mặc định; bản mặc định bị chặn trên CSDL đã có `user`/`audit_log` (`importFlags`)
+- [ ] Đăng bài mới ở admin cũ → sau khi chạy nhập `--merge`, `v2.` hiện bài trong ≤ 10 phút (cần khóa B2; chưa kiểm thật)
+- [ ] `--merge --dry-run` trên bản sao D1 hiện tại với nguồn B2 thật cho số dòng hợp lý (cần khóa B2)
+- [ ] Thử câu `INSERT … SELECT … VALUES … WHERE EXISTS` trên D1 thật (chỉ sau khi chủ dự án đồng ý chạy nhập)
 - [ ] File JSON hỏng không làm trang đổi, log có lỗi (phần đọc B2 đã có test ở T19)
+- [ ] (tùy chọn) chạy theo lịch (T1b), chưa làm
 
 **Phụ thuộc:** T19 (khóa B2, so định dạng), T23/T24 (D1), T42a; quyết định của chủ dự án. T1b chỉ cần nếu chạy theo lịch. **Quy mô:** M
 
