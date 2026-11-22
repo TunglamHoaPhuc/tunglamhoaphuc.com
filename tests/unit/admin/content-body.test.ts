@@ -178,3 +178,17 @@ describe("B5: the display name of a Tông Chỉ article follows its title", () =
 		expect(nameOf(w)).toBe("Tên khác");
 	});
 });
+
+describe("B9: the Tông Chỉ preview shows the saved HTML the way the public page does", () => {
+	it("gives the same body as the page for what Markdown cannot say (table, caption, sound, bold list items)", async () => {
+		const { sanitizeHtml } = await import("../../../src/admin/content/html");
+		const { tongChiArticle } = await import("../../../src/libs/content/tongChi");
+		const html = '<h2>Giới</h2><ul><li><strong>Một</strong>: không sát sinh</li></ul><table><tbody><tr><td>A</td><td>B</td></tr></tbody></table><figure><img src="/anh-goc/s2-cnv03/a.webp" alt="Sen"><figcaption>Hoa sen</figcaption></figure><audio controls src="https://example.test/p.mp3"></audio>';
+		const entry = { id: "t", slug: "x", title: "X", name: "X", subtitle: "", group: { slug: "g", name: "G" }, banner: null, excerpt: "", author: "", authorHref: null, publishedDate: "", views: 0, video: null, featured: null, gallery: [], book: null, keywords: [], body: "", html } as never;
+		const page = tongChiArticle(entry, []).contentHtml;
+		expect(sanitizeHtml(html)).toBe(page);
+		expect(page).toContain("<li><strong>Một</strong>: không sát sinh</li>");
+		expect(page).toContain("<table>");
+		expect(page).toContain("<figcaption>Hoa sen</figcaption>");
+	});
+});
