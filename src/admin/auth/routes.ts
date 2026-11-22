@@ -74,12 +74,11 @@ registerRoutes(
 		needs: "public",
 		handler: async (call) => {
 			const input = await call.body(z.object({ email }));
-			// The mail goes out after the answer, so how long the answer takes says nothing about the address.
-			const mailer = (message: Parameters<typeof call.deps.mailer>[0]) => {
-				call.deps.defer(call.deps.mailer(message).catch((error) => console.error("reset mail failed", error)));
-				return Promise.resolve();
-			};
-			const allowed = await requestPasswordReset(call.ctx, input.email, mailer);
+			// Everything that depends on there being an account (the lookup, the token, the mail) runs after the answer, started
+			// from a timer so it does not share the answer's turn: how long the answer takes says nothing about the address.
+			const later = (work: () => Promise<unknown>) =>
+				call.deps.defer(new Promise<void>((resolve) => setTimeout(resolve, 0)).then(work).catch((error) => console.error("password reset failed", error)));
+			const allowed = await requestPasswordReset(call.ctx, input.email, call.deps.mailer, later);
 			if (!allowed) throw new ApiError(429, "too_many_attempts", "Bạn gửi yêu cầu quá nhiều lần. Hãy thử lại sau.", undefined, 3600);
 			return { message: "Nếu email này có tài khoản, một thư hướng dẫn đặt lại mật khẩu sẽ được gửi tới." };
 		},

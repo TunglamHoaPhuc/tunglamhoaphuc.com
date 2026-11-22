@@ -414,7 +414,7 @@ function whereOf(kind: Kind, filter: ListFilter, withStatus: boolean, nowIso: st
 
 export async function listItems(ctx: AuthContext, by: Authed, kind: Kind, filter: ListFilter, page: Page): Promise<{ rows: ListRow[]; total: number }> {
 	const { clause, args } = whereOf(kind, filter, true, ctx.now().toISOString());
-	let sort = filter.sort && SORTS[filter.sort] ? filter.sort : "-updatedAt";
+	let sort = filter.sort && Object.hasOwn(SORTS, filter.sort) ? filter.sort : "-updatedAt";
 	if ((sort === "position" && !kind.hasPosition) || (sort.endsWith("publishedDate") && kind.dateColumn !== "published_date")) sort = "-updatedAt";
 	const order = SORTS[sort];
 	const total = await ctx.db.prepare(`SELECT COUNT(*) AS n FROM ${kind.table} t WHERE ${clause}`).bind(...args).first();

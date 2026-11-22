@@ -180,7 +180,7 @@ export async function makeSlug(ctx: AuthContext, input: { text: string; type: st
 			const row = await ctx.db.prepare("SELECT 1 AS yes FROM category WHERE kind = ? AND section = ? AND slug = ? AND deleted_at IS NULL AND id <> ?").bind(input.kind || "post", input.section ?? "", slug, input.excludeId ?? "").first();
 			return Boolean(row);
 		}
-		const spec = SLUG_TABLES[input.type];
+		const spec = Object.hasOwn(SLUG_TABLES, input.type) ? SLUG_TABLES[input.type] : undefined;
 		if (!spec) throw new ApiError(400, "invalid_input", "Loại nội dung chưa đúng.", { type: "Loại nội dung chưa đúng." });
 		const sql = `SELECT 1 AS yes FROM ${spec.table} WHERE slug = ? AND deleted_at IS NULL AND id <> ?${spec.section ? " AND section = ?" : ""}`;
 		const args: unknown[] = [slug, input.excludeId ?? ""];

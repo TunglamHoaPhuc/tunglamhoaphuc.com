@@ -37,7 +37,7 @@ export type Permissions = ReadonlyMap<string, Scope>;
 export const permissionKey = (module: string, action: string) => `${module}.${action}`;
 
 export function isKnownPermission(module: string, action: string): boolean {
-	return module in MODULES && (ACTIONS as readonly string[]).includes(action);
+	return Object.hasOwn(MODULES, module) && (ACTIONS as readonly string[]).includes(action);
 }
 
 /**

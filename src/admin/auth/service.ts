@@ -9,7 +9,7 @@ import type { Permissions } from "../rbac/catalog";
 import { loadPermissions } from "../rbac/check";
 import { ApiError } from "../http/errors";
 import { dummyHash, hashPassword, passwordProblem, verifyPassword, type PasswordParams } from "./password";
-import { clearFailures, hit, IP_BACKOFF, LOGIN_BACKOFF, recordFailure, waitSeconds } from "./throttle";
+import { clearFailures, EMAIL_BACKOFF, hit, IP_BACKOFF, LOGIN_BACKOFF, MFA_USER_LIMIT, recordFailure, release, reserve, throttleIp, waitSeconds } from "./throttle";
 import { ACCESS_TTL_SECONDS, csrfToken, randomToken, sha256Hex, signAccessToken, verifyAccessToken } from "./tokens";
 import { checkTotp, generateTotpSecret, otpauthUri, stepAt } from "./totp";
 
@@ -84,9 +84,13 @@ async function issueSession(ctx: AuthContext, user: { id: string }, mfaPassed: b
 export async function login(ctx: AuthContext, input: { email: string; password: string }): Promise<Issued> {
 	const email = normalizeEmail(input.email);
 	const now = ctx.now();
-	const pairKey = `login:${await sha256Hex(email)}:${ctx.ip}`;
-	const ipKey = `login-ip:${ctx.ip}`;
-	const wait = await waitSeconds(ctx.db, [pairKey, ipKey], now);
+	const emailHash = await sha256Hex(email);
+	// An IPv6 address counts as its /64, and the email has a counter of its own, so a guess spread over many addresses still slows down.
+	const address = throttleIp(ctx.ip);
+	const pairKey = `login:${emailHash}:${address}`;
+	const ipKey = `login-ip:${address}`;
+	const emailKey = `login-email:${emailHash}`;
+	const wait = await waitSeconds(ctx.db, [pairKey, ipKey, emailKey], now);
 	if (wait > 0) throw new ApiError(429, "too_many_attempts", "Bạn thử quá nhiều lần. Hãy đợi một lát rồi thử lại.", undefined, wait);
 
 	const user = await ctx.db.prepare("SELECT id, email, password_hash, locked_at FROM user WHERE email = ? AND deleted_at IS NULL").bind(email).first();
@@ -96,6 +100,7 @@ export async function login(ctx: AuthContext, input: { email: string; password: 
 	if (!user || !valid || user.locked_at) {
 		await recordFailure(ctx.db, pairKey, now, LOGIN_BACKOFF);
 		await recordFailure(ctx.db, ipKey, now, IP_BACKOFF);
+		await recordFailure(ctx.db, emailKey, now, EMAIL_BACKOFF);
 		await writeAudit(ctx.db, { ...actor(ctx, user ? { id: text(user.id), email } : null), userEmail: email, action: "auth.login_failed", entityType: "user", entityId: user ? text(user.id) : "-" }, now);
 		throw new ApiError(401, "invalid_credentials", "Email hoặc mật khẩu không đúng.");
 	}
@@ -109,18 +114,36 @@ export async function login(ctx: AuthContext, input: { email: string; password: 
 	return issued;
 }
 
-/** The second step: a 2FA code (or a recovery code) on the session `login` left pending. Returns a new, full session. */
+/**
+ * The second step: a 2FA code (or a recovery code) on the session `login` left pending. Returns a new, full session.
+ * A try is counted before the code is weighed, by one statement each, so any number of requests at once still get five tries
+ * per pending session and ten per account in 15 minutes (the password step does not reset the account's count).
+ */
 export async function verifySecondFactor(ctx: AuthContext, sessionId: string, code: string): Promise<Issued> {
 	const now = ctx.now();
-	const session = await ctx.db.prepare("SELECT id, user_id, mfa_passed, mfa_failures, revoked_at, expires_at FROM session WHERE id = ?").bind(sessionId).first();
-	if (!session || session.revoked_at || text(session.expires_at) <= now.toISOString() || num(session.mfa_passed) === 1) {
-		throw new ApiError(401, "unauthorized", "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.");
-	}
+	const stamp = now.toISOString();
+	const expired = () => new ApiError(401, "unauthorized", "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.");
+	const session = await ctx.db.prepare("SELECT id, user_id, mfa_passed, revoked_at, expires_at FROM session WHERE id = ?").bind(sessionId).first();
+	if (!session || session.revoked_at || text(session.expires_at) <= stamp || num(session.mfa_passed) === 1) throw expired();
 	const userId = text(session.user_id);
-	const failures = num(session.mfa_failures);
+
+	// Five tries for this pending session, the fifth also ends it. The test and the increment are one statement.
+	const counted = await ctx.db
+		.prepare(
+			`UPDATE session SET mfa_failures = mfa_failures + 1, revoked_at = CASE WHEN mfa_failures + 1 >= ? THEN ? ELSE revoked_at END
+			 WHERE id = ? AND revoked_at IS NULL AND mfa_passed = 0 AND mfa_failures < ?`,
+		)
+		.bind(MAX_MFA_FAILURES, stamp, sessionId, MAX_MFA_FAILURES)
+		.run();
+	if (counted.meta.changes !== 1) throw expired();
+	// Ten tries for the account across all its sign-ins.
+	const userKey = `mfa-user:${await sha256Hex(userId)}`;
+	const allowance = await reserve(ctx.db, userKey, now, MFA_USER_LIMIT.limit, MFA_USER_LIMIT.windowMs);
+	if (!allowance.ok) throw new ApiError(429, "too_many_attempts", "Bạn thử quá nhiều lần. Hãy đợi một lát rồi thử lại.", undefined, allowance.retryAfter);
+
 	const totp = await ctx.db.prepare("SELECT secret_enc, enabled_at, recovery_hashes, last_used_step FROM user_totp WHERE user_id = ?").bind(userId).first();
 	const user = await ctx.db.prepare("SELECT email FROM user WHERE id = ? AND deleted_at IS NULL AND locked_at IS NULL").bind(userId).first();
-	if (!totp?.enabled_at || !user) throw new ApiError(401, "unauthorized", "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại.");
+	if (!totp?.enabled_at || !user) throw expired();
 
 	const clean = code.replace(/\s+/g, "");
 	let ok = false;
@@ -138,16 +161,14 @@ export async function verifySecondFactor(ctx: AuthContext, sessionId: string, co
 	}
 
 	if (!ok) {
-		const next = failures + 1;
-		if (next >= MAX_MFA_FAILURES) await ctx.db.prepare("UPDATE session SET revoked_at = ?, mfa_failures = ? WHERE id = ?").bind(now.toISOString(), next, sessionId).run();
-		else await ctx.db.prepare("UPDATE session SET mfa_failures = ? WHERE id = ?").bind(next, sessionId).run();
 		await writeAudit(ctx.db, { ...actor(ctx, { id: userId, email: text(user.email) }), action: "auth.mfa_failed", entityType: "user", entityId: userId }, now);
 		throw new ApiError(401, "invalid_code", "Mã xác thực không đúng.");
 	}
 
-	// A new session (new id, new refresh token, new CSRF token); the pending one ends.
+	// A right code gives its try back to the account; a new session (new id, new refresh token, new CSRF token) replaces the pending one.
+	await release(ctx.db, userKey);
 	await ctx.db.batch([
-		ctx.db.prepare("UPDATE session SET revoked_at = ? WHERE id = ?").bind(now.toISOString(), sessionId),
+		ctx.db.prepare("UPDATE session SET revoked_at = ? WHERE id = ?").bind(stamp, sessionId),
 		ctx.db.prepare("UPDATE user_totp SET last_used_step = ?, recovery_hashes = ? WHERE user_id = ?").bind(usedStep ?? num(totp.last_used_step), JSON.stringify(recovery), userId),
 	]);
 	const issued = await issueSession(ctx, { id: userId }, true);
@@ -251,9 +272,27 @@ export async function revokeSessions(ctx: AuthContext, userId: string, opts: { s
 
 // ------------------------------------------------------------------ password
 
+/**
+ * Checks the signed-in person's password again, for the actions that ask for it (changing it, turning 2FA off, downloading a
+ * backup). Wrong tries slow down the way they do at sign-in and are counted together for all three; false when it is wrong.
+ */
+export async function checkOwnPassword(ctx: AuthContext, userId: string, password: string): Promise<boolean> {
+	const now = ctx.now();
+	const key = `own-pw:${await sha256Hex(userId)}`;
+	const wait = await waitSeconds(ctx.db, [key], now);
+	if (wait > 0) throw new ApiError(429, "too_many_attempts", "Bạn thử quá nhiều lần. Hãy đợi một lát rồi thử lại.", undefined, wait);
+	const row = await ctx.db.prepare("SELECT password_hash FROM user WHERE id = ?").bind(userId).first();
+	const hash = text(row?.password_hash);
+	if (!hash || !verifyPassword(password, hash)) {
+		await recordFailure(ctx.db, key, now, LOGIN_BACKOFF);
+		return false;
+	}
+	await clearFailures(ctx.db, key);
+	return true;
+}
+
 export async function changePassword(ctx: AuthContext, authed: Authed, input: { current: string; next: string }): Promise<void> {
-	const row = await ctx.db.prepare("SELECT password_hash FROM user WHERE id = ?").bind(authed.user.id).first();
-	if (!verifyPassword(input.current, text(row?.password_hash) || dummyHash())) throw new ApiError(400, "wrong_password", "Mật khẩu hiện tại không đúng.", { current: "Mật khẩu hiện tại không đúng." });
+	if (!(await checkOwnPassword(ctx, authed.user.id, input.current))) throw new ApiError(400, "wrong_password", "Mật khẩu hiện tại không đúng.", { current: "Mật khẩu hiện tại không đúng." });
 	const problem = passwordProblem(input.next, authed.user.email);
 	if (problem) throw new ApiError(422, "weak_password", problem, { next: problem });
 	if (input.next === input.current) throw new ApiError(422, "same_password", "Mật khẩu mới phải khác mật khẩu cũ.", { next: "Mật khẩu mới phải khác mật khẩu cũ." });
@@ -265,28 +304,37 @@ export async function changePassword(ctx: AuthContext, authed: Authed, input: { 
 	]);
 }
 
-/** Mails a reset link when the email belongs to an account. Always looks the same from outside. Returns false only when the caller's address is over its limit. */
-export async function requestPasswordReset(ctx: AuthContext, emailInput: string, mailer: Mailer): Promise<boolean> {
+/**
+ * Mails a reset link when the email belongs to an account. Always looks the same from outside: the same two counters are
+ * touched for any email, and everything that depends on whether there is an account (the lookup, the new token, the mail) is
+ * `work`, handed to `defer` to run after the answer is on its way. Without `defer` it runs here (tests).
+ * Returns false only when the caller's address is over its limit.
+ */
+export async function requestPasswordReset(ctx: AuthContext, emailInput: string, mailer: Mailer, defer?: (work: () => Promise<unknown>) => void): Promise<boolean> {
 	const now = ctx.now();
 	const email = normalizeEmail(emailInput);
-	if (!(await hit(ctx.db, `reset-ip:${ctx.ip}`, now, 10, 3600_000))) return false;
+	if (!(await hit(ctx.db, `reset-ip:${throttleIp(ctx.ip)}`, now, 10, 3600_000))) return false;
 	// Over the per-email limit the answer is the same as ever, but no mail goes out.
 	if (!(await hit(ctx.db, `reset-email:${await sha256Hex(email)}`, now, 3, 3600_000))) return true;
-	const user = await ctx.db.prepare("SELECT id, email FROM user WHERE email = ? AND deleted_at IS NULL AND locked_at IS NULL AND password_hash IS NOT NULL").bind(email).first();
-	if (!user) return true;
-	const token = randomToken();
-	const stamp = now.toISOString();
-	await ctx.db.batch([
-		ctx.db.prepare("UPDATE password_reset SET used_at = ? WHERE user_id = ? AND used_at IS NULL").bind(stamp, text(user.id)),
-		ctx.db.prepare("INSERT INTO password_reset (id, user_id, token_hash, created_at, expires_at, requested_ip) VALUES (?, ?, ?, ?, ?, ?)").bind(newId("pwr", now.getTime()), text(user.id), await sha256Hex(token), stamp, new Date(now.getTime() + RESET_TTL_MS).toISOString(), ctx.ip),
-		auditStatement(ctx.db, { ...actor(ctx, { id: text(user.id), email }), action: "auth.password_reset_requested", entityType: "user", entityId: text(user.id) }, now),
-	]);
-	const link = `${ctx.env.ADMIN_BASE_URL.replace(/\/$/, "")}/quan-tri/dat-lai-mat-khau?token=${token}`;
-	await mailer({
-		to: email,
-		subject: "Đặt lại mật khẩu quản trị Tùng Lâm Hòa Phúc",
-		text: `Có yêu cầu đặt lại mật khẩu cho tài khoản này.\n\nMở liên kết sau trong vòng 20 phút (chỉ dùng được một lần):\n${link}\n\nNếu bạn không yêu cầu, hãy bỏ qua thư này; mật khẩu hiện tại vẫn giữ nguyên.`,
-	});
+	const work = async () => {
+		const user = await ctx.db.prepare("SELECT id, email FROM user WHERE email = ? AND deleted_at IS NULL AND locked_at IS NULL AND password_hash IS NOT NULL").bind(email).first();
+		if (!user) return;
+		const token = randomToken();
+		const stamp = now.toISOString();
+		await ctx.db.batch([
+			ctx.db.prepare("UPDATE password_reset SET used_at = ? WHERE user_id = ? AND used_at IS NULL").bind(stamp, text(user.id)),
+			ctx.db.prepare("INSERT INTO password_reset (id, user_id, token_hash, created_at, expires_at, requested_ip) VALUES (?, ?, ?, ?, ?, ?)").bind(newId("pwr", now.getTime()), text(user.id), await sha256Hex(token), stamp, new Date(now.getTime() + RESET_TTL_MS).toISOString(), ctx.ip),
+			auditStatement(ctx.db, { ...actor(ctx, { id: text(user.id), email }), action: "auth.password_reset_requested", entityType: "user", entityId: text(user.id) }, now),
+		]);
+		const link = `${ctx.env.ADMIN_BASE_URL.replace(/\/$/, "")}/quan-tri/dat-lai-mat-khau?token=${token}`;
+		await mailer({
+			to: email,
+			subject: "Đặt lại mật khẩu quản trị Tùng Lâm Hòa Phúc",
+			text: `Có yêu cầu đặt lại mật khẩu cho tài khoản này.\n\nMở liên kết sau trong vòng 20 phút (chỉ dùng được một lần):\n${link}\n\nNếu bạn không yêu cầu, hãy bỏ qua thư này; mật khẩu hiện tại vẫn giữ nguyên.`,
+		});
+	};
+	if (defer) defer(work);
+	else await work();
 	return true;
 }
 
@@ -294,7 +342,7 @@ export async function resetPassword(ctx: AuthContext, input: { token: string; pa
 	const now = ctx.now();
 	const stamp = now.toISOString();
 	const bad = () => new ApiError(400, "invalid_token", "Liên kết đặt lại mật khẩu không hợp lệ hoặc đã hết hạn.");
-	if (!(await hit(ctx.db, `reset-try:${ctx.ip}`, now, 20, 3600_000))) throw new ApiError(429, "too_many_attempts", "Bạn thử quá nhiều lần. Hãy đợi một lát rồi thử lại.", undefined, 3600);
+	if (!(await hit(ctx.db, `reset-try:${throttleIp(ctx.ip)}`, now, 20, 3600_000))) throw new ApiError(429, "too_many_attempts", "Bạn thử quá nhiều lần. Hãy đợi một lát rồi thử lại.", undefined, 3600);
 	const tokenHash = await sha256Hex(input.token);
 	const row = await ctx.db
 		.prepare("SELECT p.id, p.user_id, u.email FROM password_reset p JOIN user u ON u.id = p.user_id WHERE p.token_hash = ? AND p.used_at IS NULL AND p.expires_at > ? AND u.deleted_at IS NULL")
@@ -310,7 +358,7 @@ export async function resetPassword(ctx: AuthContext, input: { token: string; pa
 	await ctx.db.batch([
 		ctx.db.prepare("UPDATE user SET password_hash = ?, password_changed_at = ?, must_change_password = 0, failed_logins = 0, updated_at = ? WHERE id = ?").bind(hashPassword(input.password, ctx.passwordParams), stamp, stamp, userId),
 		ctx.db.prepare("UPDATE session SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL").bind(stamp, userId),
-		ctx.db.prepare("DELETE FROM auth_throttle WHERE key LIKE ?").bind(`login:${await sha256Hex(text(row.email))}:%`),
+		ctx.db.prepare("DELETE FROM auth_throttle WHERE key LIKE ? OR key = ?").bind(`login:${await sha256Hex(text(row.email))}:%`, `login-email:${await sha256Hex(text(row.email))}`),
 		auditStatement(ctx.db, { ...actor(ctx, { id: userId, email: text(row.email) }), action: "auth.password_reset", entityType: "user", entityId: userId }, now),
 	]);
 }
@@ -345,8 +393,7 @@ export async function enableTotp(ctx: AuthContext, authed: Authed, code: string)
 }
 
 export async function disableTotp(ctx: AuthContext, authed: Authed, password: string): Promise<void> {
-	const row = await ctx.db.prepare("SELECT password_hash FROM user WHERE id = ?").bind(authed.user.id).first();
-	if (!verifyPassword(password, text(row?.password_hash) || dummyHash())) throw new ApiError(400, "wrong_password", "Mật khẩu không đúng.", { password: "Mật khẩu không đúng." });
+	if (!(await checkOwnPassword(ctx, authed.user.id, password))) throw new ApiError(400, "wrong_password", "Mật khẩu không đúng.", { password: "Mật khẩu không đúng." });
 	await ctx.db.batch([
 		ctx.db.prepare("DELETE FROM user_totp WHERE user_id = ?").bind(authed.user.id),
 		auditStatement(ctx.db, { ...actor(ctx, authed.user), action: "auth.2fa_disabled", entityType: "user", entityId: authed.user.id }, ctx.now()),

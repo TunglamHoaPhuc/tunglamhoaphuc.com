@@ -225,6 +225,8 @@ describe("forgetting the password over HTTP", () => {
 		const unknown = await w.call("POST", "auth/forgot-password", { email: "khong-co@example.test" });
 		expect(known.status).toBe(200);
 		expect(known.json).toEqual(unknown.json);
+		expect(w.mails).toHaveLength(0); // the lookup and the mail wait until the answer is out
+		await Promise.all(w.deferred);
 		expect(w.mails).toHaveLength(1);
 		const token = /token=([\w-]+)/.exec(w.mails[0].text)![1];
 		expect((await w.call("POST", "auth/reset-password", { token, password: "ngan" })).json.error.code).toBe("weak_password");
