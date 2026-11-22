@@ -128,25 +128,32 @@ test.describe("reduced motion keeps only what does not move", () => {
 	});
 });
 
-// WCAG 2.2.2: whatever moves by itself has a pause button in its block. The Bexon sample
-// pages are left out until their tasks replace them.
-test.describe("self-moving content can be paused", () => {
+// WCAG 2.2.2: whatever moves by itself has no pause button; it stands still while the pointer
+// is over it or keyboard focus is inside, and has arrows so visitors pick the frame themselves.
+// The Bexon sample pages are left out until their tasks replace them.
+test.describe("self-moving content holds and has arrows", () => {
 	for (const path of ["/", "/dong-chay-hoang-phap", "/dong-chay-hoang-phap/phap-hoi-huyet-bon-trai", "/lich-tu-hoc", "/khong-co-trang-nay"]) {
-		test(`${path} has a pause button by each slider and sliding row`, async ({ page }) => {
+		test(`${path} has no pause button and arrows (44px, named) by each slider and sliding row`, async ({ page }) => {
 			await settle(page, path);
-			const unpausable = await page.evaluate(() => {
+			expect(await page.locator(".tlhp-pause").count()).toBe(0);
+			expect(await page.getByRole("button", { name: /Tạm dừng|Chạy tiếp/ }).count()).toBe(0);
+			const problems = await page.evaluate(() => {
 				const moving = [
 					...[...document.querySelectorAll<SliderElement>(".swiper")].filter((el) => el.swiper?.autoplay?.running),
 					...document.querySelectorAll<HTMLElement>(".tlhp-marquee-track"),
 				];
-				return moving
-					.filter((el) => {
-						const button = el.closest("section, .footer-marquee")?.querySelector(".tlhp-pause");
-						return !button || !button.getClientRects().length;
-					})
-					.map((el) => el.className);
+				return moving.flatMap((el) => {
+					const block = el.closest("section, .tlhp-quote-card, .tlhp-latest-wrap, .tlhp-feature, .tlhp-marquee");
+					const arrows = [...(block?.querySelectorAll<HTMLElement>("button[class*='-prev'], button[class*='-next']") ?? [])].filter((b) => b.getClientRects().length);
+					if (arrows.length < 2) return [`${el.className}: ${arrows.length} arrows`];
+					return arrows.flatMap((b) => {
+						const box = b.getBoundingClientRect();
+						const name = b.getAttribute("aria-label") ?? b.textContent?.trim() ?? "";
+						return [...(box.width < 44 || box.height < 44 ? [`${name}: ${box.width}x${box.height}`] : []), ...(name ? [] : ["unnamed arrow"])];
+					});
+				});
 			});
-			expect(unpausable).toEqual([]);
+			expect(problems).toEqual([]);
 		});
 	}
 });

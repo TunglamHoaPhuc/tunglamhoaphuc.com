@@ -647,7 +647,7 @@ START: Testimonial CSS
 }
 
 // TLHP: Lời Thầy dạy (Testimonials2). The verse in the scripture style, the month's
-// poster beside it, and the pause button under the slider.
+// poster beside it, and the slider's arrows under it.
 .tlhp-verses {
 	.testimonial-img-area {
 		height: 100%;
@@ -741,9 +741,6 @@ START: Testimonial CSS
 		@media #{$sm, $xs} {
 			margin-bottom: 12px;
 		}
-	}
-	.tlhp-verses-pause {
-		margin-top: 20px;
 	}
 	// Twelve months of dots wrap; Bexon's line-height 0 laid the two rows on each other.
 	.tlhp-verses-pagination {

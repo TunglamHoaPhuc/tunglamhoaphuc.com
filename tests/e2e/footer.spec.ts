@@ -135,7 +135,7 @@ test.describe("footer with motion", () => {
 		expect(unfocusable).toEqual([]);
 	});
 
-	test("the slogan line runs when motion is allowed, and its button stops it", async ({ page, isMobile }) => {
+	test("the slogan line runs when motion is allowed, stops under the pointer, and has no button of its own", async ({ page, isMobile }) => {
 		test.skip(isMobile, "one check is enough");
 		await open(page, "/");
 		const track = footer(page).locator(".footer-marquee .tlhp-marquee-track");
@@ -144,10 +144,13 @@ test.describe("footer with motion", () => {
 		await page.waitForTimeout(1500);
 		expect(await transform()).not.toBe(before);
 
-		const pause = footer(page).getByRole("button", { name: "Tạm dừng chữ chạy cuối trang" });
-		await pause.focus();
-		await page.keyboard.press("Enter");
-		await expect(footer(page).getByRole("button", { name: "Chạy tiếp chữ chạy cuối trang" })).toBeFocused();
+		await expect(footer(page).getByRole("button", { name: /Tạm dừng|Chạy tiếp/ })).toHaveCount(0);
+		// Smooth scrolling glides on for a moment; the pointer must land on a still page.
+		await footer(page).locator(".footer-marquee .tlhp-marquee-view").scrollIntoViewIfNeeded();
+		await page.waitForTimeout(3000);
+		const box = (await footer(page).locator(".footer-marquee .tlhp-marquee-view").boundingBox())!;
+		await page.mouse.move(box.x + box.width / 2 - 40, box.y + box.height / 2);
+		await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2, { steps: 4 });
 		// The animation runs off the main thread; its stop shows a frame later.
 		await page.waitForTimeout(150);
 		const stopped = await transform();

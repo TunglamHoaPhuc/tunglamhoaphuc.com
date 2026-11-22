@@ -1,7 +1,7 @@
 "use client";
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import BlogCard2 from "@/components/shared/cards/BlogCard2";
-import PauseButton from "@/components/shared/sliders/PauseButton";
+import SliderArrows from "@/components/shared/sliders/SliderArrows";
 import { useAutoplay } from "@/hooks/useAutoplay";
 import { useRef, useState } from "react";
 import { A11y, Autoplay, Navigation, Pagination } from "swiper/modules";
@@ -68,7 +68,7 @@ const NewsSlider = ({ posts, autoplay }) => {
 
 /**
  * Bexon's blog slider as the home news block (plan.md, home block 4): two tabs, Tin mới
- * nhất and Dấu ấn hoằng pháp (most read), over one self-moving slider with a pause button.
+ * nhất and Dấu ấn hoằng pháp (most read), over one self-moving slider that holds under the pointer or keyboard focus, with its arrows.
  * @param {{ latest: import("@/libs/home").NewsCard[], popular: import("@/libs/home").NewsCard[] }} props
  */
 const Blogs2 = ({ latest, popular }) => {
@@ -94,7 +94,7 @@ const Blogs2 = ({ latest, popular }) => {
 	};
 
 	return (
-		<section className="tj-blog-section-2 section-gap tlhp-news" aria-labelledby="tin-tuc-title" onFocus={autoplay.onFocus}>
+		<section className="tj-blog-section-2 section-gap tlhp-news" aria-labelledby="tin-tuc-title" onFocus={autoplay.onFocus} onBlur={autoplay.onBlur}>
 			<div className="container">
 				<div className="row">
 					<div className="col-12">
@@ -111,20 +111,6 @@ const Blogs2 = ({ latest, popular }) => {
 								</div>
 								<div className="wow fadeInUp" data-wow-delay=".5s">
 									<p className="desc">Pháp sự, khóa lễ, cộng tu và các đại lễ tại Tùng Lâm Hòa Phúc.</p>
-								</div>
-								<div className="slider-navigation d-none d-md-inline-flex wow fadeInUp" data-wow-delay=".7s">
-									<button type="button" className="slider-prev tlhp-news-prev" aria-label="Bài trước">
-										<span className="anim-icon" aria-hidden="true">
-											<i className="tji-arrow-left"></i>
-											<i className="tji-arrow-left"></i>
-										</span>
-									</button>
-									<button type="button" className="slider-next tlhp-news-next" aria-label="Bài sau">
-										<span className="anim-icon" aria-hidden="true">
-											<i className="tji-arrow-right"></i>
-											<i className="tji-arrow-right"></i>
-										</span>
-									</button>
 								</div>
 							</div>
 						</div>
@@ -155,7 +141,7 @@ const Blogs2 = ({ latest, popular }) => {
 							</button>
 						))}
 					</div>
-					<PauseButton paused={autoplay.paused} onClick={autoplay.toggle} what="danh sách bài" />
+					<SliderArrows prevClass="tlhp-news-prev" nextClass="tlhp-news-next" prevLabel="Bài trước" nextLabel="Bài sau" />
 				</div>
 				<div className="row">
 					<div className="col-12">

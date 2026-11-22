@@ -1,16 +1,18 @@
 "use client";
 import TestimonialsCard2 from "@/components/shared/cards/TestimonialsCard2";
 import SectionMark from "@/components/shared/others/SectionMark";
-import PauseButton from "@/components/shared/sliders/PauseButton";
+import SliderArrows from "@/components/shared/sliders/SliderArrows";
 import QuoteCard from "@/components/home/QuoteCard";
 import { shuffled } from "@/components/home/quoteOrder";
 import { useAutoplay } from "@/hooks/useAutoplay";
 import { useEffect, useState } from "react";
 import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
-import { A11y, Autoplay, Pagination } from "swiper/modules";
+import { A11y, Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 
 const A11Y = {
+	prevSlideMessage: "Câu kệ trước",
+	nextSlideMessage: "Câu kệ kế tiếp",
 	paginationBulletMessage: "Tới câu kệ {{index}}",
 	slideLabelMessage: "Câu kệ {{index}}/{{slidesLength}}",
 	containerRoleDescriptionMessage: "trình chiếu",
@@ -19,7 +21,7 @@ const A11Y = {
 
 /**
  * Bexon's testimonials as Lời Thầy dạy (plan.md, home block 9): the verses of the month
- * themes, this month's first, sliding by themselves with a pause button; beside them this
+ * themes, this month's first, sliding by themselves (held under the pointer or keyboard focus, with arrows); beside them this
  * month's poster. The poster carries its own words ("Ân Đức Tổ Thầy"), so it shows whole,
  * with nothing laid over it: the title stands over the block and the month's theme is the
  * poster's caption (17/11/2026; Bexon's heading and rating box covered the poster's words).
@@ -41,7 +43,7 @@ const Testimonials2 = ({ verses, quotes }) => {
 	if (!verses?.length && !quoteItems) return null;
 	const current = verses?.[0];
 	return (
-		<section className="tj-testimonial-section-2 section-gap tlhp-verses" aria-labelledby="loi-thay-day" onFocus={autoplay.onFocus}>
+		<section className="tj-testimonial-section-2 section-gap tlhp-verses" aria-labelledby="loi-thay-day" onFocus={autoplay.onFocus} onBlur={autoplay.onBlur}>
 			<div className="container">
 				<div className="row">
 					<div className="col-12">
@@ -84,8 +86,9 @@ const Testimonials2 = ({ verses, quotes }) => {
 								speed={1500}
 								autoplay={{ delay: 9000, pauseOnMouseEnter: true, disableOnInteraction: false }}
 								pagination={{ el: ".tlhp-verses-pagination", clickable: true }}
+								navigation={{ prevEl: ".tlhp-verses-prev", nextEl: ".tlhp-verses-next" }}
 								a11y={A11Y}
-								modules={[A11y, Pagination, Autoplay]}
+								modules={[A11y, Pagination, Autoplay, Navigation]}
 								className="testimonial-slider-2"
 							>
 								{quoteItems
@@ -101,7 +104,7 @@ const Testimonials2 = ({ verses, quotes }) => {
 										))}
 								<div className="swiper-pagination-area tlhp-verses-pagination"></div>
 							</Swiper>
-							<PauseButton paused={autoplay.paused} onClick={autoplay.toggle} what="lời Thầy dạy" className="tlhp-verses-pause" />
+							<SliderArrows prevClass="tlhp-verses-prev" nextClass="tlhp-verses-next" prevLabel="Câu kệ trước" nextLabel="Câu kệ kế tiếp" className="tlhp-verses-arrows" />
 						</div>
 					</div>
 				</div>

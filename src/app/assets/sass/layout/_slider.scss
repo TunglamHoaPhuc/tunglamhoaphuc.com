@@ -285,8 +285,13 @@ START: Theme Slider CSS
 			background-color: var(--tj-color-common-white);
 		}
 
+		// Phones keep the arrows too, at the least a finger can hit.
 		@media #{$sm, $xs} {
-			display: none;
+			width: 44px;
+			height: 44px;
+			font-size: 20px;
+			margin-top: 0;
+			background-color: color-mix(in srgb, var(--tj-color-theme-dark) 55%, transparent);
 		}
 	}
 	@media #{$xl, $lg} {
@@ -375,7 +380,7 @@ START: Theme Slider CSS
 }
 
 // TLHP hero (Hero2): pictures as <img>, a darker veil, the overline and subtitle lines,
-// long post titles, the thumbnail row with the pause button, and the ring of words in SVG.
+// long post titles, the thumbnail row, and the ring of words in SVG.
 .tlhp-hero {
 	.slider-bg-image {
 		inset: 0;
@@ -459,7 +464,7 @@ START: Theme Slider CSS
 		transition-delay: 0.8s;
 	}
 
-	// Bexon placed only the thumbnails here; the pause button joins them.
+	// Bexon placed only the thumbnails here; the hero's own arrows stay at its sides.
 	.tlhp-hero-bar {
 		--tlhp-thumb: 80px;
 		position: absolute;
@@ -550,20 +555,6 @@ START: Theme Slider CSS
 			display: inline-block;
 			width: 1em;
 		}
-	}
-}
-
-// The pause button on the dark hero and footer: a dark glass pill, readable over any picture.
-.tlhp-hero .tlhp-pause,
-.footer-marquee .tlhp-pause {
-	border-color: var(--tj-color-border-4);
-	background-color: color-mix(in srgb, var(--tj-color-theme-dark) 75%, transparent);
-	color: var(--tj-color-common-white);
-	backdrop-filter: blur(10px);
-	&:hover {
-		border-color: var(--tj-color-common-white);
-		background-color: var(--tj-color-common-white);
-		color: var(--tj-color-theme-dark);
 	}
 }
 

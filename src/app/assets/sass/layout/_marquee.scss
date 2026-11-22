@@ -1,4 +1,6 @@
 @use "../utilities" as *;
+// Arrows of every slider and sliding row (SliderArrows.tsx).
+@forward "slider-arrows";
 
 /**----------------------------------------
 START: Theme Marquee CSS
@@ -80,16 +82,13 @@ START: Theme Marquee CSS
 }
 
 // TLHP: Marquee.tsx, Bexon's sliding rows in CSS. The track holds the list twice and slides
-// by one copy, so the loop has no seam; it stops on the spot on hover, while focus is in
-// the row, or when paused.
+// by one copy, so the loop has no seam; it stops on the spot while the pointer is over it or
+// focus is inside (the arrows included). The arrows lie over the row's two ends.
 .tlhp-marquee {
 	position: relative;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	.tlhp-marquee-pause {
-		margin-top: 24px;
-	}
 }
 .tlhp-marquee-view {
 	align-self: stretch;
@@ -111,9 +110,9 @@ START: Theme Marquee CSS
 	padding: 0;
 	list-style: none;
 }
-.tlhp-marquee-view:hover .tlhp-marquee-track,
-.tlhp-marquee-view:focus-within .tlhp-marquee-track,
-.tlhp-marquee.is-paused .tlhp-marquee-track {
+.tlhp-marquee:hover .tlhp-marquee-track,
+.tlhp-marquee:has(:focus-visible) .tlhp-marquee-track,
+html[data-motion-hold] .tlhp-marquee-track {
 	animation-play-state: paused;
 }
 @keyframes tlhp-marquee {
@@ -125,18 +124,16 @@ START: Theme Marquee CSS
 	.tlhp-marquee-track {
 		animation: none;
 	}
+	// Nothing moves, so there is nothing to step.
+	.tlhp-marquee .tlhp-marquee-arrows {
+		display: none;
+	}
 }
 
 .footer-marquee {
 	position: relative;
 	.marquee-img {
 		display: block;
-	}
-	.tlhp-marquee-pause {
-		position: absolute;
-		inset-inline-end: 15px;
-		bottom: 12px;
-		margin: 0;
 	}
 }
 

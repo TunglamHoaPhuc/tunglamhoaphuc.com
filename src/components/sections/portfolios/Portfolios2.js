@@ -1,14 +1,16 @@
 "use client";
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import PortfolioCard2 from "@/components/shared/cards/PortfolioCard2";
-import PauseButton from "@/components/shared/sliders/PauseButton";
+import SliderArrows from "@/components/shared/sliders/SliderArrows";
 import { vuTru } from "@/config/vuTru";
 import { useAutoplay } from "@/hooks/useAutoplay";
-import { A11y, Autoplay, Pagination } from "swiper/modules";
+import { A11y, Autoplay, Navigation, Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import SectionMark from "@/components/shared/others/SectionMark";
 
 const A11Y = {
+	prevSlideMessage: "Khu vực trước",
+	nextSlideMessage: "Khu vực kế tiếp",
 	paginationBulletMessage: "Tới khu vực {{index}}",
 	slideLabelMessage: "Khu vực {{index}}/{{slidesLength}}",
 	containerRoleDescriptionMessage: "danh sách trượt",
@@ -17,14 +19,15 @@ const A11Y = {
 
 /**
  * Bexon's project slider as Khu vực nổi bật (plan.md, home block 7): the areas of the temple
- * in map order, the centre slide large, moving by itself every 7 seconds with a pause button.
+ * in map order, every slide in one frame (620x550, narrower on a phone), moving by itself every 7 seconds (held under the
+ * pointer or keyboard focus), with its arrows beside the button to the map.
  * @param {{ areas: import("@/libs/vuTru").AreaTeaser[] }} props
  */
 const Portfolios2 = ({ areas }) => {
 	const autoplay = useAutoplay();
 	if (!areas?.length) return null;
 	return (
-		<section className="tj-project-section-2 section-gap tlhp-area-slider" aria-labelledby="khu-vuc-noi-bat" onFocus={autoplay.onFocus}>
+		<section className="tj-project-section-2 section-gap tlhp-area-slider" aria-labelledby="khu-vuc-noi-bat" onFocus={autoplay.onFocus} onBlur={autoplay.onBlur}>
 			<div className="container">
 				<div className="row">
 					<div className="col-12">
@@ -46,22 +49,20 @@ const Portfolios2 = ({ areas }) => {
 						<div className="project-wrapper wow fadeInUp" data-wow-delay=".5s">
 							<Swiper
 								onSwiper={autoplay.onSwiper}
-								slidesPerView={1.2}
+								slidesPerView="auto"
 								spaceBetween={15}
 								loop={areas.length > 3}
 								speed={1500}
 								centeredSlides={true}
 								autoplay={{ delay: 7000, pauseOnMouseEnter: true, disableOnInteraction: false }}
 								pagination={{ el: ".tlhp-area-pagination", clickable: true }}
+								navigation={{ prevEl: ".tlhp-area-prev", nextEl: ".tlhp-area-next" }}
 								a11y={A11Y}
 								breakpoints={{
-									576: { slidesPerView: 1.7, spaceBetween: 20 },
-									768: { slidesPerView: 2, spaceBetween: 20 },
-									992: { slidesPerView: 2, spaceBetween: 30 },
-									1024: { slidesPerView: 2.2, spaceBetween: 30 },
-									1400: { slidesPerView: 2.31, spaceBetween: 30 },
+									576: { spaceBetween: 20 },
+									992: { spaceBetween: 30 },
 								}}
-								modules={[A11y, Pagination, Autoplay]}
+								modules={[A11y, Pagination, Autoplay, Navigation]}
 								className="project-slider"
 							>
 								{areas.map((area) => (
@@ -77,8 +78,8 @@ const Portfolios2 = ({ areas }) => {
 			</div>
 			<div className="container">
 				<div className="tlhp-area-slider-bar">
+					<SliderArrows prevClass="tlhp-area-prev" nextClass="tlhp-area-next" prevLabel="Khu vực trước" nextLabel="Khu vực kế tiếp" />
 					<ButtonPrimary text="Xem sơ đồ 2D" url={vuTru.path} />
-					<PauseButton paused={autoplay.paused} onClick={autoplay.toggle} what="danh sách khu vực" />
 				</div>
 			</div>
 		</section>

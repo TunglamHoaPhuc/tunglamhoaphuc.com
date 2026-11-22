@@ -466,6 +466,22 @@ START: Project CSS
 	}
 }
 
+// TLHP Khu vực nổi bật (Portfolios2): Bexon sized a slide by how many fit the screen (about
+// 2.3), so on a wide screen the pictures grew without end and no two screens showed the same
+// frame. Every slide is one frame, 620 x 550 at most and narrower on a phone, the same picture
+// crop everywhere; the centre one is the one in full colour.
+.tlhp-area-slider .project-slider {
+	.swiper-slide {
+		width: clamp(280px, 80vw, 620px);
+		height: auto;
+	}
+	.project-item {
+		width: 100%;
+		min-height: 0;
+		aspect-ratio: 620 / 550;
+	}
+}
+
 // tj-project-section-3
 .project-slider-2 {
 	.project-item {

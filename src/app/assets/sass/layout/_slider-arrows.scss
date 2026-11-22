@@ -1,0 +1,136 @@
+@use "../utilities" as *;
+
+/**----------------------------------------
+START: TLHP slider arrows
+----------------------------------------*/
+// The two arrows of every slider and sliding row (SliderArrows.tsx), so visitors can pick the
+// frame themselves. 44px is the least a finger can hit. At the end of a slider that does not
+// loop Swiper marks the arrow `swiper-button-disabled`; when every slide fits it marks both
+// `swiper-button-lock`.
+.tlhp-arrows {
+	display: inline-flex;
+	align-items: center;
+	gap: 12px;
+}
+.tlhp-arrow {
+	display: inline-flex;
+	flex: 0 0 auto;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 1px solid var(--tj-color-border-1);
+	border-radius: 50%;
+	background-color: var(--tj-color-surface);
+	color: var(--tj-color-heading-primary);
+	cursor: pointer;
+	transition:
+		background-color 0.3s ease-in-out,
+		border-color 0.3s ease-in-out,
+		color 0.3s ease-in-out,
+		opacity 0.3s ease-in-out;
+	&:hover,
+	&:focus-visible {
+		border-color: var(--tj-color-theme-primary);
+		background-color: var(--tj-color-primary-fill);
+		color: var(--tj-color-common-white);
+	}
+	&.swiper-button-disabled {
+		opacity: 0.35;
+		cursor: default;
+		pointer-events: none;
+	}
+	&.swiper-button-lock {
+		display: none;
+	}
+}
+
+// The sliding rows: the arrows lie over the two ends of the row, as glass discs readable on
+// any background.
+.tlhp-marquee .tlhp-marquee-arrows {
+	position: absolute;
+	inset-inline: 12px;
+	top: 50%;
+	z-index: 3;
+	display: flex;
+	justify-content: space-between;
+	transform: translateY(-50%);
+	pointer-events: none;
+	.tlhp-arrow {
+		pointer-events: auto;
+		background-color: color-mix(in srgb, var(--tj-color-surface) 88%, transparent);
+		backdrop-filter: blur(6px);
+		box-shadow: 0 4px 14px rgb(0 0 0 / 0.18);
+		&:hover,
+		&:focus-visible {
+			background-color: var(--tj-color-primary-fill);
+		}
+	}
+}
+
+// Home news (Blogs2): the arrows close the tab row on the right.
+.tlhp-news-bar .tlhp-arrows {
+	margin-inline-start: auto;
+}
+// Lời Thầy dạy (Testimonials2): centred under the slider.
+.tlhp-verses .tlhp-verses-arrows {
+	display: flex;
+	justify-content: center;
+	margin-top: 20px;
+}
+
+// The arrows of the home sliders written earlier in the old page's own look: 44px on touch,
+// and still out of the way when every slide fits.
+:root[data-theme] body .tlhp-quote-card .tlhp-quote-arrows button {
+	width: 44px;
+	height: 44px;
+}
+:root[data-theme] body .tlhp-slider-arrows button,
+:root[data-theme] body .tlhp-quote-arrows button {
+	&.swiper-button-disabled {
+		opacity: 0.35;
+		cursor: default;
+		pointer-events: none;
+	}
+	&.swiper-button-lock {
+		display: none;
+	}
+}
+/* !END: TLHP slider arrows */
+
+// The page's one switch for everything that moves by itself (MotionToggle.tsx): a small round
+// button in the lower left corner, faint until the pointer or focus is on it. With reduced
+// motion nothing moves, so it is not drawn.
+.tlhp-motion-toggle {
+	position: fixed;
+	inset-block-end: 16px;
+	inset-inline-start: 16px;
+	z-index: 90;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	padding: 0;
+	border: 1px solid var(--tlhp-gold-line, rgb(242 193 78 / 0.5));
+	border-radius: 50%;
+	background-color: rgb(28 15 8 / 0.8);
+	color: var(--tlhp-gold, #ffde59);
+	opacity: 0.55;
+	cursor: pointer;
+	transition:
+		opacity 0.2s ease,
+		background-color 0.2s ease;
+	&:hover,
+	&:focus-visible,
+	&[aria-pressed="true"] {
+		opacity: 1;
+	}
+	&:hover {
+		background-color: #351c0f;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		display: none;
+	}
+}

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Announcement } from "@/config/site";
 import BackToTop from "@/components/shared/others/BackToTop";
+import MotionToggle from "@/components/shared/others/MotionToggle";
 import AnnouncementBar from "./AnnouncementBar";
 import Footer2 from "./footer/Footer2";
 import Header from "./header/Header";
@@ -33,6 +34,7 @@ export default function SiteShell({ children, headerType = 1, showSearch, announ
 			</div>
 			{/* After the footer, so it is also the last stop for the Tab key. */}
 			<BackToTop />
+			<MotionToggle />
 			<PageEffects />
 		</>
 	);

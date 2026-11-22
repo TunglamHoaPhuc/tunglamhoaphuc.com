@@ -187,7 +187,7 @@ test.describe("home page content", () => {
 			expect(box.left).toBeGreaterThanOrEqual(0);
 			expect(box.right).toBeLessThanOrEqual(375);
 		}
-		await expect(entrances(page).locator(".tlhp-pause")).toBeHidden();
+		await expect(entrances(page).locator(".tlhp-pause")).toHaveCount(0);
 		expect(await transformOf(page, "#loi-vao .tlhp-marquee-track")).toBe("none");
 	});
 
@@ -378,18 +378,11 @@ test.describe("home sliders with motion allowed", () => {
 		}
 	});
 
-	test("the hero pause button stops and restarts it from the keyboard", async ({ page }) => {
+	test("no slider carries a pause button; the hero has its two arrows", async ({ page }) => {
 		await open(page);
-		const pause = hero(page).getByRole("button", { name: "Tạm dừng trình chiếu đầu trang" });
-		await expect(pause).toBeVisible();
-		await pause.focus();
-		await page.keyboard.press("Enter");
-		const play = hero(page).getByRole("button", { name: "Chạy tiếp trình chiếu đầu trang" });
-		await expect(play).toBeFocused();
-		expect((await autoplayOf(page, ".hero-slider")).running).toBe(false);
-		await page.keyboard.press("Enter");
-		await expect(pause).toBeFocused();
-		expect((await autoplayOf(page, ".hero-slider")).running).toBe(true);
+		await expect(page.locator(".tlhp-pause")).toHaveCount(0);
+		await expect(page.getByRole("button", { name: /Tạm dừng|Chạy tiếp/ })).toHaveCount(0);
+		await expect(hero(page).getByRole("button", { name: /Khung trước|Khung sau/ })).toHaveCount(2);
 	});
 
 	test("focus moving into a slider stops it, the pointer over it holds it", async ({ page, isMobile }) => {
@@ -402,23 +395,12 @@ test.describe("home sliders with motion allowed", () => {
 		}
 		await hero(page).getByRole("link", { name: "Tìm hiểu Bổn tự" }).focus();
 		await expect.poll(async () => (await autoplayOf(page, ".hero-slider")).running).toBe(false);
-		await expect(hero(page).getByRole("button", { name: "Chạy tiếp trình chiếu đầu trang" })).toBeVisible();
 
 		await news(page).getByRole("tab", { name: "Tin mới nhất" }).focus();
 		await expect.poll(async () => (await autoplayOf(page, ".tlhp-news .blog-slider")).running).toBe(false);
 	});
 
-	test("the news slider keeps a stopped state when the tab changes", async ({ page }) => {
-		await open(page);
-		const pause = news(page).getByRole("button", { name: "Tạm dừng danh sách bài" });
-		await pause.scrollIntoViewIfNeeded();
-		await pause.click();
-		await news(page).getByRole("tab", { name: "Dấu ấn hoằng pháp" }).click();
-		await expect(news(page).getByRole("button", { name: "Chạy tiếp danh sách bài" })).toBeVisible();
-		expect((await autoplayOf(page, ".tlhp-news .blog-slider")).running).toBe(false);
-	});
-
-	test("the ways in slide, and stop under the pointer, on focus and with their button", async ({ page, isMobile }) => {
+	test("the ways in slide, and stop under the pointer and on focus", async ({ page, isMobile }) => {
 		await open(page);
 		await entrances(page).scrollIntoViewIfNeeded();
 		// Smooth scrolling glides on for a moment; the pointer must land on a still page.
@@ -442,11 +424,8 @@ test.describe("home sliders with motion allowed", () => {
 
 		await entrances(page).getByRole("link", { name: "Vũ Trụ Phật Giáo" }).focus();
 		expect(await moves()).toBe(false);
-		await entrances(page).getByRole("button", { name: "Tạm dừng dải chuyên mục" }).focus();
+		await page.evaluate(() => (document.activeElement as HTMLElement).blur());
 		expect(await moves()).toBe(true);
-		await page.keyboard.press("Enter");
-		await expect(entrances(page).getByRole("button", { name: "Chạy tiếp dải chuyên mục" })).toBeFocused();
-		expect(await moves()).toBe(false);
 	});
 });
 

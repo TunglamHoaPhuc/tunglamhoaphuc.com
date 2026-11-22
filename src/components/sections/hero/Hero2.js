@@ -1,6 +1,5 @@
 "use client";
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
-import PauseButton from "@/components/shared/sliders/PauseButton";
 import { useAutoplay } from "@/hooks/useAutoplay";
 import { useState } from "react";
 import { A11y, Autoplay, EffectFade, Navigation, Thumbs } from "swiper/modules";
@@ -57,16 +56,15 @@ const HeroPicture = ({ image, first }) => (
 
 /**
  * Bexon's home slider with the temple's frames (plan.md, home block 1): "Nơi để trở về",
- * the next retreat with the days left, and the latest ceremony. Each frame stays 7 seconds, with
- * a pause button; the slider also stops when focus moves into it and holds under the
- * pointer.
+ * the next retreat with the days left, and the latest ceremony. Each frame stays 7 seconds;
+ * the slider holds under the pointer and while focus is inside it, and has its two arrows.
  * @param {{ slides: import("@/libs/home").HeroSlide[] }} props
  */
 const Hero2 = ({ slides }) => {
 	const [thumbs, setThumbs] = useState(null);
 	const autoplay = useAutoplay();
 	return (
-		<section className="tj-slider-section tlhp-hero" aria-label="Trình chiếu đầu trang" onFocus={autoplay.onFocus}>
+		<section className="tj-slider-section tlhp-hero" aria-label="Trình chiếu đầu trang" onFocus={autoplay.onFocus} onBlur={autoplay.onBlur}>
 			<h1 className="visually-hidden">Tùng Lâm Hòa Phúc – Nơi để trở về, chốn thiêng bình yên</h1>
 			<Swiper
 				onSwiper={autoplay.onSwiper}
@@ -148,7 +146,6 @@ const Hero2 = ({ slides }) => {
 							</SwiperSlide>
 						))}
 					</Swiper>
-					<PauseButton paused={autoplay.paused} onClick={autoplay.toggle} what="trình chiếu đầu trang" />
 				</div>
 			) : null}
 

@@ -214,35 +214,3 @@
 		font-size: 20px;
 	}
 }
-
-// Pause button of self-moving sliders and rows (PauseButton.tsx): a 44px pill that says
-// what pressing it does. Nothing moves with reduced motion, so it is not shown then.
-.tlhp-pause {
-	display: inline-flex;
-	align-items: center;
-	gap: 8px;
-	min-height: 44px;
-	padding: 0 18px;
-	border: 1px solid var(--tj-color-border-1);
-	border-radius: var(--tlhp-radius-pill);
-	background-color: var(--tj-color-surface);
-	color: var(--tj-color-heading-primary);
-	font-size: var(--tlhp-text-body-sm);
-	font-weight: var(--tj-fw-medium);
-	line-height: 1;
-	transition:
-		background-color 0.3s ease-in-out,
-		border-color 0.3s ease-in-out,
-		color 0.3s ease-in-out;
-	svg {
-		flex: 0 0 auto;
-	}
-	&:hover {
-		border-color: var(--tj-color-theme-primary);
-		background-color: var(--tj-color-primary-fill);
-		color: var(--tj-color-common-white);
-	}
-	@media (prefers-reduced-motion: reduce) {
-		display: none;
-	}
-}
