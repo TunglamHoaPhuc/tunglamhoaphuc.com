@@ -2340,7 +2340,7 @@
 - `upsert` ghi đè **mọi cột nội dung** của dòng đã có (tiêu đề, thân bài, ảnh…); chỉ các cột nhập không đụng tới (`version`, `created_by`, `updated_by`, `deleted_at`, `visible`, `registration_open`…) được giữ. Bài sửa bằng admin mới mất chữ, còn `version` vẫn như đã sửa.
 - `prune` **xóa** mọi dòng không có trong nguồn: bài, tượng, sự kiện, Danh Tăng… do admin mới **tạo** (không có ở B2) sẽ bị xóa; bài xóa mềm ở admin mới (còn trong B2) bị ghi đè nội dung.
 - Bảng con (`album_item`, `milestone`, `art_variation`) bị xóa hết rồi nhập lại.
-- Admin mới chạy trên `www` từ 22/11; chưa kiểm D1 thật xem đã có dòng nào `version > 1` hoặc `created_by` khác rỗng (cần lệnh đọc trên D1 thật, chưa chạy vì chưa được phép).
+- Admin mới chạy trên `www` từ 22/11. **Đọc D1 thật (chỉ SELECT, chủ dự án cho phép 22/11) :** `post` 632, `teaching_article` 25, `page` 6, `area` 14, `statue` 126, `calendar_event` 15 dòng, tất cả `version = 1`, không dòng nào có `created_by`, `updated_by` hay `deleted_at`; `revision` 0; `audit_log` 12 dòng, `user` 1. Tức là **tới giờ chưa có dữ liệu nào của admin mới bị rủi ro**; nhưng khoảng an toàn này hết ngay khi Ban Biên Tập lưu bài đầu tiên. (`monk` không có cột kiểm toán, không đọc.)
 
 Phương án:
 
