@@ -315,3 +315,30 @@ describe("Q9: a broken Origin or path is a refusal, never a 500", () => {
 });
 
 void CONTENT_SEEDS;
+
+describe("data the account screens need to hide what the server would refuse (G4/G5)", () => {
+	it("says on an account whether the caller may manage it", async () => {
+		const w = await world(SEEDS_PLUS);
+		const admin = await w.as("admin@example.test");
+		expect((await admin.call("GET", "users/root")).data.manageable).toBe(false); // holds rights beyond the Admin's
+		expect((await admin.call("GET", "users/author")).data.manageable).toBe(true);
+		expect((await admin.call("GET", "users/admin")).data.manageable).toBe(false); // oneself: never locked, deleted or re-roled
+		const root = await w.as("root@example.test");
+		expect((await root.call("GET", "users/admin")).data.manageable).toBe(true);
+		expect((await root.call("GET", "users/root2")).data.manageable).toBe(true);
+	});
+
+	it("says on each role whether the caller may give it", async () => {
+		const w = await world(SEEDS_PLUS);
+		const admin = await w.as("admin@example.test");
+		const roles = (await admin.call("GET", "roles")).data.roles as { id: string; assignable: boolean }[];
+		const flag = (id: string) => roles.find((role) => role.id === id)?.assignable;
+		expect(flag("role-super-admin")).toBe(false);
+		expect(flag("role-admin")).toBe(true);
+		expect(flag("role-editor")).toBe(true);
+		expect(flag("role-author")).toBe(true);
+		const root = await w.as("root@example.test");
+		const all = (await root.call("GET", "roles")).data.roles as { assignable: boolean }[];
+		expect(all.every((role) => role.assignable)).toBe(true);
+	});
+});
