@@ -57,17 +57,9 @@ create table menu_item (
 create table redirect (from_path text primary key, to_path text, code integer default 301, note text default '', hits integer default 0, active integer default 1, created_by text, created_at text);
 `;
 
-export type FakeD1 = D1Like & { exec(sql: string): void; insert(table: string, row: Record<string, unknown>): void };
-
-export function createFakeD1(): FakeD1 {
-	const sqlite = new DatabaseSync(":memory:");
-	sqlite.exec(SCHEMA);
+/** A D1-shaped reader over any node:sqlite database: the in-memory stand-in below, or a real migrated file (tests/helpers/real-db.ts). */
+export function d1Over(sqlite: DatabaseSync): D1Like {
 	return {
-		exec: (sql) => sqlite.exec(sql),
-		insert(table, row) {
-			const columns = Object.keys(row);
-			sqlite.prepare(`insert into ${table} (${columns.join(",")}) values (${columns.map(() => "?").join(",")})`).run(...(Object.values(row) as never[]));
-		},
 		prepare(sql) {
 			let values: unknown[] = [];
 			const statement = {
@@ -80,6 +72,21 @@ export function createFakeD1(): FakeD1 {
 				},
 			};
 			return statement;
+		},
+	};
+}
+
+export type FakeD1 = D1Like & { exec(sql: string): void; insert(table: string, row: Record<string, unknown>): void };
+
+export function createFakeD1(): FakeD1 {
+	const sqlite = new DatabaseSync(":memory:");
+	sqlite.exec(SCHEMA);
+	return {
+		...d1Over(sqlite),
+		exec: (sql) => sqlite.exec(sql),
+		insert(table, row) {
+			const columns = Object.keys(row);
+			sqlite.prepare(`insert into ${table} (${columns.join(",")}) values (${columns.map(() => "?").join(",")})`).run(...(Object.values(row) as never[]));
 		},
 	};
 }
