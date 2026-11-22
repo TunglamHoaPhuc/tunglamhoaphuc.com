@@ -7,6 +7,13 @@ import StarterKit from "@tiptap/starter-kit";
 import { Table, TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
 import Youtube from "@tiptap/extension-youtube";
 
+/** TipTap's YouTube node that also takes the video when it is a bare <iframe> (what the server stores for one that has no wrapper). */
+const YoutubeAnywhere = Youtube.extend({
+	parseHTML() {
+		return [{ tag: "div[data-youtube-video] iframe" }, { tag: 'iframe[src*="youtube"]' }];
+	},
+});
+
 export type QuoteVariant = "kinh" | "tho" | null;
 
 /** A blockquote; `variant` "kinh" (trích kinh) or "tho" (thơ) becomes its class. */
@@ -110,6 +117,8 @@ export function editorExtensions(): Extensions {
 		TableRow,
 		TableHeader,
 		TableCell,
-		Youtube.configure({ nocookie: true, controls: true, width: 640, height: 360, addPasteHandler: true }),
+		// The server keeps a YouTube video as a bare <iframe> as well as inside the editor's <div data-youtube-video>; TipTap alone reads only the
+		// wrapped one, so a post whose HTML came from elsewhere (an API, pasted HTML) lost its video the moment the editor opened it and saved.
+		YoutubeAnywhere.configure({ nocookie: true, controls: true, width: 640, height: 360, addPasteHandler: true }),
 	];
 }
