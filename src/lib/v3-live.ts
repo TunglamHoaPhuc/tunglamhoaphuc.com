@@ -71,12 +71,14 @@ async function summariesOf(r: ContentRepository, section: string) {
 export async function livePost(slugOrId: string, section: string, repo?: ContentRepository): Promise<V3Post | null> {
 	const r = await open(repo);
 	const key = decode(slugOrId);
-	const post = await r.getPostBySlug(key);
-	if (post) return post.section === section ? toPostRecord(post) : null;
+	// Slugs are unique per section, not across the site: ask for the post of THIS section, so a slug shared with a post of
+	// another section (that comes first in the table) cannot hide it.
+	const post = await r.getPostBySlug(key, section);
+	if (post) return toPostRecord(post);
 	// V3 sometimes links by id ("post-1060"): only a live post of this section can be found that way.
 	const hit = (await summariesOf(r, section)).find((p) => p.id === key || p.id === `post-${key}`);
-	const full = hit && (await r.getPostBySlug(hit.slug));
-	return full && full.section === section ? toPostRecord(full) : null;
+	const full = hit && (await r.getPostBySlug(hit.slug, section));
+	return full ? toPostRecord(full) : null;
 }
 
 /** Every live post of a section as list records, newest first. */
