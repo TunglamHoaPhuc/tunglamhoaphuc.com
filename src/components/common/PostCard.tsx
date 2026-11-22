@@ -1,4 +1,5 @@
 'use client';
+import { fitImage } from '@/utils/image';
 
 import React, { FC } from 'react';
 import Link from 'next/link';
@@ -148,7 +149,7 @@ export const PostCard: FC<PostCardProps> = ({
         {/* 1. Khung ảnh Thumbnail: flex-1 min-h-0 co lại mượt mà vào trong khi hover */}
         <div className="relative w-full flex-1 min-h-0 overflow-hidden bg-[#1A120B] transition-all duration-500 ease-out">
           <img
-            src={post.imageUrl || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp'}
+            src={fitImage(post.imageUrl || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp', 640)}
             alt={post.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             style={{ objectPosition: post.thumbnailPosition || post.imagePosition || 'center 20%' }}
@@ -161,7 +162,7 @@ export const PostCard: FC<PostCardProps> = ({
         <div className="relative w-full h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/70 to-transparent z-10 shrink-0 transition-all duration-500 ease-out">
           {/* Huy hiệu Logo Chuyên mục con nổi chính giữa tim đường kẻ */}
           <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[44px] h-[44px] md:w-[50px] md:h-[50px] rounded-full border-2 border-[#F2C14E] bg-[#24160E] flex items-center justify-center p-2 shadow-[0_0_16px_rgba(242,193,78,0.6)] group-hover:scale-110 group-hover:shadow-[0_0_24px_rgba(242,193,78,0.85)] transition-all duration-300">
-            <img
+            <img loading="lazy" decoding="async"
               src={`${logoUrl}?v=4`}
               alt={post.title}
               className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.5)]"
@@ -234,7 +235,7 @@ export const PostCard: FC<PostCardProps> = ({
       {/* 1. Khung ảnh Thumbnail tỷ lệ 3:4 linh hoạt */}
       <div className="relative w-full flex-1 min-h-0 overflow-hidden bg-[#1A120B]">
         <img
-          src={post.imageUrl || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp'}
+          src={fitImage(post.imageUrl || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp', 640)}
           alt={post.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           style={{ objectPosition: post.thumbnailPosition || post.imagePosition || 'center 20%' }}
@@ -247,7 +248,7 @@ export const PostCard: FC<PostCardProps> = ({
       <div className="relative w-full h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/70 to-transparent z-10 shrink-0">
         {/* Huy hiệu Logo Danh mục nổi chính giữa tim đường kẻ (Phóng to trang nghiêm, tròn trịa cân đối) */}
         <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[46px] h-[46px] md:w-[54px] md:h-[54px] rounded-full border-2 border-[#F2C14E] bg-[#24160E] flex items-center justify-center p-2 md:p-2.5 shadow-[0_0_16px_rgba(242,193,78,0.6)] group-hover:scale-110 group-hover:shadow-[0_0_24px_rgba(242,193,78,0.85)] transition-all duration-300">
-          <img
+          <img loading="lazy" decoding="async"
             src={`${logoUrl}?v=4`}
             alt={categoryTag}
             className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.5)]"

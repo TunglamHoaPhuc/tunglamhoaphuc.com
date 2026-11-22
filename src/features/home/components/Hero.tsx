@@ -13,17 +13,32 @@ export const Hero: FC = () => {
   const [isGalaxyOpen, setIsGalaxyOpen] = useState(false);
   const playerRef = useRef<any>(null);
 
+  const [videoOn, setVideoOn] = useState(false);
+
+  // Video nền (YouTube, ~2 MB và ~500 KB JS) chỉ tải khi người xem bắt đầu tương tác hoặc sau 8 giây,
+  // để trang hiện ngay trên điện thoại (trên máy tính, rê chuột là video chạy).
+  useEffect(() => {
+    if (videoOn) return;
+    const start = () => setVideoOn(true);
+    const events = ["pointerdown", "pointermove", "keydown", "touchstart", "scroll", "wheel"] as const;
+    events.forEach((e) => window.addEventListener(e, start, { once: true, passive: true }));
+    const timer = window.setTimeout(start, 8000);
+    return () => {
+      events.forEach((e) => window.removeEventListener(e, start));
+      window.clearTimeout(timer);
+    };
+  }, [videoOn]);
+
   // ✂️ TỰ ĐỘNG NHẢY CÓC BỎ QUA ĐOẠN 1:36 -> 2:43
   useEffect(() => {
+    if (!videoOn) return;
     // 1. Tải script YouTube IFrame API nếu chưa có
     if (!document.getElementById('youtube-iframe-api')) {
       const tag = document.createElement('script');
       tag.id = 'youtube-iframe-api';
       tag.src = "https://www.youtube.com/iframe_api";
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      if (firstScriptTag && firstScriptTag.parentNode) {
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-      }
+      tag.async = true;
+      document.head.appendChild(tag);
     }
 
     let intervalId: NodeJS.Timeout;
@@ -87,7 +102,7 @@ export const Hero: FC = () => {
         playerRef.current.destroy();
       }
     };
-  }, []);
+  }, [videoOn]);
 
   const scrollToAiSearch = () => {
     const el = document.getElementById("smart-search-ai-bar");

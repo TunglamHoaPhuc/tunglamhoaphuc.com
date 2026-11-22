@@ -1,4 +1,5 @@
 'use client';
+import { fitImage } from '@/utils/image';
 
 import { FC, useState, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
@@ -647,7 +648,7 @@ export const CalendarSection: FC = () => {
       {/* ── Background Ambient Aura ── */}
       <div className="absolute inset-0 pointer-events-none">
         <img
-          src={monthTheme.bannerImg}
+          src={fitImage(monthTheme.bannerImg, 1280)}
           alt="Bối cảnh Lịch tu học"
           className="w-full h-full object-cover opacity-15 blur-sm"
           loading="lazy"
@@ -707,8 +708,8 @@ export const CalendarSection: FC = () => {
               <div className="flex-1 flex flex-col justify-between animate-in fade-in duration-500 overflow-hidden h-full">
                 {/* 1.1 TRANH MINH HỌA NGHỆ THUẬT (TỈ LỆ GỐC ASPECT 1200/1015 TRÊN DESKTOP, ASPECT 16/10 TRÊN MOBILE) */}
                 <div className="relative w-full aspect-[16/10] sm:aspect-[1200/900] lg:aspect-[1200/1015] shrink-0 overflow-hidden bg-black/40">
-                  <img
-                    src={monthTheme.bannerImg}
+                  <img loading="lazy" decoding="async"
+                    src={fitImage(monthTheme.bannerImg, 1280)}
                     alt={monthTheme.title}
                     className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-102"
                     onError={(e) => {
@@ -723,7 +724,7 @@ export const CalendarSection: FC = () => {
                 <div className="relative w-full h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/70 to-transparent z-10 shrink-0 my-3">
                   {/* Huy hiệu Logo Quote Chủ Đề nổi chính giữa tim đường kẻ */}
                   <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#F2C14E] bg-[#24160E] flex items-center justify-center p-2 shadow-[0_0_16px_rgba(242,193,78,0.6)]">
-                    <img
+                    <img loading="lazy" decoding="async"
                       src="/images/icons/icon-quote-chu-de.png"
                       alt="Quote Chủ Đề"
                       className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
@@ -818,8 +819,8 @@ export const CalendarSection: FC = () => {
                     }}
                   >
                     <div className="relative h-full w-auto max-w-full flex items-center justify-center rounded-xl overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.95)]">
-                      <img
-                        src={currentSlide.quote.url}
+                      <img loading="lazy" decoding="async"
+                        src={fitImage(currentSlide.quote.url, 640)}
                         alt={currentSlide.quote.title || 'Quote tu học'}
                         className="h-full w-auto max-w-full object-contain mx-auto transition-transform duration-500 group-hover/imgbox:scale-[1.01]"
                         onError={(e) => {
@@ -1061,7 +1062,7 @@ export const CalendarSection: FC = () => {
                                 }}
                               >
                                 {/* Logo Biểu Tượng: Cân đối kích thước vừa vặn rõ ràng cho các ngày trong khóa tu */}
-                                <img
+                                <img loading="lazy" decoding="async"
                                   src={iconUrl}
                                   alt={ev.title}
                                   className={`${
@@ -1166,7 +1167,7 @@ export const CalendarSection: FC = () => {
 
                 {/* Logo 1: Cộng Tu (Bỏ khung, để trên nền, chữ nghiêng) */}
                 <div className="flex items-center gap-1.5">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src="/images/icons/icon-cong-tu.png"
                     alt="Cộng Tu"
                     className="w-4 h-4 object-contain"
@@ -1176,7 +1177,7 @@ export const CalendarSection: FC = () => {
 
                 {/* Logo 2: Khóa Lễ Truyền Thống (Bỏ khung, để trên nền, chữ nghiêng) */}
                 <div className="flex items-center gap-1.5">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src="/images/icons/icon-khoa-le-truyen-thong.png"
                     alt="Khóa Lễ Truyền Thống"
                     className="w-4 h-4 object-contain"
@@ -1186,7 +1187,7 @@ export const CalendarSection: FC = () => {
 
                 {/* Logo 3: Đại Lễ Sự Kiện (Bỏ khung, để trên nền, chữ nghiêng) */}
                 <div className="flex items-center gap-1.5">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src="/images/icons/icon-dai-le-su-kien.png"
                     alt="Đại Lễ Sự Kiện"
                     className="w-4 h-4 object-contain"
@@ -1227,8 +1228,8 @@ export const CalendarSection: FC = () => {
 
               {/* 1. TOP BANNER IMAGE */}
               <div className="relative w-full h-[160px] sm:h-[185px] bg-black shrink-0 overflow-hidden">
-                <img
-                  src={selectedEvent.imgUrl}
+                <img loading="lazy" decoding="async"
+                  src={fitImage(selectedEvent.imgUrl, 640)}
                   alt={selectedEvent.title}
                   className="w-full h-full object-cover"
                   style={{
@@ -1244,7 +1245,7 @@ export const CalendarSection: FC = () => {
               {/* 2. ĐƯỜNG KẺ GRADIENT CẮT MẾP CHÂN ẢNH CÓ BIỂU TƯỢNG HÌNH TRÒN CHÍNH GIỮA (GIỐNG POSTER, BỎ CHỮ DANH MỤC) */}
               <div className="relative w-full h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/70 to-transparent z-10 shrink-0">
                 <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#F2C14E] bg-[#24160E] flex items-center justify-center p-2 shadow-[0_0_16px_rgba(242,193,78,0.6)]">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={getEventCategoryIcon(selectedEvent.category)}
                     alt={selectedEvent.category}
                     className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.5)]"
@@ -1417,7 +1418,7 @@ export const CalendarSection: FC = () => {
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     className="text-xs sm:text-[13px] text-[#FFE5A3] flex items-center gap-2 font-medium"
                   >
-                    <img
+                    <img loading="lazy" decoding="async"
                       src="/images/icons/icon-cac-khu-vuc-noi-bat.webp"
                       alt="Địa điểm"
                       className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_0_6px_rgba(242,193,78,0.5)]"
@@ -1481,7 +1482,7 @@ export const CalendarSection: FC = () => {
               className="relative max-h-full max-w-full flex items-center justify-center cursor-default"
               onClick={(e) => e.stopPropagation()}
             >
-              <img
+              <img loading="lazy" decoding="async"
                 src={selectedZoomQuote?.url || monthTheme.quoteImg || monthTheme.bannerImg}
                 alt={selectedZoomQuote?.title || monthTheme.quoteTitle || monthTheme.title || 'Quote tu học'}
                 className="max-h-[92vh] max-w-[94vw] w-auto h-auto object-contain rounded-2xl shadow-[0_25px_80px_rgba(0,0,0,0.95)] border border-[#F2C14E]/30 animate-in zoom-in-95 duration-200"

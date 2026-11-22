@@ -1,4 +1,5 @@
 'use client';
+import { fitImage } from '@/utils/image';
 
 import { FC, useState, useEffect } from "react";
 import { SectionTransitionOverlay } from "@/components/common/SectionTransitionOverlay";
@@ -172,7 +173,7 @@ export const NewsSection: FC = () => {
       <div className="absolute inset-0 pointer-events-none">
         <img
           key={`bg-${activeIdx}`}
-          src={currentNews.imgUrl}
+          src={fitImage(currentNews.imgUrl, 640)}
           alt="Bối cảnh"
           className={`w-full h-full object-cover opacity-20 blur-[2px] transition-all duration-700 ${animClass}`}
           loading="lazy"
@@ -197,9 +198,9 @@ export const NewsSection: FC = () => {
           >
             {/* Box Ảnh Bên Trái với viền mờ dần ở cả 2 mép (mép ngoài và góc trong luồn dưới card chính) */}
             <div className="relative w-full h-[320px] md:h-[380px] lg:h-[430px] overflow-hidden border-y border-l border-[#F2C14E]/30 rounded-l-xl shadow-2xl [mask-image:linear-gradient(to_right,transparent_0%,black_28%,black_82%,transparent_100%)]">
-              <img
+              <img loading="lazy" decoding="async"
                 key={`left-img-${prevNews.id}`}
-                src={prevNews.imgUrl}
+                src={fitImage(prevNews.imgUrl, 360)}
                 alt={prevNews.title}
                 style={{ objectPosition: prevNews.imgPosition || 'center 35%' }}
                 className={`w-full h-full object-cover ${animClass}`}
@@ -211,7 +212,7 @@ export const NewsSection: FC = () => {
             <div className="w-full py-2.5 px-3 text-center bg-[#1A120B]/90 border-b border-l border-[#F2C14E]/30 rounded-bl-xl flex flex-col items-center justify-center [mask-image:linear-gradient(to_right,transparent_0%,black_28%,black_82%,transparent_100%)]">
               {prevNews.iconUrl && (
                 <div className="w-7 h-7 rounded-full border border-[#F2C14E]/60 bg-[#1C120B] shadow-[0_0_10px_rgba(242,193,78,0.3)] flex items-center justify-center p-1 mb-1">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={prevNews.iconUrl}
                     alt="Biểu tượng"
                     className="w-full h-full object-contain opacity-85"
@@ -245,9 +246,9 @@ export const NewsSection: FC = () => {
               }}
               onClick={() => (window.location.href = currentNews.targetUrl)}
             >
-              <img
+              <img loading="lazy" decoding="async"
                 key={`center-img-${currentNews.id}`}
-                src={currentNews.imgUrl}
+                src={fitImage(currentNews.imgUrl, 640)}
                 alt={currentNews.title}
                 style={{ objectPosition: currentNews.imgPosition || 'center 20%' }}
                 className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out ${animClass}`}
@@ -339,9 +340,9 @@ export const NewsSection: FC = () => {
           >
             {/* Box Ảnh Bên Phải với viền mờ dần ở cả 2 mép (góc trong luồn dưới card chính và mép ngoài) */}
             <div className="relative w-full h-[320px] md:h-[380px] lg:h-[430px] overflow-hidden border-y border-r border-[#F2C14E]/30 rounded-r-xl shadow-2xl [mask-image:linear-gradient(to_right,transparent_0%,black_18%,black_72%,transparent_100%)]">
-              <img
+              <img loading="lazy" decoding="async"
                 key={`right-img-${nextNews.id}`}
-                src={nextNews.imgUrl}
+                src={fitImage(nextNews.imgUrl, 360)}
                 alt={nextNews.title}
                 style={{ objectPosition: nextNews.imgPosition || 'center 35%' }}
                 className={`w-full h-full object-cover ${animClass}`}
@@ -353,7 +354,7 @@ export const NewsSection: FC = () => {
             <div className="w-full py-2.5 px-3 text-center bg-[#1A120B]/90 border-b border-r border-[#F2C14E]/30 rounded-br-xl flex flex-col items-center justify-center [mask-image:linear-gradient(to_right,transparent_0%,black_18%,black_72%,transparent_100%)]">
               {nextNews.iconUrl && (
                 <div className="w-7 h-7 rounded-full border border-[#F2C14E]/60 bg-[#1C120B] shadow-[0_0_10px_rgba(242,193,78,0.3)] flex items-center justify-center p-1 mb-1">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={nextNews.iconUrl}
                     alt="Biểu tượng"
                     className="w-full h-full object-contain opacity-85"

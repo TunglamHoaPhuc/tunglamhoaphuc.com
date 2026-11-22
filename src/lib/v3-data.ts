@@ -6,11 +6,12 @@ import scheduleBase from "@/data/schedule-database.json";
 import { getContentRepository } from "@/lib/tlhp-content/repository";
 import type { AboutTopic, Area, GalleryImage, MediaImage, Post, PostSummary, Schedule, TongChiArticle, TongChiSummary } from "@/lib/tlhp-content/types";
 
-/** Pictures stay where www keeps them: its /anh-goc route reads the shared R2 bucket. */
+/** Pictures stay where www keeps them (R2 tlhp-media, B2); v3 reads them through its own /anh-goc route, bound to the same bucket. */
 export const WWW_ORIGIN = "https://www.tunglamhoaphuc.com";
 
 export function absUrl(src: string | null | undefined): string {
 	if (!src) return "";
+	if (src.startsWith("/anh-goc/")) return src;
 	if (src.startsWith("/") && !src.startsWith("//")) return `${WWW_ORIGIN}${src}`;
 	return src;
 }

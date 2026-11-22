@@ -1,3 +1,4 @@
+import { imageAt, mediaUrl } from '@/lib/tlhp-content/media';
 export const WP_BASE_URL = 'https://admin.tunglamhoaphuc.com';
 export const PLACEHOLDER_IMAGE = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
 
@@ -34,6 +35,11 @@ export function getImageUrl(path?: string | null, fallbackUrl: string = ''): str
     trimmed.startsWith('data:') ||
     trimmed.startsWith('blob:')
   ) {
+    return trimmed;
+  }
+
+  // Ảnh qua /anh-goc/ hay đã thu nhỏ (/cdn-cgi/image/) nằm trên chính site này
+  if (trimmed.startsWith('/anh-goc/') || trimmed.startsWith('/cdn-cgi/image/')) {
     return trimmed;
   }
 
@@ -88,4 +94,25 @@ export function getOptimizedNextImageUrl(
     return `/_next/image?url=${encodeURIComponent(highRes)}&w=${width}&q=${quality}`;
   }
   return highRes;
+}
+
+
+const WWW_ANH_GOC = 'https://www.tunglamhoaphuc.com/anh-goc/';
+
+/**
+ * Ảnh thu nhỏ theo bề rộng hiển thị, qua image transformations của Cloudflare trên zone này
+ * (AVIF/WebP, chất lượng 75). Ảnh gốc trên B2 / WordPress / kho R2 của www đi qua /anh-goc/ của v3.
+ * Ảnh khác (đường dẫn tĩnh /images, host lạ) giữ nguyên.
+ */
+export function fitImage(url: string | null | undefined, width: number): string {
+  if (!url) return '';
+  let src = url.trim();
+  if (src.startsWith(WWW_ANH_GOC)) src = src.slice('https://www.tunglamhoaphuc.com'.length);
+  if (!src.startsWith('/anh-goc/')) {
+    if (src.startsWith('/')) return src;
+    const local = mediaUrl(src);
+    if (!local || !local.startsWith('/anh-goc/')) return src;
+    src = local;
+  }
+  return imageAt(src, width);
 }

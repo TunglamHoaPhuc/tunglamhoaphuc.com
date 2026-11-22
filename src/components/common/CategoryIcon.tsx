@@ -48,7 +48,7 @@ const LUCIDE_ICON_MAP: Record<string, FC<{ className?: string }>> = {
 /**
  * Flexible Category/Taxonomy Icon component ready for WordPress CMS integration.
  * Priority rendering:
- * 1. iconUrl: If WordPress CMS SVG/PNG URL exists -> renders <img src={iconUrl} />
+ * 1. iconUrl: If WordPress CMS SVG/PNG URL exists -> renders <img loading="lazy" decoding="async" src={iconUrl} />
  * 2. iconNode: If custom ReactNode provided -> renders iconNode
  * 3. iconName: If Lucide iconName string provided -> renders matched Lucide icon
  * 4. categoryName: If categoryName provided -> queries taxonomy mapping getCategoryInfo
@@ -63,7 +63,7 @@ export function getCategory1Icon(
   // 1. WordPress CMS Custom Icon URL (SVG/PNG)
   if (iconUrl) {
     return (
-      <img
+      <img loading="lazy" decoding="async"
         src={iconUrl}
         alt={categoryName || "category icon"}
         className={`object-contain shrink-0 ${className}`}
@@ -86,7 +86,7 @@ export function getCategory1Icon(
   const { IconComponent, iconUrl: taxUrl } = getCategoryInfo(categoryName);
   if (taxUrl) {
     return (
-      <img
+      <img loading="lazy" decoding="async"
         src={taxUrl}
         alt={categoryName || "category icon"}
         className={`object-contain shrink-0 ${className}`}
