@@ -158,6 +158,20 @@ export async function allAbout(): Promise<V3About[]> {
 
 // ── Vũ Trụ Phật Giáo ────────────────────────────────────────────────────────
 
+/** The temples the admin knows (its `temple` field is a slug); an unknown slug is written out in capitals-and-spaces. */
+const TEMPLE_NAMES: Record<string, string> = {
+	"tung-lam-hoa-phuc": "Tùng Lâm Hòa Phúc",
+	"quynh-nhai-cam-lo-tu": "Quỳnh Nhai Cam Lộ Tự",
+};
+
+export const templeName = (temple: string) =>
+	TEMPLE_NAMES[temple] ?? temple.split("-").filter(Boolean).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+
+/**
+ * An area as the V3 pages read it. `description` is the admin's plain-text intro; `contentHtml` the body the admin saved
+ * (cleaned with special/html.ts there, and again where it is shown). D1 keeps no pin number: `pinNumber` is the area's place
+ * among the visible areas in the editors' order. The temple's name comes from its slug.
+ */
 export function toAreaRecord(a: Area, index = 0) {
 	return {
 		id: a.id,
@@ -166,12 +180,13 @@ export function toAreaRecord(a: Area, index = 0) {
 		name: a.name,
 		subtitle: a.subtitle,
 		temple: a.temple,
-		templeName: "Tùng Lâm Hòa Phúc",
+		templeName: templeName(a.temple),
 		imgUrl: pic(a.cover),
+		imgPosition: pos(a.cover),
 		mapPos: a.mapPos ?? undefined,
 		description: a.intro,
 		fullContent: "",
-		fullContentHtml: a.contentHtml,
+		contentHtml: a.contentHtml,
 	};
 }
 

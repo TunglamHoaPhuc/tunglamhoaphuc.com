@@ -23,18 +23,7 @@ import { ChayDuongSection } from '@/features/universe/components/ChayDuongSectio
 import { ThapBatLaHanGrid } from '@/features/universe/components/ThapBatLaHanGrid';
 import { ThapDaiDeTuCards } from '@/features/universe/components/ThapDaiDeTuCards';
 import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
-
-function formatParagraphsHtml(fullContent?: string, description?: string): string {
-  const sourceText = (fullContent && fullContent.trim().length > 0) ? fullContent : (description || '');
-  if (!sourceText) return '';
-
-  const paragraphs = sourceText
-    .split(/\n\s*\n/)
-    .map((p) => p.trim())
-    .filter((p) => p.length > 0);
-
-  return paragraphs.map((p) => `<p>${p}</p>`).join('');
-}
+import { areaBodyHtml } from '@/lib/area-body';
 
 function matchesArea(itemAreaSlug: string, pageSlug: string, areaSlug: string): boolean {
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '_');
@@ -141,6 +130,7 @@ export default function AreaDetailClient({ area }: { area: UniverseArea }) {
         <HeroBanner
           id="herobanner"
           bannerUrl={area.imgUrl}
+          bannerPosition={area.imgPosition}
           title={area.name.toUpperCase()}
           subtitle={area.subtitle.toUpperCase()}
         />
@@ -165,7 +155,7 @@ export default function AreaDetailClient({ area }: { area: UniverseArea }) {
                 [&>p:first-of-type::first-letter]:float-left [&>p:first-of-type::first-letter]:leading-none
               "
               dangerouslySetInnerHTML={{
-                __html: formatParagraphsHtml(area.fullContent, area.description),
+                __html: areaBodyHtml({ intro: area.description, contentHtml: area.contentHtml }),
               }}
             />
           </section>

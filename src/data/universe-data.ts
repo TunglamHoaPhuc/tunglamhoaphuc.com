@@ -7,6 +7,8 @@ export interface UniverseArea {
   temple: "tung-lam-hoa-phuc" | "quynh-nhai-cam-lo-tu";
   templeName: string;
   imgUrl: string;
+  /** CSS object-position the editors chose for the cover ("center 40%"). */
+  imgPosition?: string;
   mapPos: { x: number; y: number };
   description: string;
   fullContent?: string;
