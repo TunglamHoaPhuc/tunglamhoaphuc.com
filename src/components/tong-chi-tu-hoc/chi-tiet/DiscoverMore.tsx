@@ -19,35 +19,8 @@ interface PropsTimHieuThem {
 export function DiscoverMore({ relatedArticles }: PropsTimHieuThem) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // 🔴 1. DỮ LIỆU MẶC ĐỊNH SANG TRỌNG KHI CHƯA CÓ API TRẢ VỀ (TRÁNH BỊ TRỐNG KHUNG)
-  const defaultArticles: BaiVietLienQuan[] = [
-    {
-      category: 'TÔNG PHONG TRUYỀN THỪA',
-      title: 'Hành Trình Tiếp Nối Dòng Mạng Mạch Hoằng Pháp',
-      url: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp',
-      link: '#',
-    },
-    {
-      category: 'NỀN TẢNG TU HỌC',
-      title: 'Quy Củ Thiền Môn Và Pháp Môn Tịnh Độ Tu Tập',
-      url: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp',
-      link: '#',
-    },
-    {
-      category: 'CÔNG HẠNH SƯ TỔ',
-      title: 'Tấm Gương Sáng Ngời Của Chư Vị Tổ Sư Khai Sơn',
-      url: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/08-tu-an-book/di-qua-kho-vui-cuoc-doi-bia-1.webp',
-      link: '#',
-    },
-    {
-      category: 'TRUYỀN THỐNG ĐẠO TRÀNG',
-      title: 'Nét Đẹp Tâm Linh Trong Các Khóa Tu Mùa Hè',
-      url: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-_-tong-phong-truyen-thua_-bai-tho-mien-nam-chon-to_thumbnail_herobanner-1787470412489.webp',
-      link: '#',
-    },
-  ];
-
-  const items = relatedArticles && relatedArticles.length > 0 ? relatedArticles : defaultArticles;
+  // Chỉ hiện các bài do trang truyền vào (bài đang hiển thị ở D1); không có thì không có khối này.
+  const items = relatedArticles ?? [];
 
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
   const [canScrollRight, setCanScrollRight] = React.useState(true);
@@ -84,6 +57,8 @@ export function DiscoverMore({ relatedArticles }: PropsTimHieuThem) {
       setTimeout(checkScroll, 350);
     }
   };
+
+  if (items.length === 0) return null;
 
   return (
     <section id="tim-hieu-them" className="scroll-mt-24 pt-8 pb-10 w-full relative">

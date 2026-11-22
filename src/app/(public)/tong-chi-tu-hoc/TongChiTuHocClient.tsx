@@ -1,10 +1,7 @@
 'use client';
 
-import React, { useState, useEffect, useTransition, useCallback } from 'react';
-import Link from 'next/link';
-import { getImageUrl } from '@/utils/image';
+import React, { useState, useEffect, useCallback } from 'react';
 import { SectionData } from '@/types/tong-chi-tu-hoc';
-import { NAV_ITEMS, INITIAL_SECTIONS_DATA } from '@/data/tong-chi-tu-hoc-data';
 import { SubNavbar } from '@/components/tong-chi-tu-hoc/SubNavbar';
 import { SidebarNav } from '@/components/tong-chi-tu-hoc/SidebarNav';
 import { HeroBanner } from '@/components/tong-chi-tu-hoc/HeroBanner';
@@ -12,53 +9,18 @@ import { SectionCarousel } from '@/components/tong-chi-tu-hoc/SectionCarousel';
 import { PageIntro } from '@/components/tong-chi-tu-hoc/PageIntro';
 import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 
-// 🛠️ 1. HÀM XỬ LÝ HTML CHO PAGE INTRO (Giữ lại thẻ <p>, xóa sạch dấu ...)
-function formatIntroHtml(rawHtml: string): string {
-  if (!rawHtml) return '';
-
-  let clean = rawHtml
-    .replace(/<img[^>]*>/gi, '')                     // Xóa ảnh nằm trong bài
-    .replace(/<a[^>]*class="more-link"[^>]*>.*?<\/a>/gi, '') // Xóa nút Read More của WP
-    .replace(/&#8230;/g, '')                         // Xóa mã dấu ba chấm
-    .replace(/&hellip;/g, '')                        // Xóa mã helip
-    .replace(/\.\.\./g, '')                          // Xóa dấu ...
-    .replace(/&amp;/g, '&')
-    .replace(/&nbsp;/g, ' ')
-    .normalize('NFC')                                // Ghép liền nét tiếng Việt
-    .trim();
-
-  // Đảm bảo bọc thẻ <p> để CSS [&>p] Drop Cap hoạt động
-  if (!clean.startsWith('<p>')) {
-    clean = `<p>${clean}</p>`;
-  }
-
-  return clean;
-}
-
-// 🛠️ 2. HÀM BÓC TÁCH ẢNH TỪ NỘI DUNG WORDPRESS
-function extractImgFromContent(htmlContent: string): string {
-  if (!htmlContent || typeof window === 'undefined') return '';
-  try {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(htmlContent, 'text/html');
-    const firstImg = doc.querySelector('img');
-    if (firstImg) {
-      const src = firstImg.getAttribute('src') || firstImg.getAttribute('data-src') || '';
-      return getImageUrl(src);
-    }
-  } catch (err) {
-    console.error('Lỗi bóc tách ảnh:', err);
-  }
-  return '';
-}
-
-export default function TongChiTuHocPage() {
+// Các khối và lời mở đầu do máy chủ dựng từ D1 (page.tsx); trang không tự đi lấy gì thêm.
+export default function TongChiTuHocClient({
+  sections,
+  navItems,
+  introHtml,
+}: {
+  sections: SectionData[];
+  navItems: { id: string; label: string }[];
+  introHtml: string;
+}) {
   const [activeSection, setActiveSection] = useState('tong-chi-tu-hoc');
   const [isScrolled, setIsScrolled] = useState(false);
-  const [bannerUrl, setBannerUrl] = useState<string>('');
-  const [pageDescription, setPageDescription] = useState<string>('');
-  const [sectionsData, setSectionsData] = useState<SectionData[]>(INITIAL_SECTIONS_DATA);
-  const [categoryBgImage, setCategoryBgImage] = useState<string>('');
 
   // 1. THROTTLED SCROLL & INTERSECTION OBSERVER
   useEffect(() => {
@@ -75,7 +37,7 @@ export default function TongChiTuHocPage() {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
 
-    const sectionElements = NAV_ITEMS.map((item) => document.getElementById(item.id)).filter(
+    const sectionElements = navItems.map((item) => document.getElementById(item.id)).filter(
       (el): el is HTMLElement => el !== null
     );
 
@@ -100,101 +62,7 @@ export default function TongChiTuHocPage() {
       window.removeEventListener('scroll', handleScroll);
       sectionElements.forEach((el) => observer.unobserve(el));
     };
-  }, []);
-
-  // 2. PARALLEL API DATA FETCHING WITH ABORT CONTROLLER
-  useEffect(() => {
-    const controller = new AbortController();
-    const { signal } = controller;
-
-    async function loadData() {
-      try {
-        // 1. Fetch Local Backend Articles (Chính xác 100% từ Admin, không lấy bài trùng từ WP)
-        try {
-          const localRes = await fetch('/api/admin/tong-chi', { signal, cache: 'no-store' });
-          if (localRes.ok) {
-            const localData = await localRes.json();
-            if (localData.success && Array.isArray(localData.data) && localData.data.length > 0) {
-              const categoryToSectionId: Record<string, string> = {
-                'tong-phong-truyen-thua': 'tong-phong',
-                'nen-tang-tu-hoc': 'nen-tang',
-                'phuong-phap-hanh-tri': 'phap-mon',
-                'lo-trinh-tu-hoc': 'lo-trinh',
-                'nep-song-thien-gia': 'nep-song',
-              };
-
-              setSectionsData((prev) =>
-                prev.map((sec) => {
-                  const matchingArticles = localData.data.filter((item: any) => {
-                    const targetSecId = categoryToSectionId[item.category];
-                    return targetSecId === sec.id;
-                  });
-
-                  if (matchingArticles.length > 0) {
-                    const cards = matchingArticles.map((item: any) => ({
-                      id: item.id,
-                      title: item.title,
-                      subtitle: item.subtitle || item.excerpt || 'Tông phong tu học Tùng Lâm Hòa Phúc.',
-                      imageUrl: item.bannerImage || '/images/toan-canh-chua.jpg',
-                      imagePosition: item.thumbnailPosition || item.bannerPosition || 'center 20%',
-                      thumbnailPosition: item.thumbnailPosition || item.bannerPosition || 'center 20%',
-                      link: `/tong-chi-tu-hoc/${item.slug}`,
-                    }));
-                    return { ...sec, cards };
-                  }
-                  return sec;
-                })
-              );
-            }
-          }
-        } catch (localErr) {
-          console.log('Local tong chi fetch error:', localErr);
-        }
-
-        // 2. Fetch WordPress API (Chỉ lấy Banner & Intro Mô tả chung)
-        const fetchCatBg = fetch('https://admin.tunglamhoaphuc.com/wp-json/tunglam/v1/danh-muc-tong-chi/12', { signal, cache: 'no-store' })
-          .then((res) => (res.ok ? res.json() : null))
-          .catch(() => null);
-
-        const fetchBanner = fetch('https://admin.tunglamhoaphuc.com/wp-json/wp/v2/tong-chi/388?_embed', { signal, cache: 'no-store' })
-          .then((res) => (res.ok ? res.json() : null))
-          .catch(async () => {
-            const res2 = await fetch('https://admin.tunglamhoaphuc.com/wp-json/wp/v2/tong-chi-tu-hoc/388?_embed', { signal, cache: 'no-store' });
-            return res2.ok ? res2.json() : null;
-          })
-          .catch(() => null);
-
-        const [catData, bannerData] = await Promise.all([fetchCatBg, fetchBanner]);
-
-        if (catData) {
-          const wpImageUrl = catData?.anh_nen?.url || catData?.anh_dai_dien?.url;
-          if (wpImageUrl) setCategoryBgImage(wpImageUrl);
-        }
-
-        if (bannerData) {
-          const featuredImageUrl =
-            bannerData?._embedded?.['wp:featuredmedia']?.[0]?.source_url ||
-            (typeof bannerData?.acf?.banner_image === 'string' ? bannerData?.acf?.banner_image : bannerData?.acf?.banner_image?.url) ||
-            bannerData?.featured_image_url ||
-            extractImgFromContent(bannerData?.content?.rendered || '') ||
-            'https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/07/bg-chua.jpg';
-
-          if (featuredImageUrl) setBannerUrl(getImageUrl(featuredImageUrl));
-
-          const fullContent = bannerData?.content?.rendered || bannerData?.acf?.description || bannerData?.excerpt?.rendered || '';
-          if (fullContent) setPageDescription(formatIntroHtml(fullContent));
-        }
-      } catch (err) {
-        console.error('Lỗi tải dữ liệu Tông Chỉ Tu Học:', err);
-      }
-    }
-
-    loadData();
-
-    return () => {
-      controller.abort();
-    };
-  }, []);
+  }, [navItems]);
 
   const scrollToSection = useCallback((id: string) => {
     setActiveSection(id);
@@ -212,43 +80,31 @@ export default function TongChiTuHocPage() {
         isScrolled={isScrolled}
         onScrollToSection={scrollToSection}
         pageTitle="TÔNG CHỈ TU HỌC"
-        navItems={NAV_ITEMS}
+        navItems={navItems}
       />
       <SidebarNav
         activeSection={activeSection}
         isScrolled={isScrolled}
         onScrollToSection={scrollToSection}
         pageTitle="TÔNG CHỈ TU HỌC"
-        navItems={NAV_ITEMS}
+        navItems={navItems}
       />
 
       <div className="px-4 sm:px-8 md:pl-20 md:pr-10">
         {/* Banner chính */}
         <HeroBanner
-          bannerUrl={bannerUrl}
           emblemUrl="/images/icons/icon-tong-chi-tu-hoc.webp"
           emblemAlt="Biểu tượng Tông Chỉ Tu Học"
         />
 
         {/* Khối mô tả trang đầy đủ không bị cắt */}
-        <PageIntro description={pageDescription} />
+        <PageIntro description={introHtml} />
 
         <main className="max-w-6xl mx-auto space-y-16 py-8 relative">
           <div className="relative z-10 space-y-16">
-            {sectionsData.map((section) => {
-              // Bắt cả 2 ID để chắc chắn khối Tông Phong nhận được ảnh
-              const isTongPhong =
-                section.id === 'tong-phong' ||
-                section.id === 'tong-phong-truyen-thua';
-
-              return (
-                <SectionCarousel
-                  key={section.id}
-                  section={section}
-                  dynamicBgImage={isTongPhong ? categoryBgImage : undefined}
-                />
-              );
-            })}
+            {sections.map((section) => (
+              <SectionCarousel key={section.id} section={section} />
+            ))}
           </div>
 
           <div className="pt-8">

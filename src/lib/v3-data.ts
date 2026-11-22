@@ -99,16 +99,20 @@ export function toTongChiRecord(a: TongChiSummary | TongChiArticle, index = 0) {
 		contentHtml: full?.contentHtml ?? "",
 		author: full?.author ?? "",
 		authorLink: full?.authorHref ?? undefined,
-		publishedAt: full?.publishedDate ? `${full.publishedDate}T08:00:00.000Z` : undefined,
+		// YYYY-MM-DD as D1 holds it: no invented time of day.
+		publishedAt: full?.publishedDate || undefined,
 		viewsCount: full?.views ?? 0,
 		status: "published",
-		videoBlock: full?.video ? { title: full.video.title, videoUrl: full.video.url, summary: full.video.description } : undefined,
+		// The pages read `description`; `summary` stays for the callers written against the old admin's file.
+		videoBlock: full?.video ? { title: full.video.title, videoUrl: full.video.url, description: full.video.description, summary: full.video.description } : undefined,
 		featuredArticle: full?.featured ? { label: full.featured.label, title: full.featured.title, author: full.featured.author, linkUrl: full.featured.href ?? undefined } : undefined,
 		sourceBook: full?.book ? { bookTitle: full.book.title, author: full.book.author, coverImage: absUrl(full.book.cover), description: full.book.description, linkUrl: full.book.href ?? undefined } : undefined,
 		photoGallery: full ? gallery(full.gallery) : [],
 		keywords: full ? full.keywords.map((k) => ({ ...k })) : [],
 	};
 }
+
+export type V3TongChi = ReturnType<typeof toTongChiRecord>;
 
 export async function allTongChi() {
 	const r = await repo();
