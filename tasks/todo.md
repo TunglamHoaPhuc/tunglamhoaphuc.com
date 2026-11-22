@@ -2411,3 +2411,9 @@ Trạng thái 22/11/2026: **mới kiểm kê, chưa sửa mã.** Cây làm việ
 | RV-12 | Hero banner ảnh riêng ở trang chi tiết (mới trên sheet, ngoài danh sách ban đầu) | Ghi nhận; liên quan `DetailHero.tsx` chưa commit. |
 
 Lên live: `www` và `v2.` đang cùng trả 200 từ Worker `tlhp-web`. Chưa deploy gì trong đợt này vì HEAD không chứa việc dở nào ở trên.
+
+**Cập nhật 22/11/2026 (sau deploy):**
+- Đã deploy Worker `tlhp-web` (v2 và www dùng chung một Worker nên là một lần deploy): phiên bản **`cb625f4d-c758-4be6-b971-5b6f67e5d409`**. Phiên bản trước để lùi: `8dc0692e-859d-4a91-a8eb-9bd6c4c21e0a` (trước nữa `84f3824b-553e-448b-b741-89129696b25c`); lùi bằng `npx cf workers deployments` / rollback về mã đó.
+- Nội dung deploy: fc674f5 và d4ef7b1 (phiên Agent Skills: lịch một dòng mobile, Lộ trình, CTA, iframe Maps, công tắc dừng chung, mũi tên slider) cộng 2 commit RV-11 trên nhánh `fix/review-rv11` (tượng TP0001: bỏ số "2" thừa, đổi `LAM_TI_NI`; footer thêm giờ Sám hối 19:00). Không bật admin, không migration.
+- Kiểm trên www: các trang chính 200, trang lạ 404, `/api/quan-tri` 503; e2e smoke, footer, motion-toggle, slider-arrows, lien-he, lich-tu-hoc: 72 đạt, 2 lỗi cũ (test "địa chỉ admin cũ chuyển sang quantri." vì `/admin` hiện đi qua Cloudflare Access).
+- Còn lại: icon mạng xã hội footer (chờ link chính thức, GD-06); ảnh Sư tổ 404 và chính tả "cở" (sửa dữ liệu D1, chờ đồng ý); RV-02, RV-04, RV-05, RV-08 (đề xuất, chờ quyết thiết kế); hero mobile 390px đã đạt.
