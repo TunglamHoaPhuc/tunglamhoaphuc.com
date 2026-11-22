@@ -4,9 +4,17 @@ import { defineConfig, devices } from "@playwright/test";
 // otherwise it runs against the locally built Worker (`npm run build` first).
 const baseURL = process.env.BASE_URL ?? "http://localhost:4173";
 
+// The home page's welcome notice (a modal <dialog>) opens a second after the first visit and
+// makes the page behind it inert. Every test starts as a visitor who has already closed it;
+// tests/e2e/welcome-notice.spec.ts starts without this to check the notice itself.
+const welcomeNoticeSeen = {
+	cookies: [],
+	origins: [{ origin: new URL(baseURL).origin, localStorage: [{ name: "tlhp_welcome_notice_v1_0", value: "seen" }] }],
+};
+
 export default defineConfig({
 	testDir: "tests/e2e",
-	use: { baseURL },
+	use: { baseURL, storageState: welcomeNoticeSeen },
 	projects: [
 		{ name: "desktop", use: { ...devices["Desktop Chrome"] } },
 		{ name: "mobile", use: { ...devices["Pixel 7"] } },

@@ -22,13 +22,18 @@ test.describe("home page welcome", () => {
 		expect(welcome.top).toBeGreaterThanOrEqual(hero);
 	});
 
-	test("on a first visit the notice opens in its own layer and Lời chào stays in the flow", async ({ page }) => {
-		await page.goto("/");
-		const notice = page.locator("dialog.tlhp-welcome-notice");
-		await expect(notice).toBeVisible({ timeout: 5000 });
-		expect((await notice.evaluate(layout)).position).toBe("fixed");
-		expect((await page.locator("section.tlhp-welcome").evaluate(layout)).position).not.toBe("fixed");
-		await notice.getByRole("button", { name: "Đóng thông báo" }).click();
-		await expect(notice).toHaveCount(0);
+	// playwright.config.ts marks the notice as seen for every test; this one is a first visit.
+	test.describe("on a first visit", () => {
+		test.use({ storageState: { cookies: [], origins: [] } });
+
+		test("the notice opens in its own layer and Lời chào stays in the flow", async ({ page }) => {
+			await page.goto("/");
+			const notice = page.locator("dialog.tlhp-welcome-notice");
+			await expect(notice).toBeVisible({ timeout: 5000 });
+			expect((await notice.evaluate(layout)).position).toBe("fixed");
+			expect((await page.locator("section.tlhp-welcome").evaluate(layout)).position).not.toBe("fixed");
+			await notice.getByRole("button", { name: "Đóng thông báo" }).click();
+			await expect(notice).toHaveCount(0);
+		});
 	});
 });
