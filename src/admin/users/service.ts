@@ -1,6 +1,6 @@
 // Accounts and roles, as the people who manage them see them (docs/admin-architecture.md 6.4, 7.2).
 // The rules that sit outside the permission table are here, so no route can forget them:
-// - nobody changes, locks, deletes or gives a role to anyone holding rights beyond their own;
+// - nobody changes, locks, deletes or gives a role to anyone holding rights beyond their own, nor EQUAL to their own (see `above`);
 // - only a Super Admin gives or takes the Super Admin role, and one always remains;
 // - nobody locks, deletes or changes the role of their own account.
 import { auditStatement, type AuditEntry } from "../audit/log";
@@ -102,20 +102,31 @@ async function mustHaveLanded(ctx: AuthContext, id: string, now: string): Promis
 	if (!(await ctx.db.prepare("SELECT 1 AS yes FROM user WHERE id = ? AND updated_at = ?").bind(id, now).first())) throw lastSuperAdmin();
 }
 
-/** Throws unless `by` may act on `target`: not oneself, and nothing beyond their own rights. Exported for the trash, which acts on accounts too. */
+/**
+ * Policy (second security audit, owner-visible): acting on someone else's account, or handing out a role, takes rights STRICTLY greater
+ * than the other side's, unless the actor is a Super Admin. With "covers" alone two Admins could change each other's email, run
+ * "forgot password" and sign in as the peer with the audit trail pointing at the victim. Seeded roles: Admin still manages Editor and
+ * Author (they hold less); Super Admin manages everyone, subject to the last-Super-Admin rule. Editing yourself is a separate path.
+ */
+function above(by: Authed, theirs: Permissions): boolean {
+	if (by.user.roleId === SUPER_ADMIN_ROLE_ID) return true;
+	return covers(by.permissions, theirs) && !covers(theirs, by.permissions);
+}
+
+/** Throws unless `by` may act on `target`: not oneself, and rights strictly greater than the target's (a Super Admin: anyone). Exported for the trash, which acts on accounts too. */
 export async function mayManage(ctx: AuthContext, by: Authed, target: Pick<UserRow, "id" | "roleId">, opts: { self?: "allow" | "refuse" } = {}): Promise<void> {
 	if (target.id === by.user.id) {
 		if (opts.self === "allow") return;
 		throw new ApiError(403, "forbidden_self", "Bạn không thể làm điều này với chính tài khoản của mình.");
 	}
-	if (!covers(by.permissions, await loadPermissions(ctx.db, target.roleId))) throw new ApiError(403, "forbidden_higher", "Tài khoản này có quyền cao hơn quyền của bạn.");
+	if (!above(by, await loadPermissions(ctx.db, target.roleId))) throw new ApiError(403, "forbidden_higher", "Tài khoản này có quyền cao hơn hoặc ngang quyền của bạn, nên bạn không thao tác lên nó được.");
 }
 
 async function mayAssign(ctx: AuthContext, by: Authed, roleId: string): Promise<void> {
 	const role = await ctx.db.prepare("SELECT id FROM role WHERE id = ? AND deleted_at IS NULL").bind(roleId).first();
 	if (!role) throw new ApiError(400, "invalid_input", "Vai trò không tồn tại.", { roleId: "Vai trò không tồn tại." });
 	if (roleId === SUPER_ADMIN_ROLE_ID && by.user.roleId !== SUPER_ADMIN_ROLE_ID) throw new ApiError(403, "forbidden_super", "Chỉ Super Admin mới cấp vai trò Super Admin.");
-	if (!covers(by.permissions, await loadPermissions(ctx.db, roleId))) throw new ApiError(403, "forbidden_higher", "Bạn không thể cấp vai trò có quyền vượt quá quyền của bạn.");
+	if (!above(by, await loadPermissions(ctx.db, roleId))) throw new ApiError(403, "forbidden_higher", "Bạn chỉ cấp được vai trò có quyền thấp hơn quyền của bạn.");
 }
 
 /** Whether `by` may give `roleId` (the server's own answer, for the account screens to grey out what it would refuse). */
@@ -383,6 +394,9 @@ export async function deleteRole(ctx: AuthContext, by: Authed, id: string): Prom
 	const role = await getRole(ctx, id);
 	if (role.isSystem) throw new ApiError(403, "system_role", "Không xóa được vai trò mẫu.");
 	if (role.users > 0) throw new ApiError(409, "role_in_use", `Còn ${role.users} tài khoản đang dùng vai trò này. Hãy chuyển họ sang vai trò khác trước.`);
+	// An account in the trash still points at its role and would get it back on restore.
+	const trashed = num((await ctx.db.prepare("SELECT COUNT(*) AS n FROM user WHERE role_id = ? AND deleted_at IS NOT NULL").bind(id).first())?.n);
+	if (trashed > 0) throw new ApiError(409, "role_in_use", `Còn ${trashed} tài khoản trong thùng rác đang giữ vai trò này. Hãy xóa vĩnh viễn hoặc chuyển họ sang vai trò khác trước.`);
 	if (!covers(by.permissions, await loadPermissions(ctx.db, id))) throw new ApiError(403, "forbidden_higher", "Vai trò này có quyền cao hơn quyền của bạn.");
 	await ctx.db.batch([
 		ctx.db.prepare("UPDATE role SET deleted_at = ? WHERE id = ?").bind(stamp(ctx), id),

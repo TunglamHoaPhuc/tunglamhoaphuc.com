@@ -334,7 +334,7 @@ describe("data the account screens need to hide what the server would refuse (G4
 		const roles = (await admin.call("GET", "roles")).data.roles as { id: string; assignable: boolean }[];
 		const flag = (id: string) => roles.find((role) => role.id === id)?.assignable;
 		expect(flag("role-super-admin")).toBe(false);
-		expect(flag("role-admin")).toBe(true);
+		expect(flag("role-admin")).toBe(false); // equal rights are not handed out (second audit: strictly greater only)
 		expect(flag("role-editor")).toBe(true);
 		expect(flag("role-author")).toBe(true);
 		const root = await w.as("root@example.test");
