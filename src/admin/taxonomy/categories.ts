@@ -411,6 +411,7 @@ registerTrashable({
 	table: "category",
 	titleSql: "name",
 	module: "categories",
+	isLive: () => false, // no publish state: editing categories never took the publish right
 	hasCreatedBy: false,
 	purge: (ctx, _by, id) => [
 		ctx.db.prepare("DELETE FROM media_usage WHERE entity_type = 'category' AND entity_id = ?").bind(id),

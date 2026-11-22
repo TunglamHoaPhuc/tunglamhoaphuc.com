@@ -11,7 +11,7 @@ import { newId } from "../ids";
 import { mediaPath, replaceUsageStatements } from "../media/service";
 import { revisionStatement } from "../revision";
 import { registerTrashable, trashStatement } from "../trash";
-import { asBool, audit, checkMedia, checkStatusChange, conflictOf, diffOf, invalid, json, mayChange, slugFor, stamp, staleVersion, taken, type SimpleStatus } from "./common";
+import { asBool, audit, checkMedia, checkStatusChange, conflictOf, diffOf, invalid, json, mayChange, mayChangeLive, slugFor, stamp, staleVersion, taken, type SimpleStatus } from "./common";
 
 export const REGISTRATION = ["closed", "open", "full"] as const;
 export type EventTime = { label: string; time: string };
@@ -235,6 +235,7 @@ export async function createEvent(ctx: AuthContext, by: Authed, model: EventMode
 export async function updateEvent(ctx: AuthContext, by: Authed, id: string, version: number, patch: Partial<EventModel>): Promise<EventItem> {
 	const row = await findRow(ctx, id);
 	mayChange(by, "events", "update", text(row.created_by) || null);
+	mayChangeLive(by, "events", text(row.status) === "published");
 	staleVersion(row, version);
 	const current = toItem(row);
 	const before = toModel(current);
@@ -264,6 +265,7 @@ export async function updateEvent(ctx: AuthContext, by: Authed, id: string, vers
 export async function deleteEvent(ctx: AuthContext, by: Authed, id: string): Promise<void> {
 	const row = await findRow(ctx, id);
 	mayChange(by, "events", "delete", text(row.created_by) || null);
+	mayChangeLive(by, "events", text(row.status) === "published");
 	await ctx.db.batch([trashStatement(ctx, by, "calendar_event", id), audit(ctx, by, { action: "event.trash", entityType: "calendar_event", entityId: id, before: { title: row.title, startDate: row.start_date } })]);
 }
 
@@ -282,6 +284,7 @@ registerTrashable({
 	table: "calendar_event",
 	titleSql: "title",
 	module: "events",
+	isLive: (row) => text(row.status) === "published",
 	hasCreatedBy: true,
 	purge: (ctx, _by, id) => [
 		ctx.db.prepare("DELETE FROM revision WHERE entity_type = 'calendar_event' AND entity_id = ?").bind(id),
@@ -303,6 +306,7 @@ export async function listPrograms(ctx: AuthContext): Promise<ProgramItem[]> {
 }
 
 export async function updateProgram(ctx: AuthContext, by: Authed, id: string, patch: ProgramPatch): Promise<ProgramItem[]> {
+	mayChangeLive(by, "events", true); // a regular program is on the page as soon as it is saved
 	const current = (await listPrograms(ctx)).find((item) => item.id === id);
 	if (!current) throw notFound("Chương trình");
 	const next = { ...current, ...Object.fromEntries(Object.entries(patch).filter(([, value]) => value !== undefined)) } as ProgramItem;
@@ -355,6 +359,7 @@ export function cleanVerseLine(line: string): string {
 
 export async function updateTheme(ctx: AuthContext, by: Authed, month: number, input: { title?: string; posterMediaId?: string | null; lines?: string[]; author?: string }): Promise<ThemeItem> {
 	if (!Number.isInteger(month) || month < 1 || month > 12) throw notFound("Chủ đề tháng");
+	mayChangeLive(by, "events", true); // a month theme is on the page as soon as it is saved
 	const current = (await listThemes(ctx))[month - 1];
 	const lines = input.lines === undefined ? current.lines : input.lines.map(cleanVerseLine).filter((line) => line.trim() !== "");
 	const next = { title: input.title ?? current.title, posterMediaId: input.posterMediaId === undefined ? current.posterMediaId : input.posterMediaId, lines, author: input.author ?? current.author };

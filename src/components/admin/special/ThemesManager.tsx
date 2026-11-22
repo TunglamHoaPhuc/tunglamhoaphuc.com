@@ -119,7 +119,8 @@ function ProgramForm({ program, canEdit, onSaved }: { program: Program; canEdit:
 
 export function ThemesManager() {
 	const { can } = useAdmin();
-	const canEdit = can("events", "update");
+	// Themes and regular programs are on the site as soon as they are saved: they take the publish right (the server refuses otherwise).
+	const canEdit = can("events", "update") && can("events", "publish");
 	const themes = useLoader(() => api<{ themes: Theme[] }>("GET", "events/themes"), "themes");
 	const programs = useLoader(() => api<{ programs: Program[] }>("GET", "events/programs"), "programs");
 	const [month, setMonth] = useState(() => new Date(Date.now() + 7 * 3_600_000).getUTCMonth() + 1);
@@ -138,6 +139,7 @@ export function ThemesManager() {
 				}
 			/>
 
+			{can("events", "update") && !canEdit ? <Alert kind="info">Chủ đề tháng và chương trình định kỳ hiện ngay trên trang, nên chỉ người có quyền xuất bản sự kiện mới sửa được.</Alert> : null}
 			<h2 className="tq-h2">Chủ đề của từng tháng</h2>
 			<p className="tq-muted">Poster, câu kệ và tác giả hiện ở khối “Lời Thầy dạy” trên trang chủ và ở trang lịch tu học.</p>
 			{themes.error ? (

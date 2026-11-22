@@ -2,10 +2,11 @@
 import type { AuthContext, Authed } from "../auth/service";
 import { num, text, type Row } from "../db";
 import { ApiError, notFound } from "../http/errors";
+import { can } from "../rbac/check";
 import { mediaPath, replaceUsageStatements } from "../media/service";
 import { revisionStatement } from "../revision";
 import { registerTrashable, trashStatement } from "../trash";
-import { asBool, audit, checkMedia, conflictOf, diffOf, invalid, mayChange, stamp, staleVersion } from "./common";
+import { asBool, audit, checkMedia, conflictOf, diffOf, invalid, mayChange, mayChangeLive, needsPublisher, stamp, staleVersion } from "./common";
 import { cleanBodyHtml } from "./html";
 
 export type AreaModel = {
@@ -71,6 +72,7 @@ export async function updateArea(ctx: AuthContext, by: Authed, id: string, versi
 	staleVersion(row, version);
 	const before = modelOf(row);
 	const model: AreaModel = { ...before, ...Object.fromEntries(Object.entries(patch).filter(([, value]) => value !== undefined)) };
+	mayChangeLive(by, "areas", before.visible || model.visible); // editing a visible area, or switching one on
 	model.name = model.name.trim();
 	if (!model.name) throw invalid("name", "Nhập tên khu vực.");
 	for (const [field, value] of [["mapX", model.mapX], ["mapY", model.mapY]] as const) {
@@ -103,6 +105,8 @@ const MAX_FEATURED = 12;
 
 /** The areas the home page features, in order; every other area is switched off. */
 export async function setFeatured(ctx: AuthContext, by: Authed, ids: string[]): Promise<AreaItem[]> {
+	// The featured set is live at once (no draft): docs 7.6 puts it under the home page rights, so changing it takes home.publish.
+	if (!can(by.permissions, "home", "publish")) throw needsPublisher("Khu vực nổi bật hiện ngay trên trang chủ, nên cần quyền xuất bản trang chủ.");
 	if (ids.length > MAX_FEATURED) throw invalid("ids", `Tối đa ${MAX_FEATURED} khu vực nổi bật.`);
 	if (new Set(ids).size !== ids.length) throw invalid("ids", "Có khu vực được chọn hai lần.");
 	const before = (await listAreas(ctx)).filter((area) => area.featured).sort((a, b) => a.featuredPosition - b.featuredPosition).map((area) => area.id);
@@ -119,6 +123,7 @@ export async function setFeatured(ctx: AuthContext, by: Authed, ids: string[]): 
 export async function deleteArea(ctx: AuthContext, by: Authed, id: string): Promise<void> {
 	const row = await findRow(ctx, id);
 	mayChange(by, "areas", "delete", text(row.created_by) || null);
+	mayChangeLive(by, "areas", asBool(row.visible));
 	await ctx.db.batch([
 		trashStatement(ctx, by, "area", id),
 		ctx.db.prepare("UPDATE area SET featured = 0 WHERE id = ?").bind(id),
@@ -132,6 +137,7 @@ registerTrashable({
 	table: "area",
 	titleSql: "name",
 	module: "areas",
+	isLive: (row) => asBool(row.visible),
 	hasCreatedBy: true,
 	purge: (ctx, _by, id) => [
 		ctx.db.prepare("DELETE FROM revision WHERE entity_type = 'area' AND entity_id = ?").bind(id),

@@ -346,7 +346,7 @@ TOTP 6 số, bước 30 giây, chấp nhận lệch 1 bước. Khi bật: hiện
 Quy tắc cứng nằm ngoài bảng quyền:
 
 - Chỉ Super Admin gán hoặc gỡ vai trò Super Admin, và luôn phải còn ít nhất một Super Admin đang hoạt động.
-- Không ai được sửa, khóa, thu hồi phiên của một tài khoản, hay gán một vai trò, có quyền vượt ra ngoài tập quyền của chính mình. Nhờ đó Admin không thể đổi email của Super Admin rồi dùng "quên mật khẩu" để chiếm tài khoản.
+- Không ai được sửa, khóa, xóa, thu hồi phiên của một tài khoản, hay gán một vai trò, có quyền vượt ra ngoài hoặc chỉ ngang bằng tập quyền của chính mình (cần quyền lớn hơn hẳn; riêng Super Admin thao tác được trên mọi tài khoản, trừ quy tắc còn ít nhất một Super Admin). Nhờ đó Admin không thể đổi email của Super Admin hay của một Admin khác rồi dùng "quên mật khẩu" để chiếm tài khoản.
 - Đổi email của một tài khoản gửi thư báo tới địa chỉ cũ và thu hồi mọi phiên của tài khoản đó.
 - Nhóm cấu hình `mail.smtp` và `security.policy` chỉ Super Admin sửa được. Chính sách bảo mật có mức sàn ghi trong mã (ví dụ mật khẩu không ngắn hơn 10 ký tự) mà giao diện không hạ xuống được.
 - Không ai tự khóa, tự xóa hay tự đổi vai trò của chính mình.

@@ -158,6 +158,11 @@ function mayEditLive(by: Authed, kind: Kind, row: Row) {
 	}
 }
 
+/** Pinning (or unpinning) puts an article at the top of the public lists: that is a publishing decision, not an author's. */
+function mayPin(by: Authed, kind: Kind, touchesPinned: boolean) {
+	if (touchesPinned && !can(by.permissions, kind.module, "publish")) throw new ApiError(403, "needs_publisher", "Ghim bài lên đầu danh sách cần quyền xuất bản; hãy nhờ biên tập viên.");
+}
+
 const rightsOn = (by: Authed, kind: Kind, row: Row) => ({
 	canUpdate: can(by.permissions, kind.module, "update", { userId: by.user.id, ownerId: ownerOf(row) }) && (!["published", "scheduled"].includes(text(row.status)) || can(by.permissions, kind.module, "publish")),
 	canDelete: can(by.permissions, kind.module, "delete", { userId: by.user.id, ownerId: ownerOf(row) }) && (!["published", "scheduled"].includes(text(row.status)) || can(by.permissions, kind.module, "publish")),
@@ -826,6 +831,7 @@ const summaryOf = (kind: Kind, keys: string[]) => {
 
 export async function createItem(ctx: AuthContext, by: Authed, kind: Kind, input: State, opts: { summary?: string; action?: string } = {}): Promise<ContentDetail> {
 	const prepared = await prepare(ctx.db, kind, null, input, null, null);
+	mayPin(by, kind, prepared.next.pinned === true);
 	const id = newId(kind.idPrefix, ctx.now().getTime());
 	const now = iso(ctx);
 	const next: State = { ...prepared.next, status: "draft", publishAt: null };
@@ -869,6 +875,7 @@ export async function updateItem(ctx: AuthContext, by: Authed, kind: Kind, id: s
 	const { version: _ignored, ...changes } = input;
 	void _ignored;
 	const prepared = await prepare(ctx.db, kind, current, changes, row, id, opts.action === "restore");
+	mayPin(by, kind, prepared.changedKeys.includes("pinned"));
 	if (!prepared.changedKeys.length && !opts.summary) return { ...(await detailOf(ctx, by, kind, row)), bodyChanged: prepared.bodyChanged };
 
 	const next: State = { ...prepared.next, status: current.status, publishAt: current.publishAt };
@@ -1192,6 +1199,7 @@ for (const kind of Object.values(KINDS)) {
 		table: kind.table,
 		titleSql: "title",
 		module: kind.module,
+		isLive: (row) => text(row.status) === "published" || text(row.status) === "scheduled",
 		hasCreatedBy: true,
 		purge: (ctx, _by, id) => [
 			ctx.db.prepare("DELETE FROM revision WHERE entity_type = ? AND entity_id = ?").bind(kind.entityType, id),

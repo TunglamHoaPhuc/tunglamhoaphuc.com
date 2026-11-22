@@ -2,9 +2,13 @@ import type { AdminDb } from "../db";
 import { text } from "../db";
 import { permissionKey, type Action, type Permissions, type Scope } from "./catalog";
 
-export async function loadPermissions(db: AdminDb, roleId: string | null): Promise<Permissions> {
+/** A deleted role grants nothing; `includeDeleted` is for the trash only, which must judge what restoring a role would hand back. */
+export async function loadPermissions(db: AdminDb, roleId: string | null, opts: { includeDeleted?: boolean } = {}): Promise<Permissions> {
 	if (!roleId) return new Map();
-	const { results } = await db.prepare("SELECT module, action, scope FROM role_permission WHERE role_id = ?").bind(roleId).all();
+	const { results } = await db
+		.prepare(`SELECT p.module, p.action, p.scope FROM role_permission p JOIN role ON role.id = p.role_id WHERE p.role_id = ?${opts.includeDeleted ? "" : " AND role.deleted_at IS NULL"}`)
+		.bind(roleId)
+		.all();
 	return new Map(results.map((row) => [permissionKey(text(row.module), text(row.action)), text(row.scope) === "own" ? "own" : "all"] as [string, Scope]));
 }
 

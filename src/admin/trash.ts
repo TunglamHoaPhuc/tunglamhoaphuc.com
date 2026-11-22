@@ -2,7 +2,7 @@
 // leaves the lists and the public site. Each module that has trashable rows registers them here, and the trash
 // screen (ops module) lists, restores and removes for good across all of them.
 import type { AuthContext, Authed } from "./auth/service";
-import type { AdminStmt } from "./db";
+import type { AdminStmt, Row } from "./db";
 
 export type Trashable = {
 	/** The kind as the API and the audit log name it: "post", "teaching_article", "page", "statue", … */
@@ -20,6 +20,12 @@ export type Trashable = {
 	module: string;
 	/** A rule beyond the module's rights, run before a restore or removal (accounts and roles: never above one's own rights). */
 	guard?: (ctx: AuthContext, by: Authed, id: string, action: "update" | "delete") => Promise<void>;
+	/**
+	 * Whether the row, as it sits in the trash, is on the public site the moment it is restored (published or scheduled article, published
+	 * event or statue, visible area, active quote). Restoring such a row is publishing it, so it takes `<module>.publish` on top of the rest.
+	 * Required, so that a new kind has to decide: say `() => false` only when restoring cannot put anything on the site by itself.
+	 */
+	isLive: (row: Row) => boolean;
 	/** Whether the table has `created_by` (so a person with "own" rights may restore their own). */
 	hasCreatedBy: boolean;
 	/** Statements that remove what hangs off a row (revisions, usage rows, child tables) before the row itself goes for good. */
