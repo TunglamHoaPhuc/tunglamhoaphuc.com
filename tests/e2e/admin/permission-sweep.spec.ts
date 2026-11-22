@@ -56,8 +56,10 @@ function contentCounts(): Record<string, number> {
 	const out: Record<string, number> = {};
 	for (const { name } of db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'd1_%' ORDER BY name").all() as { name: string }[]) {
 		// accounts, sessions and 2FA set-up are written by the sweep's own sign-ins and by `me/2fa/setup`, which any session may call
-		if (/session|audit|rate|attempt|^user$|token|mfa|totp|backup|reset/i.test(name)) continue;
-		out[name] = (db.prepare(`SELECT COUNT(*) AS n FROM "${name}"`).get() as { n: number }).n;
+		if (/session|audit|rate|attempt|throttle|^user$|token|mfa|totp|backup|reset/i.test(name)) continue;
+		// `PUT seo/defaults` with `{}` is a valid request that stores the (empty) defaults: the one setting an empty body may write
+		const where = name === "setting" ? " WHERE key <> 'seo.defaults'" : "";
+		out[name] = (db.prepare(`SELECT COUNT(*) AS n FROM "${name}"${where}`).get() as { n: number }).n;
 	}
 	db.close();
 	return out;

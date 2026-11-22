@@ -9,9 +9,22 @@ test.setTimeout(900_000);
 
 const stamp = Date.now().toString(36);
 let admin: AdminApi;
+/** The old site's articles hold no table, video or sound, so one that does is made here: what the server stores for such a body (a bare YouTube iframe, a table, sound). */
+let richId = "";
 
 test.beforeAll(async ({ baseURL }) => {
 	admin = await superAdminApi(baseURL!);
+	const made = unwrap<{ id: string; version: number }>(await admin.call("POST", "posts", { title: `Bài giàu định dạng ${stamp}`, section: "dong-chay-hoang-phap", summary: "s" }));
+	const html = [
+		"<table><tbody><tr><th>Cột 1</th><th>Cột 2</th></tr><tr><td>Ô 1</td><td>Ô 2</td></tr></tbody></table>",
+		"<ul><li>Mục một</li><li>Mục hai</li></ul>",
+		'<p>Xem <a href="https://example.test/lien-ket">liên kết</a>.</p>',
+		'<audio controls src="https://example.test/am-thanh.mp3"></audio>',
+		'<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>',
+		"<blockquote><p>Trích dẫn</p></blockquote>",
+	].join("");
+	expect((await admin.call("PATCH", `posts/${made.id}`, { version: made.version, contentHtml: html })).status).toBe(200);
+	richId = made.id;
 });
 test.afterAll(async () => {
 	await admin.dispose();
@@ -55,7 +68,8 @@ test("opening imported articles in the editor and leaving writes nothing: no uns
 	const teachings = (db.prepare("SELECT id FROM teaching_article ORDER BY position LIMIT 3").all() as { id: string }[]).map((row) => row.id);
 	const pages = (db.prepare("SELECT id FROM page ORDER BY position LIMIT 2").all() as { id: string }[]).map((row) => row.id);
 	db.close();
-	expect(posts.length).toBeGreaterThanOrEqual(8);
+	posts.unshift(richId);
+	expect(posts.length).toBeGreaterThanOrEqual(6);
 
 	const login = superAdminLogin();
 	await signInOnPage(page, login.email, login.password);
@@ -89,7 +103,7 @@ test("opening imported articles in the editor and leaving writes nothing: no uns
 
 test("typing a character and deleting it again, then saving, keeps every word, link, picture and video of an imported article", async ({ page }) => {
 	const db = localDb();
-	const wanted = (db.prepare("SELECT id FROM post WHERE deleted_at IS NULL AND (content_html LIKE '%<table%' OR content_html LIKE '%<iframe%' OR content_html LIKE '%<audio%' OR content_html LIKE '%.mp3%') ORDER BY published_date DESC LIMIT 6").all() as { id: string }[]).map((row) => row.id);
+	const wanted = [richId, ...(db.prepare("SELECT id FROM post WHERE deleted_at IS NULL AND (content_html LIKE '%<table%' OR content_html LIKE '%<iframe%' OR content_html LIKE '%<audio%' OR content_html LIKE '%.mp3%') ORDER BY published_date DESC LIMIT 5").all() as { id: string }[]).map((row) => row.id)];
 	const plain = (db.prepare("SELECT id FROM post WHERE deleted_at IS NULL AND content_html LIKE '%<a %' AND content_html NOT LIKE '%<table%' LIMIT 3").all() as { id: string }[]).map((row) => row.id);
 	db.close();
 	const login = superAdminLogin();
