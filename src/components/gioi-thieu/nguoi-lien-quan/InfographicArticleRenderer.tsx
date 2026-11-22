@@ -1,0 +1,1637 @@
+'use client';
+
+import React, { useState } from 'react';
+import Link from 'next/link';
+import { ArrowRight, Compass, Layers, Leaf, Sparkles, X, ZoomIn } from './icons';
+import { getImageUrl } from './image';
+import { FourCirclesPortalSection } from './FourCirclesPortalSection';
+
+interface PopupKeyword {
+  keyword: string;
+  title: string;
+  subtitle?: string;
+  description: string;
+  imageUrl?: string;
+  imagePosition?: string;
+  linkUrl?: string;
+}
+
+interface InfographicRendererProps {
+  rawContent: string;
+  /** Not drawn: the pages show the title above the text. */
+  title?: string;
+  subtitle?: string;
+  author?: string;
+  authorLink?: string;
+  popups?: PopupKeyword[];
+  onKeywordClick?: (keyword: string) => void;
+}
+
+// 🪷 Helper: Chuyển đổi tiêu đề thành anchor ID không dấu
+export function toSectionId(text: string): string {
+  return text
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[đĐ]/g, 'd')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+// 🪷 Helper: Kiểm tra xem một đoạn văn bản có phải là khổ thơ không (phải có ít nhất 2 câu thơ)
+function isPoemStanza(text: string): boolean {
+  if (!text) return false;
+  const lines = text.split('\n').map((l) => l.trim()).filter(Boolean);
+  if (lines.length < 2) return false; // Đoạn văn xuôi đơn lẻ không bị hiểu nhầm là thơ
+  return lines.every((l) => l.length < 95 && !/^\s*(?:[-•]|\*(?!\*))\s+|\d+[.)]\s+|###?\s+/.test(l));
+}
+
+// 🪷 Helper: Nhận diện đường phân cách (Dấu gạch ngang, em-dash, <hr>, wp-block-separator)
+function isDividerLine(line: string): boolean {
+  if (!line) return false;
+  const t = line.trim();
+  // 1. Dòng chỉ chứa từ 2 ký tự phân cách trở lên: - hoặc — hoặc – hoặc * hoặc _ hoặc = hoặc ~ hoặc • (không chứa chữ/số)
+  if (/^[-—–*_~=•·\s]{2,}$/.test(t) && !/[a-zA-Z0-9À-ỹ]/.test(t)) {
+    return true;
+  }
+  // 2. Thẻ HTML <hr> hoặc Gutenberg separator
+  if (/^<hr[^>]*\/?>$/i.test(t)) {
+    return true;
+  }
+  if (/wp-block-separator/i.test(t)) {
+    return true;
+  }
+  return false;
+}
+
+// 🪷 Helper: Nhận diện một câu thơ ngắn (< 95 ký tự, không chứa nhiều câu văn xuôi)
+function isShortVerseLine(text: string): boolean {
+  if (!text) return false;
+  const t = text.trim();
+  if (isDividerLine(t)) return false;
+  if (t.length > 95 || t.length < 5) return false;
+  // Markdown heading or list bullet (- item, • item, or * item followed by space) or numbered list
+  if (/^#{1,4}\s+|^\s*(?:[-•]|\*(?!\*))\s+|\d+[.)]\s+/.test(t)) return false;
+  if (t.startsWith('http') || t.startsWith('Cũng vậy') || t.startsWith('Một tâm nguyện')) return false;
+  const stripped = t.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
+  const sentenceCount = (stripped.match(/[.!?](\s+|$)/g) || []).length;
+  if (sentenceCount > 1) return false;
+  return true;
+}
+
+// 🪷 Helper: Format inline text (Bold, Italic, Underline, Keywords) tuân thủ trực tiếp theo khung soạn thảo
+function highlightText(
+  text: string,
+  popups: PopupKeyword[] = [],
+  onKeywordClick: (kw: string) => void
+): React.ReactNode {
+  if (!text) return '';
+  // Quét và chuẩn hóa dấu gạch dài — và – thành -
+  let normalized = text.replace(/[—–]/g, '-');
+
+  // 1. Gộp và làm sạch các thẻ lồng nhau liên tiếp (ví dụ <b><b><b>...</b></b></b> -> <b>...</b>)
+  normalized = normalized
+    .replace(/(?:<b[^>]*>|<strong[^>]*>)+/gi, '<b>')
+    .replace(/(?:<\/b>|<\/strong>)+/gi, '</b>')
+    .replace(/(?:<i[^>]*>|<em[^>]*>)+/gi, '<i>')
+    .replace(/(?:<\/i>|<\/em>)+/gi, '</i>')
+    .replace(/(?:<u[^>]*>)+/gi, '<u>')
+    .replace(/(?:<\/u>)+/gi, '</u>')
+    .replace(/<b>\s*<\/b>/gi, '')
+    .replace(/<i>\s*<\/i>/gi, '')
+    .replace(/<u>\s*<\/u>/gi, '');
+
+  // 2. Chuyển đổi cú pháp markdown sang thẻ HTML chuẩn
+  normalized = normalized
+    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+    .replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, '<i>$1</i>');
+
+  // Lọc lại một lần nữa để tránh thẻ trùng lặp
+  normalized = normalized
+    .replace(/(?:<b[^>]*>)+/gi, '<b>')
+    .replace(/(?:<\/b>)+/gi, '</b>')
+    .replace(/(?:<i[^>]*>)+/gi, '<i>')
+    .replace(/(?:<\/i>)+/gi, '</i>');
+
+  // Split text by tags: <b>...</b>, <i>...</i>, <u>...</u>
+  const parts = normalized.split(/(<b>[\s\S]*?<\/b>|<i>[\s\S]*?<\/i>|<u>[\s\S]*?<\/u>)/gi);
+
+  return parts.map((part, pIdx) => {
+    if (part.startsWith('<b>') && part.endsWith('</b>')) {
+      const inner = part.slice(3, -4).replace(/<\/?b>/gi, '');
+      return (
+        <strong key={pIdx} className="font-bold text-[#FFDE59] drop-shadow-sm">
+          {renderKeywordPopups(inner, popups, onKeywordClick, true)}
+        </strong>
+      );
+    }
+    if (part.startsWith('<i>') && part.endsWith('</i>')) {
+      const inner = part.slice(3, -4).replace(/<\/?i>/gi, '');
+      return (
+        <em key={pIdx} className="italic text-[#FFE5A3]">
+          {renderKeywordPopups(inner, popups, onKeywordClick, false)}
+        </em>
+      );
+    }
+    if (part.startsWith('<u>') && part.endsWith('</u>')) {
+      const inner = part.slice(3, -4).replace(/<\/?u>/gi, '');
+      return (
+        <u key={pIdx} className="underline decoration-[#F2C14E]/70 underline-offset-2 text-[#FFE5A3]">
+          {renderKeywordPopups(inner, popups, onKeywordClick, false)}
+        </u>
+      );
+    }
+    // Loại bỏ mọi thẻ đóng/mở mồ côi nếu có để không bao giờ in thẻ thô ra giao diện
+    const cleanPart = part.replace(/<\/?(?:b|strong|i|em|u)>/gi, '');
+    return <React.Fragment key={pIdx}>{renderKeywordPopups(cleanPart, popups, onKeywordClick, false)}</React.Fragment>;
+  });
+}
+
+// 🪷 Gắn sự kiện chú thích cho từ khóa — tự động in đậm ánh vàng kim nổi bật
+function renderKeywordPopups(
+  str: string,
+  popups: PopupKeyword[] = [],
+  onKeywordClick: (kw: string) => void,
+  isInsideBold: boolean = false
+): React.ReactNode {
+  if (!str) return '';
+  if (popups.length === 0) return str;
+
+  const sorted = [...popups].sort((a, b) => (b.keyword?.length || 0) - (a.keyword?.length || 0));
+  const regexPattern = sorted
+    .map((p) => (p.keyword || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+    .filter(Boolean)
+    .join('|');
+
+  if (!regexPattern) return str;
+
+  const regex = new RegExp(`(${regexPattern})`, 'gi');
+  const tokens = str.split(regex);
+
+  return tokens.map((token, i) => {
+    const match = popups.find((p) => (p.keyword || (p as PopupKeyword & { tag?: string }).tag || '').toLowerCase() === token.toLowerCase());
+    if (match) {
+      return (
+        <span
+          key={i}
+          onClick={(e) => {
+            e.stopPropagation();
+            onKeywordClick(match.keyword);
+          }}
+          style={{
+            fontFamily: "'UTM Avo', sans-serif",
+          }}
+          className={`cursor-pointer transition-all inline align-baseline font-bold text-[#FFDE59] hover:text-white pb-[1px] border-b border-transparent hover:border-[#F2C14E] ${
+            isInsideBold ? 'drop-shadow-md' : 'drop-shadow-sm'
+          } hover:drop-shadow-[0_0_8px_rgba(255,222,89,0.85)]`}
+          title={`Bấm để xem chú thích: ${match.title || match.keyword}`}
+        >
+          {token}
+        </span>
+      );
+    }
+    return token;
+  });
+}
+
+// 🪷 4 Cards Pillar Component (Ham học hỏi, Siêng năng, Giữ gìn giới hạnh, Sẵn lòng phụng sự)
+function FourPillarsGrid() {
+  const cards = [
+    {
+      icon: '🌱',
+      title: 'Ham học hỏi giáo pháp',
+      desc: 'Không ngừng mở rộng hiểu biết để đi đúng con đường tu học.',
+    },
+    {
+      icon: '🙏',
+      title: 'Siêng năng hành trì',
+      desc: 'Kiên trì chuyển hóa thân tâm trong từng thời khóa tu tập.',
+    },
+    {
+      icon: '🛡',
+      title: 'Giữ gìn giới hạnh',
+      desc: 'Tinh cần bảo hộ thân, khẩu, ý bằng đời sống chánh niệm và trách nhiệm.',
+    },
+    {
+      icon: '❤️',
+      title: 'Sẵn lòng phụng sự',
+      desc: 'Lan tỏa những điều tốt đẹp đã chuyển hóa đến với mọi người.',
+    },
+  ];
+
+  return (
+    <div className="my-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+      {cards.map((c, i) => (
+        <div
+          key={i}
+          className="p-5 rounded-2xl bg-gradient-to-br from-[#27180E] to-[#1C120A] border border-[#F2C14E]/30 hover:border-[#F2C14E] transition-all hover:scale-[1.01] shadow-lg group flex flex-col justify-between"
+        >
+          <div>
+            <div className="flex items-center gap-2.5 mb-2">
+              <span className="text-2xl">{c.icon}</span>
+              <h5
+                style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                className="text-base font-bold text-[#FFE5A3] group-hover:text-[#ffde59] transition-colors"
+              >
+                {c.title}
+              </h5>
+            </div>
+            <div className="w-8 h-0.5 bg-[#F2C14E]/40 mb-3 group-hover:w-16 transition-all" />
+            <p
+              style={{ fontFamily: "'UTM Avo', sans-serif" }}
+              className="text-xs sm:text-sm text-[#FFE5A3]/90 leading-relaxed"
+            >
+              {c.desc}
+            </p>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// 🪷 Infographic 1: Ba Viên Ngọc Quý Của Thế Gian & Ba Ân Đức Nâng Đỡ (Bác sĩ, Thuốc, Điều dưỡng)
+function TamQuyThreeJewelsGrid({ onKeywordClick }: { onKeywordClick: (kw: string) => void }) {
+  const jewels = [
+    {
+      title: 'ÂN ĐỨC CỦA PHẬT',
+      popupKw: 'ÂN ĐỨC CỦA PHẬT',
+      popupRef: '[1]',
+      symbol: '🏥',
+      role: 'BẬC Y VƯƠNG',
+      badge: 'Bác Sĩ',
+      arrowText: 'Chỉ đường dẫn lối',
+      desc: 'Đức Phật là bậc Y vương vĩ đại, người chỉ đường sáng tỏ, khai mở trí tuệ để chúng sinh tự chữa lành tâm bệnh.',
+      quote: '“Quy y Phật giống như việc có một bác sĩ chăm sóc sức khỏe cho gia đình, Ngài là người chỉ dẫn cho ta trên con đường tu tập.”',
+      gradient: 'from-[#3A2210] via-[#24150A] to-[#170E08]',
+      border: 'border-[#F2C14E]/40',
+    },
+    {
+      title: 'ÂN ĐỨC CỦA PHÁP',
+      popupKw: 'ÂN ĐỨC CỦA PHÁP',
+      popupRef: '[2]',
+      symbol: '💊',
+      role: 'DIỆU DƯỢC',
+      badge: 'Thuốc Trị Liệu',
+      arrowText: 'Con đường chuyển hóa',
+      desc: 'Giáo pháp là linh dược giải thoát, soi tỏ nhân - duyên - quả, giúp nhận diện thiện ác và dứt trừ phiền não.',
+      quote: '“Quy y Pháp chính là liều thuốc chữa bệnh, giúp ta hiểu rõ về nhân - duyên - quả, phân biệt thiện ác.”',
+      gradient: 'from-[#332212] via-[#20140A] to-[#150D06]',
+      border: 'border-[#FFDE59]/40',
+    },
+    {
+      title: 'ÂN ĐỨC CỦA TĂNG',
+      popupKw: 'ÂN ĐỨC CỦA TĂNG',
+      popupRef: '[3]',
+      symbol: '🤝',
+      role: 'BẠN ĐỒNG HÀNH',
+      badge: 'Điều Dưỡng',
+      arrowText: 'Đồng hành tu học',
+      desc: 'Tăng đoàn là đoàn thể xuất gia hòa hợp, người bạn lành kề cận chăm sóc, dìu dắt trên từng bước chuyển hóa.',
+      quote: '“Quy y Tăng như những y tá, điều dưỡng bên cạnh, lắng nghe, hỗ trợ và hướng dẫn chúng ta trong hành trình tu học.”',
+      gradient: 'from-[#3A2414] via-[#23150B] to-[#170E08]',
+      border: 'border-[#F2C14E]/40',
+    },
+  ];
+
+  return (
+    <div className="my-10 space-y-4 select-none">
+      <div className="text-center mb-6">
+        <span className="px-3.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[#FFDE59] text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-1.5 shadow-sm">
+          <Sparkles className="w-3.5 h-3.5 text-[#F2C14E]" />
+          <span>Infographic • Ba Viên Ngọc Quý Của Thế Gian</span>
+        </span>
+        <h4
+          style={{ fontFamily: "'UTM Niagara', var(--font-playfair), 'Playfair Display', serif" }}
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#FFE5A3] mt-2 tracking-wider uppercase"
+        >
+          QUY Y TAM BẢO &amp; BA ÂN ĐỨC NÂNG ĐỠ
+        </h4>
+        <div className="w-24 h-[1.5px] bg-gradient-to-r from-transparent via-[#F2C14E] to-transparent mx-auto mt-2" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {jewels.map((j, idx) => (
+          <div
+            key={idx}
+            className={`p-5 sm:p-6 rounded-2xl bg-gradient-to-b ${j.gradient} border ${j.border} hover:border-[#FFDE59] transition-all hover:scale-[1.02] shadow-xl flex flex-col justify-between group relative overflow-hidden`}
+          >
+            <div className="absolute -top-10 -right-10 w-28 h-28 bg-[#F2C14E]/10 rounded-full blur-2xl pointer-events-none" />
+
+            <div>
+              <div className="flex items-center justify-between gap-2 mb-4">
+                <span className="text-3xl p-2.5 rounded-xl bg-black/40 border border-[#F2C14E]/30 shadow-inner">
+                  {j.symbol}
+                </span>
+                <span className="px-2.5 py-1 rounded-full bg-[#1C120A] border border-[#F2C14E]/40 text-[#FFDE59] text-[10px] font-bold uppercase tracking-wider">
+                  {j.role}
+                </span>
+              </div>
+
+              <h5
+                style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                className="text-base sm:text-lg font-bold text-[#FFDE59] group-hover:text-white transition-colors"
+              >
+                {j.title}
+              </h5>
+
+              <div className="my-3.5 p-2.5 rounded-xl bg-black/30 border border-[#F2C14E]/20 space-y-1.5 text-center">
+                <div className="text-xs font-semibold text-[#FFE5A3]">
+                  Hình tượng: <strong className="text-white">{j.badge}</strong>
+                </div>
+                <div className="text-[#F2C14E] text-xs font-bold flex items-center justify-center gap-1">
+                  <span>↓</span>
+                  <span className="text-[11px] uppercase tracking-wider">{j.arrowText}</span>
+                </div>
+              </div>
+
+              <p className="text-xs sm:text-sm text-[#FFE5A3]/90 leading-relaxed mt-2">
+                {j.desc}
+              </p>
+            </div>
+
+            <div className="mt-5 pt-3 border-t border-[#F2C14E]/20">
+              <button
+                type="button"
+                onClick={() => onKeywordClick(j.popupKw)}
+                className="w-full py-2 px-3 rounded-xl bg-[#2A1B10] hover:bg-[#F2C14E] text-[#FFE5A3] hover:text-[#120A05] text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-[#F2C14E]/40 shadow-sm cursor-pointer"
+                title={`Bấm để xem chú thích chi tiết lời Thầy về ${j.title}`}
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#F2C14E]" />
+                <span>Xem Lời Khai Thị {j.popupRef}</span>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// 🪷 Infographic 2: Tam Bảo Bên Ngoài & Tam Bảo Nơi Tự Thân (Cây phân nhánh đối sánh)
+function TamBaoInnerOuterBranch({ onKeywordClick }: { onKeywordClick: (kw: string) => void }) {
+  return (
+    <div className="my-10 space-y-4 select-none">
+      <div className="text-center mb-6">
+        <span className="px-3.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[#FFDE59] text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-1.5 shadow-sm">
+          <Layers className="w-3.5 h-3.5 text-[#F2C14E]" />
+          <span>Infographic • Nhị Thể Tam Bảo</span>
+        </span>
+        <h4
+          style={{ fontFamily: "'UTM Niagara', var(--font-playfair), 'Playfair Display', serif" }}
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#FFE5A3] mt-2 tracking-wider uppercase"
+        >
+          TAM BẢO BÊN NGOÀI &amp; TAM BẢO NƠI TỰ THÂN
+        </h4>
+        <div className="w-24 h-[1.5px] bg-gradient-to-r from-transparent via-[#F2C14E] to-transparent mx-auto mt-2" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Nhánh 1: TAM BẢO BÊN NGOÀI */}
+        <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-[#29180D] via-[#1E1209] to-[#140C07] border-2 border-[#F2C14E]/40 hover:border-[#F2C14E] transition-all shadow-xl space-y-4 flex flex-col justify-between group">
+          <div>
+            <div className="flex items-center justify-between gap-2 border-b border-[#F2C14E]/20 pb-3">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#F2C14E]">
+                  Hình tướng thế gian
+                </span>
+                <h5
+                  style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                  className="text-lg font-bold text-[#FFDE59] group-hover:text-white transition-colors"
+                >
+                  TAM BẢO BÊN NGOÀI (NGOẠI TẠI)
+                </h5>
+              </div>
+              <span className="text-2xl">🏛️</span>
+            </div>
+
+            <p className="text-xs italic text-[#FFE5A3]/80 my-3">
+              Hình ảnh tôn nghiêm của Tam Bảo nơi chốn già lam nâng đỡ sơ tâm, gieo duyên lành giải thoát.
+            </p>
+
+            <div className="space-y-3 mt-4">
+              <div className="p-3 rounded-xl bg-black/40 border border-[#F2C14E]/20 flex items-start gap-3">
+                <span className="text-xl shrink-0 mt-0.5">🪷</span>
+                <div>
+                  <h6 className="text-xs font-bold text-[#FFDE59] uppercase">PHẬT BẢO</h6>
+                  <p className="text-xs text-[#FFE5A3]/90 mt-0.5">
+                    Tôn tượng Phật, tranh ảnh Phật trang nghiêm, nhắc nhở tấm gương giác ngộ viên mãn của Đấng Từ Phụ.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-black/40 border border-[#F2C14E]/20 flex items-start gap-3">
+                <span className="text-xl shrink-0 mt-0.5">📖</span>
+                <div>
+                  <h6 className="text-xs font-bold text-[#FFDE59] uppercase">PHÁP BẢO</h6>
+                  <p className="text-xs text-[#FFE5A3]/90 mt-0.5">
+                    Kinh sách, băng giảng, lời dạy chánh biến tri chỉ rõ con đường chuyển hóa khổ đau thành an lạc.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-black/40 border border-[#F2C14E]/20 flex items-start gap-3">
+                <span className="text-xl shrink-0 mt-0.5">👥</span>
+                <div>
+                  <h6 className="text-xs font-bold text-[#FFDE59] uppercase">TĂNG BẢO</h6>
+                  <p className="text-xs text-[#FFE5A3]/90 mt-0.5">
+                    Đoàn thể xuất gia hòa hợp, những người thầy, người bạn đồng hành sống đời giới hạnh thanh tịnh.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-3 border-t border-[#F2C14E]/20">
+            <button
+              type="button"
+              onClick={() => onKeywordClick('Tam Bảo bên ngoài')}
+              className="w-full py-2 px-3 rounded-xl bg-[#2A1B10] hover:bg-[#F2C14E] text-[#FFE5A3] hover:text-[#120A05] text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-[#F2C14E]/40 shadow-sm cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#F2C14E]" />
+              <span>Xem Lời Khai Thị Về Tam Bảo Ngoại [4]</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Nhánh 2: TAM BẢO NƠI TỰ THÂN */}
+        <div className="p-5 sm:p-6 rounded-2xl bg-gradient-to-br from-[#2D1B0F] via-[#21130A] to-[#150D06] border-2 border-[#FFDE59]/50 hover:border-[#FFDE59] transition-all shadow-xl space-y-4 flex flex-col justify-between group">
+          <div>
+            <div className="flex items-center justify-between gap-2 border-b border-[#F2C14E]/20 pb-3">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-[#FFDE59]">
+                  Tâm tính nội tại
+                </span>
+                <h5
+                  style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                  className="text-lg font-bold text-[#FFDE59] group-hover:text-white transition-colors"
+                >
+                  TAM BẢO NƠI TỰ THÂN (NỘI TẠI)
+                </h5>
+              </div>
+              <span className="text-2xl">✨</span>
+            </div>
+
+            <p className="text-xs italic text-[#FFE5A3]/80 my-3">
+              Ánh sáng giác ngộ không ở đâu xa, mà được nuôi dưỡng ngay trong tự tâm qua từng phút giây tỉnh thức.
+            </p>
+
+            <div className="space-y-3 mt-4">
+              <div className="p-3 rounded-xl bg-black/40 border border-[#F2C14E]/20 flex items-start gap-3">
+                <span className="text-xl shrink-0 mt-0.5">✨</span>
+                <div>
+                  <h6 className="text-xs font-bold text-[#FFDE59] uppercase">PHẬT LÀ GIÁC NGỘ</h6>
+                  <p className="text-xs text-[#FFE5A3]/90 mt-0.5">
+                    Năng lực tỉnh thức bên trong chính mình. Phật chính là tâm sáng suốt, nhận biết rõ ràng mọi suy nghĩ và hành động.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-black/40 border border-[#F2C14E]/20 flex items-start gap-3">
+                <span className="text-xl shrink-0 mt-0.5">🌱</span>
+                <div>
+                  <h6 className="text-xs font-bold text-[#FFDE59] uppercase">PHÁP LÀ KHỞI NGUYỆN TU HỌC</h6>
+                  <p className="text-xs text-[#FFE5A3]/90 mt-0.5">
+                    Ý niệm muốn hướng thiện, muốn tu học Phật pháp. Năng lượng thôi thúc hướng thượng trong tâm chính là Pháp bảo bên trong.
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-3 rounded-xl bg-black/40 border border-[#F2C14E]/20 flex items-start gap-3">
+                <span className="text-xl shrink-0 mt-0.5">🪷</span>
+                <div>
+                  <h6 className="text-xs font-bold text-[#FFDE59] uppercase">TĂNG LÀ TÂM THANH TỊNH</h6>
+                  <p className="text-xs text-[#FFE5A3]/90 mt-0.5">
+                    Không hướng tâm vào điều tiêu cực, xấu ác. Ngay khoảnh khắc tâm an định, trong sáng thì Tăng bảo đang hiển lộ trong ta.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-3 border-t border-[#F2C14E]/20">
+            <button
+              type="button"
+              onClick={() => onKeywordClick('Tam Bảo nơi tự thân')}
+              className="w-full py-2 px-3 rounded-xl bg-[#2A1B10] hover:bg-[#F2C14E] text-[#FFE5A3] hover:text-[#120A05] text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-[#F2C14E]/40 shadow-sm cursor-pointer"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#F2C14E]" />
+              <span>Xem Lời Khai Thị Về Tam Bảo Tự Thân [5]</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// 🪷 Infographic 3: Tam Bảo Hiện Diện Trong Đời Sống Gia Đình (3 Thẻ Ngang)
+function TamBaoInDailyLifeGrid() {
+  const cards = [
+    {
+      role: 'ĐỨC PHẬT TRONG MÁI ẤM',
+      title: 'PHẬT',
+      subtitle: 'Người chồng là Phật, người con là Phật',
+      desc: 'Quán chiếu sâu sắc để nhận ra những vị Bồ Tát dễ thương, gần gũi đang cùng chung sống và nâng đỡ ta mỗi ngày.',
+      icon: '🪷',
+    },
+    {
+      role: 'PHÁP BẢO NUÔI DƯỠNG',
+      title: 'PHÁP',
+      subtitle: 'Mâm cơm ấm cúng & Lời sẻ chia',
+      desc: 'Khoảnh khắc có mặt trọn vẹn bên nhau, bữa cơm gia đình và lời nói ái ngữ chính là giáo pháp dưỡng nuôi hạnh phúc.',
+      icon: '🍲',
+    },
+    {
+      role: 'TĂNG ĐOÀN GIA ĐÌNH',
+      title: 'TĂNG',
+      subtitle: 'Sự hòa hợp, lắng nghe & Nâng đỡ',
+      desc: 'Mái ấm có sự hòa hợp, lắng nghe và nâng đỡ nhau vượt qua khó khăn chính là hiện thân sống động của Tăng thân giữa đời thường.',
+      icon: '🤝',
+    },
+  ];
+
+  return (
+    <div className="my-10 space-y-4 select-none">
+      <div className="text-center mb-6">
+        <span className="px-3.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[#FFDE59] text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-1.5 shadow-sm">
+          <Compass className="w-3.5 h-3.5 text-[#F2C14E]" />
+          <span>Thực Tại Hiện Tiền • Tam Bảo Trong Mái Ấm</span>
+        </span>
+        <h4
+          style={{ fontFamily: "'UTM Niagara', var(--font-playfair), 'Playfair Display', serif" }}
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#FFE5A3] mt-2 tracking-wider uppercase"
+        >
+          TAM BẢO HIỆN DIỆN TRONG ĐỜI SỐNG GIA ĐÌNH
+        </h4>
+        <div className="w-24 h-[1.5px] bg-gradient-to-r from-transparent via-[#F2C14E] to-transparent mx-auto mt-2" />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {cards.map((c, idx) => (
+          <div
+            key={idx}
+            className="p-5 sm:p-6 rounded-2xl bg-gradient-to-b from-[#28180E] to-[#1A0F08] border border-[#F2C14E]/35 hover:border-[#FFDE59] transition-all hover:scale-[1.02] shadow-xl flex flex-col justify-between group"
+          >
+            <div>
+              <div className="flex items-center justify-between gap-2 mb-3">
+                <span className="text-2xl p-2 rounded-xl bg-black/40 border border-[#F2C14E]/30">
+                  {c.icon}
+                </span>
+                <span className="text-[10px] font-bold uppercase text-[#F2C14E] tracking-wider">
+                  {c.role}
+                </span>
+              </div>
+
+              <h5
+                style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                className="text-xl font-bold text-[#FFDE59] group-hover:text-white transition-colors"
+              >
+                {c.title}
+              </h5>
+              <div className="text-xs font-semibold text-[#FFE5A3] mt-1 mb-2">
+                {c.subtitle}
+              </div>
+              <div className="w-10 h-0.5 bg-[#F2C14E]/40 mb-3 group-hover:w-20 transition-all" />
+              <p className="text-xs sm:text-sm text-[#FFE5A3]/90 leading-relaxed">
+                {c.desc}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// 🪷 Infographic 4: Sáu Phương Pháp Thực Tập Tam Quy Mỗi Ngày (6 Thẻ Điều Hướng Hành Trì)
+function TamQuyDailyPracticesGrid() {
+  const practices = [
+    {
+      icon: '🌱',
+      title: 'BỒ ĐỀ TÂM',
+      action: 'Phát nguyện và định hướng con đường tu học',
+      desc: 'Khơi dậy sơ tâm thanh tịnh, đặt nền móng vững chắc cho mọi công đức tu tập.',
+      link: '/tong-chi-tu-hoc/bo-de-tam-khoi-nguon-thien-phap',
+      btnText: 'Khám phá Bồ Đề Tâm',
+    },
+    {
+      icon: '🪷',
+      title: 'NGŨ GIỚI',
+      action: 'Giữ gìn nền tảng đạo đức sau khi quy y',
+      desc: 'Năm điều đạo đức căn bản giúp bảo vệ thân tâm, kiến tạo đời sống an lành hạnh phúc.',
+      link: '/tong-chi-tu-hoc/ngu-gioi',
+      btnText: 'Khám phá Ngũ Giới',
+    },
+    {
+      icon: '🙏',
+      title: 'LẠY PHẬT',
+      action: 'Thực tập nuôi lớn lòng tri ân và trở về',
+      desc: 'Cúi đầu kính lạy trước Ba Ngôi Báu, buông bỏ ngã mạn, nuôi dưỡng tâm khiêm hạ chí thành.',
+      link: '/tong-chi-tu-hoc#phuong-phap-hanh-tri',
+      btnText: 'Phương pháp Lạy Phật',
+    },
+    {
+      icon: '📖',
+      title: 'TỤNG KINH',
+      action: 'Tiếp xúc sâu sắc với lời Phật dạy',
+      desc: 'Mỗi lời kinh là một dòng suối pháp mát lành, gột rửa tâm tư và mở mang trí tuệ giải thoát.',
+      link: '/tong-chi-tu-hoc#phuong-phap-hanh-tri',
+      btnText: 'Phương pháp Tụng Kinh',
+    },
+    {
+      icon: '🎧',
+      title: 'NGHE PHÁP',
+      action: 'Nuôi dưỡng chánh kiến và hiểu biết đúng đắn',
+      desc: 'Lắng nghe diệu pháp từ chư tôn đức để giải tỏa vướng mắc, tinh tiến trên đường thiện lành.',
+      link: '/tong-chi-tu-hoc#phuong-phap-hanh-tri',
+      btnText: 'Phương pháp Nghe Pháp',
+    },
+    {
+      icon: '🤲',
+      title: 'PHỤNG SỰ',
+      action: 'Đưa lòng tri ân Tam Bảo vào hành động',
+      desc: 'Biến lời dạy thành việc làm cụ thể: cúng dường, công quả, đem niềm vui chan rải muôn người.',
+      link: '/tong-chi-tu-hoc#phuong-phap-hanh-tri',
+      btnText: 'Hạnh Nguyện Phụng Sự',
+    },
+  ];
+
+  return (
+    <div className="my-10 space-y-4 select-none">
+      <div className="text-center mb-6">
+        <span className="px-3.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[#FFDE59] text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-1.5 shadow-sm">
+          <Leaf className="w-3.5 h-3.5 text-[#F2C14E]" />
+          <span>Hành Trì Hằng Ngày • Nuôi Dưỡng Đức Tin</span>
+        </span>
+        <h4
+          style={{ fontFamily: "'UTM Niagara', var(--font-playfair), 'Playfair Display', serif" }}
+          className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#FFE5A3] mt-2 tracking-wider uppercase"
+        >
+          SÁU PHƯƠNG PHÁP THỰC TẬP TAM QUY MỖI NGÀY
+        </h4>
+        <div className="w-24 h-[1.5px] bg-gradient-to-r from-transparent via-[#F2C14E] to-transparent mx-auto mt-2" />
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {practices.map((p, idx) => (
+          <div
+            key={idx}
+            className="p-5 rounded-2xl bg-[#23140B] border border-[#F2C14E]/30 hover:border-[#FFDE59] transition-all hover:scale-[1.01] shadow-lg flex flex-col justify-between group"
+          >
+            <div>
+              <div className="flex items-center gap-2.5 mb-2">
+                <span className="text-2xl p-2 rounded-xl bg-black/40 border border-[#F2C14E]/30">
+                  {p.icon}
+                </span>
+                <div>
+                  <span className="text-[10px] font-bold text-[#F2C14E] uppercase tracking-wider">
+                    Hành Trì
+                  </span>
+                  <h5
+                    style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                    className="text-base font-bold text-[#FFDE59] group-hover:text-white transition-colors"
+                  >
+                    {p.title}
+                  </h5>
+                </div>
+              </div>
+
+              <p className="text-xs font-semibold text-[#FFE5A3] mt-2 mb-1">
+                {p.action}
+              </p>
+              <p className="text-[11px] sm:text-xs text-[#FFE5A3]/80 leading-relaxed mb-4">
+                {p.desc}
+              </p>
+            </div>
+
+            <Link
+              href={p.link}
+              className="inline-flex items-center justify-between w-full py-2 px-3 rounded-xl bg-[#2E1A0F] hover:bg-[#F2C14E] text-[#FFE5A3] hover:text-[#120A05] text-xs font-bold transition-all border border-[#F2C14E]/30 pt-2"
+            >
+              <span>{p.btnText}</span>
+              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+            </Link>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// 🪷 Block Parser Data Structure
+type SectionElement =
+  | { type: 'paragraph'; text: string }
+  | { type: 'list'; ordered: boolean; items: { marker: string; text: string }[] }
+  | { type: 'poem'; stanzas: string[] }
+  | { type: 'quote'; quote: string; quoteAuthor?: string }
+  | { type: 'image'; src: string; caption?: string; alt?: string; align?: 'center' | 'left' | 'right' }
+  | { type: 'divider' };
+
+type SectionBlock = {
+  heading: string;
+  sectionId: string;
+  quote?: string;
+  quoteAuthor?: string;
+  elements: SectionElement[];
+  hasFourPillars?: boolean;
+  hasFourDrawers?: boolean;
+  hasTamQuyThreeJewels?: boolean;
+  hasTamBaoInnerOuter?: boolean;
+  hasTamBaoDailyLife?: boolean;
+  hasTamQuyPractices?: boolean;
+};
+
+// 🪷 Xử lý phân nhóm & gộp thơ cho từng section
+function processSectionElements(elements: SectionElement[]): SectionElement[] {
+  // 🪷 Bước 1: Gộp các câu thơ đơn lẻ (paragraph) liên tiếp (từ 2 câu trở lên) thành các khổ thơ (poem)
+  const elementsWithPoems: SectionElement[] = [];
+  let pendingVerses: string[] = [];
+
+  const flushPendingVerses = () => {
+    if (pendingVerses.length === 0) return;
+    if (pendingVerses.length >= 2) {
+      elementsWithPoems.push({
+        type: 'poem',
+        stanzas: [pendingVerses.join('\n')],
+      });
+    } else {
+      for (const v of pendingVerses) {
+        elementsWithPoems.push({ type: 'paragraph', text: v });
+      }
+    }
+    pendingVerses = [];
+  };
+
+  for (const el of elements) {
+    if (el.type === 'paragraph' && isShortVerseLine(el.text)) {
+      pendingVerses.push(el.text.trim());
+    } else {
+      flushPendingVerses();
+      elementsWithPoems.push(el);
+    }
+  }
+  flushPendingVerses();
+
+  // 🪷 Bước 2: Tối ưu gộp các khối thơ liên tiếp thành một bài thơ hoàn chỉnh
+  const mergedElements: SectionElement[] = [];
+  let currentPoemStanzas: string[] = [];
+
+  for (const el of elementsWithPoems) {
+    if (el.type === 'poem') {
+      currentPoemStanzas.push(...el.stanzas);
+    } else {
+      if (currentPoemStanzas.length > 0) {
+        mergedElements.push({ type: 'poem', stanzas: currentPoemStanzas });
+        currentPoemStanzas = [];
+      }
+      mergedElements.push(el);
+    }
+  }
+  if (currentPoemStanzas.length > 0) {
+    mergedElements.push({ type: 'poem', stanzas: currentPoemStanzas });
+  }
+
+  return mergedElements;
+}
+
+function parseSections(raw: string): { sections: SectionBlock[]; endQuote?: { text: string; author?: string } } {
+  if (!raw) return { sections: [] };
+
+  // Convert HTML linebreaks to newlines if HTML was passed
+  const text = raw
+    .replace(/&gt;/g, '>')
+    .replace(/&lt;/g, '<')
+    .replace(/<br\s*[/]?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n\n')
+    .replace(/<hr[^>]*\/?>/gi, '\n\n---\n\n')
+    .replace(/<\/?(?:div|p|section|article|header|footer)[^>]*>/gi, '\n')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&#8230;/g, '...')
+    .replace(/&hellip;/g, '...')
+    .replace(/[—–]/g, '-')
+    .trim();
+
+  // Clean raw content by removing banner header lines
+  const cleaned = text
+    .replace(/^BANNER[\s\S]*?\.jpg\s*/im, '')
+    .replace(/BANNER,\s*TIÊU ĐỀ,\s*GIỚI THIỆU/gi, '')
+    .trim();
+
+  const lines = cleaned.split('\n');
+  const sections: SectionBlock[] = [];
+  let currentSection: SectionBlock | null = null;
+  let endQuoteData: { text: string; author?: string } | undefined = undefined;
+
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i].trim();
+    if (!line) {
+      i++;
+      continue;
+    }
+
+    // Stop at Reference section (handled by footer component)
+    if (/^TÀI LIỆU THAM KHẢO/i.test(line)) {
+      break;
+    }
+
+    // End Quote section
+    if (/^QUOTE CUỐI TRANG/i.test(line) || (line.includes('“Bạn nên hiểu') && line.includes('bình an là sự thực tập'))) {
+      i++;
+      const qLines: string[] = [];
+      if (line.includes('“Bạn nên hiểu')) {
+        qLines.push(line);
+      }
+      let authorName = 'Vô Trí - Tâm Hòa';
+      while (i < lines.length && !/^TÀI LIỆU THAM KHẢO/i.test(lines[i].trim())) {
+        const nextL = lines[i].trim();
+        if (nextL) {
+          if (/^(Vô Trí|Thích Tâm Hòa|Sa Môn)/i.test(nextL)) {
+            authorName = nextL;
+          } else {
+            qLines.push(nextL);
+          }
+        }
+        i++;
+      }
+      endQuoteData = { text: qLines.join('\n'), author: authorName };
+      continue;
+    }
+
+    // Check if line is an Image (Markdown, HTML img, or Bracket tag)
+    const mdImgMatch = line.match(/^!\[(.*?)\]\((.*?)\)/);
+    const htmlImgMatch = line.match(/<img\s+[^>]*src=["']([^"']+)["'][^>]*alt=["']?([^"'>]*)["']?/i) || line.match(/<img\s+[^>]*src=["']([^"']+)["']/i);
+    const bracketImgMatch = line.match(/^\[(?:ẢNH|HÌNH|ANH|IMAGE):\s*([^\s\]|]+)(?:\|([^\]]+))?\]/i);
+
+    if (mdImgMatch || htmlImgMatch || bracketImgMatch) {
+      let src = '';
+      let caption = '';
+      let align: 'center' | 'left' | 'right' = 'center';
+
+      if (mdImgMatch) {
+        const rawCap = mdImgMatch[1]?.trim() || '';
+        src = mdImgMatch[2]?.trim() || '';
+        if (rawCap.startsWith('left:')) {
+          align = 'left';
+          caption = rawCap.replace(/^left:\s*/, '');
+        } else if (rawCap.startsWith('right:')) {
+          align = 'right';
+          caption = rawCap.replace(/^right:\s*/, '');
+        } else if (rawCap.startsWith('center:')) {
+          align = 'center';
+          caption = rawCap.replace(/^center:\s*/, '');
+        } else {
+          caption = rawCap;
+        }
+      } else if (htmlImgMatch) {
+        src = htmlImgMatch[1]?.trim() || '';
+        caption = htmlImgMatch[2]?.trim() || '';
+      } else if (bracketImgMatch) {
+        src = bracketImgMatch[1]?.trim() || '';
+        const params = bracketImgMatch[2] || '';
+        if (params.includes('align=left')) align = 'left';
+        if (params.includes('align=right')) align = 'right';
+        const capMatch = params.match(/caption=([^|]+)/);
+        if (capMatch) caption = capMatch[1].trim();
+        else if (params && !params.includes('=')) caption = params.trim();
+      }
+
+      if (src) {
+        if (!currentSection) {
+          currentSection = {
+            heading: '',
+            sectionId: 'intro',
+            elements: [],
+          };
+        }
+        currentSection.elements.push({
+          type: 'image',
+          src: getImageUrl(src),
+          caption,
+          alt: caption || 'Hình ảnh minh họa',
+          align,
+        });
+        i++;
+        continue;
+      }
+    }
+
+    // 1. Kiểm tra nếu là đường phân cách (---, ———, ***, <hr>, wp-block-separator...)
+    if (isDividerLine(line)) {
+      if (!currentSection) {
+        currentSection = {
+          heading: '',
+          sectionId: 'intro',
+          elements: [],
+        };
+      }
+      const lastEl = currentSection.elements[currentSection.elements.length - 1];
+      if (!lastEl || lastEl.type !== 'divider') {
+        currentSection.elements.push({ type: 'divider' });
+      }
+      i++;
+      continue;
+    }
+
+    // 2. Check if line is a Section Heading (Markdown #, ##, ###, #### or uppercase heading)
+    const strippedLine = line.replace(/^#{1,4}\s+/, '').replace(/^\*\*|\*\*$/g, '').replace(/<[^>]+>/g, '').trim();
+    const isMdHeading = /^#{1,4}\s+/.test(line);
+    const hasLetters = /[a-zA-ZÀ-ỹ]/.test(strippedLine);
+    const isHeading =
+      hasLetters &&
+      (isMdHeading ||
+        ((strippedLine.startsWith('BỒ ĐỀ TÂM') ||
+          strippedLine.startsWith('SỐNG VỚI') ||
+          strippedLine.startsWith('ĐỂ BỒ ĐỀ TÂM') ||
+          strippedLine.startsWith('TAM QUY') ||
+          strippedLine.startsWith('NGŨ GIỚI') ||
+          (strippedLine === strippedLine.toUpperCase() && !strippedLine.startsWith('>') && !strippedLine.startsWith('!['))) &&
+        strippedLine.length < 80 &&
+        strippedLine.length > 3 &&
+        !strippedLine.includes('“') &&
+        !strippedLine.includes('”') &&
+        !strippedLine.startsWith('📘') &&
+        !strippedLine.startsWith('VIDEO:') &&
+        !strippedLine.startsWith('Sa Môn') &&
+        !strippedLine.startsWith('Vô Trí')));
+
+    if (isHeading) {
+      if (currentSection) {
+        currentSection.elements = processSectionElements(currentSection.elements);
+        sections.push(currentSection);
+      }
+      const cleanHeading = line.replace(/^#{1,4}\s+/, '').replace(/^\*\*|\*\*$/g, '').replace(/<[^>]+>/g, '').trim();
+      currentSection = {
+        heading: cleanHeading,
+        sectionId: toSectionId(cleanHeading),
+        elements: [],
+      };
+      i++;
+      continue;
+    }
+
+    // Check if line is Quote / Kệ trích dẫn (Chỉ kích hoạt khi có ký tự > rõ ràng)
+    const isQuoteExplicit =
+      line.startsWith('>') ||
+      line.startsWith('&gt;') ||
+      /^Quote:\s*/i.test(line);
+
+    if (isQuoteExplicit) {
+      const cleanFirstLine = line
+        .replace(/^(?:>|&gt;|Quote:)\s*/i, '')
+        .replace(/<[^>]+>/g, '')
+        .replace(/^[“"”]{1,3}|[“"”]{1,3}$/g, '')
+        .trim();
+      const qLines = cleanFirstLine ? [cleanFirstLine] : [];
+      let quoteAuthor = '';
+      i++;
+      while (i < lines.length) {
+        const nextL = lines[i].trim();
+        if (!nextL) {
+          // Lookahead: kiểm tra xem dòng không trống tiếp theo có phải là dòng tác giả hoặc tiếp tục quote không
+          let peekIdx = i + 1;
+          while (peekIdx < lines.length && !lines[peekIdx].trim()) {
+            peekIdx++;
+          }
+          if (peekIdx < lines.length) {
+            const peekL = lines[peekIdx].trim();
+            if (peekL.startsWith('>') || peekL.startsWith('&gt;')) {
+              i = peekIdx;
+              continue;
+            }
+            if (/^(?:—|–|-|~|\*|_|<i>|<em|)(?:Tác giả[:\s-]*|Sa Môn|Vô Trí|Thích Tâm Hòa|Tâm Hòa)/i.test(peekL)) {
+              quoteAuthor = peekL.replace(/^(?:—|–|-|~|\*|_|<i>|<em|Tác giả[:\s-]*)+/i, '').replace(/(?:\*|_|<\/i>|<\/em>|\s)+$/i, '').trim();
+              i = peekIdx + 1;
+              break;
+            }
+          }
+          i++;
+          break;
+        }
+
+        if (/^(?:—|–|-|~|\*|_|<i>|<em|)(?:Tác giả[:\s-]*|Sa Môn|Vô Trí|Thích Tâm Hòa|Tâm Hòa)/i.test(nextL)) {
+          quoteAuthor = nextL.replace(/^(?:—|–|-|~|\*|_|<i>|<em|Tác giả[:\s-]*)+/i, '').replace(/(?:\*|_|<\/i>|<\/em>|\s)+$/i, '').trim();
+          i++;
+          break;
+        }
+
+        if (
+          nextL.startsWith('>') ||
+          nextL.startsWith('&gt;')
+        ) {
+          const cleanL = nextL
+            .replace(/^(?:>|&gt;|Quote:)\s*/i, '')
+            .replace(/^[“"”]{1,3}|[“"”]{1,3}$/g, '')
+            .trim();
+          if (cleanL) {
+            if (/^(?:—|–|-|~|\*|_|<i>|<em|)(?:Tác giả[:\s-]*|Sa Môn|Vô Trí|Thích Tâm Hòa|Tâm Hòa)/i.test(cleanL)) {
+              quoteAuthor = cleanL.replace(/^(?:—|–|-|~|\*|_|<i>|<em|Tác giả[:\s-]*)+/i, '').replace(/(?:\*|_|<\/i>|<\/em>|\s)+$/i, '').trim();
+            } else {
+              qLines.push(cleanL);
+            }
+          }
+          i++;
+          continue;
+        }
+
+        if (
+          /^#{1,4}\s+/.test(nextL) ||
+          nextL.startsWith('“““') ||
+          nextL.startsWith('"""') ||
+          /^!\[/.test(nextL) ||
+          /^<img/i.test(nextL) ||
+          /^(Infographic|Hình tam giác|4 card|4 Ngăn kéo|Ngăn kéo card|QUOTE CUỐI|TÀI LIỆU)/i.test(nextL)
+        ) {
+          break;
+        }
+
+        // Multiline quote continuation
+        const cleanContent = nextL.replace(/^[“"”]{1,3}|[“"”]{1,3}$/g, '').trim();
+        if (/^(?:—|–|-|~|\*|_|<i>|<em|)(?:Tác giả[:\s-]*|Sa Môn|Vô Trí|Thích Tâm Hòa|Tâm Hòa)/i.test(cleanContent)) {
+          quoteAuthor = cleanContent.replace(/^(?:—|–|-|~|\*|_|<i>|<em|Tác giả[:\s-]*)+/i, '').replace(/(?:\*|_|<\/i>|<\/em>|\s)+$/i, '').trim();
+          i++;
+          break;
+        }
+
+        qLines.push(cleanContent);
+        if (nextL.includes('”') || nextL.endsWith('"') || nextL.endsWith('”') || nextL.endsWith('”.')) {
+          let peekIdx = i + 1;
+          while (peekIdx < lines.length && !lines[peekIdx].trim()) {
+            peekIdx++;
+          }
+          if (peekIdx < lines.length && /^(?:—|–|-|~|\*|_|<i>|<em|)(?:Tác giả[:\s-]*|Sa Môn|Vô Trí|Thích Tâm Hòa|Tâm Hòa)/i.test(lines[peekIdx].trim())) {
+            quoteAuthor = lines[peekIdx].trim().replace(/^(?:—|–|-|~|\*|_|<i>|<em|Tác giả[:\s-]*)+/i, '').replace(/(?:\*|_|<\/i>|<\/em>|\s)+$/i, '').trim();
+            i = peekIdx + 1;
+          } else {
+            i++;
+          }
+          break;
+        }
+        i++;
+      }
+
+      // Check if last collected line in qLines is an author line
+      if (qLines.length > 0) {
+        const lastL = qLines[qLines.length - 1];
+        if (/^(?:—|–|-|~|\*|_|<i>|<em|)(?:Tác giả[:\s-]*|Sa Môn|Vô Trí|Thích Tâm Hòa|Tâm Hòa)/i.test(lastL)) {
+          quoteAuthor = lastL.replace(/^(?:—|–|-|~|\*|_|<i>|<em|Tác giả[:\s-]*)+/i, '').replace(/(?:\*|_|<\/i>|<\/em>|\s)+$/i, '').trim();
+          qLines.pop();
+        }
+      }
+
+      if (qLines.length > 0) {
+        if (!currentSection) {
+          currentSection = {
+            heading: '',
+            sectionId: 'intro',
+            elements: [],
+          };
+        }
+        if (!currentSection.quote) {
+          currentSection.quote = qLines.join('\n');
+          if (quoteAuthor) currentSection.quoteAuthor = quoteAuthor;
+        } else {
+          currentSection.elements.push({
+            type: 'quote',
+            quote: qLines.join('\n'),
+            quoteAuthor: quoteAuthor || undefined,
+          });
+        }
+      }
+      continue;
+    }
+
+    // Check for Infographics triggers
+    if (/4\s*card/i.test(line) || line.includes('🌱 Ham học hỏi giáo pháp')) {
+      if (currentSection) currentSection.hasFourPillars = true;
+      i++;
+      while (i < lines.length) {
+        const nextL = lines[i].trim().replace(/^#{1,4}\s+/, '').replace(/^\*\*|\*\*$/g, '').trim();
+        if (/^(ĐỂ BỒ ĐỀ TÂM|SỐNG VỚI|4 Ngăn kéo|Ngăn kéo card|QUOTE CUỐI|TÀI LIỆU)/i.test(nextL)) {
+          break;
+        }
+        i++;
+      }
+      continue;
+    }
+
+    if (/Ngăn kéo card/i.test(line) || (line.includes('🌿 Nền tảng tu học') && line.includes('Những nền tảng'))) {
+      if (currentSection) currentSection.hasFourDrawers = true;
+      i++;
+      while (i < lines.length) {
+        const nextL = lines[i].trim().replace(/^#{1,4}\s+/, '').replace(/^\*\*|\*\*$/g, '').trim();
+        if (/^(QUOTE CUỐI|TÀI LIỆU)/i.test(nextL) || (nextL.includes('“Bạn nên hiểu') && nextL.includes('bình an là sự thực tập'))) {
+          break;
+        }
+        i++;
+      }
+      continue;
+    }
+
+    // 🪷 Check for Tam Quy Infographics triggers
+    if (/INFOGRAPHIC_TAM_QUY_BA_VIEN_NGOC|ÂN ĐỨC CỦA PHẬT.*ÂN ĐỨC CỦA PHÁP|Bác sĩ.*Thuốc.*Điều dưỡng/i.test(line)) {
+      if (currentSection) currentSection.hasTamQuyThreeJewels = true;
+      i++;
+      while (i < lines.length) {
+        const nextL = lines[i].trim();
+        if (nextL.startsWith('>') || nextL.startsWith('##') || nextL.startsWith('“') || nextL.startsWith('Quote') || nextL.includes('ba viên ngọc quý')) {
+          break;
+        }
+        i++;
+      }
+      continue;
+    }
+
+    if (/INFOGRAPHIC_TAM_BAO_TU_THAN|TAM BẢO BÊN NGOÀI.*TAM BẢO NƠI TỰ THÂN/i.test(line)) {
+      if (currentSection) currentSection.hasTamBaoInnerOuter = true;
+      i++;
+      while (i < lines.length) {
+        const nextL = lines[i].trim();
+        if (nextL.startsWith('>') || nextL.startsWith('##') || nextL.includes('Tam Bảo nơi tự thân là lời nhắc')) {
+          break;
+        }
+        i++;
+      }
+      continue;
+    }
+
+    if (/INFOGRAPHIC_TAM_BAO_DOI_SONG|Có thể làm 3 hình ảnh theo khối ngang/i.test(line)) {
+      if (currentSection) currentSection.hasTamBaoDailyLife = true;
+      i++;
+      while (i < lines.length) {
+        const nextL = lines[i].trim();
+        if (nextL.startsWith('>') || nextL.startsWith('##') || nextL.includes('Quy y Tam Bảo không đưa chúng ta')) {
+          break;
+        }
+        i++;
+      }
+      continue;
+    }
+
+    if (/INFOGRAPHIC_THUC_TAP_TAM_QUY|Phát nguyện và định hướng con đường tu học/i.test(line)) {
+      if (currentSection) currentSection.hasTamQuyPractices = true;
+      i++;
+      while (i < lines.length) {
+        const nextL = lines[i].trim();
+        if (nextL.startsWith('>') || nextL.startsWith('##') || /^(QUOTE CUỐI|TÀI LIỆU|Gắng con nhé)/i.test(nextL)) {
+          break;
+        }
+        i++;
+      }
+      continue;
+    }
+
+    // Skip isolated Infographic diagram text if it exists (không nhảy cóc bỏ qua ảnh hay đoạn văn phía dưới)
+    if (/^(?:Infographic|Hình tam giác)\s*$/i.test(line)) {
+      i++;
+      continue;
+    }
+
+    // Gán tác giả cho quote trước đó nếu gặp dòng tên tác giả
+    if (/^(?:\*|_|<i>|<em|)(?:Tác giả[:\s-]*|)(Vô Trí\s*-\s*Tâm Hòa|Thích Tâm Hòa|Sa Môn Vô Trí|Tâm Hòa)(?:\*|_|<\/i>|<\/em>|\s)*$/i.test(line)) {
+      const auth = line.replace(/^(?:—|–|-|~|\*|_|<i>|<em|Tác giả[:\s-]*)+/i, '').replace(/(?:\*|_|<\/i>|<\/em>|\s)+$/i, '').trim();
+      if (currentSection) {
+        if (currentSection.quote && !currentSection.quoteAuthor) {
+          currentSection.quoteAuthor = auth;
+        } else if (currentSection.elements.length > 0) {
+          const lastEl = currentSection.elements[currentSection.elements.length - 1];
+          if (lastEl.type === 'quote' && !lastEl.quoteAuthor) {
+            lastEl.quoteAuthor = auth;
+          }
+        }
+      }
+      i++;
+      continue;
+    }
+
+    // 🪷 Thu thập các dòng văn bản tiếp theo
+    const pLines = [line];
+    i++;
+    while (i < lines.length) {
+      const nextL = lines[i].trim();
+      if (!nextL) {
+        // Gặp dòng trống -> dừng đoạn hiện tại
+        i++;
+        break;
+      }
+      if (
+        isDividerLine(nextL) ||
+        nextL.startsWith('>') ||
+        nextL.startsWith('&gt;') ||
+        /^#{1,4}\s+/.test(nextL) ||
+        nextL.startsWith('“““') ||
+        nextL.startsWith('"""') ||
+        /^Typography\s*lớn:/i.test(nextL) ||
+        /^Quote:/i.test(nextL) ||
+        /^!\[/.test(nextL) ||
+        /^<img/i.test(nextL) ||
+        /^\[(?:ẢNH|HÌNH|ANH|IMAGE):/i.test(nextL) ||
+        /^(Infographic|Hình tam giác|4 card|4 Ngăn kéo|Ngăn kéo card|QUOTE CUỐI|TÀI LIỆU)/i.test(nextL) ||
+        ((nextL.startsWith('BỒ ĐỀ TÂM') || nextL.startsWith('SỐNG VỚI') || nextL.startsWith('ĐỂ BỒ ĐỀ TÂM')) && nextL.length < 80)
+      ) {
+        break;
+      }
+      if (/^(?:\*|_|<i>|<em|)(?:Tác giả[:\s]*|)(Vô Trí\s*-\s*Tâm Hòa|Thích Tâm Hòa|Sa Môn Vô Trí|Tâm Hòa)(?:\*|_|<\/i>|<\/em>|\s)*$/i.test(nextL)) {
+        i++;
+        break;
+      }
+      pLines.push(nextL);
+      i++;
+    }
+
+    // Lọc bỏ dòng tác giả & các dòng phân cách (---) nếu lọt vào pLines
+    const filteredPLines = pLines.filter((pl) => {
+      const t = pl.trim();
+      if (!t) return false;
+      if (/^(?:\*|_|<i>|<em|)(?:Tác giả[:\s]*|)(Vô Trí\s*-\s*Tâm Hòa|Thích Tâm Hòa|Sa Môn Vô Trí|Tâm Hòa)(?:\*|_|<\/i>|<\/em>|\s)*$/i.test(t)) return false;
+      if (isDividerLine(t)) return false;
+      return true;
+    });
+    if (filteredPLines.length === 0) {
+      continue;
+    }
+
+    if (!currentSection) {
+      currentSection = {
+        heading: '',
+        sectionId: 'intro',
+        elements: [],
+      };
+    }
+
+    const parseListMarker = (rawL: string): { ordered: boolean; marker: string; text: string } | null => {
+      const bulletMatch = rawL.match(/^\s*(?:[-•]|\*(?!\*))\s+(.+)$/);
+      if (bulletMatch) {
+        return { ordered: false, marker: '—', text: bulletMatch[1].trim() };
+      }
+      const numMatch = rawL.match(/^\s*(\d+[.)])\s+(.+)$/);
+      if (numMatch) {
+        return { ordered: true, marker: numMatch[1], text: numMatch[2].trim() };
+      }
+      return null;
+    };
+
+    // Tách sạch các khối danh sách (- / 1)) khỏi đoạn văn xuôi hoặc khổ thơ
+    let textChunk: string[] = [];
+    let listChunk: { ordered: boolean; items: { marker: string; text: string }[] } | null = null;
+
+    const flushTextChunk = () => {
+      if (textChunk.length === 0) return;
+      const joinedText = textChunk.join('\n');
+      if (isPoemStanza(joinedText)) {
+        currentSection!.elements.push({ type: 'poem', stanzas: [joinedText] });
+      } else {
+        currentSection!.elements.push({ type: 'paragraph', text: joinedText });
+      }
+      textChunk = [];
+    };
+
+    const flushListChunk = () => {
+      if (!listChunk || listChunk.items.length === 0) return;
+      currentSection!.elements.push({
+        type: 'list',
+        ordered: listChunk.ordered,
+        items: listChunk.items,
+      });
+      listChunk = null;
+    };
+
+    for (const rawLine of filteredPLines) {
+      const listHit = parseListMarker(rawLine);
+      if (listHit) {
+        flushTextChunk();
+        if (!listChunk || listChunk.ordered !== listHit.ordered) {
+          flushListChunk();
+          listChunk = { ordered: listHit.ordered, items: [] };
+        }
+        listChunk.items.push({ marker: listHit.marker, text: listHit.text });
+      } else {
+        flushListChunk();
+        textChunk.push(rawLine);
+      }
+    }
+    flushListChunk();
+    flushTextChunk();
+  }
+
+  if (currentSection) {
+    currentSection.elements = processSectionElements(currentSection.elements);
+    sections.push(currentSection);
+  }
+
+  return { sections, endQuote: endQuoteData };
+}
+
+export function InfographicArticleRenderer({
+  rawContent,
+  author,
+  authorLink,
+  popups = [],
+  onKeywordClick = () => {},
+}: InfographicRendererProps) {
+  const [zoomImage, setZoomImage] = useState<{ src: string; caption?: string } | null>(null);
+
+  if (!rawContent) return null;
+
+  const { sections, endQuote } = parseSections(rawContent);
+  let globalParagraphIndex = 0;
+
+  return (
+    <div
+      style={{ fontFamily: "'UTM Avo', sans-serif" }}
+      className="space-y-8 max-w-3xl mx-auto text-left"
+    >
+      {sections.map((sec, idx) => (
+        <section
+          key={idx}
+          id={sec.sectionId}
+          className="scroll-mt-28 relative pt-2"
+        >
+          {/* 1. SECTION HEADING (UTM NIAGARA / PLAYFAIR DISPLAY MÀU VÀNG HOÀNG KIM) */}
+          {sec.heading && (
+            <div className="text-center pt-2 pb-1">
+              <h3
+                style={{ fontFamily: "'UTM Niagara', var(--font-playfair), 'Playfair Display', serif" }}
+                className="text-2xl sm:text-3xl md:text-4xl font-bold text-[#FFDE59] tracking-wider uppercase drop-shadow-md"
+              >
+                {sec.heading}
+              </h3>
+              {/* Nét gạch gradient 2 bên nhẹ nhàng màu vàng */}
+              <div className="w-24 sm:w-32 h-[1.5px] bg-gradient-to-r from-transparent via-[#F2C14E] to-transparent mx-auto mt-3 mb-6" />
+            </div>
+          )}
+
+          {/* 2. QUOTE / KỆ THƠ / LỜI THẦY */}
+          {sec.quote && (
+            <div className="my-6 max-w-2xl mx-auto text-center space-y-2.5 p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-[#452D1D]/95 via-[#553621]/90 to-[#321B0E]/95 border-2 border-[#F2C14E]/70 shadow-[0_0_30px_rgba(242,193,78,0.22)]">
+              <div 
+                style={{ fontFamily: "var(--font-montserrat), 'Montserrat', 'UTM Avo', sans-serif" }}
+                className="text-base sm:text-lg md:text-xl font-semibold italic text-[#FFE5A3] leading-relaxed sm:leading-loose whitespace-pre-line tracking-wide"
+              >
+                “{highlightText(sec.quote.replace(/^[“"”\s]+|[“"”\s]+$/g, ''), popups, onKeywordClick)}”
+              </div>
+              {sec.quoteAuthor && (
+                <p className="text-sm sm:text-base italic text-[#F2C14E] mt-3 font-semibold text-center">
+                  {sec.quoteAuthor.replace(/^[—–-]\s*/, '')}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* 3. PARAGRAPHS, POEMS & INLINE IMAGES */}
+          <div className="space-y-6 my-6 clearfix">
+            {sec.elements.map((el, elIdx) => {
+              if (el.type === 'quote') {
+                return (
+                  <div key={elIdx} className="my-6 max-w-2xl mx-auto text-center space-y-2.5 p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-[#452D1D]/95 via-[#553621]/90 to-[#321B0E]/95 border-2 border-[#F2C14E]/70 shadow-[0_0_30px_rgba(242,193,78,0.22)]">
+                    <div 
+                      style={{ fontFamily: "var(--font-montserrat), 'Montserrat', 'UTM Avo', sans-serif" }}
+                      className="text-base sm:text-lg md:text-xl font-semibold italic text-[#FFE5A3] leading-relaxed sm:leading-loose whitespace-pre-line tracking-wide"
+                    >
+                      “{highlightText(el.quote.replace(/^[“"”\s]+|[“"”\s]+$/g, ''), popups, onKeywordClick)}”
+                    </div>
+                    {el.quoteAuthor && (
+                      <p className="text-sm sm:text-base italic text-[#F2C14E] mt-3 font-semibold text-center">
+                        {el.quoteAuthor.replace(/^[—–-]\s*/, '')}
+                      </p>
+                    )}
+                  </div>
+                );
+              }
+
+              if (el.type === 'image') {
+                return (
+                  <div key={elIdx} className="my-8 text-center w-full max-w-2xl mx-auto select-none">
+                    <div 
+                      onClick={() => setZoomImage({ src: el.src, caption: el.caption })}
+                      className="rounded-2xl overflow-hidden border-2 border-[#F2C14E]/50 shadow-[0_10px_35px_rgba(0,0,0,0.8)] bg-black/40 group p-1 backdrop-blur-sm cursor-zoom-in relative inline-block max-w-full"
+                    >
+                      <img
+                        src={getImageUrl(el.src)}
+                        alt={el.alt || el.caption || 'Hình ảnh minh họa'}
+                        className="w-full max-h-[650px] h-auto object-contain rounded-xl transition-transform duration-500 group-hover:scale-[1.01]"
+                        loading="lazy"
+                      />
+                      <div className="absolute bottom-3 right-3 p-1.5 rounded-lg bg-black/75 text-[#F2C14E] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[11px] backdrop-blur-xs">
+                        <ZoomIn className="w-3.5 h-3.5" />
+                        <span>Phóng to</span>
+                      </div>
+                    </div>
+                    {el.caption && (
+                      <p className="mt-2.5 text-xs sm:text-sm italic text-[#FFE5A3]/90 leading-relaxed text-center max-w-xl mx-auto">
+                        ({el.caption})
+                      </p>
+                    )}
+                  </div>
+                );
+              }
+
+              // 🪷 RENDER ĐƯỜNG PHÂN CÁCH GRADIENT ĐƠN
+              if (el.type === 'divider') {
+                return (
+                  <div key={elIdx} className="w-full flex items-center justify-center my-8 sm:my-10 clear-both">
+                    <div className="w-36 sm:w-48 h-[1.5px] bg-gradient-to-r from-transparent via-[#F2C14E]/70 to-transparent" />
+                  </div>
+                );
+              }
+
+              // 🪷 RENDER THỂ THƠ (CĂN CHÍNH GIỮA, KHÔNG DROP CAP, ĐỒNG NHẤT CỠ CHỮ & MÀU SẮC, GẠCH GRADIENT KHI HOVER)
+              if (el.type === 'poem') {
+                return (
+                  <div key={elIdx} className="my-8 w-full max-w-3xl mx-auto text-center select-text">
+                    {/* Danh sách các khổ thơ */}
+                    <div className="space-y-6 sm:space-y-8">
+                      {el.stanzas.map((stanza, sIdx) => (
+                        <div key={sIdx} className="group/stanza relative py-2 sm:py-3 space-y-2.5 sm:space-y-3 cursor-default transition-all">
+                          {stanza.split('\n').map((line, lIdx) => (
+                            <p
+                              key={lIdx}
+                              style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                              className="text-lg sm:text-xl md:text-2xl not-italic font-medium text-[#FFE5A3] leading-loose md:leading-[2.6rem] tracking-wide drop-shadow-sm text-center mx-auto"
+                            >
+                              {highlightText(line, popups, onKeywordClick)}
+                            </p>
+                          ))}
+                          {/* Đường gạch gradient 2 đầu mỏng tinh tế, chỉ hiện lên khi rê chuột vào khổ thơ (hover) */}
+                          <div className="pt-3 sm:pt-4 flex justify-center">
+                            <div className="w-28 sm:w-36 h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/60 to-transparent opacity-0 group-hover/stanza:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              }
+
+              // 🪷 RENDER DANH SÁCH GẠCH ĐẦU DÒNG / ĐÁNH SỐ (KHÔNG THỤT LỀ LỆCH, MỖI MỤC MỘT DÒNG RÕ RÀNG)
+              if (el.type === 'list') {
+                return (
+                  <ul
+                    key={elIdx}
+                    style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                    className="my-4 space-y-3 pl-0 list-none"
+                  >
+                    {el.items.map((item, itemIdx) => (
+                      <li
+                        key={itemIdx}
+                        className="flex items-start gap-3 text-base sm:text-lg text-[#FFE5A3] leading-relaxed tracking-wide"
+                      >
+                        <span
+                          aria-hidden="true"
+                          className={
+                            el.ordered
+                              ? 'shrink-0 min-w-[1.75rem] pt-0.5 text-sm sm:text-base font-bold text-[#F2C14E] tabular-nums'
+                              : 'shrink-0 mt-[0.55rem] w-2 h-2 rotate-45 bg-[#F2C14E] shadow-[0_0_8px_rgba(242,193,78,0.55)]'
+                          }
+                        >
+                          {el.ordered ? item.marker : null}
+                        </span>
+                        <div className="flex-1 text-justify [text-align-last:left]">
+                          {highlightText(item.text, popups, onKeywordClick)}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                );
+              }
+
+              // 🪷 RENDER CÂU CHUYỂN TIẾP TRANG TRỌNG HOẶC ĐOẠN VĂN XUÔI
+              const trimmed = el.text.trim();
+              const isTransitionLeadIn =
+                trimmed.startsWith('Cũng vậy') ||
+                trimmed.startsWith('Một tâm nguyện đúng') ||
+                (trimmed.length < 130 && (trimmed.endsWith('…') || trimmed.endsWith('...')));
+
+              if (isTransitionLeadIn) {
+                return (
+                  <p
+                    key={elIdx}
+                    style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                    className="text-base sm:text-lg text-[#FFE5A3] font-medium leading-relaxed text-center tracking-wide my-4 select-text drop-shadow-xs"
+                  >
+                    {highlightText(el.text, popups, onKeywordClick)}
+                  </p>
+                );
+              }
+
+              globalParagraphIndex++;
+              const prevEl = elIdx > 0 ? sec.elements[elIdx - 1] : null;
+              const isFirstParagraph = globalParagraphIndex === 1 && idx === 0;
+              const shouldIndent = prevEl?.type === 'paragraph';
+
+              if (isFirstParagraph) {
+                return (
+                  <p
+                    key={elIdx}
+                    style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                    className="text-base sm:text-lg md:text-xl text-[#FFDE59] leading-relaxed md:leading-loose text-justify [text-align-last:left] tracking-wide my-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] first-letter:float-left first-letter:[font-family:'UTM_ClassizismAntiqua','UTM_ClassicAntiqua',serif] first-letter:text-6xl md:first-letter:text-7xl first-letter:font-bold first-letter:text-[#ffde59] first-letter:mr-3.5 first-letter:mb-1 first-letter:pb-1.5 first-letter:border-b-2 first-letter:border-[#ffde59] first-letter:leading-none"
+                  >
+                    {highlightText(el.text, popups, onKeywordClick)}
+                  </p>
+                );
+              }
+
+              return (
+                <p
+                  key={elIdx}
+                  style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                  className={`text-base sm:text-lg text-[#FFE5A3] leading-relaxed md:leading-loose text-justify [text-align-last:left] tracking-wide whitespace-pre-line my-4 ${
+                    shouldIndent ? 'indent-6 sm:indent-8' : ''
+                  }`}
+                >
+                  {highlightText(el.text, popups, onKeywordClick)}
+                </p>
+              );
+            })}
+          </div>
+
+          {/* 4. INFOGRAPHIC 4 CARDS IF APPLICABLE */}
+          {sec.hasFourPillars && <FourPillarsGrid />}
+
+          {/* 5. 4 PORTAL CIRCLES (THEO CHUẨN RIOT / LOL UNIVERSE THAY CHO HỘP CŨ) */}
+          {sec.hasFourDrawers && <FourCirclesPortalSection />}
+
+          {/* 🪷 INFOGRAPHICS TAM QUY */}
+          {sec.hasTamQuyThreeJewels && <TamQuyThreeJewelsGrid onKeywordClick={onKeywordClick} />}
+          {sec.hasTamBaoInnerOuter && <TamBaoInnerOuterBranch onKeywordClick={onKeywordClick} />}
+          {sec.hasTamBaoDailyLife && <TamBaoInDailyLifeGrid />}
+          {sec.hasTamQuyPractices && <TamQuyDailyPracticesGrid />}
+
+          {/* 6. ĐƯỜNG GRADIENT DÀI PHÂN ĐOẠN (CHỈ HIỆN KHI ĐOẠN TRƯỚC KHÔNG PHẢI LÀ DIVIDER) */}
+          {idx < sections.length - 1 && (!sec.elements.length || sec.elements[sec.elements.length - 1].type !== 'divider') && (
+            <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/30 to-transparent my-10 sm:my-12 clear-both" />
+          )}
+        </section>
+      ))}
+
+      {/* 🌟 7. HUY HIỆU TÁC GIẢ (ĐẶT TRÊN ĐƯỜNG KẺ, KHÔNG CÓ CHỮ TÁC GIẢ, KHÔNG GẠCH CHÂN, KHÔNG ICON EXTERNAL LINK) */}
+      {author && (
+        <div className="pt-2 pr-4 sm:pr-8 text-right my-4">
+          <Link
+            href={authorLink || '/gioi-thieu/su-phu-tru-tri'}
+            className="inline-flex items-center group cursor-pointer bg-[#3A2718]/80 hover:bg-[#4A3220] px-5 py-2 rounded-full border border-[#F2C14E]/40 hover:border-[#F2C14E] transition-all shadow-sm"
+          >
+            <span
+              style={{ fontFamily: "var(--font-montserrat), 'Montserrat', 'UTM Avo', sans-serif" }}
+              className="text-sm sm:text-base font-bold italic text-[#F2C14E] group-hover:text-[#ffde59] transition-colors tracking-wide"
+            >
+              {author.replace(/[—–]/g, '-')}
+            </span>
+          </Link>
+        </div>
+      )}
+
+      {/* QUOTE CUỐI TRANG */}
+      {endQuote && (
+        <div className="my-10 pt-4 text-center">
+          <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/30 to-transparent mb-10" />
+          <div className="max-w-2xl mx-auto text-center space-y-2.5">
+            <p 
+              style={{ fontFamily: "var(--font-montserrat), 'Montserrat', 'UTM Avo', sans-serif" }}
+              className="text-base sm:text-lg md:text-xl font-semibold italic text-[#FFE5A3] leading-relaxed tracking-wide whitespace-pre-line"
+            >
+              {highlightText(endQuote.text, popups, onKeywordClick)}
+            </p>
+            {endQuote.author && (
+              <p className="text-sm sm:text-base italic text-[#F2C14E] mt-3 font-semibold text-center">
+                {endQuote.author.replace(/^[—–-]\s*/, '')}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* 🔍 LIGHTBOX MODAL PHÓNG TO ẢNH TRONG BÀI */}
+      {zoomImage && (
+        <div
+          onClick={() => setZoomImage(null)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-md animate-in fade-in"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()} 
+            className="relative max-w-4xl max-h-[90vh] flex flex-col items-center"
+          >
+            <button
+              onClick={() => setZoomImage(null)}
+              className="absolute -top-12 right-0 p-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            <img
+              src={getImageUrl(zoomImage.src)}
+              alt={zoomImage.caption || 'Phóng to ảnh'}
+              className="max-h-[80vh] w-auto object-contain rounded-2xl border-2 border-[#F2C14E]/60 shadow-[0_0_50px_rgba(242,193,78,0.3)]"
+            />
+            {zoomImage.caption && (
+              <p className="mt-4 text-sm sm:text-base italic text-[#FFE5A3] text-center max-w-xl">
+                ({zoomImage.caption})
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}

@@ -16,6 +16,7 @@ import { type HomeData, loadHomeData } from "@/libs/home";
 import { getHomeExtras } from "@/libs/homeData";
 import { organizationJsonLd } from "@/libs/seo";
 import JsonLd from "@/components/shared/others/JsonLd";
+import WelcomeNotice from "@/components/home/WelcomeNotice";
 
 export const metadata: Metadata = {
 	title: `${site.name} – ${site.slogan}`,
@@ -50,6 +51,7 @@ export default async function Home() {
 	return (
 		<main>
 			<JsonLd data={organizationJsonLd()} />
+			<WelcomeNotice />
 			<div className="top-space-15"></div>
 			{BLOCKS.map((block) => (
 				<Fragment key={block.id}>{block.render(data)}</Fragment>

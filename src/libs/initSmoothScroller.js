@@ -2,6 +2,10 @@ import { gsap, ScrollSmoother } from "@/libs/gsap.config";
 import { setSmoother } from "@/libs/smoother";
 
 const initSmoothScroller = contanerRef => {
+	// A page whose layout needs the window to scroll (sticky and fixed parts, the Tiểu sử Sư Tổ
+	// page) opts out with data-tlhp-native-scroll: ScrollSmoother moves the content with a
+	// transform, under which position: sticky and fixed no longer hold.
+	if (document.querySelector("[data-tlhp-native-scroll]")) return;
 	const animItems = gsap.utils.toArray("#smooth-wrapper");
 	if (animItems.length) {
 		gsap.config({

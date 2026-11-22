@@ -160,3 +160,44 @@
 	src: local("Arial Narrow"), local("Arial");
 	size-adjust: 58%;
 }
+
+/* UTM Avo: the old site's text face, in its four faces (bo-nhan-dien/04_Fonts_Chua, woff2, about
+   10 KB a face). Only the old site's parts use it for now: the welcome notice of the home page and
+   the pages of "Người Liên Quan". The upright files are not named *-normal-*, so layout.js does
+   not preload them on every page; they load where a part asks for the face. */
+@font-face {
+	font-family: "UTM Avo";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url("../fonts/tlhp/utm-avo-roman-400.woff2") format("woff2");
+}
+@font-face {
+	font-family: "UTM Avo";
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: url("../fonts/tlhp/utm-avo-roman-700.woff2") format("woff2");
+}
+@font-face {
+	font-family: "UTM Avo";
+	font-style: italic;
+	font-weight: 400;
+	font-display: swap;
+	src: url("../fonts/tlhp/utm-avo-italic-400.woff2") format("woff2");
+}
+@font-face {
+	font-family: "UTM Avo";
+	font-style: italic;
+	font-weight: 700;
+	font-display: swap;
+	src: url("../fonts/tlhp/utm-avo-italic-700.woff2") format("woff2");
+}
+/* Until UTM Avo arrives: a sans of close width, so lines break about the same. */
+@font-face {
+	font-family: "UTM Avo Fallback";
+	src: local("Arial");
+	ascent-override: 92%;
+	descent-override: 24%;
+	size-adjust: 97%;
+}

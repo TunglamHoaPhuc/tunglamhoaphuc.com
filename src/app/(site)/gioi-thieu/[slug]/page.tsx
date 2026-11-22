@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AboutCard from "@/components/sections/about/AboutCard";
 import AboutMilestones from "@/components/sections/about/AboutMilestones";
+import { nguoiLienQuanLayout } from "@/components/gioi-thieu/nguoi-lien-quan/content";
+import NguoiLienQuanPage from "@/components/gioi-thieu/nguoi-lien-quan/NguoiLienQuanPage";
 import AnchorTabs, { type AnchorTab } from "@/components/sections/posts/AnchorTabs";
 import PostGallery from "@/components/sections/posts/PostGallery";
 import ReadingFrame from "@/components/sections/posts/ReadingFrame";
@@ -52,6 +54,10 @@ export default async function GioiThieuTopic({ params }: Props) {
 	const found = await findTopic((await params).slug);
 	if (!found) notFound();
 	const { topic, topics } = found;
+	// "Người Liên Quan" keeps the old site's pages (22/11/2026): Sư Tổ's Odyssey view, the detail
+	// layout for the others, and for topics editors add to the group later.
+	const layout = nguoiLienQuanLayout(topic);
+	if (layout) return <NguoiLienQuanPage layout={layout} topics={topics} />;
 	const others = topics.filter((item) => item.id !== topic.id && item.group.slug === topic.group.slug);
 	const picture = topic.portrait ?? topic.banner;
 	const tabs: AnchorTab[] = [
