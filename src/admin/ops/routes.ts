@@ -139,5 +139,16 @@ registerRoutes(
 		needs: { module: "backup", action: "view" },
 		handler: async (call) => (call.deps.backup ? { configured: true, backups: await listBackups(call.deps.backup) } : { configured: false, backups: [] }),
 	},
-	{ method: "GET", path: "backup/:name/download", needs: { module: "backup", action: "view" }, handler: async (call) => downloadStored(call.ctx, call.authed!, bucket(call), call.params.name) },
+	// A stored file holds all the content too, so it asks for the password again like the export (a POST: a plain link cannot carry it).
+	{
+		method: "POST",
+		path: "backup/:name/download",
+		needs: { module: "backup", action: "view" },
+		handler: async (call) => {
+			const bucketOrFail = bucket(call);
+			const { password } = await call.body(z.object({ password: z.string().min(1, "Nhập mật khẩu của bạn.").max(200) }));
+			await confirmPassword(call.ctx, call.authed!, password);
+			return downloadStored(call.ctx, call.authed!, bucketOrFail, call.params.name);
+		},
+	},
 );

@@ -513,7 +513,7 @@ Các bản cắt cũ của ảnh bị xóa khi thay tệp; giao diện nhắc c�
 | `GET /settings/:group`, `PUT /settings/:group` | thông tin chùa, mạng xã hội, SMTP, chính sách bảo mật | `settings.view` / `update` |
 | `POST /settings/smtp/test` | gửi thư thử | `settings.update` |
 | `POST /backup/export` | tạo bản sao lưu, trả tệp tải về | `backup.create` |
-| `GET /backup`, `GET /backup/:id/download` | danh sách bản sao lưu trong R2 | `backup.view` |
+| `GET /backup`, `POST /backup/:id/download` (nhập lại mật khẩu) | danh sách bản sao lưu trong R2 | `backup.view` |
 | `POST /cache/revalidate` | làm mới cache trang công khai | `settings.update` |
 
 Meta Title, Meta Description và ảnh OG của từng bài, trang, chuyên mục nằm ngay trong form của bản ghi đó (các cột `seo_*`, `og_media_id`).

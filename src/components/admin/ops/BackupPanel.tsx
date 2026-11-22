@@ -27,7 +27,8 @@ export function BackupPanel() {
 	const list = useLoader(() => api<List>("GET", "backup"), "backup");
 	const [password, setPassword] = useState("");
 	const [passwordError, setPasswordError] = useState("");
-	const [busy, setBusy] = useState<"export" | "run" | null>(null);
+	const [busy, setBusy] = useState<"export" | "stored" | "run" | null>(null);
+	const [downloading, setDownloading] = useState<string | null>(null);
 	const [notice, setNotice] = useState<{ kind: "success" | "error"; text: string } | null>(null);
 
 	if (!can("backup", "view")) return <NoRight />;
@@ -46,14 +47,20 @@ export function BackupPanel() {
 		}
 	}
 
-	async function exportNow(event: React.FormEvent) {
+	function exportNow(event: React.FormEvent) {
 		event.preventDefault();
-		setBusy("export");
+		return fetchFile("export", "backup/export");
+	}
+
+	/** Asks for a file with the password and saves it. `which` is "export" (made now) or a stored file's name. */
+	async function fetchFile(which: string, path: string) {
+		setBusy(which === "export" ? "export" : "stored");
+		setDownloading(which);
 		setNotice(null);
 		setPasswordError("");
 		try {
 			// The file is not JSON, so it does not go through the api helper; the CSRF token is the one /auth/me gave.
-			const response = await fetch("/api/quan-tri/v1/backup/export", {
+			const response = await fetch(`/api/quan-tri/v1/${path}`, {
 				method: "POST",
 				credentials: "same-origin",
 				cache: "no-store",
@@ -74,6 +81,7 @@ export function BackupPanel() {
 			setNotice({ kind: "error", text: errorText(caught) });
 		} finally {
 			setBusy(null);
+			setDownloading(null);
 		}
 	}
 
@@ -111,6 +119,9 @@ export function BackupPanel() {
 							</p>
 						) : null}
 						<p className="tq-hint">Giữ 30 bản mới nhất; bản cũ hơn tự bị xóa.</p>
+						{data.backups.length > 0 ? (
+							<TextField label="Nhập lại mật khẩu của bạn để tải một bản" type="password" autoComplete="current-password" value={password} error={passwordError} onChange={(e) => setPassword(e.target.value)} hint="Mỗi lần tải đều hỏi lại mật khẩu, vì tệp chứa toàn bộ nội dung." />
+						) : null}
 						{data.backups.length === 0 ? (
 							<EmptyState>Chưa có bản sao lưu nào trong kho lưu trữ.</EmptyState>
 						) : (
@@ -132,9 +143,9 @@ export function BackupPanel() {
 												<td>{when(backup.createdAt)}</td>
 												<td>{formatBytes(backup.size)}</td>
 												<td>
-													<a href={`/api/quan-tri/v1/backup/${encodeURIComponent(backup.name)}/download`} download={`tlhp-backup-${backup.name}`}>
+													<Button variant="secondary" busy={downloading === backup.name} disabled={busy !== null || !password} onClick={() => void fetchFile(backup.name, `backup/${encodeURIComponent(backup.name)}/download`)}>
 														Tải <span className="tq-muted">({backup.name})</span>
-													</a>
+													</Button>
 												</td>
 											</tr>
 										))}

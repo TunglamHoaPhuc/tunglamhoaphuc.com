@@ -189,7 +189,7 @@ PUT settings/:group | settings.update
 POST backup/export | backup.create
 POST backup/run | backup.create
 GET backup | backup.view
-GET backup/:name/download | backup.view
+POST backup/:name/download | backup.view
 `;
 
 export type Entry = { key: string; method: string; path: string; needs: string; own: boolean; superOnly: boolean; any: string[] };
