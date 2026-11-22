@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { revalidatePath } from 'next/cache';
+// Read only: V3 has no write route here (edit statues in www's admin).
 import { OFFICIAL_STATUE_DATASET, StatueRecord } from '@/data/statue-data';
-import { loadServerlessJson, saveServerlessJson } from '@/lib/serverless-db';
+import { loadServerlessJson } from '@/lib/serverless-db';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -16,25 +16,6 @@ const DB_CONFIG = {
 function getStatues(): StatueRecord[] {
   const data = loadServerlessJson<StatueRecord[]>(DB_CONFIG);
   return Array.isArray(data) && data.length > 0 ? data : OFFICIAL_STATUE_DATASET;
-}
-
-async function saveStatues(statues: StatueRecord[]) {
-  await saveServerlessJson<StatueRecord[]>(DB_CONFIG, statues);
-}
-
-function triggerRevalidation() {
-  try {
-    revalidatePath('/', 'page');
-    revalidatePath('/bao-tuong-phat-giao', 'page');
-    revalidatePath('/vu-tru-phat-giao', 'page');
-    revalidatePath('/vu-tru-phat-giao/tam-bao', 'page');
-    revalidatePath('/vu-tru-phat-giao/to-duong', 'page');
-    revalidatePath('/vu-tru-phat-giao/tu-an', 'page');
-    revalidatePath('/vu-tru-phat-giao/thu-vien', 'page');
-    revalidatePath('/vu-tru-phat-giao/giang-duong', 'page');
-  } catch (e) {
-    console.warn('Revalidation warning:', e);
-  }
 }
 
 export async function GET(req: NextRequest) {
@@ -75,78 +56,6 @@ export async function GET(req: NextRequest) {
       success: true,
       total: statues.length,
       statues,
-    });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  }
-}
-
-export async function PUT(req: NextRequest) {
-  try {
-    const body = await req.json();
-
-    // Hỗ trợ lưu danh sách sắp xếp thứ tự
-    if (Array.isArray(body)) {
-      await saveStatues(body);
-      triggerRevalidation();
-      return NextResponse.json({ success: true, count: body.length });
-    }
-
-    const { id, code, updates } = body;
-
-    if (!id && !code) {
-      return NextResponse.json(
-        { success: false, error: 'Cần cung cấp ID hoặc Mã tượng (code)' },
-        { status: 400 }
-      );
-    }
-
-    const statues = getStatues();
-    const index = statues.findIndex((s) => (id && s.id === id) || (code && s.code === code));
-
-    if (index === -1) {
-      return NextResponse.json(
-        { success: false, error: 'Không tìm thấy bảo tượng tương ứng' },
-        { status: 404 }
-      );
-    }
-
-    statues[index] = {
-      ...statues[index],
-      ...updates,
-    };
-
-    await saveStatues(statues);
-    triggerRevalidation();
-
-    return NextResponse.json({
-      success: true,
-      data: statues[index],
-    });
-  } catch (error: any) {
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
-  }
-}
-
-export async function POST(req: NextRequest) {
-  try {
-    const body = await req.json();
-    const statues = getStatues();
-
-    const newId = body.id || `statue-${Date.now()}`;
-    const newStatue: StatueRecord = {
-      ...body,
-      id: newId,
-      code: body.code || `TP${String(statues.length + 1).padStart(4, '0')}`,
-    };
-
-    statues.unshift(newStatue);
-    await saveStatues(statues);
-    triggerRevalidation();
-
-    return NextResponse.json({
-      success: true,
-      data: newStatue,
     });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

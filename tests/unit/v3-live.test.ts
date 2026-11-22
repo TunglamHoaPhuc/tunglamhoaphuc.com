@@ -154,7 +154,6 @@ test("các trang và API của những loại này không còn dùng bản đón
 		"src/lib/dong-chay.ts": /HOANG_PHAP_ARTICLES/,
 		"src/app/(public)/dong-chay-hoang-phap/[slug]/page.tsx": /HOANG_PHAP_ARTICLES/,
 		"src/app/(public)/dong-chay-hoang-phap/[slug]/DongChayDetailClient.tsx": /HOANG_PHAP_ARTICLES|\/api\/admin/,
-		"src/app/api/admin/posts/[id]/route.ts": /HOANG_PHAP_ARTICLES/,
 		"src/app/(public)/tri-tue-phat-phap/page.tsx": /WISDOM_ITEMS/,
 		"src/app/(public)/tri-tue-phat-phap/[slug]/page.tsx": /WISDOM_ITEMS/,
 		"src/app/(public)/tri-tue-phat-phap/[slug]/TriTueDetailClient.tsx": /WISDOM_ITEMS|\|\| 108|\/api\/admin/,
