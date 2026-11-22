@@ -5,6 +5,9 @@ import { storedMediaAddress } from "../../libs/content/media";
 
 /** The media id the import gave the picture at `src`, or `null` when `src` is no address. Runs on a Worker (Web Crypto) and in Node. */
 export async function mediaIdOfSrc(src: string): Promise<string | null> {
+	// A picture uploaded through the library is served at /anh-goc/<bucket>/cms/<id>/v<n>/<name>: its id is in the address itself.
+	const library = /\/anh-goc\/(?:[^/]+\/)?cms\/([A-Za-z0-9_-]+)\/v\d+\//.exec(src);
+	if (library) return library[1];
 	const address = storedMediaAddress(src);
 	if (!address) return null;
 	const digest = new Uint8Array(await crypto.subtle.digest("SHA-1", new TextEncoder().encode(address)));

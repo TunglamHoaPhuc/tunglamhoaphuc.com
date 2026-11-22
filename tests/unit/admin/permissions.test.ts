@@ -298,7 +298,7 @@ describe("Q9: a broken Origin or path is a refusal, never a 500", () => {
 		for (const origin of ["null", "not a url", `http://${host}`, `https://${host}:8443`, "https://evil.example", ""]) {
 			const response = await send(w, "POST", "auth/login", origin === "" ? {} : { origin });
 			expect(response.status, `Origin: ${origin}`).toBe(403);
-			expect((await response.json()).error.code).toBe("bad_origin");
+			expect(((await response.json()) as { error: { code: string } }).error.code).toBe("bad_origin");
 		}
 		const fine = await send(w, "POST", "auth/login", { origin: BASE });
 		expect(fine.status).not.toBe(403);
@@ -309,7 +309,7 @@ describe("Q9: a broken Origin or path is a refusal, never a 500", () => {
 		for (const path of ["users/%E0%A4%A", "users/%", "media/folders/%zz"]) {
 			const response = await send(w, "GET", path, {});
 			expect(response.status, path).toBe(404);
-			expect((await response.json()).error.code).toBe("not_found");
+			expect(((await response.json()) as { error: { code: string } }).error.code).toBe("not_found");
 		}
 	});
 });

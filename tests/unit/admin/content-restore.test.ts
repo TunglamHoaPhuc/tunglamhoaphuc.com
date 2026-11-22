@@ -59,3 +59,18 @@ describe("the first save of an imported Tông Chỉ article", () => {
 		expect(await pageOf(w)).toBe(before);
 	});
 });
+
+describe("a picture of the library held by its address only", () => {
+	it("is found by the id in its /anh-goc/<bucket>/cms/<id>/v<n>/ path and counted as used (a body, an intro, a book cover)", async () => {
+		const w = await contentWorld();
+		const root = await w.as("root@example.test");
+		// media-a is in the library at cms/media-a/v2/sen.webp; the body names it with no data-media-id
+		const saved = await root.call("PATCH", "posts/post-1060", { version: 1, contentHtml: '<p>Ảnh</p><img src="/anh-goc/s2-cnv03/cms/media-a/v2/sen.webp" alt="Hoa sen">' });
+		expect(saved.status, JSON.stringify(saved.json)).toBe(200);
+		expect(w.raw.prepare("SELECT field FROM media_usage WHERE entity_type = 'post' AND entity_id = 'post-1060' AND media_id = 'media-a'").all()).toEqual([{ field: "content" }]);
+		// an address that names no row of the library is not recorded (and does not break the save)
+		const other = await root.call("PATCH", "posts/post-1060", { version: 2, contentHtml: '<img src="/anh-goc/s2-cnv03/cms/khong-co/v1/x.webp" alt="">' });
+		expect(other.status).toBe(200);
+		expect(w.raw.prepare("SELECT COUNT(*) AS n FROM media_usage WHERE entity_type = 'post' AND entity_id = 'post-1060'").get()).toEqual({ n: 0 });
+	});
+});

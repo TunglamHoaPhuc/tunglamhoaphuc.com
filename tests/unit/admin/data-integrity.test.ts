@@ -58,7 +58,7 @@ const SIDE_SQL: Record<string, string> = {
 };
 
 /** The items the first-edit sample covers: every post with a long slug, every tenth of the rest, all articles and pages. */
-let sample: { kind: Kind; table: string; id: string; row: Raw }[] = [];
+const sample: { kind: Kind; table: string; id: string; row: Raw }[] = [];
 /** What the public page shows of each Tông Chỉ article before any edit (its body is the designer's brief, shown after conversion). */
 const shownBefore = new Map<string, string>();
 const edited = new Map<string, { title: string; withBody: boolean }>();
