@@ -598,7 +598,8 @@ async function categoryOf(db: AdminDb, kind: Kind, categoryId: string, section: 
  * Applies `input` over `current` and works out what to store: cleaned values, checked references, the sanitised body
  * (with library pictures pointed at their current address) and the columns that change. `current` is null on create.
  */
-async function prepare(db: AdminDb, kind: Kind, current: State | null, input: State, currentRow: Row | null, ownId: string | null, trustSlug = false): Promise<Prepared> {
+async function prepare(db: AdminDb, kind: Kind, current: State | null, input: State, currentRow: Row | null, ownId: string | null, restoring = false): Promise<Prepared> {
+	const trustSlug = restoring;
 	const next: State = { ...(current ?? {}) };
 	const columns = new Map<string, unknown>();
 	const changedKeys: string[] = [];
@@ -728,7 +729,12 @@ async function prepare(db: AdminDb, kind: Kind, current: State | null, input: St
 		const mediaSrc = new Map(Object.values(known).map((item) => [item.id, item.url]));
 		const tree = mediaSrc.size ? parseSafe(String(input.contentHtml ?? ""), { mediaSrc, changes: secondChanges }) : firstPass;
 		bodyChanged = (mediaSrc.size ? secondChanges : firstChanges).length > 0;
-		const html = serialize(tree).trim();
+		// Restoring puts back the text the version kept, as it was: sanitising the old site's HTML again would rewrite it (it adds
+		// target="_blank" to its links). A version holding library pictures still goes through the sanitiser, which points them at their
+		// current address.
+		const asKept = restoring && !/data-media-id/i.test(String(input.contentHtml ?? ""));
+		const html = asKept ? String(input.contentHtml ?? "") : serialize(tree).trim();
+		if (asKept) bodyChanged = false;
 		bodyTree = tree;
 		const stored = kind.bodyColumn === "body" ? markdownOf(tree) : html;
 		const before = currentRow ? text(currentRow[kind.bodyColumn]) : null;
@@ -880,6 +886,9 @@ export async function updateItem(ctx: AuthContext, by: Authed, kind: Kind, id: s
 
 	const next: State = { ...prepared.next, status: current.status, publishAt: current.publishAt };
 	const columns = new Map(prepared.columns);
+	// An imported Tông Chỉ article has no HTML of its own: its page is made from the Markdown brief, the title and the titles of the other
+	// articles, so changing a title would change the text the page shows. The first save fixes the text as the page shows it now.
+	if (kind.bodyColumn === "body" && !text(row.content_html) && !columns.has("content_html")) columns.set("content_html", String(current.contentHtml ?? ""));
 	columns.set("search_text", prepared.searchText);
 	columns.set("version", version + 1);
 	columns.set("updated_at", iso(ctx));

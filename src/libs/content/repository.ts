@@ -196,11 +196,20 @@ export function contentSource(value = process.env.CONTENT_SOURCE): ContentSource
 	throw new Error(`CONTENT_SOURCE không hợp lệ: "${value}" (snapshot | b2 | d1)`);
 }
 
-/** A value made again once `ttl` ms have passed since it was made. */
-export function renewing<T>(make: () => T, ttl: number, now: () => number = Date.now): () => T {
-	let current: { value: T; until: number } | undefined;
+/**
+ * Counts the writes the admin has made in this Worker instance. What the site reads is kept for a while (see `renewing`); a write makes
+ * the next read in the same instance start from the database again, so the person who saved sees it without waiting for the time to run
+ * out. Other instances (and the pages cached at the edge) still follow their own clocks.
+ */
+let contentEpoch = 0;
+export const bumpContentEpoch = (): number => ++contentEpoch;
+export const currentContentEpoch = (): number => contentEpoch;
+
+/** A value made again once `ttl` ms have passed since it was made, or an admin write has happened since (`epoch`). */
+export function renewing<T>(make: () => T, ttl: number, now: () => number = Date.now, epoch: () => number = currentContentEpoch): () => T {
+	let current: { value: T; until: number; epoch: number } | undefined;
 	return () => {
-		if (!current || now() >= current.until) current = { value: make(), until: now() + ttl };
+		if (!current || now() >= current.until || current.epoch !== epoch()) current = { value: make(), until: now() + ttl, epoch: epoch() };
 		return current.value;
 	};
 }

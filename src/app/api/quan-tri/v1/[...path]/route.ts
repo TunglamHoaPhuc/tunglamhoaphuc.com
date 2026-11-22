@@ -4,6 +4,7 @@ import type { AdminEnv } from "@/admin/db";
 import { createSmtpMailer } from "@/admin/mail/smtp";
 import type { BackupBucket } from "@/admin/ops/backup";
 import { r2Store, type R2Like } from "@/admin/media/store";
+import { bumpContentEpoch } from "@/libs/content/repository";
 
 // The admin API (docs/admin-architecture.md 7). Never cached, never indexed; one address only (dispatch checks).
 export const dynamic = "force-dynamic";
@@ -38,7 +39,7 @@ async function handle(request: Request, { params }: Context): Promise<Response> 
 	}
 	if (!env) return new Response(null, { status: 503 });
 	const { path } = await params;
-	return dispatch(request, path.join("/"), {
+	const response = await dispatch(request, path.join("/"), {
 		env: env as AdminEnv,
 		defer: (work) => void waitUntil(work),
 		media: env.MEDIA ? r2Store(env.MEDIA as R2Like) : undefined,
@@ -47,6 +48,9 @@ async function handle(request: Request, { params }: Context): Promise<Response> 
 		// SMTP settings are read from D1 on every send; without them the mailer throws and the caller reports it.
 		mailer: createSmtpMailer((env as AdminEnv).DB, env as AdminEnv),
 	});
+	// What the site holds in memory (articles, menus, the home page) is read again from the database after any write that went through.
+	if (request.method !== "GET" && request.method !== "HEAD" && response.ok) bumpContentEpoch();
+	return response;
 }
 
 export const GET = handle;
