@@ -46,18 +46,32 @@ CREATE INDEX `media_deleted` ON `media` (`deleted_at`);--> statement-breakpoint
 -- Where each picture is used today: one row per place, read from every column that points at `media`.
 -- Added by hand (drizzle-kit does not generate data). Pictures inside article text are not here: they are
 -- found by scripts/backfill-admin.ts and kept up to date by the editor when an article is saved.
+-- One statement per column: D1 allows only a few terms in one compound SELECT.
 INSERT OR IGNORE INTO media_usage (media_id, entity_type, entity_id, field)
-SELECT thumbnail_media_id, 'post', id, 'thumbnail' FROM post WHERE thumbnail_media_id IS NOT NULL
-UNION ALL SELECT banner_media_id, 'post', id, 'banner' FROM post WHERE banner_media_id IS NOT NULL
-UNION ALL SELECT banner_media_id, 'teaching_article', id, 'banner' FROM teaching_article WHERE banner_media_id IS NOT NULL
-UNION ALL SELECT banner_media_id, 'page', id, 'banner' FROM page WHERE banner_media_id IS NOT NULL
-UNION ALL SELECT portrait_media_id, 'page', id, 'portrait' FROM page WHERE portrait_media_id IS NOT NULL
-UNION ALL SELECT cover_media_id, 'area', id, 'cover' FROM area WHERE cover_media_id IS NOT NULL
-UNION ALL SELECT image_media_id, 'statue', id, 'image' FROM statue WHERE image_media_id IS NOT NULL
-UNION ALL SELECT image_media_id, 'art_variation', id, 'image' FROM art_variation WHERE image_media_id IS NOT NULL
-UNION ALL SELECT avatar_media_id, 'monk', id, 'avatar' FROM monk WHERE avatar_media_id IS NOT NULL
-UNION ALL SELECT image_media_id, 'calendar_event', id, 'image' FROM calendar_event WHERE image_media_id IS NOT NULL
-UNION ALL SELECT image_media_id, 'featured_program', id, 'image' FROM featured_program WHERE image_media_id IS NOT NULL
-UNION ALL SELECT poster_media_id, 'month_theme', CAST(month AS TEXT), 'poster' FROM month_theme WHERE poster_media_id IS NOT NULL
-UNION ALL SELECT media_id, 'quote_image', id, 'image' FROM quote_image
-UNION ALL SELECT media_id, 'album', album_id, 'item' FROM album_item;
+SELECT thumbnail_media_id, 'post', id, 'thumbnail' FROM post WHERE thumbnail_media_id IS NOT NULL;--> statement-breakpoint
+INSERT OR IGNORE INTO media_usage (media_id, entity_type, entity_id, field)
+SELECT banner_media_id, 'post', id, 'banner' FROM post WHERE banner_media_id IS NOT NULL;--> statement-breakpoint
+INSERT OR IGNORE INTO media_usage (media_id, entity_type, entity_id, field)
+SELECT banner_media_id, 'teaching_article', id, 'banner' FROM teaching_article WHERE banner_media_id IS NOT NULL;--> statement-breakpoint
+INSERT OR IGNORE INTO media_usage (media_id, entity_type, entity_id, field)
+SELECT banner_media_id, 'page', id, 'banner' FROM page WHERE banner_media_id IS NOT NULL;--> statement-breakpoint
+INSERT OR IGNORE INTO media_usage (media_id, entity_type, entity_id, field)
+SELECT portrait_media_id, 'page', id, 'portrait' FROM page WHERE portrait_media_id IS NOT NULL;--> statement-breakpoint
+INSERT OR IGNORE INTO media_usage (media_id, entity_type, entity_id, field)
+SELECT cover_media_id, 'area', id, 'cover' FROM area WHERE cover_media_id IS NOT NULL;--> statement-breakpoint
+INSERT OR IGNORE INTO media_usage (media_id, entity_type, entity_id, field)
+SELECT image_media_id, 'statue', id, 'image' FROM statue WHERE image_media_id IS NOT NULL;--> statement-breakpoint
+INSERT OR IGNORE INTO media_usage (media_id, entity_type, entity_id, field)
+SELECT image_media_id, 'art_variation', id, 'image' FROM art_variation WHERE image_media_id IS NOT NULL;--> statement-breakpoint
+INSERT OR IGNORE INTO media_usage (media_id, entity_type, entity_id, field)
+SELECT avatar_media_id, 'monk', id, 'avatar' FROM monk WHERE avatar_media_id IS NOT NULL;--> statement-breakpoint
+INSERT OR IGNORE INTO media_usage (media_id, entity_type, entity_id, field)
+SELECT image_media_id, 'calendar_event', id, 'image' FROM calendar_event WHERE image_media_id IS NOT NULL;--> statement-breakpoint
+INSERT OR IGNORE INTO media_usage (media_id, entity_type, entity_id, field)
+SELECT image_media_id, 'featured_program', id, 'image' FROM featured_program WHERE image_media_id IS NOT NULL;--> statement-breakpoint
+INSERT OR IGNORE INTO media_usage (media_id, entity_type, entity_id, field)
+SELECT poster_media_id, 'month_theme', CAST(month AS TEXT), 'poster' FROM month_theme WHERE poster_media_id IS NOT NULL;--> statement-breakpoint
+INSERT OR IGNORE INTO media_usage (media_id, entity_type, entity_id, field)
+SELECT media_id, 'quote_image', id, 'image' FROM quote_image;--> statement-breakpoint
+INSERT OR IGNORE INTO media_usage (media_id, entity_type, entity_id, field)
+SELECT media_id, 'album', album_id, 'item' FROM album_item;
