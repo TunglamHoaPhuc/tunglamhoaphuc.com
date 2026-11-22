@@ -302,7 +302,7 @@ Chi tiết từng task (mô tả, file Bexon liên quan, tiêu chí nghiệm thu
 - [x] T42a: Kiểm kê chỗ v2 còn dùng chung với web cũ (xong 17/11: 21.424 ảnh, ≈ 3,65 GB; xem docs/van-hanh/tach-du-lieu.md)
 - [x] T42b: Chép ảnh sang bucket R2 riêng `tlhp-media` (xong 17/11: 20.912 ảnh, 2,95 GB, 558 ảnh lỗi đã liệt kê)
 - [x] T42c: `/anh-goc/` đọc từ R2, chuyển nguồn ảnh (mã xong 17/11, kiểm cục bộ; chờ deploy để kiểm trên `v2.`; phải xong trước khi tắt B2 và WordPress)
-- [ ] T42d: Bản sao JSON riêng của v2 (xét lại 22/11: v2 đọc D1 nên cần đồng bộ B2 → D1, không phải `r2`; chờ chủ dự án chọn phương án (a)–(d) ở tasks/todo.md, và khóa B2)
+- [ ] T42d: Bản sao JSON riêng của v2 (xét lại 22/11: v2 đọc D1 nên cần đồng bộ B2 → D1, không phải `r2`; chờ chủ dự án chọn phương án (a)–(d) ở tasks/todo.md, và khóa B2; 22/11: đã có `npm run import -- --merge --dry-run`, test xanh, chưa chạy trên D1 thật)
 - [ ] T42e: Gỡ phụ thuộc cuối (sau T39, trước Checkpoint J)
 - [ ] **Checkpoint J** – hoàn tất, tắt admin cũ và WordPress theo kế hoạch Cloudflare
 

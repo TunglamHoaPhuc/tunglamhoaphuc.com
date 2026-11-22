@@ -2353,6 +2353,8 @@ Phương án:
 
 **Khuyến nghị:** nếu T39 (chuyển hẳn sang admin mới) còn xa hơn vài tuần: làm **(a)** trước (ít rủi ro, làm ngay), nâng lên **(c)** nếu Ban Biên Tập vẫn cần sửa bài ở admin cũ. Nếu T39 gần (khoảng 2 tuần): **(b)**, rẻ và an toàn nhất. Dù chọn gì, trước mọi lần nhập lên D1 thật phải chạy `npm run import` vào `--db=<bản sao D1>` rồi so khác biệt, và có sao lưu (quy trình ở d1.md mục 7). Thiếu khóa B2 nên chưa chạy được bước nào trên dữ liệu thật.
 
+**Đã làm 22/11/2026 (phần an toàn của phương án (a), chưa chạy trên D1 thật):** `npm run import` có `--merge` (chỉ `INSERT … ON CONFLICT DO NOTHING`; không `prune`, không xóa hay sửa dòng có sẵn; con khóa ghép chỉ thêm khi cha chưa qua tay admin), `--dry-run` (in "N sẽ thêm", cảnh báo trùng slug/mã), từ chối cờ lạ, và chặn nhập mặc định vào CSDL đã có `user`/`audit_log` trừ khi `--force`. Làm theo TDD, một reviewer độc lập tìm ra hai lỗi (con bị hồi sinh, cờ gõ sai chạy bản nguy hiểm) đã sửa; test-engineer thử 15 đột biến, mọi đột biến bị test mới bắt. `src/db/import.ts`, `scripts/import.ts`, `tests/unit/importMerge.test.ts` (+Gaps, +Flags). Kiểm: typecheck sạch, eslint sạch, `vitest tests/unit` 813/814 (hỏng đúng `taxonomyHeader`, có sẵn, của phiên khác). Giới hạn đã biết: dòng admin xóa vĩnh viễn bị nhập lại; sửa của admin cũ cho dòng đã có không sang; câu `INSERT … SELECT … VALUES … WHERE EXISTS` chưa thử trên D1 thật. Chưa có đồng bộ theo lịch.
+
 **Mô tả (sau xét lại, chờ quyết định):** đồng bộ B2 → D1 theo phương án được chọn, **chỉ đọc B2, không ghi gì vào B2**, chạy lại được, có `--dry-run`, giữ bản tốt gần nhất. Bỏ `tlhp-data` và nguồn `r2` (làm lại nếu chọn (d)).
 
 **Tiêu chí nghiệm thu (nháp, chốt sau khi chọn phương án):**
