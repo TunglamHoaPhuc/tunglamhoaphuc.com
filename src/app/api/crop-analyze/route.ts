@@ -1,11 +1,12 @@
 import { analyze, tibetanText, wordsInRect } from "@/libs/tibetan/api";
 import { PROMPT_VERSION } from "@/libs/tibetan/prompts";
-import { cachedJson, json, pageWords, readBody, workerEnv } from "@/libs/tibetan/server";
+import { cachedJson, json, overLimit, pageWords, readBody, tooMany, workerEnv } from "@/libs/tibetan/server";
 
 // The Tibetan course (T17b): the learner draws a rectangle on a page of the book. The words in
 // it come from the book's word positions (sara_words_coords.json, one file a page), not from
 // reading the picture; the text the learner had selected is the fallback.
 export async function POST(request: Request) {
+	if (await overLimit(request, "crop-analyze", 40)) return tooMany();
 	const body = await readBody(request);
 	if (!body) return json({ status: "error" }, 400);
 	const { AI, ASSETS } = await workerEnv();

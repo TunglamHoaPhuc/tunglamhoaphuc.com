@@ -120,3 +120,26 @@ describe("speak", () => {
 		expect(await speak(TASHI, errored)).toBeNull();
 	});
 });
+
+describe("overLimit", () => {
+	const request = (ip: string) => new Request("https://www.example.test/api/analyze", { method: "POST", headers: { "cf-connecting-ip": ip } });
+
+	it("lets a visitor ask `limit` times a minute, then says no, and starts again the next minute", async () => {
+		const { overLimit } = await import("@/libs/tibetan/server");
+		const at = Date.UTC(2026, 10, 23, 8, 0, 10);
+		for (let i = 0; i < 3; i++) expect(await overLimit(request("1.1.1.1"), "t1", 3, at), `call ${i + 1}`).toBe(false);
+		expect(await overLimit(request("1.1.1.1"), "t1", 3, at)).toBe(true);
+		// another visitor, another route and the next minute each have their own allowance
+		expect(await overLimit(request("2.2.2.2"), "t1", 3, at)).toBe(false);
+		expect(await overLimit(request("1.1.1.1"), "t2", 3, at)).toBe(false);
+		expect(await overLimit(request("1.1.1.1"), "t1", 3, at + 60_000)).toBe(false);
+	});
+
+	it("answers 429 with a Vietnamese message and Retry-After", async () => {
+		const { tooMany } = await import("@/libs/tibetan/server");
+		const response = tooMany();
+		expect(response.status).toBe(429);
+		expect(response.headers.get("retry-after")).toBe("60");
+		expect(((await response.json()) as { message: string }).message).toContain("đợi một phút");
+	});
+});

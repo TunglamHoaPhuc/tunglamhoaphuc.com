@@ -75,3 +75,39 @@ export async function cachedJson<T extends { status?: string }>(kind: string, ke
 	}
 	return value;
 }
+
+/** Calls counted per visitor and minute in this isolate, for when the data centre cache is missing (dev). */
+const counted = new Map<string, number>();
+
+/**
+ * A free allowance of AI calls per visitor: more than `limit` in one minute answers 429. Counted in the
+ * data centre's cache (the same one the answers are kept in), so it holds across Worker isolates in one
+ * place; it is a brake on a script hammering the Workers AI bill, not an exact meter.
+ */
+export async function overLimit(request: Request, bucket: string, limit: number, now = Date.now()): Promise<boolean> {
+	const ip = request.headers.get("cf-connecting-ip") ?? request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "local";
+	const minute = Math.floor(now / 60_000);
+	const name = `${bucket}/${ip}/${minute}`;
+	const cache = (globalThis as { caches?: { default?: Cache } }).caches?.default;
+	if (!cache) {
+		for (const key of counted.keys()) if (!key.endsWith(`/${minute}`)) counted.delete(key);
+		const next = (counted.get(name) ?? 0) + 1;
+		counted.set(name, next);
+		return next > limit;
+	}
+	const key = new Request(`https://tieng-tang.ratelimit.invalid/${encodeURIComponent(name)}`);
+	let used = 0;
+	try {
+		const hit = await cache.match(key);
+		if (hit) used = Number(await hit.text()) || 0;
+	} catch {
+		// A cache that cannot be read lets the call through: the brake must never stop the course.
+		return false;
+	}
+	used += 1;
+	await cache.put(key, new Response(String(used), { headers: { "Cache-Control": "public, max-age=120" } })).catch(() => undefined);
+	return used > limit;
+}
+
+/** The answer to a visitor over the allowance. */
+export const tooMany = () => Response.json({ status: "error", message: "Bạn hỏi hơi nhanh, mời đợi một phút rồi thử lại." }, { status: 429, headers: { "Cache-Control": "no-store", "Retry-After": "60" } });
