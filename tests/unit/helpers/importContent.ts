@@ -28,6 +28,12 @@ export function post(id: string, patch: Partial<Post> = {}): Post {
 		keywords: [{ keyword: "Địa Tạng", title: "Bồ Tát", description: "…" }],
 		gallery: [],
 		videos: [],
+		pinned: false,
+		seoTitle: "",
+		seoDescription: "",
+		ogImage: null,
+		extra: { audio: null, youtubeId: null, book: null },
+		related: [],
 		...patch,
 	};
 }

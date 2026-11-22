@@ -1,4 +1,4 @@
-/** An error the API turns into `{ error: { code, message, fields? } }` with this status. */
+/** An error the API turns into `{ error: { code, message, fields?, ...extra } }` with this status. */
 export class ApiError extends Error {
 	constructor(
 		readonly status: number,
@@ -7,6 +7,8 @@ export class ApiError extends Error {
 		readonly fields?: Record<string, string>,
 		/** Seconds the caller should wait (sent as Retry-After). */
 		readonly retryAfter?: number,
+		/** More to say beside the message (for example `suggestion`); added to the error object as it is. */
+		readonly extra?: Record<string, unknown>,
 	) {
 		super(message);
 	}

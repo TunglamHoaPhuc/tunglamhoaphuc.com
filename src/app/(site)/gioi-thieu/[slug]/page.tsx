@@ -16,6 +16,7 @@ import { IMAGE_WIDTH, imageAt, topImagePriority } from "@/libs/content/media";
 import { getContentRepository, slugKey } from "@/libs/content/repository";
 import type { AboutTopic } from "@/libs/content/types";
 import { formatNumber, titleCase } from "@/libs/format";
+import { redirectIfMoved } from "@/libs/siteRedirect";
 
 // Served from Cloudflare's Workers Cache and made again at most every 5 minutes (T41e).
 export const revalidate = 300;
@@ -51,8 +52,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // the overview and the teaching it is known by, then the timeline, the text in the reading
 // frame, the album and the other topics of its group.
 export default async function GioiThieuTopic({ params }: Props) {
-	const found = await findTopic((await params).slug);
-	if (!found) notFound();
+	const { slug } = await params;
+	const found = await findTopic(slug);
+	if (!found) {
+		await redirectIfMoved(`${PATH}/${slug}`);
+		notFound();
+	}
 	const { topic, topics } = found;
 	// "Người Liên Quan" keeps the old site's pages (22/11/2026): Sư Tổ's Odyssey view, the detail
 	// layout for the others, and for topics editors add to the group later.

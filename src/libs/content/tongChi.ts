@@ -4,7 +4,7 @@
 // turned into HTML only when a page asks for one (tongChiBody.ts says why they need work).
 import { parseSafe, serialize } from "../../admin/content/html";
 import { z } from "zod";
-import { isUnsavedUpload, mediaUrl } from "./media";
+import { cleanPosition, isUnsavedUpload, mediaUrl } from "./media";
 import { bare, cleanText, renderContent, toIsoDate } from "./normalize";
 import { videosOf } from "./posts";
 import { type BodyTarget, tongChiMarkdown } from "./tongChiBody";
@@ -69,7 +69,7 @@ export function parseTongChi(file: unknown): ParsedTongChi {
 		if (article.status !== "published") continue;
 		const id = article.slug;
 		const bannerSrc = picture(id, article.bannerImage);
-		const banner: MediaImage | null = bannerSrc ? { src: bannerSrc, position: article.bannerPosition.trim() || "center 50%" } : null;
+		const banner: MediaImage | null = bannerSrc ? { src: bannerSrc, position: cleanPosition(article.bannerPosition) } : null;
 		const video = article.videoBlock ? videosOf(article.videoBlock.videoUrl)[0] : undefined;
 		const gallery: GalleryImage[] = article.photoGallery.flatMap((photo) => {
 			const src = picture(id, photo.imageUrl);
@@ -107,6 +107,9 @@ export function parseTongChi(file: unknown): ParsedTongChi {
 			keywords: article.keywords
 				.map((keyword): Keyword => ({ keyword: plain(keyword.keyword), title: plain(keyword.title), description: plain(keyword.description) }))
 				.filter((keyword) => keyword.description && (keyword.title || keyword.keyword)),
+			seoTitle: "",
+			seoDescription: "",
+			ogImage: null,
 			body: article.content,
 		});
 	}

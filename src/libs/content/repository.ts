@@ -12,7 +12,7 @@ const MAX_PAGE_SIZE = 60;
 
 const collator = new Intl.Collator("vi", { sensitivity: "base", numeric: true });
 
-const compare: Record<PostSort, (a: PostSummary, b: PostSummary) => number> = {
+const compareBy: Record<PostSort, (a: PostSummary, b: PostSummary) => number> = {
 	newest: (a, b) => b.publishedDate.localeCompare(a.publishedDate) || collator.compare(a.title, b.title),
 	oldest: (a, b) => a.publishedDate.localeCompare(b.publishedDate) || collator.compare(a.title, b.title),
 	az: (a, b) => collator.compare(a.title, b.title) || b.publishedDate.localeCompare(a.publishedDate),
@@ -20,9 +20,15 @@ const compare: Record<PostSort, (a: PostSummary, b: PostSummary) => number> = {
 	views: (a, b) => b.views - a.views || b.publishedDate.localeCompare(a.publishedDate),
 };
 
+/** Pinned posts first in the lists ordered by date or title; a ranking by views is left as it is. */
+const compare = (sort: PostSort): ((a: PostSummary, b: PostSummary) => number) => {
+	const by = compareBy[sort] ?? compareBy.newest;
+	return sort === "views" ? by : (a, b) => Number(b.pinned) - Number(a.pinned) || by(a, b);
+};
+
 function toSummary(post: Post): PostSummary {
-	const { id, slug, title, subtitle, section, category, author, publishedDate, views, thumbnail, banner, summary, galleryCount } = post;
-	return { id, slug, title, subtitle, section, category, author, publishedDate, views, thumbnail, banner, summary, galleryCount };
+	const { id, slug, title, subtitle, section, category, author, publishedDate, views, thumbnail, banner, summary, galleryCount, pinned } = post;
+	return { id, slug, title, subtitle, section, category, author, publishedDate, views, thumbnail, banner, summary, galleryCount, pinned };
 }
 
 /** Slugs arrive decoded from the URL; a few are stored percent-encoded (emoji). Compare both decoded. */
@@ -51,7 +57,10 @@ export type MemoryRepositoryOptions = {
 
 const EMPTY_SCHEDULE: Schedule = { events: [], programs: [], themes: [], quotes: [] };
 
-type PostIndex = { bySlug: Map<string, Post>; summaries: PostSummary[] };
+type PostIndex = { bySlug: Map<string, Post>; bySectionSlug: Map<string, Post>; summaries: PostSummary[] };
+
+/** A post's place in an index: slugs are unique per section. */
+export const sectionSlugKey = (section: string, slug: string): string => `${section}/${slugKey(slug)}`;
 
 /** The posts of a query, from the summaries of all posts: what every source answers a list page with. */
 export function queryPosts(summaries: PostSummary[], { section, category, sort = "newest", page = 1, pageSize = DEFAULT_PAGE_SIZE }: PostQuery = {}): Page<PostSummary> {
@@ -59,7 +68,7 @@ export function queryPosts(summaries: PostSummary[], { section, category, sort =
 	const sections = section === undefined ? null : [section].flat();
 	const matching = summaries
 		.filter((post) => (!sections || sections.includes(post.section)) && (!category || post.category.slug === category))
-		.sort(compare[sort] ?? compare.newest);
+		.sort(compare(sort));
 	const pageCount = Math.max(1, Math.ceil(matching.length / size));
 	const current = Math.max(1, Math.trunc(page) || 1);
 	return {
@@ -106,7 +115,11 @@ export function createMemoryRepository(
 ): ContentRepository {
 	const postIndex = lazy(async (): Promise<PostIndex> => {
 		const list = typeof posts === "function" ? await posts() : posts;
-		return { bySlug: new Map(list.map((post) => [slugKey(post.slug), post])), summaries: list.map(toSummary) };
+		return {
+			bySlug: new Map(list.map((post) => [slugKey(post.slug), post])),
+			bySectionSlug: new Map(list.map((post) => [sectionSlugKey(post.section, post.slug), post])),
+			summaries: list.map(toSummary),
+		};
 	});
 	const albums = lazy(loadAlbums ?? (async () => new Map<string, GalleryImage[]>()));
 	const schedule = lazy(loadSchedule ?? (async () => EMPTY_SCHEDULE));
@@ -123,8 +136,9 @@ export function createMemoryRepository(
 			return queryPosts((await postIndex()).summaries, query);
 		},
 
-		async getPostBySlug(slug) {
-			const post = (await postIndex()).bySlug.get(slugKey(slug));
+		async getPostBySlug(slug, section) {
+			const index = await postIndex();
+			const post = section === undefined ? index.bySlug.get(slugKey(slug)) : index.bySectionSlug.get(sectionSlugKey(section, slug));
 			if (!post || post.gallery.length) return post ?? null;
 			const gallery = (await albums()).get(post.id);
 			return gallery?.length ? { ...post, gallery } : post;

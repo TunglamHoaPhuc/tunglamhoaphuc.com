@@ -24,6 +24,12 @@ function post(id: number, title: string, publishedDate: string, views: number, e
 		keywords: [],
 		gallery: [],
 		videos: [],
+		pinned: false,
+		seoTitle: "",
+		seoDescription: "",
+		ogImage: null,
+		extra: { audio: null, youtubeId: null, book: null },
+		related: [],
 		...extra,
 	};
 }

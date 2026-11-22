@@ -3,16 +3,15 @@
 // A picture's media id is the one the import made: the first 20 hex digits of the SHA-1 of its site address.
 import { createHash } from "node:crypto";
 import type { DatabaseSync } from "node:sqlite";
-import { mediaUrl } from "../libs/content/media";
+import { addressesIn } from "../admin/media/ids";
+import { mediaUrl, storedMediaAddress } from "../libs/content/media";
 
-const URL_IN_TEXT = /(?:https?:)?\/\/[^\s"'<>()[\]]+|\/anh-goc\/[^\s"'<>()[\]]+/g;
-
-/** The media ids of every picture address found in `text`. */
+/** The media ids of every picture address found in `text`: the id the import gave the address the picture was filed under (admin/media/ids.ts). */
 export function mediaIdsIn(text: string): Set<string> {
 	const ids = new Set<string>();
-	for (const match of text.matchAll(URL_IN_TEXT)) {
-		const url = mediaUrl(match[0].replace(/[.,;:!?]+$/, ""));
-		if (url?.startsWith("/anh-goc/")) ids.add(createHash("sha1").update(url).digest("hex").slice(0, 20));
+	for (const address of addressesIn(text)) {
+		const filed = mediaUrl(address)?.startsWith("/anh-goc/") ? storedMediaAddress(address) : null;
+		if (filed) ids.add(createHash("sha1").update(filed).digest("hex").slice(0, 20));
 	}
 	return ids;
 }

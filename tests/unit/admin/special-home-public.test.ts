@@ -30,6 +30,12 @@ const post = (id: number, title: string, publishedDate: string, extra: Partial<P
 	keywords: [],
 	gallery: [],
 	videos: [],
+	pinned: false,
+	seoTitle: "",
+	seoDescription: "",
+	ogImage: null,
+	extra: { audio: null, youtubeId: null, book: null },
+	related: [],
 	...extra,
 });
 const posts = [post(1, "Bài mới", "2026-10-17"), post(2, "Bài cũ", "2026-09-01")];

@@ -61,6 +61,7 @@ const SAMPLE_POST: PostSummary = {
 	banner: null,
 	summary: "Mùa Vu Lan nhắc người con Phật nhớ ơn cha mẹ, ông bà và tổ tiên.",
 	galleryCount: 0,
+	pinned: false,
 };
 const SAMPLE_MEMBER = { id: 1, name: "Thầy Thích Ấn Định", desig: "Trụ trì", img: "/images/team/team-1.webp" };
 const SAMPLE_GROUP = {

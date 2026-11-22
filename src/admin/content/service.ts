@@ -7,17 +7,20 @@ import { num, text, type AdminDb, type AdminStmt, type Row } from "../db";
 import { ApiError, forbidden, notFound } from "../http/errors";
 import { likeWord, type Page } from "../http/paging";
 import { newId } from "../ids";
+import { addressesIn, mediaIdOfSrc } from "../media/ids";
 import { mediaPath, replaceUsageStatements } from "../media/service";
 import { can } from "../rbac/check";
 import { getRevision, listRevisions, revisionStatement } from "../revision";
-import { slugify } from "../slug";
+import { SLUG_MAX, slugify } from "../slug";
 import { registerTrashable, trashStatement } from "../trash";
-import { IMAGE_WIDTH, imageAt } from "../../libs/content/media";
+import { cleanPosition, IMAGE_WIDTH, imageAt } from "../../libs/content/media";
 import { renderContent } from "../../libs/content/normalize";
 import { tongChiMarkdown, type BodyTarget } from "../../libs/content/tongChiBody";
 import { extraMediaUses, parseExtra } from "./extra";
-import { markdownOf, mediaIdsIn, parseSafe, plainText, serialize, textOf } from "./html";
-import { KINDS, SECTIONS, SPECIAL_LABELS, STATUS_LABELS, type FieldSpec, type Kind, type Status } from "./kinds";
+import { type HtmlNode, markdownOf, mediaIdsIn, parseSafe, plainText, serialize, textOf } from "./html";
+import { checkFrom, checkTo } from "../../libs/redirects";
+import { bare } from "../../libs/content/normalize";
+import { KINDS, publicPathOf, SECTIONS, SPECIAL_LABELS, STATUS_LABELS, type FieldSpec, type Kind, type Status } from "./kinds";
 import { signPreview, verifyPreview } from "./preview";
 import { searchTextOf, searchWords } from "./search";
 
@@ -27,6 +30,16 @@ export type State = Record<string, unknown>;
 const iso = (ctx: AuthContext) => ctx.now().toISOString();
 /** Today in Vietnam (UTC+7), YYYY-MM-DD. */
 export const vietnamToday = (now: Date) => new Date(now.getTime() + 7 * 3600_000).toISOString().slice(0, 10);
+
+/**
+ * The status the public site is in: a scheduled article whose time has come is on the site (the reader derives it, there is no job
+ * that changes the row), so the admin shows it as published too. The stored status stays "scheduled" until somebody changes it.
+ */
+export function effectiveStatus(row: Row, now: Date): Status {
+	const status = (text(row.status) || "draft") as Status;
+	const at = text(row.publish_at);
+	return status === "scheduled" && at && at <= now.toISOString() ? "published" : status;
+}
 
 const audit = (ctx: AuthContext, by: Authed, entry: Pick<AuditEntry, "action" | "entityType" | "entityId" | "before" | "after">) =>
 	auditStatement(ctx.db, { ...entry, userId: by.user.id, userEmail: by.user.email, ip: ctx.ip, userAgent: ctx.userAgent }, ctx.now());
@@ -70,9 +83,10 @@ function fieldValue(spec: FieldSpec, row: Row): unknown {
 	const value = row[spec.column];
 	switch (spec.type) {
 		case "text":
-		case "position":
 		case "date":
 			return text(value);
+		case "position":
+			return cleanPosition(text(value));
 		case "nullableText":
 		case "media":
 		case "album":
@@ -100,7 +114,7 @@ async function teachingHtml(db: AdminDb, row: Row): Promise<string> {
 }
 
 /** The editable state of a row: what a revision keeps and what restoring puts back. */
-async function stateOf(db: AdminDb, kind: Kind, row: Row): Promise<State> {
+async function stateOf(db: AdminDb, kind: Kind, row: Row, now: Date = new Date()): Promise<State> {
 	const state: State = {};
 	for (const spec of kind.fields) state[spec.key] = fieldValue(spec, row);
 	state.slug = text(row.slug);
@@ -111,7 +125,7 @@ async function stateOf(db: AdminDb, kind: Kind, row: Row): Promise<State> {
 	state.contentJson = parseJson(row.content_json, null);
 	if (kind.hasExtra) state.extra = parseJson(row.extra, {});
 	if (kind.hasMilestones) state.milestones = await milestonesOf(db, text(row.id));
-	state.status = text(row.status) || "draft";
+	state.status = effectiveStatus(row, now);
 	state.publishAt = text(row.publish_at) || null;
 	return state;
 }
@@ -155,23 +169,72 @@ const rightsOn = (by: Authed, kind: Kind, row: Row) => ({
 
 export type MediaPreview = { id: string; url: string; thumbUrl: string; alt: string; mime: string };
 
+/** D1 allows 100 bound values in a statement: a long list of ids is asked for in pieces of 90. */
+const ID_CHUNK = 90;
+
 async function mediaPreviews(db: AdminDb, ids: string[]): Promise<Record<string, MediaPreview>> {
-	const unique = [...new Set(ids.filter(Boolean))].slice(0, 90);
-	if (!unique.length) return {};
-	const { results } = await db.prepare(`SELECT id, r2_key, url, alt, mime FROM media WHERE id IN (${unique.map(() => "?").join(", ")})`).bind(...unique).all();
+	const unique = [...new Set(ids.filter(Boolean))];
 	const out: Record<string, MediaPreview> = {};
-	for (const row of results) {
-		const url = mediaPath(text(row.r2_key) || null, text(row.url) || null);
-		out[text(row.id)] = { id: text(row.id), url, thumbUrl: url && text(row.mime).startsWith("image/") ? imageAt(url, IMAGE_WIDTH.small) : url, alt: text(row.alt), mime: text(row.mime) };
+	for (let start = 0; start < unique.length; start += ID_CHUNK) {
+		const chunk = unique.slice(start, start + ID_CHUNK);
+		const { results } = await db.prepare(`SELECT id, r2_key, url, alt, mime FROM media WHERE id IN (${chunk.map(() => "?").join(", ")})`).bind(...chunk).all();
+		for (const row of results) {
+			const url = mediaPath(text(row.r2_key) || null, text(row.url) || null);
+			out[text(row.id)] = { id: text(row.id), url, thumbUrl: url && text(row.mime).startsWith("image/") ? imageAt(url, IMAGE_WIDTH.small) : url, alt: text(row.alt), mime: text(row.mime) };
+		}
 	}
 	return out;
 }
 
-function mediaUses(kind: Kind, state: State, contentIds: string[]): { mediaId: string; field: string }[] {
+/** Which of `ids` are rows of the library (the ones a usage row may point at). */
+async function existingMediaIds(db: AdminDb, ids: Iterable<string>): Promise<string[]> {
+	const unique = [...new Set(ids)];
+	const found: string[] = [];
+	for (let start = 0; start < unique.length; start += ID_CHUNK) {
+		const chunk = unique.slice(start, start + ID_CHUNK);
+		const { results } = await db.prepare(`SELECT id FROM media WHERE id IN (${chunk.map(() => "?").join(", ")})`).bind(...chunk).all();
+		found.push(...results.map((item) => text(item.id)));
+	}
+	return found;
+}
+
+/** The addresses an article's tree points at with a picture, a sound or a link (the library's pictures it holds by address). */
+function addressesInTree(nodes: HtmlNode[], into: Set<string>) {
+	for (const node of nodes) {
+		if (node.type !== "element") continue;
+		for (const key of ["src", "href"]) if (node.attrs[key]) into.add(node.attrs[key]);
+		addressesInTree(node.children, into);
+	}
+}
+
+/**
+ * The library pictures an article uses, for `media_usage`: those named by `data-media-id`, and those it holds only by address (the
+ * imported ones: a picture in the body, one in the intro or summary text, a book's cover), found by the id the import gave their
+ * address. Only rows that exist in the library (a usage row of a missing one would break the save).
+ */
+async function referencedMedia(db: AdminDb, kind: Kind, state: State, tree: HtmlNode[]): Promise<{ content: string[]; cover: string[] }> {
+	const addresses = new Set<string>();
+	addressesInTree(tree, addresses);
+	for (const key of ["intro", kind.summaryColumn]) if (typeof state[key] === "string") for (const address of addressesIn(state[key] as string)) addresses.add(address);
+	const cover = (state.book as { cover?: unknown } | null | undefined)?.cover;
+	const coverAddress = typeof cover === "string" && cover ? cover : null;
+	const byAddress = new Map<string, string>();
+	for (const address of [...addresses, ...(coverAddress ? [coverAddress] : [])].slice(0, 500)) {
+		const id = await mediaIdOfSrc(address);
+		if (id) byAddress.set(address, id);
+	}
+	const existing = new Set(await existingMediaIds(db, [...mediaIdsIn(tree), ...byAddress.values()]));
+	const content = [...new Set([...mediaIdsIn(tree), ...[...addresses].map((address) => byAddress.get(address) ?? "")])].filter((id) => existing.has(id));
+	const coverId = coverAddress ? (byAddress.get(coverAddress) ?? "") : "";
+	return { content, cover: existing.has(coverId) ? [coverId] : [] };
+}
+
+function mediaUses(kind: Kind, state: State, contentIds: string[], coverIds: string[] = []): { mediaId: string; field: string }[] {
 	const uses: { mediaId: string; field: string }[] = [];
 	for (const spec of kind.fields) if (spec.type === "media" && typeof state[spec.key] === "string" && state[spec.key]) uses.push({ mediaId: state[spec.key] as string, field: spec.column });
 	if (kind.hasExtra) uses.push(...extraMediaUses((state.extra ?? {}) as Record<string, unknown>));
 	for (const id of contentIds) uses.push({ mediaId: id, field: "content" });
+	for (const id of coverIds) uses.push({ mediaId: id, field: "book.cover" });
 	return uses;
 }
 
@@ -217,17 +280,19 @@ export type ContentDetail = State & {
 	canDelete: boolean;
 	canPublish: boolean;
 	canSubmit: boolean;
+	/** Only in the answer to a save that sent the body: sanitising changed it, so the editor must reload `contentHtml`. */
+	bodyChanged?: boolean;
 };
 
 async function detailOf(ctx: AuthContext, by: Authed, kind: Kind, row: Row): Promise<ContentDetail> {
-	const state = await stateOf(ctx.db, kind, row);
+	const state = await stateOf(ctx.db, kind, row, ctx.now());
 	const id = text(row.id);
 	const mediaIds = mediaUses(kind, state, []).map((use) => use.mediaId);
 	return {
 		...state,
 		id,
 		version: num(row.version) || 1,
-		status: (text(row.status) || "draft") as Status,
+		status: effectiveStatus(row, ctx.now()),
 		publishAt: text(row.publish_at) || null,
 		categoryName: text(row.category_name),
 		categorySlug: text(row.category_slug),
@@ -295,7 +360,7 @@ const SORTS: Record<string, string> = {
 	position: "t.position, t.rowid",
 };
 
-function whereOf(kind: Kind, filter: ListFilter, withStatus: boolean): { clause: string; args: unknown[] } {
+function whereOf(kind: Kind, filter: ListFilter, withStatus: boolean, nowIso: string): { clause: string; args: unknown[] } {
 	const where = ["t.deleted_at IS NULL"];
 	const args: unknown[] = [];
 	if (kind.hasSection && filter.section) {
@@ -314,8 +379,17 @@ function whereOf(kind: Kind, filter: ListFilter, withStatus: boolean): { clause:
 		args.push(filter.authorId);
 	}
 	if (withStatus && filter.status) {
-		where.push("t.status = ?");
-		args.push(filter.status);
+		// A scheduled article whose time has come is on the site: it counts as published (effectiveStatus).
+		if (filter.status === "published") {
+			where.push("(t.status = 'published' OR (t.status = 'scheduled' AND t.publish_at <= ?))");
+			args.push(nowIso);
+		} else if (filter.status === "scheduled") {
+			where.push("(t.status = 'scheduled' AND (t.publish_at IS NULL OR t.publish_at > ?))");
+			args.push(nowIso);
+		} else {
+			where.push("t.status = ?");
+			args.push(filter.status);
+		}
 	}
 	if (filter.from && /^\d{4}-\d{2}-\d{2}$/.test(filter.from)) {
 		where.push(`substr(t.${kind.dateColumn}, 1, 10) >= ?`);
@@ -339,7 +413,7 @@ function whereOf(kind: Kind, filter: ListFilter, withStatus: boolean): { clause:
 }
 
 export async function listItems(ctx: AuthContext, by: Authed, kind: Kind, filter: ListFilter, page: Page): Promise<{ rows: ListRow[]; total: number }> {
-	const { clause, args } = whereOf(kind, filter, true);
+	const { clause, args } = whereOf(kind, filter, true, ctx.now().toISOString());
 	let sort = filter.sort && SORTS[filter.sort] ? filter.sort : "-updatedAt";
 	if ((sort === "position" && !kind.hasPosition) || (sort.endsWith("publishedDate") && kind.dateColumn !== "published_date")) sort = "-updatedAt";
 	const order = SORTS[sort];
@@ -372,7 +446,7 @@ export async function listItems(ctx: AuthContext, by: Authed, kind: Kind, filter
 				categoryId: text(row.category_id) || null,
 				categoryName: text(row.category_name),
 				author: text(row.author),
-				status: (text(row.status) || "draft") as Status,
+				status: effectiveStatus(row, ctx.now()),
 				publishAt: text(row.publish_at) || null,
 				publishedDate: text(row.published_date) || null,
 				pinned: num(row.pinned) === 1,
@@ -393,8 +467,12 @@ export async function listItems(ctx: AuthContext, by: Authed, kind: Kind, filter
 
 /** How many articles each status tab holds, under the same filters as the list (but any status). */
 export async function countByStatus(ctx: AuthContext, kind: Kind, filter: ListFilter): Promise<Record<Status | "all", number>> {
-	const { clause, args } = whereOf(kind, filter, false);
-	const { results } = await ctx.db.prepare(`SELECT t.status, COUNT(*) AS n FROM ${kind.table} t WHERE ${clause} GROUP BY t.status`).bind(...args).all();
+	const nowIso = ctx.now().toISOString();
+	const { clause, args } = whereOf(kind, filter, false, nowIso);
+	const { results } = await ctx.db
+		.prepare(`SELECT CASE WHEN t.status = 'scheduled' AND t.publish_at <= ? THEN 'published' ELSE t.status END AS status, COUNT(*) AS n FROM ${kind.table} t WHERE ${clause} GROUP BY 1`)
+		.bind(nowIso, ...args)
+		.all();
 	const counts = { all: 0, draft: 0, pending: 0, published: 0, scheduled: 0, hidden: 0 };
 	for (const row of results) {
 		const status = text(row.status) as Status;
@@ -431,9 +509,18 @@ async function freeSlug(db: AdminDb, kind: Kind, base: string, section: string |
 }
 
 export async function checkSlug(ctx: AuthContext, kind: Kind, input: { slug?: string; text?: string; section?: string; excludeId?: string }) {
-	const slug = slugify(input.slug || input.text || "");
+	// A slug made from a title is cut to the limit; one that is asked about is judged as it is (and one the article already has is its own).
+	const slug = input.slug ? slugify(input.slug, Number.MAX_SAFE_INTEGER) : slugify(input.text || "");
 	if (!slug) throw new ApiError(400, "invalid_input", "Đường dẫn cần có chữ hoặc số.", { slug: "Đường dẫn cần có chữ hoặc số." });
 	if (kind.hasSection && !SECTIONS.some((section) => section.slug === input.section)) throw new ApiError(400, "invalid_input", "Chọn chuyên trang.", { section: "Chọn chuyên trang." });
+	if (slug.length > SLUG_MAX) {
+		const own = input.excludeId ? await ctx.db.prepare(`SELECT slug FROM ${kind.table} WHERE id = ? AND deleted_at IS NULL`).bind(input.excludeId).first() : null;
+		if (!own || text(own.slug) !== input.slug) {
+			const message = `Đường dẫn tối đa ${SLUG_MAX} ký tự (đang có ${slug.length}). Hãy rút gọn.`;
+			throw new ApiError(400, "invalid_input", message, { slug: message });
+		}
+		return { slug: input.slug, available: true, suggestion: input.slug };
+	}
 	const taken = await slugTaken(ctx.db, kind, slug, input.section ?? null, input.excludeId || null);
 	return { slug, available: !taken, suggestion: taken ? await freeSlug(ctx.db, kind, slug, input.section ?? null, input.excludeId || null) : slug };
 }
@@ -445,8 +532,12 @@ type Prepared = {
 	/** Column -> value for the columns that change. */
 	columns: Map<string, unknown>;
 	changedKeys: string[];
+	/** The library pictures the body, intro and summary use, and the cover of a book: what `media_usage` is rebuilt from. */
 	contentIds: string[];
+	coverIds: string[];
 	searchText: string;
+	/** Sanitising dropped, unwrapped or rewrote something of the submitted body: the editor must reload the stored HTML. */
+	bodyChanged: boolean;
 };
 
 function columnValue(spec: FieldSpec, value: unknown): unknown {
@@ -502,7 +593,7 @@ async function categoryOf(db: AdminDb, kind: Kind, categoryId: string, section: 
  * Applies `input` over `current` and works out what to store: cleaned values, checked references, the sanitised body
  * (with library pictures pointed at their current address) and the columns that change. `current` is null on create.
  */
-async function prepare(db: AdminDb, kind: Kind, current: State | null, input: State, currentRow: Row | null, ownId: string | null): Promise<Prepared> {
+async function prepare(db: AdminDb, kind: Kind, current: State | null, input: State, currentRow: Row | null, ownId: string | null, trustSlug = false): Promise<Prepared> {
 	const next: State = { ...(current ?? {}) };
 	const columns = new Map<string, unknown>();
 	const changedKeys: string[] = [];
@@ -531,6 +622,22 @@ async function prepare(db: AdminDb, kind: Kind, current: State | null, input: St
 
 	if (!plainText(String(next.title ?? ""))) throw new ApiError(400, "invalid_input", "Nhập tiêu đề.", { title: "Nhập tiêu đề." });
 
+	// A Tông Chỉ article is shown under its `name` (page title, hero, share card, lists). The import made it the title, or "title: subtitle"
+	// for articles that share a title; while it is still that, a new title (or subtitle) carries it along. A name somebody wrote is theirs.
+	if (kind.table === "teaching_article" && current && !columns.has("name") && (columns.has("title") || columns.has("subtitle"))) {
+		const [oldTitle, oldSubtitle, oldName] = [String(current.title ?? ""), String(current.subtitle ?? ""), String(current.name ?? "")];
+		const [title, subtitle] = [String(next.title ?? ""), String(next.subtitle ?? "")];
+		let name: string | null = null;
+		if (!oldName || oldName === oldTitle) name = title;
+		else if (oldSubtitle && oldName === `${oldTitle}: ${oldSubtitle}`) name = subtitle ? `${title}: ${subtitle}` : title;
+		name = name === null ? null : name.slice(0, 300);
+		if (name !== null && name !== oldName) {
+			next.name = name;
+			columns.set("name", name);
+			mark("name");
+		}
+	}
+
 	// Where it lives: the section (posts), the category, the slug.
 	if (kind.hasSection) {
 		if (has("section") && input.section !== current?.section) {
@@ -555,22 +662,34 @@ async function prepare(db: AdminDb, kind: Kind, current: State | null, input: St
 		}
 	}
 
-	if (has("slug")) {
-		const slug = slugify(String(input.slug ?? ""));
+	// A slug that arrives as stored is left alone (no slugify, no cutting: 87 of the old site's slugs are longer than the
+	// editor's own limit). Only a slug somebody changed is made into a slug; a new one longer than SLUG_MAX is refused, never cut.
+	const given = has("slug") ? String(input.slug ?? "") : null;
+	if (given !== null && (current || given.trim()) && given !== current?.slug) {
+		const slug = slugify(given, Number.MAX_SAFE_INTEGER);
 		if (!slug) throw new ApiError(400, "invalid_input", "Đường dẫn cần có chữ hoặc số.", { slug: "Đường dẫn cần có chữ hoặc số." });
+		if (slug.length > SLUG_MAX && !trustSlug) {
+			const message = `Đường dẫn tối đa ${SLUG_MAX} ký tự (đang có ${slug.length}). Hãy rút gọn.`;
+			throw new ApiError(400, "invalid_input", message, { slug: message });
+		}
 		if (slug !== current?.slug) {
 			next.slug = slug;
 			columns.set("slug", slug);
 			if (current) mark("slug");
 		}
 	}
+	const explicitSlug = given !== null && (!!current || !!given.trim());
 	if (!current && !next.slug) next.slug = slugify(String(next.title)) || kind.idPrefix;
 	if (!current || columns.has("slug") || sectionChanged) {
 		const slug = String(next.slug);
 		if (await slugTaken(db, kind, slug, section, ownId)) {
-			if (current || has("slug")) throw new ApiError(409, "slug_taken", "Đường dẫn này đã có bài khác dùng.", { slug: "Đường dẫn này đã có bài khác dùng. Hãy chọn đường dẫn khác." });
+			const suggestion = await freeSlug(db, kind, slug, section, ownId);
+			// A slug somebody asked for is theirs to change: the answer carries the free one, nothing is renamed behind their back.
+			if (current || explicitSlug) {
+				throw new ApiError(409, "slug_taken", "Đường dẫn này đã có bài khác dùng.", { slug: "Đường dẫn này đã có bài khác dùng. Hãy chọn đường dẫn khác." }, undefined, { suggestion: { slug: suggestion } });
+			}
 			// A new article whose slug came from its title takes the next free one.
-			next.slug = await freeSlug(db, kind, slug, section, ownId);
+			next.slug = suggestion;
 		}
 		if (!current) columns.set("slug", next.slug);
 	}
@@ -590,15 +709,22 @@ async function prepare(db: AdminDb, kind: Kind, current: State | null, input: St
 	}
 
 	// The body: sanitised, with library pictures at their current address.
-	let contentIds: string[];
-	if (has("contentHtml")) {
-		const firstPass = parseSafe(String(input.contentHtml ?? ""));
+	let bodyTree: HtmlNode[];
+	let bodyChanged = false;
+	// The editor sends back the body as it was opened: nothing to sanitise, store or write again (the old site's HTML is never rewritten
+	// by a save that did not change it).
+	const bodyAsOpened = !!current && has("contentHtml") && String(input.contentHtml ?? "") === String(current.contentHtml ?? "");
+	if (has("contentHtml") && !bodyAsOpened) {
+		const firstChanges: string[] = [];
+		const secondChanges: string[] = [];
+		const firstPass = parseSafe(String(input.contentHtml ?? ""), { changes: firstChanges });
 		const ids = mediaIdsIn(firstPass);
 		const known = ids.length ? await mediaPreviews(db, ids) : {};
 		const mediaSrc = new Map(Object.values(known).map((item) => [item.id, item.url]));
-		const tree = mediaSrc.size ? parseSafe(String(input.contentHtml ?? ""), { mediaSrc }) : firstPass;
+		const tree = mediaSrc.size ? parseSafe(String(input.contentHtml ?? ""), { mediaSrc, changes: secondChanges }) : firstPass;
+		bodyChanged = (mediaSrc.size ? secondChanges : firstChanges).length > 0;
 		const html = serialize(tree).trim();
-		contentIds = mediaIdsIn(tree).filter((id) => id in known);
+		bodyTree = tree;
 		const stored = kind.bodyColumn === "body" ? markdownOf(tree) : html;
 		const before = currentRow ? text(currentRow[kind.bodyColumn]) : null;
 		// A Tông Chỉ article keeps the editor's HTML as well as the Markdown: the Markdown cannot hold tables, video, sound or
@@ -612,8 +738,7 @@ async function prepare(db: AdminDb, kind: Kind, current: State | null, input: St
 			if (current) mark("contentHtml");
 		}
 	} else {
-		const existing = String(next.contentHtml ?? "");
-		contentIds = mediaIdsIn(parseSafe(existing));
+		bodyTree = parseSafe(String(next.contentHtml ?? ""));
 		if (!current) {
 			next.contentHtml = "";
 			columns.set(kind.bodyColumn, "");
@@ -631,10 +756,11 @@ async function prepare(db: AdminDb, kind: Kind, current: State | null, input: St
 	} else if (kind.hasMilestones && !current) next.milestones = [];
 
 	await checkMediaIds(db, mediaToCheck);
+	const { content: contentIds, cover: coverIds } = await referencedMedia(db, kind, next, bodyTree);
 
 	const summary = String(next[kind.summaryColumn === "summary" ? "summary" : kind.summaryColumn] ?? "");
 	const searchText = searchTextOf(String(next.title ?? ""), String(next.subtitle ?? ""), summary, textOf(parseSafe(String(next.contentHtml ?? ""))));
-	return { next, columns, changedKeys, contentIds, searchText };
+	return { next, columns, changedKeys, contentIds, coverIds, searchText, bodyChanged };
 }
 
 function milestoneStatements(db: AdminDb, pageId: string, milestones: { label: string; title: string; description: string }[]): AdminStmt[] {
@@ -649,6 +775,44 @@ function milestoneStatements(db: AdminDb, pageId: string, milestones: { label: s
 		);
 	}
 	return out;
+}
+
+/**
+ * A live article (published or scheduled) whose address changes leaves its old address pointing at the new one, in the same
+ * batch as the save. Older redirects to the old address follow the article (no chains), and a redirect that starts at the
+ * address it now has is dropped (no loops); one row per old address.
+ */
+function redirectStatements(ctx: AuthContext, by: Authed, kind: Kind, current: State, next: State): AdminStmt[] {
+	if (!["published", "scheduled"].includes(String(current.status))) return [];
+	const from = publicPathOf(kind, (current.section as string | undefined) ?? null, String(current.slug));
+	const to = publicPathOf(kind, (next.section as string | undefined) ?? null, String(next.slug));
+	if (from === to || !checkFrom(from).ok || !checkTo(to).ok) return [];
+	return [
+		ctx.db.prepare("DELETE FROM redirect WHERE from_path = ?").bind(to),
+		ctx.db.prepare("UPDATE redirect SET to_path = ? WHERE to_path = ?").bind(to, from),
+		ctx.db
+			.prepare(
+				`INSERT INTO redirect (from_path, to_path, code, note, hits, active, created_by, created_at) VALUES (?, ?, 301, ?, 0, 1, ?, ?)
+				 ON CONFLICT(from_path) DO UPDATE SET to_path = excluded.to_path, code = 301, active = 1, note = excluded.note`,
+			)
+			.bind(from, to, "Tự động: bài đổi đường dẫn", by.user.id, iso(ctx)),
+	];
+}
+
+/**
+ * A row the old admin's import made has no revision: its first edit would leave nothing to go back to. This is the statement that
+ * keeps the version the row has now (before the edit), in the batch of the edit; none when that version already has one.
+ */
+async function baseRevision(ctx: AuthContext, kind: Kind, id: string, row: Row, current: State, version: number): Promise<AdminStmt[]> {
+	if (await ctx.db.prepare("SELECT 1 AS yes FROM revision WHERE entity_type = ? AND entity_id = ? AND version = ?").bind(kind.entityType, id, version).first()) return [];
+	const snapshot = JSON.stringify(snapshotOf(kind, current));
+	if (snapshot.length > 1_500_000) return [];
+	const created = text(row.created_by) || null;
+	return [
+		ctx.db
+			.prepare("INSERT INTO revision (entity_type, entity_id, version, snapshot, summary, created_by, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)")
+			.bind(kind.entityType, id, version, snapshot, created ? "Bản trước khi sửa" : "Bản nhập từ web cũ", created, text(row.updated_at) || text(row.created_at) || iso(ctx)),
+	];
 }
 
 const snapshotOf = (kind: Kind, state: State): State => Object.fromEntries([...editableKeys(kind), "status", "publishAt"].map((key) => [key, state[key] ?? null]));
@@ -683,7 +847,7 @@ export async function createItem(ctx: AuthContext, by: Authed, kind: Kind, input
 	const statements: AdminStmt[] = [
 		ctx.db.prepare(`INSERT INTO ${kind.table} (${names.join(", ")}) VALUES (${names.map(() => "?").join(", ")})`).bind(...names.map((name) => columns.get(name))),
 		revisionStatement(ctx, by, kind.entityType, id, 1, snapshotOf(kind, next), opts.summary ?? "Tạo mới"),
-		...replaceUsageStatements(ctx, kind.entityType, id, mediaUses(kind, next, prepared.contentIds)),
+		...replaceUsageStatements(ctx, kind.entityType, id, mediaUses(kind, next, prepared.contentIds, prepared.coverIds)),
 		audit(ctx, by, { action: `${kind.entityType}.${opts.action ?? "create"}`, entityType: kind.entityType, entityId: id, after: { title: next.title, slug: next.slug, section: next.section ?? undefined, categoryId: next.categoryId } }),
 	];
 	if (kind.hasMilestones) statements.push(...milestoneStatements(ctx.db, id, (next.milestones ?? []) as { label: string; title: string; description: string }[]));
@@ -692,7 +856,7 @@ export async function createItem(ctx: AuthContext, by: Authed, kind: Kind, input
 	} catch (error) {
 		mapWriteError(error, kind);
 	}
-	return getItem(ctx, by, kind, id);
+	return { ...(await getItem(ctx, by, kind, id)), bodyChanged: prepared.bodyChanged };
 }
 
 export async function updateItem(ctx: AuthContext, by: Authed, kind: Kind, id: string, input: State & { version: number }, opts: { summary?: string; action?: string } = {}): Promise<ContentDetail> {
@@ -701,11 +865,11 @@ export async function updateItem(ctx: AuthContext, by: Authed, kind: Kind, id: s
 	mayEditLive(by, kind, row);
 	const version = num(row.version) || 1;
 	if (input.version !== version) throw new ApiError(409, "conflict", "Bài đã được người khác sửa sau khi bạn mở. Hãy tải bản mới nhất rồi sửa tiếp.", { version: String(version) });
-	const current = await stateOf(ctx.db, kind, row);
+	const current = await stateOf(ctx.db, kind, row, ctx.now());
 	const { version: _ignored, ...changes } = input;
 	void _ignored;
-	const prepared = await prepare(ctx.db, kind, current, changes, row, id);
-	if (!prepared.changedKeys.length && !opts.summary) return detailOf(ctx, by, kind, row);
+	const prepared = await prepare(ctx.db, kind, current, changes, row, id, opts.action === "restore");
+	if (!prepared.changedKeys.length && !opts.summary) return { ...(await detailOf(ctx, by, kind, row)), bodyChanged: prepared.bodyChanged };
 
 	const next: State = { ...prepared.next, status: current.status, publishAt: current.publishAt };
 	const columns = new Map(prepared.columns);
@@ -717,11 +881,13 @@ export async function updateItem(ctx: AuthContext, by: Authed, kind: Kind, id: s
 	const before = Object.fromEntries(prepared.changedKeys.map((key) => [key, current[key]]));
 	const after = Object.fromEntries(prepared.changedKeys.map((key) => [key, next[key]]));
 	const statements: AdminStmt[] = [
+		...(await baseRevision(ctx, kind, id, row, current, version)),
 		ctx.db
 			.prepare(`UPDATE ${kind.table} SET ${names.map((name) => `${name} = ?`).join(", ")} WHERE id = ? AND version = ? AND deleted_at IS NULL`)
 			.bind(...names.map((name) => columns.get(name)), id, version),
 		revisionStatement(ctx, by, kind.entityType, id, version + 1, snapshotOf(kind, next), opts.summary ?? summaryOf(kind, prepared.changedKeys)),
-		...replaceUsageStatements(ctx, kind.entityType, id, mediaUses(kind, next, prepared.contentIds)),
+		...replaceUsageStatements(ctx, kind.entityType, id, mediaUses(kind, next, prepared.contentIds, prepared.coverIds)),
+		...(prepared.changedKeys.includes("slug") || prepared.changedKeys.includes("section") ? redirectStatements(ctx, by, kind, current, next) : []),
 		audit(ctx, by, { action: `${kind.entityType}.${opts.action ?? "update"}`, entityType: kind.entityType, entityId: id, before, after }),
 	];
 	if (kind.hasMilestones && prepared.changedKeys.includes("milestones")) statements.push(...milestoneStatements(ctx.db, id, next.milestones as { label: string; title: string; description: string }[]));
@@ -730,7 +896,7 @@ export async function updateItem(ctx: AuthContext, by: Authed, kind: Kind, id: s
 	} catch (error) {
 		mapWriteError(error, kind);
 	}
-	return getItem(ctx, by, kind, id);
+	return { ...(await getItem(ctx, by, kind, id)), bodyChanged: prepared.bodyChanged };
 }
 
 /** A copy as a new draft: "<slug>-sao-chep", the title marked as a copy; views, album and schedule stay with the original. */
@@ -754,6 +920,31 @@ export async function duplicateItem(ctx: AuthContext, by: Authed, kind: Kind, id
 
 export type StatusAction = "submit" | "publish" | "hide" | "unpublish";
 
+/**
+ * The publication date an article gets when it goes out, or null when its date stays. A new article's date is the day it was made
+ * (createItem); the day it first goes out replaces that, unless the editors set another by hand. An article that was ever on the site
+ * (it is now, or one of its revisions was) keeps its date, a scheduled one that is given another time follows that time.
+ */
+async function firstPublicationDate(ctx: AuthContext, kind: Kind, id: string, row: Row, nextStatus: Status, publishAt: string | null): Promise<string | null> {
+	if (!kind.fields.some((spec) => spec.key === "publishedDate")) return null;
+	const date = text(row.published_date);
+	const dayOf = (iso: string) => vietnamToday(new Date(iso));
+	const goingOut = nextStatus === "scheduled" && publishAt ? dayOf(publishAt) : vietnamToday(ctx.now());
+	const status = text(row.status);
+	if (status === "scheduled" && text(row.publish_at)) return date === dayOf(text(row.publish_at)) && nextStatus === "scheduled" && goingOut !== date ? goingOut : null;
+	if (status === "published") return null;
+	const lived = await ctx.db
+		.prepare("SELECT 1 AS yes FROM revision WHERE entity_type = ? AND entity_id = ? AND json_extract(snapshot, '$.status') IN ('published', 'scheduled') LIMIT 1")
+		.bind(kind.entityType, id)
+		.first();
+	if (lived) return null;
+	if (!date) return goingOut;
+	// The day it was made: the row's own stamp, else its first revision's.
+	let made = text(row.created_at);
+	if (!made) made = text((await ctx.db.prepare("SELECT created_at FROM revision WHERE entity_type = ? AND entity_id = ? AND version = 1").bind(kind.entityType, id).first())?.created_at);
+	return made && date === dayOf(made) && date !== goingOut ? goingOut : null;
+}
+
 export async function changeStatus(ctx: AuthContext, by: Authed, kind: Kind, id: string, action: StatusAction, input: { publishAt?: string | null; version?: number }): Promise<ContentDetail> {
 	const row = await findRow(ctx, kind, id);
 	const version = num(row.version) || 1;
@@ -774,6 +965,10 @@ export async function changeStatus(ctx: AuthContext, by: Authed, kind: Kind, id:
 				const at = new Date(input.publishAt);
 				if (Number.isNaN(at.getTime())) throw new ApiError(400, "invalid_input", "Thời điểm hẹn giờ không hợp lệ.", { publishAt: "Thời điểm hẹn giờ không hợp lệ." });
 				if (at.getTime() > ctx.now().getTime() + 60_000) {
+					// Scheduling takes the article off the site until the time: not for one that is on it.
+					if (effectiveStatus(row, ctx.now()) === "published") {
+						throw new ApiError(409, "already_live", "Bài đang hiển thị trên trang, hẹn giờ sẽ gỡ bài khỏi trang cho tới giờ hẹn. Hãy đưa bài về bản nháp trước nếu thật sự muốn hẹn giờ.");
+					}
 					publishAt = at.toISOString();
 					nextStatus = "scheduled";
 					summary = `Hẹn giờ đăng ${new Intl.DateTimeFormat("vi-VN", { dateStyle: "short", timeStyle: "short", timeZone: "Asia/Ho_Chi_Minh" }).format(at)}`;
@@ -797,15 +992,23 @@ export async function changeStatus(ctx: AuthContext, by: Authed, kind: Kind, id:
 		default:
 			throw notFound("Thao tác");
 	}
-	const state = await stateOf(ctx.db, kind, row);
-	const next = { ...state, status: nextStatus, publishAt };
+	const state = await stateOf(ctx.db, kind, row, ctx.now());
+	const publishedDate = action === "publish" ? await firstPublicationDate(ctx, kind, id, row, nextStatus, publishAt) : null;
+	const next = { ...state, status: nextStatus, publishAt, ...(publishedDate ? { publishedDate } : {}) };
 	try {
 		await ctx.db.batch([
+			...(await baseRevision(ctx, kind, id, row, state, version)),
 			ctx.db
-				.prepare(`UPDATE ${kind.table} SET status = ?, publish_at = ?, version = ?, updated_at = ?, updated_by = ? WHERE id = ? AND version = ? AND deleted_at IS NULL`)
-				.bind(nextStatus, publishAt, version + 1, iso(ctx), by.user.id, id, version),
+				.prepare(`UPDATE ${kind.table} SET status = ?, publish_at = ?, ${publishedDate ? "published_date = ?, " : ""}version = ?, updated_at = ?, updated_by = ? WHERE id = ? AND version = ? AND deleted_at IS NULL`)
+				.bind(nextStatus, publishAt, ...(publishedDate ? [publishedDate] : []), version + 1, iso(ctx), by.user.id, id, version),
 			revisionStatement(ctx, by, kind.entityType, id, version + 1, snapshotOf(kind, next), summary),
-			audit(ctx, by, { action: `${kind.entityType}.${action}`, entityType: kind.entityType, entityId: id, before: { status, publishAt: state.publishAt }, after: { status: nextStatus, publishAt } }),
+			audit(ctx, by, {
+				action: `${kind.entityType}.${action}`,
+				entityType: kind.entityType,
+				entityId: id,
+				before: { status, publishAt: state.publishAt, ...(publishedDate ? { publishedDate: state.publishedDate } : {}) },
+				after: { status: nextStatus, publishAt, ...(publishedDate ? { publishedDate } : {}) },
+			}),
 		]);
 	} catch (error) {
 		mapWriteError(error, kind);
@@ -889,10 +1092,17 @@ export async function relatedCandidates(ctx: AuthContext, q: string, excludeId: 
 	const words = searchWords(q);
 	if (!words.length) return [];
 	const postWhere = words.map(() => "p.search_text LIKE ?").join(" AND ");
-	const { results: posts } = await ctx.db
+	const { results: found } = await ctx.db
 		.prepare(`SELECT p.id, p.title, p.section, p.slug FROM post p WHERE p.deleted_at IS NULL AND p.id != ? AND ${postWhere} ORDER BY p.published_date DESC LIMIT 10`)
 		.bind(excludeId ?? "", ...words.map((word) => `%${word}%`))
 		.all();
+	// Rows the import left without search text (until fillSearchText runs) are matched on their title, without accents, here.
+	const { results: unindexed } = await ctx.db
+		.prepare("SELECT p.id, p.title, p.section, p.slug FROM post p WHERE p.deleted_at IS NULL AND p.id != ? AND p.search_text = '' ORDER BY p.published_date DESC LIMIT 1000")
+		.bind(excludeId ?? "")
+		.all();
+	const byTitle = unindexed.filter((row) => words.every((word) => bare(text(row.title)).includes(word)));
+	const posts = [...found, ...byTitle].slice(0, 10);
 	const like = `%${q.trim().replace(/[\\%_]/g, (char) => `\\${char}`)}%`;
 	const { results: statues } = await ctx.db.prepare("SELECT id, name, slug FROM statue WHERE deleted_at IS NULL AND (name LIKE ? ESCAPE '\\' OR code LIKE ? ESCAPE '\\') ORDER BY name LIMIT 10").bind(like, like).all();
 	return [
@@ -929,7 +1139,7 @@ export async function loadPreview(db: AdminDb, secret: string, now: Date, kind: 
 	const row = await db.prepare(`${SELECT_ONE(kind)} WHERE t.id = ? AND t.deleted_at IS NULL`).bind(id).first();
 	if (!row) return null;
 	let state: State;
-	if ((num(row.version) || 1) === claims.version) state = await stateOf(db, kind, row);
+	if ((num(row.version) || 1) === claims.version) state = await stateOf(db, kind, row, now);
 	else {
 		const revision = await db.prepare("SELECT snapshot FROM revision WHERE entity_type = ? AND entity_id = ? AND version = ?").bind(kind.entityType, id, claims.version).first();
 		if (!revision) return null;

@@ -65,7 +65,7 @@ describe("the article sanitiser refuses hostile input", () => {
 		['<img src="data:image/svg+xml,<svg onload=alert(1)>">', ""],
 		['<img src="javascript:alert(1)">', ""],
 		['<iframe src="https://evil.example/embed/x"></iframe>', ""],
-		['<iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>', ""],
+		['<iframe src="https://www.youtube.com.evil.example/embed/dQw4w9WgXcQ"></iframe>', ""],
 		['<iframe src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ" srcdoc="<script>alert(1)</script>"></iframe>', 'title="Video YouTube"'],
 		["<svg><script>alert(1)</script><a xlink:href='javascript:alert(1)'>x</a></svg><p>sau</p>", "<p>sau</p>"],
 		["<math><mi xlink:href='javascript:alert(1)'>x</mi></math>", ""],
