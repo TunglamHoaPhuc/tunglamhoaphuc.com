@@ -143,3 +143,38 @@ describe("B4: the video of a Tông Chỉ article", () => {
 		expect((await editor.call("PATCH", "teachings/tc-1", { version: gone.data.version, video: null })).data.version).toBe(gone.data.version);
 	});
 });
+
+describe("B5: the display name of a Tông Chỉ article follows its title", () => {
+	const nameOf = (w: Awaited<ReturnType<typeof contentWorld>>, id = "tc-1") => (w.raw.prepare("SELECT name FROM teaching_article WHERE id = ?").get(id) as Raw).name;
+
+	it("follows a new title when the name was the old title, whether or not the form sends the name back", async () => {
+		const w = await contentWorld();
+		const editor = await w.as("editor@example.test");
+		const saved = await editor.call("PATCH", "teachings/tc-1", { version: 1, title: "Niệm Phật Hằng Ngày", name: "Niệm Phật" });
+		expect(saved.status, JSON.stringify(saved.json)).toBe(200);
+		expect(saved.data).toMatchObject({ title: "Niệm Phật Hằng Ngày", name: "Niệm Phật Hằng Ngày" });
+		expect(nameOf(w)).toBe("Niệm Phật Hằng Ngày");
+		expect((await editor.call("PATCH", "teachings/tc-1", { version: 2, title: "Niệm Phật Tinh Tấn" })).data.name).toBe("Niệm Phật Tinh Tấn");
+		const revision = JSON.parse(String((w.raw.prepare("SELECT snapshot FROM revision WHERE entity_id = 'tc-1' AND version = 3").get() as Raw).snapshot));
+		expect(revision).toMatchObject({ title: "Niệm Phật Tinh Tấn", name: "Niệm Phật Tinh Tấn" });
+	});
+
+	it("follows the old 'title: subtitle' form of twins, and a name left empty by the import", async () => {
+		const w = await contentWorld();
+		w.raw.prepare("UPDATE teaching_article SET subtitle = 'Dành cho người trẻ', name = 'Niệm Phật: Dành cho người trẻ' WHERE id = 'tc-1'").run();
+		const editor = await w.as("editor@example.test");
+		expect((await editor.call("PATCH", "teachings/tc-1", { version: 1, title: "Tịnh Độ" })).data.name).toBe("Tịnh Độ: Dành cho người trẻ");
+		expect((await editor.call("PATCH", "teachings/tc-1", { version: 2, subtitle: "Cho mọi người" })).data.name).toBe("Tịnh Độ: Cho mọi người");
+		w.raw.prepare("UPDATE teaching_article SET name = '' WHERE id = 'tc-1'").run();
+		expect((await editor.call("PATCH", "teachings/tc-1", { version: 3, title: "Tịnh Độ Tông", subtitle: "" })).data.name).toBe("Tịnh Độ Tông");
+	});
+
+	it("leaves a name the editors wrote themselves, and takes the one sent with the title", async () => {
+		const w = await contentWorld();
+		w.raw.prepare("UPDATE teaching_article SET name = 'Tên riêng' WHERE id = 'tc-1'").run();
+		const editor = await w.as("editor@example.test");
+		expect((await editor.call("PATCH", "teachings/tc-1", { version: 1, title: "Niệm Phật Mới", name: "Tên riêng" })).data.name).toBe("Tên riêng");
+		expect((await editor.call("PATCH", "teachings/tc-1", { version: 2, title: "Niệm Phật Nữa", name: "Tên khác" })).data.name).toBe("Tên khác");
+		expect(nameOf(w)).toBe("Tên khác");
+	});
+});

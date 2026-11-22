@@ -545,6 +545,22 @@ async function prepare(db: AdminDb, kind: Kind, current: State | null, input: St
 
 	if (!plainText(String(next.title ?? ""))) throw new ApiError(400, "invalid_input", "Nhập tiêu đề.", { title: "Nhập tiêu đề." });
 
+	// A Tông Chỉ article is shown under its `name` (page title, hero, share card, lists). The import made it the title, or "title: subtitle"
+	// for articles that share a title; while it is still that, a new title (or subtitle) carries it along. A name somebody wrote is theirs.
+	if (kind.table === "teaching_article" && current && !columns.has("name") && (columns.has("title") || columns.has("subtitle"))) {
+		const [oldTitle, oldSubtitle, oldName] = [String(current.title ?? ""), String(current.subtitle ?? ""), String(current.name ?? "")];
+		const [title, subtitle] = [String(next.title ?? ""), String(next.subtitle ?? "")];
+		let name: string | null = null;
+		if (!oldName || oldName === oldTitle) name = title;
+		else if (oldSubtitle && oldName === `${oldTitle}: ${oldSubtitle}`) name = subtitle ? `${title}: ${subtitle}` : title;
+		name = name === null ? null : name.slice(0, 300);
+		if (name !== null && name !== oldName) {
+			next.name = name;
+			columns.set("name", name);
+			mark("name");
+		}
+	}
+
 	// Where it lives: the section (posts), the category, the slug.
 	if (kind.hasSection) {
 		if (has("section") && input.section !== current?.section) {
