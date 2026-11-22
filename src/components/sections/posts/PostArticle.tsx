@@ -8,7 +8,7 @@ import Cta from "@/components/sections/cta/Cta";
 import HeroInner from "@/components/sections/hero/HeroInner";
 import PostCard from "@/components/shared/cards/PostCard";
 import HeaderSpace from "@/components/shared/others/HeaderSpace";
-import type { PostSection } from "@/config/sections";
+import { DONG_CHAY, type PostSection, TRI_TUE } from "@/config/sections";
 import { IMAGE_WIDTH, imageAt, topImagePriority } from "@/libs/content/media";
 import { getContentRepository } from "@/libs/content/repository";
 import type { Post } from "@/libs/content/types";
@@ -18,6 +18,8 @@ import { articleJsonLd } from "@/libs/seo";
 import JsonLd from "@/components/shared/others/JsonLd";
 
 const RELATED = 3;
+/** Where the posts of each section that has article pages live. */
+const SECTION_PATHS: Record<string, string> = { [DONG_CHAY.slug]: DONG_CHAY.path, [TRI_TUE.slug]: TRI_TUE.path };
 
 type Props = {
 	section: PostSection;
@@ -31,9 +33,11 @@ type Props = {
 // and comments are left out.
 export default async function PostArticle({ section, post, extra }: Props) {
 	const categoryHref = (slug: string) => listHref(section.path, { category: slug, sort: "moi-nhat", page: 1 });
-	const related = (await (await getContentRepository()).listPosts({ section: section.slug, category: post.category.slug, pageSize: RELATED + 1 })).items
-		.filter((item) => item.id !== post.id)
-		.slice(0, RELATED);
+	// The posts the editors chose as related; none chosen, the latest of the same category.
+	const chosen = post.related.filter((item) => item.id !== post.id && item.section in SECTION_PATHS).slice(0, RELATED);
+	const related = chosen.length
+		? chosen
+		: (await (await getContentRepository()).listPosts({ section: section.slug, category: post.category.slug, pageSize: RELATED + 1 })).items.filter((item) => item.id !== post.id).slice(0, RELATED);
 	const path = `${section.path}/${post.slug}`;
 	const tabs: AnchorTab[] = [
 		{ id: "tong-quan", label: "Tổng quan" },
@@ -147,7 +151,11 @@ export default async function PostArticle({ section, post, extra }: Props) {
 							<ul className="row row-gap-4 tlhp-post-grid">
 								{related.map((item) => (
 									<li key={item.id} className="col-12 col-md-6 col-xl-4">
-										<PostCard post={item} href={`${section.path}/${item.slug}`} categoryHref={categoryHref(item.category.slug)} />
+										<PostCard
+											post={item}
+											href={`${SECTION_PATHS[item.section] ?? section.path}/${item.slug}`}
+											categoryHref={listHref(SECTION_PATHS[item.section] ?? section.path, { category: item.category.slug, sort: "moi-nhat", page: 1 })}
+										/>
 									</li>
 								))}
 							</ul>

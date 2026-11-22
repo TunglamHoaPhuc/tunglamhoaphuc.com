@@ -1,7 +1,21 @@
 // Tông Chỉ Tu Học's articles put in their five groups, with each group's line
 // from the site's words (config/tongChi.ts), for the home block and /tong-chi-tu-hoc.
+import type { Metadata } from "next";
+import { site } from "@/config/site";
 import { tongChi } from "@/config/tongChi";
-import type { TongChiSummary } from "@/libs/content/types";
+import type { TongChiArticle, TongChiSummary } from "@/libs/content/types";
+
+/** The page's metadata: the SEO title, description and share picture the editors saved, else the name, excerpt and banner. */
+export function tongChiArticleMetadata(article: TongChiArticle): Metadata {
+	const name = article.seoTitle || article.name;
+	const description = article.seoDescription || article.excerpt || article.subtitle;
+	const image = article.ogImage ?? article.banner;
+	return {
+		title: `${name} – ${tongChi.title} – ${site.name}`,
+		description,
+		openGraph: { title: name, description, images: image ? [image.src] : undefined },
+	};
+}
 
 export type TongChiGroup = { slug: string; name: string; line: string; articles: TongChiSummary[] };
 

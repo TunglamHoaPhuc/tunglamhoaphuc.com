@@ -7,14 +7,18 @@ import { getContentRepository } from "@/libs/content/repository";
 import type { Post } from "@/libs/content/types";
 
 export async function findSectionPost(section: PostSection, slug: string): Promise<Post | null> {
-	const post = await (await getContentRepository()).getPostBySlug(slug);
-	return post?.section === section.slug ? post : null;
+	// Slugs are unique per section: ask for this section's post, not the first post anywhere with the slug.
+	return (await getContentRepository()).getPostBySlug(slug, section.slug);
 }
 
+/** The page's metadata: the SEO title, description and share picture the editors saved, else the title, summary and banner. */
 export function sectionPostMetadata(section: PostSection, post: Post): Metadata {
+	const title = post.seoTitle || post.title;
+	const description = post.seoDescription || post.summary;
+	const image = post.ogImage ?? post.banner;
 	return {
-		title: `${post.title} – ${section.name} – ${site.name}`,
-		description: post.summary,
-		openGraph: { title: post.title, description: post.summary, images: post.banner ? [post.banner.src] : undefined },
+		title: `${title} – ${section.name} – ${site.name}`,
+		description,
+		openGraph: { title, description, images: image ? [image.src] : undefined },
 	};
 }

@@ -8,9 +8,9 @@
 // (schedule, Giới thiệu, Tông Chỉ, areas, statues) are read whole, once, as the files are.
 import type { StatueEntry } from "../baoTuong";
 import { MEDIA_BASE, mediaUrl } from "../media";
-import { countCategories, createMemoryRepository, lazy, queryPosts, slugKey } from "../repository";
+import { countCategories, createMemoryRepository, lazy, queryPosts, sectionSlugKey, slugKey } from "../repository";
 import type { TongChiEntry } from "../tongChi";
-import type { AboutTopic, Area, ContentRepository, GalleryImage, MediaImage, Post, PostSummary, Schedule } from "../types";
+import type { AboutTopic, Area, ContentRepository, GalleryImage, MediaImage, Post, PostExtra, PostSummary, Schedule, Video } from "../types";
 
 /** The part of a D1 database (or of anything shaped like one) this source uses. */
 export type D1Like = {
@@ -64,8 +64,8 @@ const NOW = "strftime('%Y-%m-%dT%H:%M:%fZ', 'now')";
 const live = (alias: string) => `${alias}.deleted_at is null and (${alias}.status = 'published' or (${alias}.status = 'scheduled' and ${alias}.publish_at <= ${NOW}))`;
 const livePlain = (alias: string) => `${alias}.deleted_at is null and ${alias}.status = 'published'`;
 
-const POST_SUMMARY = `
-select p.id, p.slug, p.title, p.subtitle, p.section, p.author, p.published_date, p.summary, p.gallery_count,
+const POST_SELECT = `
+select p.id, p.slug, p.title, p.subtitle, p.section, p.author, p.published_date, p.summary, p.gallery_count, p.pinned,
   p.legacy_views + coalesce(v.n, 0) as views, p.thumbnail_position, p.banner_position,
   c.slug as cat_slug, c.name as cat_name,
   t.r2_key as thumb_key, t.url as thumb_url, b.r2_key as banner_key, b.url as banner_url
@@ -73,9 +73,32 @@ from post p
 left join category c on c.id = p.category_id
 left join media t on t.id = p.thumbnail_media_id
 left join media b on b.id = p.banner_media_id
-${viewsOf("post")}p.id
+${viewsOf("post")}p.id`;
+const POST_SUMMARY = `${POST_SELECT}
 where ${live("p")}
 order by p.rowid`;
+/** The public posts a post's editors chose as related, in their order (a related statue is not a post). */
+const POST_RELATED = `${POST_SELECT}
+join post_related r on r.target_id = p.id and r.target_type = 'post'
+where r.post_id = ? and ${live("p")}
+order by r.position`;
+
+const summaryOf = (row: Row): PostSummary => ({
+	id: text(row.id),
+	slug: text(row.slug),
+	title: text(row.title),
+	subtitle: text(row.subtitle),
+	section: text(row.section),
+	category: category(row),
+	author: text(row.author),
+	publishedDate: text(row.published_date),
+	views: num(row.views),
+	thumbnail: imageOf(row, "thumb", row.thumbnail_position),
+	banner: imageOf(row, "banner", row.banner_position),
+	summary: text(row.summary),
+	galleryCount: num(row.gallery_count),
+	pinned: row.pinned === 1 || row.pinned === true,
+});
 
 /** The albums of one kind of owner ("page", "teaching"): album id → pictures, in order. */
 async function galleries(all: <T extends Row>(sql: string, ...params: unknown[]) => Promise<T[]>, prefix: string): Promise<Map<string, GalleryImage[]>> {
@@ -98,52 +121,77 @@ export function createD1Repository(db: D1Like): ContentRepository {
 		return (await db.prepare(sql).bind(...params).all<T>()).results;
 	}
 
-	// D1 holds every post of the old admin, also the one whose slug an earlier post has: its address
-	// would open the other post, so (as on the old site) it stays out of the lists until its slug is
-	// changed in the admin.
+	// Slugs are unique per section (the admin's index): the same slug in two sections is two posts, each at its own address.
+	// Within a section the import keeps the first post of a slug and leaves out a later one (its address would open the
+	// other post, as on the old site) until its slug is changed in the admin.
 	const summaries = lazy(async (): Promise<PostSummary[]> => {
 		const taken = new Set<string>();
 		const posts: PostSummary[] = [];
 		for (const row of await all(POST_SUMMARY)) {
-			const key = slugKey(text(row.slug));
+			const key = sectionSlugKey(text(row.section), text(row.slug));
 			if (taken.has(key)) continue;
 			taken.add(key);
-			posts.push({
-				id: text(row.id),
-				slug: text(row.slug),
-				title: text(row.title),
-				subtitle: text(row.subtitle),
-				section: text(row.section),
-				category: category(row),
-				author: text(row.author),
-				publishedDate: text(row.published_date),
-				views: num(row.views),
-				thumbnail: imageOf(row, "thumb", row.thumbnail_position),
-				banner: imageOf(row, "banner", row.banner_position),
-				summary: text(row.summary),
-				galleryCount: num(row.gallery_count),
-			});
+			posts.push(summaryOf(row));
 		}
 		return posts;
 	});
 
-	const bySlug = lazy(async () => new Map((await summaries()).map((post) => [slugKey(post.slug), post])));
+	const index = lazy(async () => {
+		const bySectionSlug = new Map<string, PostSummary>();
+		const bySlug = new Map<string, PostSummary>();
+		for (const post of await summaries()) {
+			bySectionSlug.set(sectionSlugKey(post.section, post.slug), post);
+			if (!bySlug.has(slugKey(post.slug))) bySlug.set(slugKey(post.slug), post);
+		}
+		return { bySectionSlug, bySlug };
+	});
 
-	async function getPostBySlug(slug: string): Promise<Post | null> {
-		const summary = (await bySlug()).get(slugKey(slug));
+	/** The extra fields of a post's category, with the library pictures and sounds they point at as addresses. */
+	async function extraOf(raw: unknown): Promise<PostExtra> {
+		const extra = json<{ audioMediaId?: string; audioUrl?: string; duration?: string; youtubeId?: string; book?: { title?: string; author?: string; coverMediaId?: string; link?: string } }>(raw, {});
+		const ids = [extra.audioMediaId, extra.book?.coverMediaId].filter((id): id is string => typeof id === "string" && !!id);
+		const media = new Map<string, string | null>();
+		if (ids.length) {
+			for (const row of await all(`select id, r2_key, url from media where id in (${ids.map(() => "?").join(", ")})`, ...ids)) media.set(text(row.id), srcOf(row.r2_key, row.url));
+		}
+		const audioSrc = (extra.audioMediaId ? media.get(extra.audioMediaId) : null) ?? (extra.audioUrl ? mediaUrl(extra.audioUrl) : null);
+		const book = extra.book && (extra.book.title || extra.book.author || extra.book.coverMediaId) ? extra.book : null;
+		return {
+			audio: audioSrc ? { src: audioSrc, duration: text(extra.duration) } : null,
+			youtubeId: extra.youtubeId ? extra.youtubeId : null,
+			book: book ? { title: text(book.title), author: text(book.author), cover: (book.coverMediaId ? media.get(book.coverMediaId) : null) ?? null, link: book.link ? book.link : null } : null,
+		};
+	}
+
+	async function getPostBySlug(slug: string, section?: string): Promise<Post | null> {
+		const { bySectionSlug, bySlug } = await index();
+		const summary = section === undefined ? bySlug.get(slugKey(slug)) : bySectionSlug.get(sectionSlugKey(section, slug));
 		if (!summary) return null;
-		const [body] = await all("select intro, content_html, keywords, videos from post where id = ?", summary.id);
+		const [body] = await all(
+			`select p.intro, p.content_html, p.keywords, p.videos, p.seo_title, p.seo_description, p.extra, o.r2_key as og_key, o.url as og_url
+			from post p left join media o on o.id = p.og_media_id where p.id = ?`,
+			summary.id,
+		);
 		const photos = await all(
 			`select ai.title, ai.caption, m.r2_key, m.url from post p join album_item ai on ai.album_id = p.album_id join media m on m.id = ai.media_id where p.id = ? order by ai.position`,
 			summary.id,
 		);
+		const related = (await all(POST_RELATED, summary.id)).map(summaryOf);
+		const extra = await extraOf(body?.extra);
+		const videos = json<Video[]>(body?.videos, []);
 		return {
 			...summary,
 			intro: text(body?.intro),
 			contentHtml: text(body?.content_html),
 			keywords: json(body?.keywords, []),
-			videos: json(body?.videos, []),
+			// A Video Phật Pháp post's video is shown where the page shows videos, unless the post lists some of its own.
+			videos: !videos.length && extra.youtubeId ? [{ id: extra.youtubeId, url: `https://www.youtube.com/watch?v=${extra.youtubeId}` }] : videos,
 			gallery: photos.map((row) => ({ src: srcOf(row.r2_key, row.url) ?? "", title: text(row.title), caption: text(row.caption) })),
+			seoTitle: text(body?.seo_title),
+			seoDescription: text(body?.seo_description),
+			ogImage: body ? imageOf(body, "og", null) : null,
+			extra,
+			related,
 		};
 	}
 
@@ -222,8 +270,9 @@ export function createD1Repository(db: D1Like): ContentRepository {
 
 	async function loadTongChi(): Promise<TongChiEntry[]> {
 		const rows = await all(
-			`select a.*, a.legacy_views + coalesce(v.n, 0) as views, c.slug as cat_slug, c.name as cat_name, b.r2_key as banner_key, b.url as banner_url
-			from teaching_article a left join category c on c.id = a.group_id left join media b on b.id = a.banner_media_id
+			`select a.*, a.legacy_views + coalesce(v.n, 0) as views, c.slug as cat_slug, c.name as cat_name, b.r2_key as banner_key, b.url as banner_url,
+				o.r2_key as og_key, o.url as og_url
+			from teaching_article a left join category c on c.id = a.group_id left join media b on b.id = a.banner_media_id left join media o on o.id = a.og_media_id
 			${viewsOf("tong-chi")}a.id
 			where ${live("a")} order by a.position, a.id`,
 		);
@@ -246,6 +295,9 @@ export function createD1Repository(db: D1Like): ContentRepository {
 			gallery: photos.get(text(row.id)) ?? [],
 			book: json(row.book, null),
 			keywords: json(row.keywords, []),
+			seoTitle: text(row.seo_title),
+			seoDescription: text(row.seo_description),
+			ogImage: imageOf(row, "og", null),
 			body: text(row.body),
 			html: text(row.content_html),
 		}));

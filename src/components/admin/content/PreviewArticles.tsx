@@ -54,6 +54,12 @@ export function PostPreview({ data }: { data: PreviewData }) {
 		keywords: (Array.isArray(state.keywords) ? state.keywords : []) as Keyword[],
 		gallery: [],
 		videos: (Array.isArray(state.videos) ? state.videos : []) as Post["videos"],
+		pinned: state.pinned === true,
+		seoTitle: str(state.seoTitle),
+		seoDescription: str(state.seoDescription),
+		ogImage: imageOf(data, "ogMediaId", ""),
+		extra: { audio: null, youtubeId: null, book: null },
+		related: [],
 	};
 	return <PostArticle section={section} post={post} />;
 }

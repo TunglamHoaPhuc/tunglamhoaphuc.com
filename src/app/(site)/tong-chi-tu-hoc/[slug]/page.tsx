@@ -8,14 +8,13 @@ import PostGallery from "@/components/sections/posts/PostGallery";
 import PostVideos from "@/components/sections/posts/PostVideos";
 import ReadingFrame from "@/components/sections/posts/ReadingFrame";
 import HeaderSpace from "@/components/shared/others/HeaderSpace";
-import { site } from "@/config/site";
 import { tongChi } from "@/config/tongChi";
 import { IMAGE_WIDTH, imageAt, topImagePriority } from "@/libs/content/media";
 import { getContentRepository } from "@/libs/content/repository";
 import type { TongChiArticle, TongChiSummary } from "@/libs/content/types";
 import { formatNumber } from "@/libs/format";
 import { redirectIfMoved } from "@/libs/siteRedirect";
-import { groupTongChi, nameInGroup, tongChiHref } from "@/libs/tongChiGroups";
+import { groupTongChi, nameInGroup, tongChiArticleMetadata, tongChiHref } from "@/libs/tongChiGroups";
 
 // Served from Cloudflare's Workers Cache and made again at most every 5 minutes (T41e).
 export const revalidate = 300;
@@ -37,13 +36,7 @@ async function findArticle(slug: string): Promise<{ article: TongChiArticle; all
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
 	const found = await findArticle((await params).slug);
 	if (!found) return {};
-	const { article } = found;
-	const description = article.excerpt || article.subtitle;
-	return {
-		title: `${article.name} – ${tongChi.title} – ${site.name}`,
-		description,
-		openGraph: { title: article.name, description, images: article.banner ? [article.banner.src] : undefined },
-	};
+	return tongChiArticleMetadata(found.article);
 }
 
 // One article of Tông Chỉ Tu Học after Bexon's service page (ServiceDetailsMain): the text in

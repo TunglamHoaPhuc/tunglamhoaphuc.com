@@ -35,6 +35,18 @@ export type PostSummary = {
 	banner: MediaImage | null;
 	summary: string;
 	galleryCount: number;
+	/** Pinned by the editors: first in the lists that sort by date or title. */
+	pinned: boolean;
+};
+
+/** What the editors saved in the fields of a post's category (Pháp Âm, Video Phật Pháp, Ấn Phẩm & Sách), their pictures and sounds as addresses. */
+export type PostExtra = {
+	/** A Pháp Âm sound: its address and its length ("45:10", empty when not given). */
+	audio: { src: string; duration: string } | null;
+	/** A Video Phật Pháp video. */
+	youtubeId: string | null;
+	/** An Ấn Phẩm & Sách book. */
+	book: { title: string; author: string; cover: string | null; link: string | null } | null;
 };
 
 export type Post = PostSummary & {
@@ -45,6 +57,14 @@ export type Post = PostSummary & {
 	keywords: Keyword[];
 	gallery: GalleryImage[];
 	videos: Video[];
+	/** The SEO title and description the editors wrote, empty when not: the page's metadata prefers them to the title and summary. */
+	seoTitle: string;
+	seoDescription: string;
+	/** The picture for shared links, when the editors chose one. */
+	ogImage: MediaImage | null;
+	extra: PostExtra;
+	/** The related posts the editors chose, in their order, those that are public (statues are not here). */
+	related: PostSummary[];
 };
 
 /** "views": most read first (the home page's Dấu ấn hoằng pháp). */
@@ -169,6 +189,11 @@ export type TongChiSummary = {
 };
 
 export type TongChiArticle = TongChiSummary & {
+	/** The SEO title and description the editors wrote, empty when not. */
+	seoTitle: string;
+	seoDescription: string;
+	/** The picture for shared links, when the editors chose one. */
+	ogImage: MediaImage | null;
 	author: string;
 	/** The author's page on this site, when the editors linked one. */
 	authorHref: string | null;
@@ -261,8 +286,11 @@ export type Monk = {
 /** Read-only access to the temple's content, whatever the source. */
 export interface ContentRepository {
 	listPosts(query?: PostQuery): Promise<Page<PostSummary>>;
-	/** `null` when no published post has this slug. */
-	getPostBySlug(slug: string): Promise<Post | null>;
+	/**
+	 * `null` when no published post has this slug. Slugs are unique per section, not across the site: with `section` the post of that
+	 * section, without it the first one that has the slug.
+	 */
+	getPostBySlug(slug: string, section?: string): Promise<Post | null>;
 	listCategories(section: string): Promise<CategoryCount[]>;
 	getSchedule(): Promise<Schedule>;
 	/** Giới thiệu, in the editors' order. */

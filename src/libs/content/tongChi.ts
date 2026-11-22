@@ -107,6 +107,9 @@ export function parseTongChi(file: unknown): ParsedTongChi {
 			keywords: article.keywords
 				.map((keyword): Keyword => ({ keyword: plain(keyword.keyword), title: plain(keyword.title), description: plain(keyword.description) }))
 				.filter((keyword) => keyword.description && (keyword.title || keyword.keyword)),
+			seoTitle: "",
+			seoDescription: "",
+			ogImage: null,
 			body: article.content,
 		});
 	}
