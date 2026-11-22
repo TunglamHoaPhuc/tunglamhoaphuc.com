@@ -48,6 +48,13 @@ create table art_variation (
   image_media_id text, image_position text default 'center 50%');
 create table statue_image (statue_id text, position integer, media_id text, label text default '', image_position text default 'center 50%', primary key (statue_id, position));
 create table statue_related (statue_id text, related_id text, position integer default 0, primary key (statue_id, related_id));
+create table setting (key text primary key, value text);
+create table menu (id text primary key, name text);
+create table menu_item (
+  id text primary key, menu_id text, parent_id text, position integer default 0, label text, link_type text default 'url', category_id text, href text default '',
+  open_new_tab integer default 0, visible integer default 1, icon_type text default 'none', icon_name text default '', icon_svg text default '', icon_media_id text,
+  icon_url text default '', icon_color text default '', updated_at text, updated_by text, deleted_at text, deleted_by text);
+create table redirect (from_path text primary key, to_path text, code integer default 301, note text default '', hits integer default 0, active integer default 1, created_by text, created_at text);
 `;
 
 export type FakeD1 = D1Like & { exec(sql: string): void; insert(table: string, row: Record<string, unknown>): void };

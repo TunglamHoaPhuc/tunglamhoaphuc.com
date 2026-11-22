@@ -2,15 +2,30 @@
 import { FC, useState } from "react";
 import { ChevronRight, Menu, X } from "lucide-react";
 import { NAV_LINKS, DROPDOWN } from "@/features/home/data/home-data";
+import { useSiteChrome } from "@/components/public/SiteChrome";
+import type { ChromeNavItem } from "@/lib/v3-menu";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+
+// Menu có sẵn của V3, dùng khi D1 chưa có mục menu đầu trang nào (admin chưa lưu).
+const BUILT_IN_NAV: ChromeNavItem[] = NAV_LINKS.map((item) => ({
+  label: item.label,
+  href: item.href || "#",
+  newTab: false,
+  children: item.dropdown ? DROPDOWN.map((d) => ({ label: d.label, href: d.href, newTab: false })) : [],
+}));
+
+const newTabProps = (newTab: boolean) => (newTab ? { target: "_blank", rel: "noopener noreferrer" } : {});
 
 interface HeaderProps {
   scrolled: boolean;
 }
 
 const Header: FC<HeaderProps> = ({ scrolled }) => {
-  const [drop, setDrop] = useState<boolean>(false);
+  // Menu đầu trang do admin sửa (D1, qua bố cục gốc); chưa có thì dùng menu có sẵn; không đọc được D1 thì rỗng.
+  const { nav } = useSiteChrome();
+  const items: ChromeNavItem[] = nav ?? BUILT_IN_NAV;
+  const [drop, setDrop] = useState<string | null>(null);
   const [mob, setMob] = useState<boolean>(false);
 
   const pathname = usePathname();
@@ -26,9 +41,17 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
   };
 
   const isLinkActive = (href?: string) => {
-    if (!href || href === '#') return false;
+    if (!href || href === '#' || !href.startsWith('/')) return false;
     if (href === '/') return pathname === '/';
     return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
+  // Đi tới địa chỉ của một mục cha có menu con (nhấp vào nút mở menu).
+  const goTo = (href: string, newTab: boolean) => {
+    if (!href || href === '#') return;
+    if (href.startsWith('/')) router.push(href);
+    else if (newTab) window.open(href, '_blank', 'noopener,noreferrer');
+    else window.location.assign(href);
   };
 
   return (
@@ -68,18 +91,19 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
 
         {/* Menu Navigation Hoàng Kim Với Hiệu Ứng Hover Đẳng Cấp */}
         <nav className="hidden lg:flex items-center gap-5 xl:gap-7 flex-shrink-0">
-          {NAV_LINKS.map((item) => {
-            const isDropdownActive = item.dropdown && (pathname.startsWith('/gioi-thieu') || drop);
+          {items.map((item) => {
+            const hasChildren = item.children.length > 0;
+            const isDropdownActive = hasChildren && (drop === item.label || item.children.some((c) => isLinkActive(c.href)));
             const active = isLinkActive(item.href);
 
             return (
               <div
                 key={item.label}
                 className="relative flex-shrink-0 py-2"
-                onMouseEnter={() => item.dropdown && setDrop(true)}
-                onMouseLeave={() => item.dropdown && setDrop(false)}
+                onMouseEnter={() => hasChildren && setDrop(item.label)}
+                onMouseLeave={() => hasChildren && setDrop(null)}
               >
-                {item.dropdown ? (
+                {hasChildren ? (
                   <button
                     className={`group/btn text-[11px] xl:text-[12px] uppercase tracking-[.1em] font-bold flex items-center gap-1.5 py-1.5 cursor-pointer whitespace-nowrap transition-all duration-300 relative ${
                       isDropdownActive
@@ -87,12 +111,12 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
                         : 'text-[#e3d2c1] hover:text-[#FFDE59] hover:drop-shadow-[0_0_10px_rgba(242,193,78,0.6)] hover:-translate-y-0.5'
                     }`}
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                    onClick={() => router.push('/gioi-thieu')}
+                    onClick={() => goTo(item.href, item.newTab)}
                   >
                     <span>{item.label}</span>
                     <ChevronRight
                       className={`w-3.5 h-3.5 flex-shrink-0 transition-transform duration-300 ${
-                        drop
+                        drop === item.label
                           ? 'rotate-[-90deg] text-[#FFDE59]'
                           : 'rotate-90 text-[#F2C14E] group-hover/btn:text-[#FFDE59] group-hover/btn:translate-y-0.5'
                       }`}
@@ -109,6 +133,7 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
                 ) : (
                   <Link
                     href={item.href || "#"}
+                    {...newTabProps(item.newTab)}
                     className={`group/link text-[11px] xl:text-[12px] uppercase tracking-[.1em] font-bold flex items-center gap-1 py-1.5 whitespace-nowrap transition-all duration-300 relative ${
                       active
                         ? 'text-[#FFDE59] drop-shadow-[0_0_12px_rgba(242,193,78,0.75)]'
@@ -129,7 +154,7 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
                 )}
 
                 {/* Dropdown Menu Giới Thiệu Hoàng Kim */}
-                {item.dropdown && drop && (
+                {hasChildren && drop === item.label && (
                   <div className="absolute top-full left-0 pt-2 w-64 z-50 animate-in fade-in slide-in-from-top-2 duration-200">
                     <div
                       className="rounded-2xl py-2.5 border shadow-[0_16px_40px_rgba(0,0,0,0.85)] backdrop-blur-xl overflow-hidden"
@@ -138,19 +163,20 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
                         borderColor: "rgba(242,193,78,0.45)",
                       }}
                     >
-                      {DROPDOWN.map((d) => {
+                      {item.children.map((d) => {
                         const isSubActive = pathname === d.href;
                         return (
                           <Link
                             key={d.label}
                             href={d.href}
+                            {...newTabProps(d.newTab)}
                             className={`group/sub flex items-center gap-2.5 px-4 py-2.5 text-xs font-bold tracking-wide transition-all duration-200 whitespace-nowrap border-l-3 ${
                               isSubActive
                                 ? 'border-[#F2C14E] bg-gradient-to-r from-[#F2C14E]/25 to-transparent text-[#FFDE59] shadow-inner'
                                 : 'border-transparent text-[#e3d2c1] hover:border-[#F2C14E] hover:bg-gradient-to-r hover:from-[#F2C14E]/20 hover:to-transparent hover:text-[#FFDE59] hover:translate-x-1'
                             }`}
                             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                            onClick={() => setDrop(false)}
+                            onClick={() => setDrop(null)}
                           >
                             <span className="text-[#F2C14E] text-[10px] opacity-70 group-hover/sub:opacity-100 group-hover/sub:scale-125 transition-all">☸</span>
                             <span className="drop-shadow-sm">{d.label}</span>
@@ -187,11 +213,12 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
             borderColor: "rgba(242,193,78,0.35)",
           }}
         >
-          {NAV_LINKS.map((item) =>
-            item.dropdown ? (
+          {items.map((item) =>
+            item.children.length > 0 ? (
               <div key={item.label} className="flex flex-col gap-2 border-b border-[#F2C14E]/15 pb-3">
                 <Link
-                  href={item.href || "/gioi-thieu"}
+                  href={item.href || "#"}
+                  {...newTabProps(item.newTab)}
                   onClick={() => setMob(false)}
                   className="text-xs uppercase font-bold tracking-widest text-[#FFDE59] flex items-center justify-between whitespace-nowrap hover:text-[#FFE5A3] transition-colors"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
@@ -200,12 +227,13 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
                   <ChevronRight className="w-4 h-4 text-[#F2C14E]" />
                 </Link>
                 <div className="flex flex-col gap-1.5 pl-3 border-l-2 border-[#F2C14E]/30 mt-1">
-                  {DROPDOWN.map((d) => {
+                  {item.children.map((d) => {
                     const isSubActive = pathname === d.href;
                     return (
                       <Link
                         key={d.label}
                         href={d.href}
+                        {...newTabProps(d.newTab)}
                         className={`text-xs font-bold tracking-wide whitespace-nowrap transition-colors py-1 ${
                           isSubActive
                             ? 'text-[#FFDE59]'
@@ -224,6 +252,7 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
               <Link
                 key={item.label}
                 href={item.href || "#"}
+                {...newTabProps(item.newTab)}
                 className={`text-xs uppercase tracking-widest font-bold whitespace-nowrap py-2 border-b border-[#F2C14E]/15 transition-colors ${
                   isLinkActive(item.href)
                     ? 'text-[#FFDE59] drop-shadow-[0_0_8px_rgba(242,193,78,0.6)]'

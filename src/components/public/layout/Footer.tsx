@@ -4,6 +4,19 @@ import { FC } from "react";
 import { Phone, Clock } from "lucide-react";
 import { FaFacebook, FaYoutube, FaInstagram, FaTiktok, FaGlobe, FaUsers } from "react-icons/fa6";
 import { usePathname, useRouter } from "next/navigation";
+import { useSiteChrome } from "@/components/public/SiteChrome";
+import { contactGroups, formatPhone, type ContactLine } from "@/lib/contact-format";
+
+// Các dòng liên hệ có sẵn của V3: chỉ dùng khi D1 chưa có số điện thoại nào do admin lưu.
+const BUILT_IN_CONTACTS: ContactLine[] = [
+  { role: "Trưởng ban lãnh chúng", name: "Phật tử Bảo Trâm", phone: "0979345373" },
+  { role: "Thư ký", name: "Phật tử Liên Vi", phone: "0961533271" },
+  { role: "Thư ký", name: "Phật tử Liên Nghi", phone: "0984569134" },
+  { role: "Hỗ trợ thông tin", name: "Phật tử Tịnh Hoàng", phone: "0919366751" },
+  { role: "Hỗ trợ thông tin", name: "Phật tử Liên Hương", phone: "0348198196" },
+  { role: "Hỗ trợ thông tin", name: "Tịnh Hòa Hưng", phone: "0329630394" },
+  { role: "Hỗ trợ thông tin", name: "Liên Phúc Huyền", phone: "0328812922" },
+];
 
 /**
  * Footer chuẩn hệ thống (Responsive & Grid 12 Cột Optimized):
@@ -17,6 +30,14 @@ import { usePathname, useRouter } from "next/navigation";
 export const Footer: FC = () => {
   const pathname = usePathname();
   const router = useRouter();
+  const { contacts, info } = useSiteChrome();
+  // Địa chỉ, giờ mở cửa, khẩu hiệu: của admin (D1) khi đã lưu thông tin trang, không thì chữ có sẵn; admin để trống thì không hiện.
+  const address = info?.address ?? 'THÔN HOÀ TRÚC - XÃ PHÚ CÁT - THÀNH PHỐ HÀ NỘI';
+  const openingHours = info?.openingHours ?? 'Sáng 7:30 – 10:30 | Chiều 13:30 – 17:30 (Ngày thường)';
+  const slogan = info?.slogan ?? 'Nơi để trở về – Chốn thiêng bình yên';
+  const contactRows = contactGroups(contacts ?? BUILT_IN_CONTACTS).flatMap(({ role, people }) =>
+    Array.from({ length: Math.ceil(people.length / 2) }, (_, i) => ({ role, people: people.slice(i * 2, i * 2 + 2) })),
+  );
 
   const handleLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -98,15 +119,17 @@ export const Footer: FC = () => {
             TÙNG LÂM HÒA PHÚC
           </h2>
 
-          <p
-            className="mt-3 text-xs md:text-sm tracking-wider uppercase text-[#e3d2c1]"
-            style={{
-              fontFamily: "'UTM Avo', sans-serif",
-              fontWeight: "bold",
-            }}
-          >
-            THÔN HOÀ TRÚC - XÃ PHÚ CÁT - THÀNH PHỐ HÀ NỘI
-          </p>
+          {address && (
+            <p
+              className="mt-3 text-xs md:text-sm tracking-wider uppercase text-[#e3d2c1]"
+              style={{
+                fontFamily: "'UTM Avo', sans-serif",
+                fontWeight: "bold",
+              }}
+            >
+              {address}
+            </p>
+          )}
         </div>
 
         {/* ── Đường Phân Cách Ngang Toàn Chiều Rộng ── */}
@@ -174,21 +197,21 @@ export const Footer: FC = () => {
             </div>
 
             {/* Thông tin mở cửa (Tách 2 dòng thoáng mắt & Không ngắt cụm (Ngày thường)) */}
-            <div
-              className="flex flex-col gap-1.5 text-sm md:text-base text-[#E2C89B]/90 mt-4"
-              style={{
-                fontFamily: "'UTM Avo', sans-serif",
-                fontWeight: "normal",
-              }}
-            >
-              <p className="flex items-center gap-2 font-semibold text-[#F2C14E]">
-                <Clock className="w-4 h-4 text-[#F2C14E] shrink-0" />
-                <span>Giờ mở cửa đón Phật tử:</span>
-              </p>
-              <p className="pl-6 text-xs sm:text-sm md:text-sm text-[#e3d2c1]">
-                Sáng 7:30 – 10:30 | Chiều 13:30 – 17:30 <span className="whitespace-nowrap">(Ngày thường)</span>
-              </p>
-            </div>
+            {openingHours && (
+              <div
+                className="flex flex-col gap-1.5 text-sm md:text-base text-[#E2C89B]/90 mt-4"
+                style={{
+                  fontFamily: "'UTM Avo', sans-serif",
+                  fontWeight: "normal",
+                }}
+              >
+                <p className="flex items-center gap-2 font-semibold text-[#F2C14E]">
+                  <Clock className="w-4 h-4 text-[#F2C14E] shrink-0" />
+                  <span>Giờ mở cửa đón Phật tử:</span>
+                </p>
+                <p className="pl-6 text-xs sm:text-sm md:text-sm text-[#e3d2c1]">{openingHours}</p>
+              </div>
+            )}
           </div>
 
           {/* Vạch kẻ phân cách đứng (Desktop) / Ngang (Mobile) */}
@@ -209,69 +232,25 @@ export const Footer: FC = () => {
 
             <div className="space-y-3.5" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
               
-              {/* Dòng 1: Trưởng ban lãnh chúng */}
-              <div className="flex items-start md:items-center gap-2 text-xs sm:text-sm lg:text-[15px] text-[#e3d2c1] whitespace-normal md:whitespace-nowrap">
-                <Phone className="w-4 h-4 text-[#F2C14E] shrink-0 mt-0.5 md:mt-0" />
-                <div className="flex flex-wrap items-center gap-1.5 md:gap-2 leading-normal">
-                  <span className="font-medium text-[#E2C89B]">Trưởng ban lãnh chúng:</span>
-                  <span className="font-medium text-[#E2C89B]">Phật tử Bảo Trâm</span>
-                  <span className="text-[#E2C89B]">–</span>
-                  <a href="tel:0979345373" className="font-bold text-[#F2C14E] hover:underline">
-                    0979.345.373
-                  </a>
+              {/* Mỗi vai trò một dòng (tối đa hai người một dòng): số điện thoại do admin lưu ở D1, chưa có thì các dòng có sẵn. */}
+              {contactRows.map((row, i) => (
+                <div key={`${row.role}-${i}`} className="flex items-start md:items-center gap-2 text-xs sm:text-sm lg:text-[15px] text-[#e3d2c1] whitespace-normal md:whitespace-nowrap">
+                  <Phone className="w-4 h-4 text-[#F2C14E] shrink-0 mt-0.5 md:mt-0" />
+                  <div className="flex flex-wrap items-center gap-1.5 md:gap-2 leading-normal">
+                    <span className="font-medium text-[#E2C89B]">{row.role}:</span>
+                    {row.people.map((person, j) => (
+                      <span key={`${person.name}-${person.phone}`} className="contents">
+                        {j > 0 && <span className="text-[#E2C89B]">–</span>}
+                        <span className="font-medium text-[#E2C89B]">{person.name}{row.people.length > 1 ? ':' : ''}</span>
+                        {row.people.length === 1 && <span className="text-[#E2C89B]">–</span>}
+                        <a href={`tel:${person.phone}`} className="font-bold text-[#F2C14E] hover:underline">
+                          {formatPhone(person.phone)}
+                        </a>
+                      </span>
+                    ))}
+                  </div>
                 </div>
-              </div>
-
-              {/* Dòng 2: Thư ký */}
-              <div className="flex items-start md:items-center gap-2 text-xs sm:text-sm lg:text-[15px] text-[#e3d2c1] whitespace-normal md:whitespace-nowrap">
-                <Phone className="w-4 h-4 text-[#F2C14E] shrink-0 mt-0.5 md:mt-0" />
-                <div className="flex flex-wrap items-center gap-1.5 md:gap-2 leading-normal">
-                  <span className="font-medium text-[#E2C89B]">Thư ký:</span>
-                  <span className="font-medium text-[#E2C89B]">Phật tử Liên Vi:</span>
-                  <a href="tel:0961533271" className="font-bold text-[#F2C14E] hover:underline">
-                    0961.533.271
-                  </a>
-                  <span className="text-[#E2C89B]">–</span>
-                  <span className="font-medium text-[#E2C89B]">Phật tử Liên Nghi:</span>
-                  <a href="tel:0984569134" className="font-bold text-[#F2C14E] hover:underline">
-                    0984.569.134
-                  </a>
-                </div>
-              </div>
-
-              {/* Dòng 3: Hỗ trợ thông tin 1 */}
-              <div className="flex items-start md:items-center gap-2 text-xs sm:text-sm lg:text-[15px] text-[#e3d2c1] whitespace-normal md:whitespace-nowrap">
-                <Phone className="w-4 h-4 text-[#F2C14E] shrink-0 mt-0.5 md:mt-0" />
-                <div className="flex flex-wrap items-center gap-1.5 md:gap-2 leading-normal">
-                  <span className="font-medium text-[#E2C89B]">Hỗ trợ thông tin:</span>
-                  <span className="font-medium text-[#E2C89B]">Phật tử Tịnh Hoàng:</span>
-                  <a href="tel:0919366751" className="font-bold text-[#F2C14E] hover:underline">
-                    0919.366.751
-                  </a>
-                  <span className="text-[#E2C89B]">–</span>
-                  <span className="font-medium text-[#E2C89B]">Phật tử Liên Hương:</span>
-                  <a href="tel:0348198196" className="font-bold text-[#F2C14E] hover:underline">
-                    0348.198.196
-                  </a>
-                </div>
-              </div>
-
-              {/* Dòng 4: Hỗ trợ thông tin 2 */}
-              <div className="flex items-start md:items-center gap-2 text-xs sm:text-sm lg:text-[15px] text-[#e3d2c1] whitespace-normal md:whitespace-nowrap">
-                <Phone className="w-4 h-4 text-[#F2C14E] shrink-0 mt-0.5 md:mt-0" />
-                <div className="flex flex-wrap items-center gap-1.5 md:gap-2 leading-normal">
-                  <span className="font-medium text-[#E2C89B]">Hỗ trợ thông tin:</span>
-                  <span className="font-medium text-[#E2C89B]">Tịnh Hòa Hưng:</span>
-                  <a href="tel:0329630394" className="font-bold text-[#F2C14E] hover:underline">
-                    0329.630.394
-                  </a>
-                  <span className="text-[#E2C89B]">–</span>
-                  <span className="font-medium text-[#E2C89B]">Liên Phúc Huyền:</span>
-                  <a href="tel:0328812922" className="font-bold text-[#F2C14E] hover:underline">
-                    0328.812.922
-                  </a>
-                </div>
-              </div>
+              ))}
 
             </div>
           </div>
@@ -289,9 +268,11 @@ export const Footer: FC = () => {
           }}
         >
           <p>© 2026 Tùng Lâm Hòa Phúc. Bảo lưu mọi quyền.</p>
-          <p className="italic" style={{ fontFamily: "'UTM Avo', sans-serif", fontStyle: "italic" }}>
-            &quot;Nơi để trở về – Chốn thiêng bình yên&quot; 🪷
-          </p>
+          {slogan && (
+            <p className="italic" style={{ fontFamily: "'UTM Avo', sans-serif", fontStyle: "italic" }}>
+              &quot;{slogan}&quot; 🪷
+            </p>
+          )}
         </div>
 
       </div>
