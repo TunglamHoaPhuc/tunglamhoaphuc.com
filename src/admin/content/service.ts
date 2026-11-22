@@ -218,6 +218,8 @@ export type ContentDetail = State & {
 	canDelete: boolean;
 	canPublish: boolean;
 	canSubmit: boolean;
+	/** Only in the answer to a save that sent the body: sanitising changed it, so the editor must reload `contentHtml`. */
+	bodyChanged?: boolean;
 };
 
 async function detailOf(ctx: AuthContext, by: Authed, kind: Kind, row: Row): Promise<ContentDetail> {
@@ -457,6 +459,8 @@ type Prepared = {
 	changedKeys: string[];
 	contentIds: string[];
 	searchText: string;
+	/** Sanitising dropped, unwrapped or rewrote something of the submitted body: the editor must reload the stored HTML. */
+	bodyChanged: boolean;
 };
 
 function columnValue(spec: FieldSpec, value: unknown): unknown {
@@ -613,12 +617,16 @@ async function prepare(db: AdminDb, kind: Kind, current: State | null, input: St
 
 	// The body: sanitised, with library pictures at their current address.
 	let contentIds: string[];
+	let bodyChanged = false;
 	if (has("contentHtml")) {
-		const firstPass = parseSafe(String(input.contentHtml ?? ""));
+		const firstChanges: string[] = [];
+		const secondChanges: string[] = [];
+		const firstPass = parseSafe(String(input.contentHtml ?? ""), { changes: firstChanges });
 		const ids = mediaIdsIn(firstPass);
 		const known = ids.length ? await mediaPreviews(db, ids) : {};
 		const mediaSrc = new Map(Object.values(known).map((item) => [item.id, item.url]));
-		const tree = mediaSrc.size ? parseSafe(String(input.contentHtml ?? ""), { mediaSrc }) : firstPass;
+		const tree = mediaSrc.size ? parseSafe(String(input.contentHtml ?? ""), { mediaSrc, changes: secondChanges }) : firstPass;
+		bodyChanged = (mediaSrc.size ? secondChanges : firstChanges).length > 0;
 		const html = serialize(tree).trim();
 		contentIds = mediaIdsIn(tree).filter((id) => id in known);
 		const stored = kind.bodyColumn === "body" ? markdownOf(tree) : html;
@@ -656,7 +664,7 @@ async function prepare(db: AdminDb, kind: Kind, current: State | null, input: St
 
 	const summary = String(next[kind.summaryColumn === "summary" ? "summary" : kind.summaryColumn] ?? "");
 	const searchText = searchTextOf(String(next.title ?? ""), String(next.subtitle ?? ""), summary, textOf(parseSafe(String(next.contentHtml ?? ""))));
-	return { next, columns, changedKeys, contentIds, searchText };
+	return { next, columns, changedKeys, contentIds, searchText, bodyChanged };
 }
 
 function milestoneStatements(db: AdminDb, pageId: string, milestones: { label: string; title: string; description: string }[]): AdminStmt[] {
@@ -736,7 +744,7 @@ export async function createItem(ctx: AuthContext, by: Authed, kind: Kind, input
 	} catch (error) {
 		mapWriteError(error, kind);
 	}
-	return getItem(ctx, by, kind, id);
+	return { ...(await getItem(ctx, by, kind, id)), bodyChanged: prepared.bodyChanged };
 }
 
 export async function updateItem(ctx: AuthContext, by: Authed, kind: Kind, id: string, input: State & { version: number }, opts: { summary?: string; action?: string } = {}): Promise<ContentDetail> {
@@ -749,7 +757,7 @@ export async function updateItem(ctx: AuthContext, by: Authed, kind: Kind, id: s
 	const { version: _ignored, ...changes } = input;
 	void _ignored;
 	const prepared = await prepare(ctx.db, kind, current, changes, row, id, opts.action === "restore");
-	if (!prepared.changedKeys.length && !opts.summary) return detailOf(ctx, by, kind, row);
+	if (!prepared.changedKeys.length && !opts.summary) return { ...(await detailOf(ctx, by, kind, row)), bodyChanged: prepared.bodyChanged };
 
 	const next: State = { ...prepared.next, status: current.status, publishAt: current.publishAt };
 	const columns = new Map(prepared.columns);
@@ -775,7 +783,7 @@ export async function updateItem(ctx: AuthContext, by: Authed, kind: Kind, id: s
 	} catch (error) {
 		mapWriteError(error, kind);
 	}
-	return getItem(ctx, by, kind, id);
+	return { ...(await getItem(ctx, by, kind, id)), bodyChanged: prepared.bodyChanged };
 }
 
 /** A copy as a new draft: "<slug>-sao-chep", the title marked as a copy; views, album and schedule stay with the original. */
