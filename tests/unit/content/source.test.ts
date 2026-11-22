@@ -34,6 +34,15 @@ describe("content source", () => {
 		expect(get()).toBe(2);
 	});
 
+	it("renews a value at once when the admin has written since, and not otherwise", async () => {
+		const { renewing, bumpContentEpoch } = await freshRepository();
+		let made = 0;
+		const get = renewing(() => ++made, 60_000, () => 0);
+		expect([get(), get()]).toEqual([1, 1]);
+		bumpContentEpoch();
+		expect([get(), get()]).toEqual([2, 2]);
+	});
+
 	it("with B2 chosen but not set up, names the missing settings", async () => {
 		vi.stubEnv("CONTENT_SOURCE", "b2");
 		for (const name of ["B2_ENDPOINT", "B2_BUCKET", "B2_KEY_ID", "B2_APPLICATION_KEY"]) vi.stubEnv(name, "");
