@@ -2,8 +2,8 @@ import { loadServerlessJsonAsync } from '@/lib/serverless-db';
 import DongChayHoangPhapClient from './DongChayHoangPhapClient';
 import { HOANG_PHAP_ARTICLES, HoangPhapArticle } from '@/data/dong-chay-hoang-phap-data';
 
-export const revalidate = 0;
-export const dynamic = 'force-dynamic';
+// Cache ở edge 5 phút: danh sách 472 bài không cần dựng lại ở mỗi lượt xem.
+export const revalidate = 300;
 
 const DB_CONFIG = {
   fileName: 'posts-database.json',
@@ -35,7 +35,7 @@ export default async function DongChayHoangPhapPage() {
       bannerUrl: p.bannerUrl || '/images/toan-canh-chua.jpg',
       summary:
         p.summary && !p.summary.includes('Tóm tắt')
-          ? p.summary
+          ? (p.summary.length > 200 ? p.summary.slice(0, 200).trimEnd() + '…' : p.summary)
           : p.content
             ? p.content.replace(/!\[.*?\]\(.*?\)/g, '').replace(/<[^>]+>/g, '').replace(/[#*`_>]/g, '').trim().slice(0, 180) + '...'
             : p.contentHtml
