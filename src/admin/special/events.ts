@@ -284,6 +284,7 @@ registerTrashable({
 	table: "calendar_event",
 	titleSql: "title",
 	module: "events",
+	isLive: (row) => text(row.status) === "published",
 	hasCreatedBy: true,
 	purge: (ctx, _by, id) => [
 		ctx.db.prepare("DELETE FROM revision WHERE entity_type = 'calendar_event' AND entity_id = ?").bind(id),

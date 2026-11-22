@@ -1192,6 +1192,7 @@ for (const kind of Object.values(KINDS)) {
 		table: kind.table,
 		titleSql: "title",
 		module: kind.module,
+		isLive: (row) => text(row.status) === "published" || text(row.status) === "scheduled",
 		hasCreatedBy: true,
 		purge: (ctx, _by, id) => [
 			ctx.db.prepare("DELETE FROM revision WHERE entity_type = ? AND entity_id = ?").bind(kind.entityType, id),

@@ -385,6 +385,7 @@ registerTrashable({
 	table: "statue",
 	titleSql: "name",
 	module: "statues",
+	isLive: (row) => text(row.status) === "published",
 	hasCreatedBy: true,
 	purge: (ctx, _by, id) => [
 		ctx.db.prepare("DELETE FROM revision WHERE entity_type = 'statue' AND entity_id = ?").bind(id),

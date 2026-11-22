@@ -114,6 +114,7 @@ registerTrashable({
 	table: "quote",
 	titleSql: "substr(text, 1, 80)",
 	module: "quotes",
+	isLive: (row) => asBool(row.active),
 	hasCreatedBy: true,
 	purge: () => [],
 });

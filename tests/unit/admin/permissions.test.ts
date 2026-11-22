@@ -83,7 +83,7 @@ describe("Q1: the trash obeys the module of what is inside", () => {
 
 	it("needs <module>.update to restore and <module>.delete to remove, whatever trash.* says", async () => {
 		const w = await world(SEEDS_PLUS);
-		w.raw.prepare("INSERT INTO post (id, slug, title, section, published_date, deleted_at, deleted_by) VALUES ('p1', 's', 'Bài', 'dong-chay-hoang-phap', '2026-01-01', '2026-04-01', 'admin')").run();
+		w.raw.prepare("INSERT INTO post (id, slug, title, section, published_date, status, deleted_at, deleted_by) VALUES ('p1', 's', 'Bài', 'dong-chay-hoang-phap', '2026-01-01', 'draft', '2026-04-01', 'admin')").run();
 		insertMedia(w.raw, { id: "m1", deletedAt: "2026-04-01T00:00:00.000Z" });
 		const email = custom(w, "bin", ["trash.view", "trash.update", "trash.delete"]);
 		const bin = await w.as(email);

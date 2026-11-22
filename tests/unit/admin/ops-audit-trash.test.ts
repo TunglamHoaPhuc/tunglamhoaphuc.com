@@ -4,7 +4,7 @@ import { world } from "../helpers/adminWorld";
 import { count, insertAudit, insertMedia, SEEDS } from "../helpers/ops";
 
 // A kind with a partial unique index (page slugs among live pages), to see a restore refused.
-registerTrashable({ type: "test_page", label: "Trang thử", table: "page", titleSql: "title", module: "pages", hasCreatedBy: true, purge: (ctx, _by, id) => [ctx.db.prepare("DELETE FROM revision WHERE entity_type = 'page' AND entity_id = ?").bind(id)] });
+registerTrashable({ type: "test_page", label: "Trang thử", table: "page", titleSql: "title", module: "pages", isLive: () => false, hasCreatedBy: true, purge: (ctx, _by, id) => [ctx.db.prepare("DELETE FROM revision WHERE entity_type = 'page' AND entity_id = ?").bind(id)] });
 
 describe("activity log", () => {
 	it("lists newest first, 50 to a page, with the total", async () => {

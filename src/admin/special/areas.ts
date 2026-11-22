@@ -137,6 +137,7 @@ registerTrashable({
 	table: "area",
 	titleSql: "name",
 	module: "areas",
+	isLive: (row) => asBool(row.visible),
 	hasCreatedBy: true,
 	purge: (ctx, _by, id) => [
 		ctx.db.prepare("DELETE FROM revision WHERE entity_type = 'area' AND entity_id = ?").bind(id),
