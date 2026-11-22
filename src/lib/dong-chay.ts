@@ -105,7 +105,7 @@ export async function dongChayPage(query: DongChayQuery, repo?: ContentRepositor
 export function relatedArticles(current: Pick<V3Post, "id" | "slug" | "title" | "subCategory" | "keywords">, all: HoangPhapArticle[], limit = 12) {
 	const category = (current.subCategory || "").toLowerCase();
 	const keywords = (current.keywords || []).map((k) => (k.keyword || "").toLowerCase()).filter(Boolean);
-	const words = (current.title || "").toLowerCase().split(/s+/).filter((w) => w.length > 2);
+	const words = (current.title || "").toLowerCase().split(/\s+/).filter((w) => w.length > 2);
 	const score = (a: HoangPhapArticle) => {
 		const title = (a.title || "").toLowerCase();
 		return (a.category && a.category.toLowerCase() === category ? 3 : 0) + (keywords.some((kw) => title.includes(kw)) ? 2 : 0) + (words.some((w) => title.includes(w)) ? 1 : 0);

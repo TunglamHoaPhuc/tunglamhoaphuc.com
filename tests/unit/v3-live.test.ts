@@ -165,3 +165,10 @@ test("các trang và API của những loại này không còn dùng bản đón
 	};
 	for (const [file, banned] of Object.entries(files)) assert.doesNotMatch(readFileSync(file, "utf8"), banned, file);
 });
+
+test("gợi ý theo từ trong tiêu đề: tách theo khoảng trắng", () => {
+	const article = (id: string, title: string) => ({ id, slug: id, title, category: "", subCategory: "", thumbnailUrl: "t", summary: "" }) as never;
+	const current = { id: "x", slug: "x", title: "Mùa Vu Lan", subCategory: "", keywords: [] };
+	const picks = relatedArticles(current, [article("a", "Chuyện xa xôi"), article("b", "Vu Lan báo hiếu")]);
+	assert.deepEqual(picks.map((p) => p.link), ["/dong-chay-hoang-phap/b", "/dong-chay-hoang-phap/a"]);
+});
