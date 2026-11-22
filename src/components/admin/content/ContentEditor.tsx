@@ -439,7 +439,9 @@ export function ContentEditor({ kind, id }: { kind: KindName; id: string | null 
 										}}
 										onBlur={() => {
 											// Only what was typed is made into a slug; the address an article already has is left exactly as stored.
-											if (slugTyped) set("slug", slugOnBlur(str(form.slug), true));
+											// (nothing is set when it is already a slug: setting clears the notice above and the page would jump under the click that caused this blur)
+											const cleaned = slugOnBlur(str(form.slug), slugTyped);
+											if (cleaned !== str(form.slug)) set("slug", cleaned);
 											setSlugTyped(false);
 										}}
 										aria-describedby="content-slug-note"

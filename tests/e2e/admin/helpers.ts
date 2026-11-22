@@ -2,7 +2,8 @@
 // prepared LOCAL database (`npm run dev:db -- --init --seed`, then `npm run dev`):
 //   BASE_URL=http://localhost:3001 npx playwright test tests/e2e/admin --project=desktop
 // The first Super Admin comes from .dev.vars (git-ignored); the other accounts are made through the API by the tests.
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { DatabaseSync } from "node:sqlite";
 import { expect, type APIRequestContext, type Page, request as playwrightRequest } from "@playwright/test";
 
 export const API = "/api/quan-tri/v1";
@@ -93,3 +94,19 @@ export async function pngBuffer(page: Page, width: number, height: number, color
 	);
 	return Buffer.from(base64, "base64");
 }
+
+/**
+ * The LOCAL development database of this checkout, opened for the few things the API cannot make (a slug longer than the editor's own
+ * limit, as the old site's imported articles have; an area, which only an import creates). The dev server holds it open in WAL mode, so a
+ * short busy timeout is enough. Never a real database: the file is under .cloudflare/state.
+ */
+export function localDb(): DatabaseSync {
+	const dir = ".cloudflare/state/v3/d1/miniflare-D1DatabaseObject";
+	const file = readdirSync(dir).find((name) => name.endsWith(".sqlite") && name !== "metadata.sqlite");
+	if (!file) throw new Error(`no local D1 file in ${dir}: run \`npm run dev:db -- --init --seed\` first`);
+	const db = new DatabaseSync(`${dir}/${file}`);
+	db.exec("PRAGMA busy_timeout = 10000");
+	return db;
+}
+
+export const unwrap = <T>(response: { json: unknown }): T => (response.json as { data: T }).data;
