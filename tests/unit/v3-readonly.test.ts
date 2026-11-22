@@ -42,6 +42,17 @@ test("không còn đường ghi cũ: saveServerlessJson, invalidateServerlessCac
 	for (const gone of ["admin/posts/[id]", "admin/tong-chi/[id]", "admin/gioi-thieu/[id]", "admin/vu-tru/[slug]", "admin/vu-tru"]) assert.equal(routes.has(`src/app/api/${gone}/route.ts`), false, gone);
 });
 
+// Bảo tượng và khu vực nay chỉ đọc từ D1: các tệp đóng gói cũ đã xóa, không được nhập lại và không route nào phát lại chúng.
+test("không còn tệp dữ liệu tượng và khu vực đóng gói, không ai nhập, không route nào phát lại", () => {
+	const removed = ["statue-data.ts", "statues-database.json", "baoTuongFullData.ts", "bao-tuong-full-data.ts", "universe-data.ts", "universe-database.json"];
+	const dataFiles = new Set(readdirSync("src/data"));
+	for (const name of removed) assert.equal(dataFiles.has(name), false, `src/data/${name} đã bị xóa`);
+	const bare = removed.map((name) => name.replace(/\.(ts|json)$/, ""));
+	const importOf = (code: string) => bare.some((name) => code.includes(`@/data/${name}"`) || code.includes(`@/data/${name}'`) || code.includes(`@/data/${name}.json`));
+	for (const file of walk("src").map(norm).filter((f) => /\.(ts|tsx)$/.test(f))) assert.equal(importOf(readFileSync(file, "utf8")), false, file);
+	assert.equal(new Set(walk("src/app/api").map(norm)).has("src/app/api/admin/bao-tuong/route.ts"), false, "/api/admin/bao-tuong phát lại danh sách tượng đóng gói nên đã bị xóa");
+});
+
 const record = (extra: Partial<MemorialRecord>): MemorialRecord => ({
 	id: "1",
 	sheetName: "s",
