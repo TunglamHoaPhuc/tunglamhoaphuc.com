@@ -8,6 +8,7 @@ import NewsSection from "@/features/home/components/NewsSection";
 import DharmaSection from "@/features/home/components/DharmaSection";
 import CalendarSection from "@/features/home/components/CalendarSection";
 import GallerySection from "@/features/home/components/GallerySection";
+import type { HomeGalleryArea, HomeGalleryStatue } from "@/lib/v3-home";
 import { SmartSearchAIBar } from "@/components/public/SmartSearchAIBar";
 import { VerticalAnchorNav } from "@/components/common/VerticalAnchorNav";
 import { WelcomeNoticeModal } from "@/components/public/modals/WelcomeNoticeModal";
@@ -21,7 +22,7 @@ const HOME_SECTIONS = [
   { id: "gallery", label: "KHU VỰC & BẢO TƯỢNG" },
 ];
 
-const Home: FC = () => {
+const Home: FC<{ gallery: { areas: HomeGalleryArea[]; statues: HomeGalleryStatue[] } }> = ({ gallery }) => {
   const [scrollY, setScrollY] = useState<number>(0);
 
   useEffect(() => {
@@ -73,7 +74,7 @@ const Home: FC = () => {
 
         {/* Section 5: Featured Areas & Statues */}
         <section id="gallery">
-          <GallerySection />
+          <GallerySection areas={gallery.areas} statues={gallery.statues} />
         </section>
       </main>
 
