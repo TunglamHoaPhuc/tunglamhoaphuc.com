@@ -356,3 +356,62 @@ dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.78);
   backdrop-filter: blur(4px);
 }
+
+/* Thân bài hiển thị bằng HTML đã lọc (src/components/article/RichHtmlBody.tsx): bảng, video, âm thanh, chú thích ảnh. */
+.tlhp-rich {
+  font-family: 'UTM Avo', sans-serif;
+  color: #ffe5a3;
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+  overflow-wrap: anywhere;
+}
+.tlhp-rich > * + * { margin-top: 1.25rem; }
+.tlhp-rich h2,
+.tlhp-rich h3,
+.tlhp-rich h4 {
+  font-family: 'UTM Niagara', 'Playfair Display', serif;
+  color: #ffde59;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  line-height: 1.25;
+  text-align: center;
+  margin-top: 2.25rem;
+}
+.tlhp-rich h2 { font-size: 2.25rem; }
+.tlhp-rich h3 { font-size: 1.875rem; }
+.tlhp-rich h4 { font-size: 1.5rem; }
+.tlhp-rich p { text-align: justify; text-align-last: left; }
+.tlhp-rich strong { color: #ffde59; font-weight: 700; }
+.tlhp-rich em { font-style: italic; }
+.tlhp-rich s { opacity: 0.7; }
+.tlhp-rich a { color: #f2c14e; text-decoration: underline; text-underline-offset: 3px; }
+.tlhp-rich a:hover { color: #ffffff; }
+.tlhp-rich ul,
+.tlhp-rich ol { padding-left: 1.5rem; }
+.tlhp-rich ul { list-style: disc; }
+.tlhp-rich ol { list-style: decimal; }
+.tlhp-rich li + li { margin-top: 0.5rem; }
+.tlhp-rich li::marker { color: #f2c14e; }
+.tlhp-rich blockquote {
+  border-left: 3px solid #f2c14e;
+  padding: 0.5rem 1rem;
+  font-style: italic;
+  font-weight: 600;
+  background: rgba(242, 193, 78, 0.06);
+  border-radius: 0 0.75rem 0.75rem 0;
+}
+.tlhp-rich blockquote.tho,
+.tlhp-rich blockquote.kinh { text-align: center; border-left: 0; border-top: 1px solid rgba(242, 193, 78, 0.5); border-bottom: 1px solid rgba(242, 193, 78, 0.5); border-radius: 0; }
+.tlhp-rich hr { border: 0; border-top: 1px solid rgba(242, 193, 78, 0.4); margin: 2rem 0; }
+.tlhp-rich figure { text-align: center; }
+.tlhp-rich img { max-width: 100%; height: auto; margin-inline: auto; border-radius: 0.75rem; border: 1px solid rgba(242, 193, 78, 0.35); }
+.tlhp-rich figcaption { margin-top: 0.5rem; font-size: 0.875rem; font-style: italic; opacity: 0.85; }
+.tlhp-rich audio { width: 100%; }
+.tlhp-rich iframe { width: 100%; height: auto; aspect-ratio: 16 / 9; border: 0; border-radius: 0.75rem; background: #000; }
+.tlhp-rich [data-youtube-video] { max-width: 100%; }
+.tlhp-rich table { display: block; max-width: 100%; overflow-x: auto; border-collapse: collapse; font-size: 0.95rem; }
+.tlhp-rich th,
+.tlhp-rich td { border: 1px solid rgba(242, 193, 78, 0.35); padding: 0.5rem 0.75rem; vertical-align: top; text-align: left; }
+.tlhp-rich th { background: rgba(242, 193, 78, 0.12); color: #ffde59; }
+.tlhp-rich caption { caption-side: top; padding-bottom: 0.5rem; font-style: italic; }
