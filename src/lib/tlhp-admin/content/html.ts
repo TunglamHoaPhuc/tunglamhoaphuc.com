@@ -7,7 +7,7 @@
 // Kept: h2–h4 (h1 becomes h2, h5/h6 become h4), p, br, strong/b, em/i, u, s/strike/del, blockquote (class "kinh"
 // or "tho" only), ul/ol/li, a (https, mailto and relative links; external ones open in a new tab with
 // rel="noopener noreferrer"), the table family, figure/img/figcaption (pictures from /anh-goc/, /brand/ or https),
-// iframe (YouTube without cookies only), audio (from /anh-goc/ or https; controls, preload none), hr, and the
+// iframe (YouTube without cookies only), audio (library media: its media id or a /anh-goc/ path; controls, preload none), hr, and the
 // <div data-youtube-video> the editor puts around a video. Everything else is unwrapped (its text stays) or, for
 // script, style, svg and the like, dropped with all it holds.
 import { decodeEntities } from "../../tlhp-content/normalize";
@@ -267,7 +267,9 @@ function attributesOf(tag: string, raw: [string, string][], options: SanitizeOpt
 		case "audio": {
 			const mediaId = decoded(get("data-media-id") ?? "");
 			const known = MEDIA_ID.test(mediaId) ? options.mediaSrc?.get(mediaId) : undefined;
-			const src = known ?? safeMediaSrc(get("src") ?? "");
+			// Sound comes from the library only: its address by media id, or the site's own /anh-goc/ path (docs 6.5), never an outside host.
+			const own = decoded(get("src") ?? "");
+			const src = known ?? (own.startsWith("/anh-goc/") ? safeMediaSrc(own) : null);
 			if (!src) return {};
 			out.src = src;
 			out.controls = "";
