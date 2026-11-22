@@ -65,6 +65,13 @@ export class AdminApi {
 		return { status: response.status(), json: text ? JSON.parse(text) : null };
 	}
 
+	/** A multipart request (a picture replaced or cut): the pictures' write routes read nothing else. */
+	async multipart(method: string, path: string, parts: Record<string, string | { name: string; mimeType: string; buffer: Buffer }>): Promise<{ status: number; json: unknown }> {
+		const response = await this.context.fetch(`${API}/${path}`, { method, headers: { Origin: this.origin, "X-TLHP-CSRF": this.csrf }, multipart: parts, failOnStatusCode: false });
+		const text = await response.text();
+		return { status: response.status(), json: text ? JSON.parse(text) : null };
+	}
+
 	/** Uploads a tiny valid PNG (made unique by `stamp`) as this person and returns the library id it got. */
 	async upload(name: string, stamp = `${Date.now()}-${Math.random()}`): Promise<string> {
 		const png = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
@@ -82,6 +89,12 @@ export class AdminApi {
 	async dispose() {
 		await this.context.dispose();
 	}
+}
+
+/** How the seeded Super Admin signs in on the page, once `superAdminApi` has changed its one-time password (call that first). */
+export function superAdminLogin(): { email: string; password: string } {
+	const vars = devVars();
+	return { email: vars.ADMIN_SEED_EMAIL, password: vars.ADMIN_E2E_PASSWORD || PASSWORD };
 }
 
 export async function superAdminApi(baseURL: string): Promise<AdminApi> {
@@ -115,8 +128,13 @@ export async function signInOnPage(page: Page, email: string, password: string) 
 	await page.goto("/quan-tri/dang-nhap");
 	// Typed before React has taken the form over, the fields are emptied again when it does (a slow dev server).
 	await page.waitForFunction(() => (window as unknown as { __tqReady?: boolean }).__tqReady === true);
-	await page.getByLabel("Email").fill(email);
-	await page.getByLabel("Mật khẩu").fill(password);
+	// A slow dev server can still re-render the form after the flag is up and empty a field: fill again until both values stay.
+	await expect(async () => {
+		await page.getByLabel("Email").fill(email);
+		await page.getByLabel("Mật khẩu").fill(password);
+		await expect(page.getByLabel("Email")).toHaveValue(email, { timeout: 500 });
+		await expect(page.getByLabel("Mật khẩu")).toHaveValue(password, { timeout: 500 });
+	}).toPass({ timeout: 15_000 });
 	await page.getByRole("button", { name: "Đăng nhập" }).click();
 	await page.waitForURL((url) => url.pathname === "/quan-tri");
 }

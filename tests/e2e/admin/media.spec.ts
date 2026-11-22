@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { devVars, pngBuffer, signInOnPage, superAdminApi } from "./helpers";
+import { pngBuffer, signInOnPage, superAdminApi, superAdminLogin } from "./helpers";
 
 test.skip(({ isMobile }) => isMobile, "the admin flows are checked on the desktop project");
 // The first page loads on a dev server compile on demand: give each test room.
@@ -8,9 +8,9 @@ test.setTimeout(150_000);
 type Item = { id: string; url: string; version: number; width: number; height: number; usageCount: number };
 
 test("upload a picture, replace it in place, cut it, and see the new picture where the old one was", async ({ page, baseURL }) => {
-	const vars = devVars();
 	const api = await superAdminApi(baseURL!);
-	await signInOnPage(page, vars.ADMIN_SEED_EMAIL, vars.ADMIN_SEED_PASSWORD);
+	const login = superAdminLogin(); // the seeded one-time password was changed by superAdminApi
+	await signInOnPage(page, login.email, login.password);
 	await page.goto("/quan-tri/media");
 
 	// 1. upload through the page (the browser turns it into WebP)

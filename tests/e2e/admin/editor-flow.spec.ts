@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { devVars, localDb, signInOnPage, superAdminApi, unwrap, type AdminApi } from "./helpers";
+import { localDb, signInOnPage, superAdminApi, superAdminLogin, unwrap, type AdminApi } from "./helpers";
 
 // The article editor in a real browser (tasks/admin-v3-spec.md B1, B2, B3, B4, B13, B15): what is typed while a save is on its way
 // stays, an imported article with a very long slug keeps its address, a taken slug offers the free one, leaving with unsaved changes
@@ -29,8 +29,8 @@ async function makePost(title: string, extra: Record<string, unknown> = {}): Pro
 }
 
 async function openEditor(page: Page, path: string) {
-	const vars = devVars();
-	await signInOnPage(page, vars.ADMIN_SEED_EMAIL, vars.ADMIN_SEED_PASSWORD);
+	const login = superAdminLogin(); // the seeded one-time password was changed by superAdminApi
+	await signInOnPage(page, login.email, login.password);
 	await page.goto(path);
 	await expect(page.locator(".ProseMirror")).toBeVisible({ timeout: 90_000 });
 }

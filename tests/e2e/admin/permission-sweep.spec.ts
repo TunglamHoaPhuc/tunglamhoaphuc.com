@@ -55,7 +55,8 @@ function contentCounts(): Record<string, number> {
 	const db = localDb();
 	const out: Record<string, number> = {};
 	for (const { name } of db.prepare("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%' AND name NOT LIKE 'd1_%' ORDER BY name").all() as { name: string }[]) {
-		if (/session|audit|rate|attempt|^user$|token|mfa|backup|reset/i.test(name)) continue;
+		// accounts, sessions and 2FA set-up are written by the sweep's own sign-ins and by `me/2fa/setup`, which any session may call
+		if (/session|audit|rate|attempt|^user$|token|mfa|totp|backup|reset/i.test(name)) continue;
 		out[name] = (db.prepare(`SELECT COUNT(*) AS n FROM "${name}"`).get() as { n: number }).n;
 	}
 	db.close();
@@ -74,7 +75,9 @@ test("every route x every role answers as the table says, and an empty sweep wri
 			const result = await send(person.api, entry);
 			const wants = allowed(principal, entry);
 			if (wants) {
-				if (result.status === 401 || result.status === 403 || (result.status >= 500 && result.status !== 503)) problems.push(`${principal.id} ${entry.key}: should pass the gate, got ${result.status} ${codeOf(result)}`);
+				// past the gate a handler may fail for its own reasons: the SMTP test of a server with no mail server set up answers 502 mail_failed
+				const ownFailure = entry.key === "POST settings/smtp/test" && result.status === 502 && codeOf(result) === "mail_failed";
+				if (result.status === 401 || result.status === 403 || (result.status >= 500 && result.status !== 503 && !ownFailure)) problems.push(`${principal.id} ${entry.key}: should pass the gate, got ${result.status} ${codeOf(result)}`);
 			} else if (result.status !== 403 || !["forbidden", "forbidden_super"].includes(codeOf(result))) {
 				problems.push(`${principal.id} ${entry.key}: should be 403 forbidden, got ${result.status} ${codeOf(result)}`);
 			}
@@ -140,10 +143,12 @@ test("IDOR: an Author cannot touch what an Editor made (post, revisions, preview
 	// pictures: the Editor's is the Author's to look at only
 	const theirs = await editor.upload(`bien-tap-${stamp}.png`);
 	const mine = await author.upload(`tac-gia-${stamp}.png`);
+	const png = { name: "x.png", mimeType: "image/png", buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64") };
 	const pictureWrites = [
 		await author.call("PATCH", `media/${theirs}`, { alt: "x" }),
 		await author.call("DELETE", `media/${theirs}`),
-		await author.call("PUT", `media/${theirs}/crops/1x1`, {}),
+		await author.multipart("PUT", `media/${theirs}/file`, { file: png }),
+		await author.multipart("PUT", `media/${theirs}/crops/1x1`, { file: png, region: JSON.stringify({ x: 0, y: 0, width: 1, height: 1 }) }),
 		await author.call("DELETE", `media/${theirs}/crops/1x1`),
 	];
 	for (const result of pictureWrites) expect([result.status, codeOf(result)]).toEqual([403, "forbidden"]);
