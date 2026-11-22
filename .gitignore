@@ -66,3 +66,6 @@ node_modules/
 
 # Lighthouse CI runs (npm run lhci)
 /.lighthouseci/
+
+# Bản sao D1 thật trước khi áp migration (không đưa vào git)
+/data/sao-luu-d1/
