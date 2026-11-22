@@ -68,14 +68,15 @@ export async function readStatueLinks(db: D1Like): Promise<StatueLinks> {
 	return links;
 }
 
-const sharedLinks = (async () => {
-	const db = await siteDb();
-	if (!db) return () => Promise.resolve(NO_LINKS);
-	return renewing(() => readStatueLinks(db), 60_000);
-})();
+let sharedLinks: Promise<() => Promise<StatueLinks>> | undefined;
 
-/** The links for this server instance (a fresh read each minute); none when V3 is not reading from D1. */
+/** The links for this server instance (a fresh read each minute); none when V3 is not reading from D1. Started on first use, not at import. */
 export async function statueLinks(): Promise<StatueLinks> {
+	sharedLinks ??= (async () => {
+		const db = await siteDb();
+		if (!db) return () => Promise.resolve(NO_LINKS);
+		return renewing(() => readStatueLinks(db), 60_000);
+	})();
 	return (await sharedLinks)();
 }
 
