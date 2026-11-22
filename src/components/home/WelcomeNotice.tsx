@@ -59,49 +59,49 @@ export default function WelcomeNotice() {
 	return (
 		<dialog
 			ref={dialogRef}
-			className="tlhp-welcome"
-			aria-labelledby="tlhp-welcome-title"
-			aria-describedby="tlhp-welcome-body"
+			className="tlhp-welcome-notice"
+			aria-labelledby="tlhp-welcome-notice-title"
+			aria-describedby="tlhp-welcome-notice-body"
 			onCancel={(event) => {
 				event.preventDefault();
 				close();
 			}}
 		>
-			<div className="tlhp-welcome__card">
-				<span className="tlhp-welcome__corner tlhp-welcome__corner--tl" aria-hidden="true" />
-				<span className="tlhp-welcome__corner tlhp-welcome__corner--tr" aria-hidden="true" />
-				<span className="tlhp-welcome__corner tlhp-welcome__corner--bl" aria-hidden="true" />
-				<span className="tlhp-welcome__corner tlhp-welcome__corner--br" aria-hidden="true" />
+			<div className="tlhp-welcome-notice__card">
+				<span className="tlhp-welcome-notice__corner tlhp-welcome-notice__corner--tl" aria-hidden="true" />
+				<span className="tlhp-welcome-notice__corner tlhp-welcome-notice__corner--tr" aria-hidden="true" />
+				<span className="tlhp-welcome-notice__corner tlhp-welcome-notice__corner--bl" aria-hidden="true" />
+				<span className="tlhp-welcome-notice__corner tlhp-welcome-notice__corner--br" aria-hidden="true" />
 
-				<button type="button" className="tlhp-welcome__close" onClick={close} aria-label="Đóng thông báo">
+				<button type="button" className="tlhp-welcome-notice__close" onClick={close} aria-label="Đóng thông báo">
 					<svg viewBox="0 0 24 24" aria-hidden="true">
 						<path d="M18 6 6 18" />
 						<path d="m6 6 12 12" />
 					</svg>
 				</button>
 
-				<header className="tlhp-welcome__head">
-					<div className="tlhp-welcome__wheel" aria-hidden="true">
+				<header className="tlhp-welcome-notice__head">
+					<div className="tlhp-welcome-notice__wheel" aria-hidden="true">
 						<span>☸</span>
 					</div>
-					<p className="tlhp-welcome__badge">ẤN BẢN SỐ HÓA V1.0.0 (XUẤT BẢN LẦN THỨ NHẤT)</p>
-					<h2 id="tlhp-welcome-title" className="tlhp-welcome__title">
+					<p className="tlhp-welcome-notice__badge">ẤN BẢN SỐ HÓA V1.0.0 (XUẤT BẢN LẦN THỨ NHẤT)</p>
+					<h2 id="tlhp-welcome-notice-title" className="tlhp-welcome-notice__title">
 						KÍNH MỪNG QUÝ PHẬT TỬ &amp; ĐẠI CHÚNG
 					</h2>
 				</header>
 
-				<div id="tlhp-welcome-body" className="tlhp-welcome__body">
-					<p className="tlhp-welcome__homage">Nam Mô Bổn Sư Thích Ca Mâu Ni Phật!</p>
+				<div id="tlhp-welcome-notice-body" className="tlhp-welcome-notice__body">
+					<p className="tlhp-welcome-notice__homage">Nam Mô Bổn Sư Thích Ca Mâu Ni Phật!</p>
 					<p>Kính bạch Chư Tôn Đức Tăng Ni, kính thưa quý thiện nam tín nữ Phật tử và quý bạn đọc thập phương,</p>
-					<div className="tlhp-welcome__quote">
+					<div className="tlhp-welcome-notice__quote">
 						<p>
 							Nhằm phụng sự Chánh pháp và mở rộng nhịp cầu kết nối truyền thông hoằng pháp trong thời đại số, Ban Biên tập và Đạo tràng Tùng Lâm Hòa Phúc trân trọng ra mắt Cổng thông tin điện tử chính thức của bổn tự (Phiên bản thử nghiệm 1.0.0).
 						</p>
-						<p className="tlhp-welcome__note">
+						<p className="tlhp-welcome-notice__note">
 							* Vì đây là ấn bản số hóa phát hành lần thứ nhất, khối lượng dữ liệu lịch sử, hình ảnh và tư liệu giáo lý đang trong quá trình đối chiếu, chuẩn hóa và tiếp tục bổ sung. Kính mong Chư Tôn Đức cùng quý đại chúng từ bi hoan hỷ lượng thứ cho những thiếu sót ban đầu và hoan hỷ gửi ý kiến đóng góp quý báu để bổn tự ngày một hoàn thiện trang nghiêm hơn.
 						</p>
 					</div>
-					<p className="tlhp-welcome__wish">
+					<p className="tlhp-welcome-notice__wish">
 						<svg viewBox="0 0 24 24" aria-hidden="true">
 							<path d="M19.414 14.414C21 12.828 22 11.5 22 9.5a5.5 5.5 0 0 0-9.591-3.676.6.6 0 0 1-.818.001A5.5 5.5 0 0 0 2 9.5c0 2.3 1.5 4 3 5.5l5.535 5.362a2 2 0 0 0 2.879.052 2.12 2.12 0 0 0-.004-3 2.124 2.124 0 1 0 3-3 2.124 2.124 0 0 0 3.004 0 2 2 0 0 0 0-2.828l-1.881-1.882a2.41 2.41 0 0 0-3.409 0l-1.71 1.71a2 2 0 0 1-2.828 0 2 2 0 0 1 0-2.828l2.823-2.762" />
 						</svg>
@@ -109,12 +109,12 @@ export default function WelcomeNotice() {
 					</p>
 				</div>
 
-				<footer className="tlhp-welcome__foot">
-					<label className="tlhp-welcome__check">
+				<footer className="tlhp-welcome-notice__foot">
+					<label className="tlhp-welcome-notice__check">
 						<input type="checkbox" checked={dontShowAgain} onChange={(event) => setDontShowAgain(event.target.checked)} />
 						<span>Không hiển thị lại thông báo này</span>
 					</label>
-					<button type="button" className="tlhp-welcome__go" onClick={close}>
+					<button type="button" className="tlhp-welcome-notice__go" onClick={close}>
 						<svg viewBox="0 0 24 24" aria-hidden="true">
 							<path d="M20 6 9 17l-5-5" />
 						</svg>

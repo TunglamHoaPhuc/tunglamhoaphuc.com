@@ -3,7 +3,7 @@ START: Thông báo chào mừng (trang chủ)
 Theo hộp WelcomeNoticeModal của web cũ (Tailwind): cùng màu, cỡ chữ, khoảng cách; mốc 640px là
 "sm" của Tailwind. Phông lấy từ design-system/tokens.css.
 ----------------------------------------*/
-.tlhp-welcome {
+.tlhp-welcome-notice {
 	--wn-gold: #f2c14e;
 	--wn-gold-bright: #ffde59;
 	--wn-text: #e3d2c1;
@@ -32,7 +32,7 @@ Theo hộp WelcomeNoticeModal của web cũ (Tailwind): cùng màu, cỡ chữ, 
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		animation: tlhp-welcome-in 0.3s ease-out;
+		animation: tlhp-welcome-notice-in 0.3s ease-out;
 	}
 	&::backdrop {
 		background: transparent;
@@ -55,7 +55,7 @@ Theo hộp WelcomeNoticeModal của web cũ (Tailwind): cùng màu, cỡ chữ, 
 	}
 }
 
-@keyframes tlhp-welcome-in {
+@keyframes tlhp-welcome-notice-in {
 	from {
 		opacity: 0;
 	}
@@ -66,14 +66,14 @@ Theo hộp WelcomeNoticeModal của web cũ (Tailwind): cùng màu, cỡ chữ, 
 
 // Giao diện tối (_tlhp-classic.scss) đặt mọi <p> 14px / 1.45 với độ ưu tiên :root[data-theme] p;
 // trong hộp, chữ theo cỡ của hộp như web cũ.
-dialog.tlhp-welcome .tlhp-welcome__card p {
+dialog.tlhp-welcome-notice .tlhp-welcome-notice__card p {
 	margin: 0;
 	color: inherit;
 	font-size: inherit;
 	line-height: inherit;
 }
 
-.tlhp-welcome__card {
+.tlhp-welcome-notice__card {
 	position: relative;
 	display: flex;
 	flex-direction: column;
@@ -89,7 +89,7 @@ dialog.tlhp-welcome .tlhp-welcome__card p {
 	line-height: 1.625;
 }
 
-.tlhp-welcome__corner {
+.tlhp-welcome-notice__corner {
 	position: absolute;
 	width: 2rem;
 	height: 2rem;
@@ -121,7 +121,7 @@ dialog.tlhp-welcome .tlhp-welcome__card p {
 	}
 }
 
-.tlhp-welcome__close {
+.tlhp-welcome-notice__close {
 	position: absolute;
 	top: 1rem;
 	right: 1rem;
@@ -156,7 +156,7 @@ dialog.tlhp-welcome .tlhp-welcome__card p {
 	}
 }
 
-.tlhp-welcome__head {
+.tlhp-welcome-notice__head {
 	position: relative;
 	padding: 2rem 1.5rem 1rem;
 	border-bottom: 1px solid rgb(242 193 78 / 0.2);
@@ -164,7 +164,7 @@ dialog.tlhp-welcome .tlhp-welcome__card p {
 	text-align: center;
 }
 
-.tlhp-welcome__wheel {
+.tlhp-welcome-notice__wheel {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -182,7 +182,7 @@ dialog.tlhp-welcome .tlhp-welcome__card p {
 	}
 }
 
-dialog.tlhp-welcome p.tlhp-welcome__badge {
+dialog.tlhp-welcome-notice p.tlhp-welcome-notice__badge {
 	display: inline-block;
 	margin-bottom: 0.5rem;
 	padding: 0.25rem 0.75rem;
@@ -197,7 +197,7 @@ dialog.tlhp-welcome p.tlhp-welcome__badge {
 	text-transform: uppercase;
 }
 
-.tlhp-welcome__title {
+.tlhp-welcome-notice__title {
 	margin: 0;
 	color: var(--wn-gold-bright);
 	font-family: "UTM Niagara", "UTM Niagara Fallback", var(--tlhp-font-serif);
@@ -214,7 +214,7 @@ dialog.tlhp-welcome p.tlhp-welcome__badge {
 	}
 }
 
-.tlhp-welcome__body {
+.tlhp-welcome-notice__body {
 	max-height: 60vh;
 	padding: 1.5rem;
 	overflow-y: auto;
@@ -227,7 +227,7 @@ dialog.tlhp-welcome p.tlhp-welcome__badge {
 	}
 }
 
-dialog.tlhp-welcome p.tlhp-welcome__homage {
+dialog.tlhp-welcome-notice p.tlhp-welcome-notice__homage {
 	color: var(--wn-gold);
 	font-size: 0.875rem;
 	font-weight: 600;
@@ -238,7 +238,7 @@ dialog.tlhp-welcome p.tlhp-welcome__homage {
 	}
 }
 
-.tlhp-welcome__quote {
+.tlhp-welcome-notice__quote {
 	padding: 1rem;
 	border: 1px solid rgb(242 193 78 / 0.3);
 	border-radius: 0.75rem;
@@ -248,12 +248,12 @@ dialog.tlhp-welcome p.tlhp-welcome__homage {
 	}
 }
 
-dialog.tlhp-welcome p.tlhp-welcome__note {
+dialog.tlhp-welcome-notice p.tlhp-welcome-notice__note {
 	color: rgb(255 229 163 / 0.9);
 	font-style: italic;
 }
 
-dialog.tlhp-welcome p.tlhp-welcome__wish {
+dialog.tlhp-welcome-notice p.tlhp-welcome-notice__wish {
 	display: flex;
 	align-items: center;
 	gap: 0.75rem;
@@ -269,7 +269,7 @@ dialog.tlhp-welcome p.tlhp-welcome__wish {
 	}
 }
 
-.tlhp-welcome__foot {
+.tlhp-welcome-notice__foot {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
@@ -283,7 +283,7 @@ dialog.tlhp-welcome p.tlhp-welcome__wish {
 	}
 }
 
-.tlhp-welcome__check {
+.tlhp-welcome-notice__check {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
@@ -302,7 +302,7 @@ dialog.tlhp-welcome p.tlhp-welcome__wish {
 	}
 }
 
-.tlhp-welcome__go {
+.tlhp-welcome-notice__go {
 	display: flex;
 	flex: 1 1 0%;
 	align-items: center;
@@ -346,10 +346,10 @@ dialog.tlhp-welcome p.tlhp-welcome__wish {
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.tlhp-welcome[open] {
+	.tlhp-welcome-notice[open] {
 		animation: none;
 	}
-	.tlhp-welcome__go:hover {
+	.tlhp-welcome-notice__go:hover {
 		transform: none;
 	}
 }
