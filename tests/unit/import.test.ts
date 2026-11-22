@@ -55,7 +55,7 @@ describe("import into D1", () => {
 		const rows = db.prepare("select r2_key, url, folder, filename from media where r2_key = 'a/thumb.webp'").all();
 		expect(rows).toEqual([{ r2_key: "a/thumb.webp", url: null, folder: "a", filename: "thumb.webp" }]);
 		const wordpress = db.prepare("select r2_key, url from media where url is not null").all();
-		expect(wordpress).toEqual([{ r2_key: null, url: "/anh-goc/wordpress/2026/07/x.jpg" }]);
+		expect(wordpress).toEqual([{ r2_key: null, url: "https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/07/x.jpg" }]);
 		expect(db.prepare("select count(*) as n from post where thumbnail_media_id = banner_media_id").get()).toEqual({ n: 2 });
 	});
 

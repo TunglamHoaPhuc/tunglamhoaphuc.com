@@ -7,7 +7,7 @@
 // summaries apart from posts; a post is read in full when its page asks. The smaller kinds
 // (schedule, Giới thiệu, Tông Chỉ, areas, statues) are read whole, once, as the files are.
 import type { StatueEntry } from "../baoTuong";
-import { MEDIA_BASE } from "../media";
+import { MEDIA_BASE, mediaUrl } from "../media";
 import { countCategories, createMemoryRepository, lazy, queryPosts, slugKey } from "../repository";
 import type { TongChiEntry } from "../tongChi";
 import type { AboutTopic, Area, ContentRepository, GalleryImage, MediaImage, Post, PostSummary, Schedule } from "../types";
@@ -34,10 +34,14 @@ const json = <T>(value: unknown, fallback: T): T => {
 	}
 };
 
-/** Where a picture is: B2 files by their key on the media host, anything else by its address. */
+/**
+ * Where a picture is: B2 files by their key on the media host, anything else by its address,
+ * drawn the way the site draws it today (mediaUrl): the table keeps the address the file had when
+ * it was imported, so a WordPress upload stored as https://admin… still comes out as /anh-goc/….
+ */
 function srcOf(key: unknown, url: unknown): string | null {
 	if (typeof key === "string" && key) return `${MEDIA_BASE}/${key}`;
-	return typeof url === "string" && url ? url : null;
+	return typeof url === "string" && url ? mediaUrl(url) : null;
 }
 
 /** A picture and where the editors centred it, from the columns a joined `media` row gives (`<prefix>_key`, `<prefix>_url`). */

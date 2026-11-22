@@ -48,6 +48,25 @@ export function mediaKey(url: string | null | undefined): string | null {
 	return null;
 }
 
+/**
+ * The address a picture is filed under in the `media` table (T42d): the one it had when D1 was first
+ * filled on 17/11/2026, before /anh-goc/ (T42c) changed what mediaUrl() gives. It is the B2 address of
+ * the key, the WordPress address of an upload, or the address itself for anything else, whatever
+ * form the source writes it in, so changing how the site draws a picture never changes the row's id.
+ * `null` for an empty or unreadable value.
+ */
+export function storedMediaAddress(url: string | null | undefined): string | null {
+	const address = mediaUrl(url);
+	if (!address?.startsWith(`${ANH_GOC}/`)) return address;
+	const [bucket, ...rest] = address.slice(ANH_GOC.length + 1).split("/");
+	const path = rest.join("/");
+	if (!bucket || !path) return address;
+	if (bucket === "wordpress") return `https://${WORDPRESS_HOST}/wp-content/uploads/${path}`;
+	return `https://${bucket}.s3.us-east-005.backblazeb2.com/${path}`;
+}
+
+const ANH_GOC = "/anh-goc";
+
 /** True for links that stop working once www moves to the new site (see MOVING_HOSTS). */
 export function isMovingLink(url: string | null | undefined): boolean {
 	const parsed = parse(url);

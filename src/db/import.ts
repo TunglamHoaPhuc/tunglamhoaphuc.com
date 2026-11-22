@@ -24,13 +24,24 @@ import { type AnySQLiteTable, getTableConfig } from "drizzle-orm/sqlite-core";
 import { drizzle } from "drizzle-orm/sqlite-proxy";
 import { vuTru } from "../config/vuTru";
 import type { StatueEntry } from "../libs/content/baoTuong";
-import { mediaKey, mediaUrl } from "../libs/content/media";
+import { mediaKey, storedMediaAddress } from "../libs/content/media";
 import { bare } from "../libs/content/normalize";
 import { parsePosts } from "../libs/content/posts";
 import { createFileLoaders, type ReadFile } from "../libs/content/sources/files";
 import type { TongChiEntry } from "../libs/content/tongChi";
 import type { AboutTopic, Area, GalleryImage, MediaImage, Monk, Post, Schedule } from "../libs/content/types";
 import * as schema from "./schema";
+
+/** The id of a media row: a hash of its stored address (see storedMediaAddress), so it stays the same when the way pictures are drawn changes. */
+function idOfAddress(address: string): string {
+	return createHash("sha1").update(address).digest("hex").slice(0, 20);
+}
+
+/** The id the import gives the media row of a picture; `null` for no picture. */
+export function mediaRowId(src: string | null | undefined): string | null {
+	const address = storedMediaAddress(src);
+	return address ? idOfAddress(address) : null;
+}
 
 /** Everything the import reads, already normalised by the content layer. */
 export type ImportContent = {
@@ -232,9 +243,9 @@ export function buildStatements(content: ImportContent, options: BuildOptions = 
 	const mediaRows = new Map<string, Row>();
 	/** The media row of a picture (made on first use), or `null` for no picture. */
 	function mediaId(src: string | null | undefined): string | null {
-		const url = mediaUrl(src);
+		const url = storedMediaAddress(src);
 		if (!url) return null;
-		const id = createHash("sha1").update(url).digest("hex").slice(0, 20);
+		const id = idOfAddress(url);
 		if (!mediaRows.has(id)) {
 			const key = mediaKey(url);
 			const path = key ?? new URL(url, "https://x.invalid").pathname.replace(/^\//, "");
