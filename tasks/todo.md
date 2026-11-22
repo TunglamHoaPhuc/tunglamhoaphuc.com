@@ -2381,3 +2381,21 @@ Phương án:
 - [ ] Mọi tiêu chí nghiệm thu đạt; 6 lệnh chuẩn xanh
 - [ ] `www` chạy D1 + admin mới ổn định 2 tuần
 - [ ] Tắt admin cũ ở `quantri.`, chuyển B2 và WordPress sang chỉ đọc rồi tắt theo kế hoạch Cloudflare
+
+---
+
+## Review 22/11/2026 (tab "Review" của sheet Q&A, RV-01…RV-12)
+
+Trạng thái 22/11/2026: **mới kiểm kê, chưa sửa mã.** Cây làm việc có khoảng 150 file đang sửa dở của các phiên khác (trang chủ classic, footer, hero, slider, bảo tượng, trí tuệ…), trùng gần hết file mà RV-01…RV-08 và RV-11 cần đụng. Sửa chồng lên sẽ ghi đè việc dở, nên chờ các phiên đó commit.
+
+| Mã | Việc | Ghi nhận |
+|---|---|---|
+| RV-01…RV-08 | Header, Hero, Tìm kiếm AI, tinh gọn và thứ tự Trang chủ, thẩm mỹ, Lịch, Khu vực nổi bật | Vùng file đang do phiên "Đồng bộ phong cách web cũ và mới" và phiên "Agent Skills" sửa dở. Chờ commit rồi kiểm lại từng mục. Mục bỏ/thu gọn khối nội dung chỉ đề xuất, không tự cắt. |
+| RV-09 | Kế thừa thẩm mỹ V1 cho trang chuyên mục (P0, định hướng) | Ghi nhận. Giữ A−/A+ và 3 nền Ngà/Giấy dó/Đêm thiền. |
+| RV-10 | Chỗ cắm trang Infographic sau này (P2) | Ghi nhận, chưa làm. |
+| RV-11 (1) | Ảnh `…/tieu-su-hoa-thuong-ngo-chan-tu-1.jpg` 404 | Đã đo: `www/anh-goc/…` trả 404. Địa chỉ nằm trong dữ liệu bài (snapshot/D1), không nằm trong mã; sửa ở dữ liệu, thuộc phiên T19/T42d và cần ghi D1 thật (chờ chủ dự án đồng ý). |
+| RV-11 (4) | Typo "cở" → "ở", dấu nháy thừa, số "2" thừa, mã thô `LAM_TI_NI` | Cũng nằm trong dữ liệu bài (`data/snapshot/posts.json` có "cở"); cùng nhóm sửa dữ liệu như trên. |
+| RV-11 (2)(3)(4 nút) | Hero mobile, Footer, mũi tên Tin tức, bộ lọc bảo tượng | File đang sửa dở của phiên khác. Chờ commit. |
+| RV-12 | Hero banner ảnh riêng ở trang chi tiết (mới trên sheet, ngoài danh sách ban đầu) | Ghi nhận; liên quan `DetailHero.tsx` chưa commit. |
+
+Lên live: `www` và `v2.` đang cùng trả 200 từ Worker `tlhp-web`. Chưa deploy gì trong đợt này vì HEAD không chứa việc dở nào ở trên.
