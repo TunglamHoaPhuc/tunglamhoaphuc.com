@@ -189,7 +189,20 @@ export function mediaSource(bucket: string, key: string[]): { r2Key: string; ori
  * argument, which is how the tests exercise both.
  */
 export type ImageDelivery = "cgi" | "variants";
-export const IMAGE_DELIVERY: ImageDelivery = "cgi";
+export const IMAGE_DELIVERY: ImageDelivery = "variants";
+
+/**
+ * Where ready-made variants exist today (first batch of 23/11/2026, scripts/media-variants.mjs): R2 key prefixes. A picture outside them keeps
+ * going through /cdn-cgi/image until its variants are made; a missing variant would only cost the route up to 14 R2 reads (then an hour in the
+ * edge cache), so the list is widened as batches are generated, never to "everything" before they exist.
+ */
+export const VARIANT_PREFIXES = ["media-tunglamhoaphuc/", "s2-cnv03/tunglamhoaphuc2/", "wordpress/2026/", "site/images/", "s2-cnv03/uploads/"] as const;
+
+/** True when the R2 key behind an /anh-goc/ path (with or without the leading slash) has its variants. */
+export function hasVariants(path: string): boolean {
+	const key = path.replace(/^\/?anh-goc\//, "");
+	return VARIANT_PREFIXES.some((prefix) => key.startsWith(prefix));
+}
 
 /** Widths of the ready-made variants; scripts/media-variants.mjs has the same list (a test keeps them equal). */
 export const VARIANT_WIDTHS = [160, 360, 640, 960, 1280, 1920] as const;
@@ -246,7 +259,7 @@ export function imageAt(src: string, width: number, delivery: ImageDelivery = IM
 	if (src.startsWith("/") && !src.startsWith("//") && !src.startsWith("/anh-goc/")) return src;
 	const source = transformSource(src);
 	if (!source) return src;
-	if (delivery === "variants") return variantUrl(`/${source}`, width);
+	if (delivery === "variants" && hasVariants(source)) return variantUrl(`/${source}`, width);
 	return `/cdn-cgi/image/width=${width},quality=75,format=auto,onerror=redirect/${source}`;
 }
 
@@ -255,7 +268,13 @@ export function imageAt(src: string, width: number, delivery: ImageDelivery = IM
  * (median 92 KB), and an album of 170 would spend the monthly quota. Variants cost no quota, so there every picture gets one.
  */
 export function albumImageAt(src: string, width: number, delivery: ImageDelivery = IMAGE_DELIVERY): string {
-	return delivery === "variants" || isWordPressMedia(src) ? imageAt(src, width, delivery) : src;
+	return (delivery === "variants" && srcHasVariants(src)) || isWordPressMedia(src) ? imageAt(src, width, delivery) : src;
+}
+
+/** True when the picture behind `src` (any form `mediaUrl` understands) is one of those that have ready-made variants. */
+export function srcHasVariants(src: string): boolean {
+	const source = transformSource(src);
+	return source !== null && hasVariants(source);
 }
 
 /** Display widths of delivered pictures. In "cgi" mode few on purpose, each one counts against the quota; "icon" and "mid" are the standard variant widths between. */
@@ -270,7 +289,7 @@ export const IMAGE_WIDTH = { icon: 160, small: 360, card: 640, mid: 960, wide: 1
  * hears of a size that does not exist.
  */
 export function imageSrcSet(src: string, widths: readonly number[], originalWidth?: number | null, delivery: ImageDelivery = IMAGE_DELIVERY): string | undefined {
-	if (delivery !== "variants") {
+	if (delivery !== "variants" || !srcHasVariants(src)) {
 		if (imageAt(src, widths[0], delivery) === src) return undefined;
 		return widths.map((width) => `${imageAt(src, width, delivery)} ${width}w`).join(", ");
 	}

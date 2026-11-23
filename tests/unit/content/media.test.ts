@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { albumImageAt, b2Source, imageAt, imageSrcSet, legacyPicturePath, mediaSource, mediaUrl, storedMediaAddress, topImagePriority } from "@/libs/content/media";
+import { albumImageAt as albumImageAtIn, b2Source, imageAt as imageAtIn, imageSrcSet as imageSrcSetIn, legacyPicturePath, mediaSource, mediaUrl, storedMediaAddress, topImagePriority } from "@/libs/content/media";
+
+// These tests are about the /cdn-cgi/image pipeline; the variant delivery (the default since 23/11/2026) is covered by mediaVariants.test.ts.
+const imageAt = (src: string, width: number) => imageAtIn(src, width, "cgi");
+const imageSrcSet = (src: string, widths: readonly number[]) => imageSrcSetIn(src, widths, null, "cgi");
+const albumImageAt = (src: string, width: number) => albumImageAtIn(src, width, "cgi");
 
 // Pictures of the old site go through Cloudflare's image transformations on this zone. B2
 // files come in through /anh-goc/ so the source is on the zone too (the zone accepts only

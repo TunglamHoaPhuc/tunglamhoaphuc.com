@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { readFileSync } from "node:fs";
-import { albumImageAt, IMAGE_WIDTH, imageAt, imageSrcSet, parseVariantRequest, variantStep, variantUrl, VARIANT_WIDTHS } from "@/libs/content/media";
+import { albumImageAt, hasVariants, IMAGE_DELIVERY, IMAGE_WIDTH, imageAt, imageSrcSet, parseVariantRequest, variantStep, variantUrl, VARIANT_WIDTHS } from "@/libs/content/media";
 import { acceptedFormats, serveMedia, type MediaBucket, type MediaCache } from "@/libs/content/mediaRoute";
 
 // 23/11/2026: ready-made AVIF/WebP variants in R2 ("<key>@<width>.<avif|webp>"), served by /anh-goc/<bucket>/<key>@<width>[.ext].
@@ -50,10 +50,19 @@ describe("parseVariantRequest", () => {
 describe("imageAt / fitting in both delivery modes", () => {
 	const b2 = `https://s2-cnv03.s3.us-east-005.backblazeb2.com/${B2_KEY}`;
 
-	it("'cgi' keeps today's /cdn-cgi/image/ address, and is the default", () => {
+	it("'cgi' keeps today's /cdn-cgi/image/ address; the default is 'variants', for the pictures that have them", () => {
 		const cgi = `/cdn-cgi/image/width=640,quality=75,format=auto,onerror=redirect/anh-goc/s2-cnv03/${B2_KEY}`;
 		expect(imageAt(b2, 640, "cgi")).toBe(cgi);
-		expect(imageAt(b2, 640)).toBe(cgi);
+		expect(IMAGE_DELIVERY).toBe("variants");
+		expect(imageAt(b2, 640)).toBe(`/anh-goc/s2-cnv03/${B2_KEY}@640`);
+		// a picture outside the prefixes that have variants keeps going through /cdn-cgi/image, even in 'variants' mode
+		const old = "/anh-goc/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2018/07/a-668x445.jpg";
+		expect(hasVariants(old)).toBe(false);
+		expect(imageAt(old, 640, "variants")).toBe(`/cdn-cgi/image/width=640,quality=75,format=auto,onerror=redirect${old}`);
+		expect(imageSrcSet(old, [360, 640], null, "variants")).toBe(imageSrcSet(old, [360, 640], null, "cgi"));
+		expect(hasVariants("/anh-goc/media-tunglamhoaphuc/x/a.webp")).toBe(true);
+		expect(hasVariants("wordpress/2026/09/a.jpg")).toBe(true);
+		expect(hasVariants("wordpress/2018/09/a.jpg")).toBe(false);
 	});
 
 	it("'variants' builds /anh-goc/<bucket>/<key>@<rounded width> (no extension: Accept decides)", () => {
@@ -70,9 +79,9 @@ describe("imageAt / fitting in both delivery modes", () => {
 	it("'variants' does not stack suffixes and leaves pictures without variants, the site's own files and other hosts alone", () => {
 		expect(imageAt(`/anh-goc/s2-cnv03/${B2_KEY}@640`, 360, "variants")).toBe(`/anh-goc/s2-cnv03/${B2_KEY}@360`);
 		expect(imageAt(`/anh-goc/s2-cnv03/${B2_KEY}@640.webp`, 960, "variants")).toBe(`/anh-goc/s2-cnv03/${B2_KEY}@960`);
-		expect(imageAt("/anh-goc/s2-cnv03/a.gif", 640, "variants")).toBe("/anh-goc/s2-cnv03/a.gif");
-		expect(imageAt("/anh-goc/s2-cnv03/a.svg", 640, "variants")).toBe("/anh-goc/s2-cnv03/a.svg");
-		expect(imageAt("/anh-goc/s2-cnv03/a.jpg?x=1", 640, "variants")).toBe("/anh-goc/s2-cnv03/a.jpg?x=1");
+		expect(imageAt("/anh-goc/s2-cnv03/tunglamhoaphuc2/a.gif", 640, "variants")).toBe("/anh-goc/s2-cnv03/tunglamhoaphuc2/a.gif");
+		expect(imageAt("/anh-goc/s2-cnv03/tunglamhoaphuc2/a.svg", 640, "variants")).toBe("/anh-goc/s2-cnv03/tunglamhoaphuc2/a.svg");
+		expect(imageAt("/anh-goc/s2-cnv03/tunglamhoaphuc2/a.jpg?x=1", 640, "variants")).toBe("/anh-goc/s2-cnv03/tunglamhoaphuc2/a.jpg?x=1");
 		expect(imageAt("/images/hero/toan-canh-chua-1920.webp", 640, "variants")).toBe("/images/hero/toan-canh-chua-1920.webp");
 		expect(imageAt("https://img2.infonet.vn/a.jpg", 640, "variants")).toBe("https://img2.infonet.vn/a.jpg");
 		expect(variantUrl("/images/a.jpg", 640)).toBe("/images/a.jpg");
@@ -95,7 +104,7 @@ describe("imageSrcSet", () => {
 
 	it("'cgi' is the list it always was", () => {
 		expect(imageSrcSet(picture, [360, 640], undefined, "cgi")).toBe(`${imageAt(picture, 360, "cgi")} 360w, ${imageAt(picture, 640, "cgi")} 640w`);
-		expect(imageSrcSet(picture, [360, 640])).toBe(imageSrcSet(picture, [360, 640], null, "cgi"));
+		expect(imageSrcSet(picture, [360, 640])).toBe(imageSrcSet(picture, [360, 640], null, "variants"));
 		expect(imageSrcSet("/images/a.webp", [360, 640], null, "cgi")).toBeUndefined();
 	});
 
@@ -115,7 +124,7 @@ describe("imageSrcSet", () => {
 
 	it("'variants' gives nothing for pictures that come in one size", () => {
 		expect(imageSrcSet("/images/a.webp", [360, 640], 900, "variants")).toBeUndefined();
-		expect(imageSrcSet("/anh-goc/s2-cnv03/a.gif", [360, 640], 900, "variants")).toBeUndefined();
+		expect(imageSrcSet("/anh-goc/s2-cnv03/tunglamhoaphuc2/a.gif", [360, 640], 900, "variants")).toBeUndefined();
 	});
 });
 
