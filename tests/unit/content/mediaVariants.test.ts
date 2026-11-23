@@ -56,7 +56,7 @@ describe("imageAt / fitting in both delivery modes", () => {
 		expect(IMAGE_DELIVERY).toBe("variants");
 		expect(imageAt(b2, 640)).toBe(`/anh-goc/s2-cnv03/${B2_KEY}@640`);
 		// a picture outside the prefixes that have variants (old WordPress, small) goes as it is in 'variants' mode: no transformation quota
-		const old = "/anh-goc/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2018/07/a-668x445.jpg";
+		const old = "/anh-goc/s2-cnv03/ngoai/2018/07/a-668x445.jpg";
 		expect(hasVariants(old)).toBe(false);
 		expect(imageAt(old, 640, "variants")).toBe(old);
 		expect(imageSrcSet(old, [360, 640], null, "variants")).toBeUndefined();
@@ -64,6 +64,16 @@ describe("imageAt / fitting in both delivery modes", () => {
 		expect(hasVariants("/anh-goc/media-tunglamhoaphuc/x/a.webp")).toBe(true);
 		expect(hasVariants("wordpress/2026/09/a.jpg")).toBe(true);
 		expect(hasVariants("wordpress/2018/09/a.jpg")).toBe(false);
+	});
+
+	it("a picture uploaded in the admin (s2-cnv03/cms/) has no variants yet, so even in 'variants' mode it keeps going through /cdn-cgi/image", () => {
+		const upload = "/anh-goc/s2-cnv03/cms/media-1/v1/le-hang-thuan.png";
+		expect(hasVariants(upload)).toBe(false);
+		expect(imageAt(upload, 640, "variants")).toBe(`/cdn-cgi/image/width=640,quality=75,format=auto,onerror=redirect${upload}`);
+		expect(imageSrcSet(upload, [640, 960], null, "variants")).toContain("/cdn-cgi/image/width=640,");
+		expect(albumImageAt(upload, 360, "variants")).toContain("/cdn-cgi/image/width=360,");
+		// the 4,795 pictures of batch 2 (old WordPress uploads) have variants
+		expect(hasVariants("s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2021/06/a-668x501.jpg")).toBe(true);
 	});
 
 	it("'variants' builds /anh-goc/<bucket>/<key>@<rounded width> (no extension: Accept decides)", () => {
