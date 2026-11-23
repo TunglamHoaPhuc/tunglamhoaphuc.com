@@ -1,9 +1,8 @@
 import { describe, expect, it } from "vitest";
-// @ts-expect-error a plain .mjs script, no types
 import { checkDeployEnv } from "../../scripts/deploy-env.mjs";
 
 type Result = { errors: string[]; warnings: string[]; adminBaseUrl: string | null };
-const check = (env: Record<string, string>) => checkDeployEnv(env) as Result;
+const check = (env: Record<string, string>): Result => checkDeployEnv(env);
 
 describe("npm run deploy:v2 environment", () => {
 	it("accepts the admin on quantri.", () => {
@@ -14,7 +13,7 @@ describe("npm run deploy:v2 environment", () => {
 	});
 
 	it("stops a deploy of the admin that does not say where it answers", () => {
-		for (const env of [{ TLHP_ADMIN: "1" }, { TLHP_ADMIN: "1", ADMIN_BASE_URL: "  " }]) expect(check(env).errors[0]).toMatch(/Thiếu ADMIN_BASE_URL/);
+		for (const env of [{ TLHP_ADMIN: "1" }, { TLHP_ADMIN: "1", ADMIN_BASE_URL: "  " }] as Record<string, string>[]) expect(check(env).errors[0]).toMatch(/Thiếu ADMIN_BASE_URL/);
 	});
 
 	it.each(["http://quantri.tunglamhoaphuc.com", "https://localhost:3001", "http://localhost:3001", "https://quantri.tunglamhoaphuc.com/quan-tri", "https://quantri.tunglamhoaphuc.com/?a=1", "quantri.tunglamhoaphuc.com"])(
