@@ -11,10 +11,13 @@ const B2 = `https://s2-cnv03.s3.us-east-005.backblazeb2.com/${KEY}`;
 const PICTURE = `/anh-goc/s2-cnv03/${KEY}`;
 const CGI = (width: number) => `/cdn-cgi/image/width=${width},quality=75,format=auto,onerror=redirect${PICTURE}`;
 
-test("công tắc giao ảnh mặc định là 'cgi' (chỉ đổi sang 'variants' sau khi biến thể đã có trong R2)", () => {
-	assert.equal(IMAGE_DELIVERY, "cgi");
-	assert.equal(fitImage(B2, 640), CGI(640));
-	assert.equal(getOptimizedNextImageUrl(B2, 640), CGI(640));
+test("công tắc giao ảnh mặc định là 'variants', chỉ cho khóa R2 đã có biến thể; ảnh còn lại vẫn qua /cdn-cgi/image", () => {
+	assert.equal(IMAGE_DELIVERY, "variants");
+	assert.equal(fitImage(B2, 640), `${PICTURE}@640`);
+	assert.equal(getOptimizedNextImageUrl(B2, 640), `${PICTURE}@640`);
+	// an old WordPress upload (668 px, no variants yet) keeps the transformation
+	const old = "/anh-goc/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2018/07/a-668x445.jpg";
+	assert.equal(fitImage(old, 640), `/cdn-cgi/image/width=640,quality=75,format=auto,onerror=redirect${old}`);
 });
 
 test("fitImage: chế độ 'cgi' giữ địa chỉ /cdn-cgi/image/, chế độ 'variants' dựng /anh-goc/<bucket>/<khóa>@<bậc>", () => {
@@ -31,7 +34,7 @@ test("fitImage: chế độ 'cgi' giữ địa chỉ /cdn-cgi/image/, chế đ�
 
 test("fitImage 'variants' không chồng hậu tố, để nguyên ảnh không có biến thể, ảnh tĩnh của site và host lạ", () => {
 	assert.equal(fitImage(`${PICTURE}@640`, 360, "variants"), `${PICTURE}@360`);
-	assert.equal(fitImage("/anh-goc/s2-cnv03/a.gif", 640, "variants"), "/anh-goc/s2-cnv03/a.gif");
+	assert.equal(fitImage("/anh-goc/s2-cnv03/tunglamhoaphuc2/a.gif", 640, "variants"), "/anh-goc/s2-cnv03/tunglamhoaphuc2/a.gif");
 	assert.equal(fitImage("/images/hero/toan-canh-chua-1920.webp", 640, "variants"), "/images/hero/toan-canh-chua-1920.webp");
 	assert.equal(fitImage("https://example.org/a.jpg", 640, "variants"), "https://example.org/a.jpg");
 	assert.equal(fitImage("", 640, "variants"), "");
