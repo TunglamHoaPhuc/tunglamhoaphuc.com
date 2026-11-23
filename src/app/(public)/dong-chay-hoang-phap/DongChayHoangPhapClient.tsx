@@ -4,7 +4,6 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { dongChayBadge, type DongChayCategoryInfo, HoangPhapArticle } from '@/data/dong-chay-hoang-phap-data';
 import type { DongChayPage } from '@/lib/dong-chay';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { CategoryFilter } from '@/components/common/CategoryFilter';
 import { PostCard } from '@/components/common/PostCard';
 import { PostItem } from '@/types/post';
@@ -187,11 +186,6 @@ export default function DongChayHoangPhapClient({ initial, categories }: { initi
           )}
 
           <Pagination page={data.page} pageCount={data.pageCount} total={data.total} disabled={loading} onPage={(page) => go({ ...view, page })} />
-        </div>
-
-        {/* ── KHUNG TRỢ LÝ AI PHẬT HỌC ── */}
-        <div className="mt-8 mb-12">
-          <SmartSearchAIBar contextTitle="Dòng Chảy Hoằng Pháp & Hoạt Động Tự Viện" />
         </div>
       </main>
     </div>

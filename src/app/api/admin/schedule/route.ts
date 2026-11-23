@@ -61,6 +61,8 @@ export async function GET() {
   try {
     return NextResponse.json({ success: true, data: await scheduleData() }, { headers: PUBLIC_CACHE });
   } catch (error) {
-    return NextResponse.json({ success: false, error: (error as Error).message }, { status: 500 });
+    // Chi tiết lỗi (có thể là câu SQL hay tên bảng của D1) chỉ vào nhật ký, không ra công khai.
+    console.error('[API /api/admin/schedule] Lỗi:', error);
+    return NextResponse.json({ success: false, error: 'Không đọc được lịch tu học' }, { status: 500 });
   }
 }

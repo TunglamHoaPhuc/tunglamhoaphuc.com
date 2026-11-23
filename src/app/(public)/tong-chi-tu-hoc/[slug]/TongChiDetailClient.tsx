@@ -11,7 +11,6 @@ import { IllustrationVideo } from '@/components/tong-chi-tu-hoc/chi-tiet/Illustr
 import { FeaturedPosts } from '@/components/tong-chi-tu-hoc/chi-tiet/FeaturedPosts';
 import { PhotoGallery } from '@/components/tong-chi-tu-hoc/chi-tiet/PhotoGallery';
 import { DiscoverMore } from '@/components/tong-chi-tu-hoc/chi-tiet/DiscoverMore';
-import { AiQnA } from '@/components/tong-chi-tu-hoc/chi-tiet/AiQnA';
 import { DetailModal } from '@/components/tong-chi-tu-hoc/chi-tiet/DetailModal';
 import {
   BookCitationSection,
@@ -374,8 +373,6 @@ export default function TongChiDetailClient({ article, related }: { article: V3T
               <DiscoverMore relatedArticles={data?.relatedArticles} />
             </>
           )}
-
-          <AiQnA />
         </main>
 
         <DetailModal

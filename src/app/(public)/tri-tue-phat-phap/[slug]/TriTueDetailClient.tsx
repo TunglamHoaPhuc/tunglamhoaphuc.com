@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Eye, Calendar, Play, ArrowLeft, ChevronRight, Bell, Sparkles, Video, Images, BookOpen, Clock, Landmark, ArrowRight } from 'lucide-react';
 import Header from '@/components/public/layout/Header';
 import Footer from '@/components/public/layout/Footer';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { HeroBanner } from '@/components/tong-chi-tu-hoc/HeroBanner';
 import { InfographicArticleRenderer } from '@/components/tong-chi-tu-hoc/chi-tiet/InfographicArticleRenderer';
 import { BookCitationSection } from '@/components/tong-chi-tu-hoc/chi-tiet/BookCitationSection';
@@ -145,11 +144,6 @@ export default function TriTueDetailClient({ item, relatedFormatted }: { item: a
         {/* ── 6. BLOCK TÌM HIỂU THÊM ── */}
         <div className="w-full">
           <DiscoverMore relatedArticles={relatedFormatted} />
-        </div>
-
-        {/* Smart Search AI Bar */}
-        <div className="my-10">
-          <SmartSearchAIBar contextTitle={item.title} />
         </div>
       </main>
 

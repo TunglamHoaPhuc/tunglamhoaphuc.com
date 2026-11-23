@@ -1,6 +1,8 @@
 // Một khu vực của Vũ Trụ Phật Giáo, đọc ở máy chủ từ D1 của www. Khu vực bị ẩn, đã xóa hay không có: 404
 // (không còn khu vực đóng gói hay khu vực tự dựng từ slug để thay vào). Tượng của khu vực cũng từ D1: chỉ tượng đang hiển thị.
 import type { Metadata } from 'next';
+import JsonLd from '@/components/public/JsonLd';
+import { breadcrumbJsonLd } from '@/lib/v3-jsonld';
 import { notFoundOrMoved } from '@/lib/v3-redirect';
 import { areaMetadataFor } from '@/lib/v3-seo';
 import { liveStatueRecords } from '@/lib/v3-statues';
@@ -23,11 +25,14 @@ export default async function UniverseDetailPage({ params }: { params: Promise<{
   // Chỉ gửi xuống trình duyệt tượng của khu vực này.
   const here = statues.filter((s) => s.areaSlug === area.slug);
   return (
-    <AreaDetailClient
-      area={area}
-      statues={here.filter((s) => s.categoryType === 'TƯỢNG CHÍNH')}
-      artItems={here.filter((s) => s.categoryType !== 'TƯỢNG CHÍNH')}
-      areas={areas}
-    />
+    <>
+      <JsonLd data={breadcrumbJsonLd([{ name: 'Vũ Trụ Phật Giáo', path: '/vu-tru-phat-giao' }, { name: area.name, path: `/vu-tru-phat-giao/${area.slug}` }])} />
+      <AreaDetailClient
+        area={area}
+        statues={here.filter((s) => s.categoryType === 'TƯỢNG CHÍNH')}
+        artItems={here.filter((s) => s.categoryType !== 'TƯỢNG CHÍNH')}
+        areas={areas}
+      />
+    </>
   );
 }

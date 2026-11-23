@@ -4,7 +4,6 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Search, ChevronDown } from 'lucide-react';
 import type { StatueItem } from '@/lib/statue-types';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { CustomDropdown } from '@/components/common/CustomDropdown';
 import { getImageUrl } from '@/utils/image';
 import { KIND_OPTIONS, layoutStatues, type StatueKind } from '@/lib/statue-list';
@@ -255,11 +254,6 @@ export default function BaoTuongPhatGiaoClient({
               </button>
             </div>
           )}
-        </div>
-
-        {/* ── 4. KHUNG TRỢ LÝ AI PHẬT HỌC ── */}
-        <div className="mt-12 mb-12">
-          <SmartSearchAIBar contextTitle="Bảo Tượng Phật Giáo Tùng Lâm Hòa Phúc" />
         </div>
       </main>
     </div>

@@ -10,9 +10,10 @@
 // Every function takes what it reads as its last arguments so a test can hand it a fixture.
 import articleExtras from "@/data/statue-article-extras.json";
 import type { StatueRecord } from "@/lib/statue-types";
-import { getContentRepository, renewing } from "@/lib/tlhp-content/repository";
+import { getContentRepository } from "@/lib/tlhp-content/repository";
 import type { D1Like } from "@/lib/tlhp-content/sources/d1";
 import type { ContentRepository, Statue, StatueSummary } from "@/lib/tlhp-content/types";
+import { renewingAsync } from "@/lib/renew-async";
 import { absUrl, type V3Area } from "@/lib/v3-data";
 import { siteDb } from "@/lib/v3-db";
 import { liveAreas } from "@/lib/v3-live";
@@ -75,7 +76,8 @@ export async function statueLinks(): Promise<StatueLinks> {
 	sharedLinks ??= (async () => {
 		const db = await siteDb();
 		if (!db) return () => Promise.resolve(NO_LINKS);
-		return renewing(() => readStatueLinks(db), 60_000);
+		// Not `renewing`: that would keep a failed read for the whole minute and fail every statue page (and the home page) meanwhile.
+		return renewingAsync(() => readStatueLinks(db), 60_000);
 	})();
 	return (await sharedLinks)();
 }

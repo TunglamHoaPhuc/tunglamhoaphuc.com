@@ -2,11 +2,18 @@
 // tạo ở admin có thẻ và địa chỉ ngay). Không còn danh sách sáu chủ đề đóng gói.
 import React from 'react';
 import Link from 'next/link';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { Scroll, Landmark, User, HeartHandshake, ArrowRight } from 'lucide-react';
 import { liveAbout } from '@/lib/v3-live';
+import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/v3-seo';
 
 export const revalidate = 60;
+
+export const metadata: Metadata = pageMetadata({
+  title: "Giới thiệu",
+  description: "Chốn già lam thanh tịnh – Nơi hội tụ truyền thống truyền thừa, tâm nguyện độ sanh và tinh hoa văn hóa Phật giáo Việt Nam.",
+  path: '/gioi-thieu',
+});
 
 // Biểu tượng theo nhóm là phần thiết kế; nhóm lạ dùng biểu tượng chung.
 const GROUP_ICON: Record<string, typeof Scroll> = {
@@ -125,11 +132,6 @@ export default async function GioiThieuOverviewPage() {
                 </Link>
               );
             })}
-          </div>
-
-          {/* Smart Search AI Bar */}
-          <div className="mt-16 mb-12">
-            <SmartSearchAIBar contextTitle="Tra cứu Giới thiệu Tùng Lâm Hòa Phúc" />
           </div>
         </div>
       </main>

@@ -1,8 +1,10 @@
 // Một bài Tông Chỉ Tu Học, đọc ở máy chủ từ D1 của www (qua src/lib/v3-live.ts). Bài nháp, hẹn giờ chưa tới,
 // trong thùng rác hay không có: 404. Không còn lời gọi nào tới WordPress và không có bản đóng gói dự phòng.
 import type { Metadata } from 'next';
+import JsonLd from '@/components/public/JsonLd';
 import { NavPanelProvider } from '@/components/tong-chi-tu-hoc/NavPanelData';
 import { buildTongChiNavGroups } from '@/lib/tong-chi-sections';
+import { breadcrumbJsonLd } from '@/lib/v3-jsonld';
 import { liveTongChi, liveTongChiList, relatedTongChi } from '@/lib/v3-live';
 import { notFoundOrMoved } from '@/lib/v3-redirect';
 import { tongChiMetadataFor } from '@/lib/v3-seo';
@@ -24,6 +26,7 @@ export default async function TongChiDetailPage({ params }: { params: Promise<{ 
   const related = relatedTongChi(article, list);
   return (
     <NavPanelProvider data={{ tongChi: buildTongChiNavGroups(list) }}>
+      <JsonLd data={breadcrumbJsonLd([{ name: 'Tông Chỉ Tu Học', path: '/tong-chi-tu-hoc' }, { name: article.title, path: `/tong-chi-tu-hoc/${article.slug}` }])} />
       <TongChiDetailClient article={article} related={related} />
     </NavPanelProvider>
   );

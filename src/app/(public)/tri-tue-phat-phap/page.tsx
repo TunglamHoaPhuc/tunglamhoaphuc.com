@@ -1,12 +1,19 @@
 // Trang Trí Tuệ Phật Pháp: các bài đang hiển thị ở D1 của www (đọc ở máy chủ). Không còn danh sách đóng gói,
 // không còn lời gọi WordPress; D1 không có bài thì trang trống.
 import { WisdomArchiveSection } from '@/features/wisdom/components/WisdomArchiveSection';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { getImageUrl } from '@/utils/image';
 import { livePosts } from '@/lib/v3-live';
 import { toWisdomItem, TRI_TUE_SECTION } from '@/lib/wisdom';
+import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/v3-seo';
 
 export const revalidate = 60;
+
+export const metadata: Metadata = pageMetadata({
+  title: "Trí Tuệ Phật Pháp",
+  description: "Tổng hợp bài viết, câu chuyện, pháp âm & video lưu thông pháp bảo của Tùng Lâm Hòa Phúc.",
+  path: '/tri-tue-phat-phap',
+});
 
 export default async function TriTuePhatPhapPage() {
   const items = (await livePosts(TRI_TUE_SECTION)).map(toWisdomItem);
@@ -70,11 +77,6 @@ export default async function TriTuePhatPhapPage() {
 
       <main className="max-w-[1280px] mx-auto px-4 md:px-10 py-6">
         <WisdomArchiveSection items={items} />
-
-        {/* Smart Search AI Bar */}
-        <div className="mt-16 mb-12">
-          <SmartSearchAIBar contextTitle="Kho Tàng Trí Tuệ Phật Pháp" />
-        </div>
       </main>
     </div>
   );

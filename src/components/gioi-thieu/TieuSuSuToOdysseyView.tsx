@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { SuToKaraokeReader } from './SuToKaraokeReader';
 import type { GioiThieuTopicDetail } from '@/data/gioi-thieu-data';
 import type { OtherAboutTopic } from './GioiThieuDetailLayout';
@@ -2615,12 +2614,6 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                 ))}
               </div>
             </div>
-
-            {!isLedMode && (
-              <div className="pt-4">
-                <SmartSearchAIBar contextTitle={`Tra cứu về ${topic.title}`} />
-              </div>
-            )}
           </div>
         </section>
       </div>

@@ -7,7 +7,6 @@ import { SidebarNav } from '@/components/tong-chi-tu-hoc/SidebarNav';
 import { HeroBanner } from '@/components/tong-chi-tu-hoc/HeroBanner';
 import { SectionCarousel } from '@/components/tong-chi-tu-hoc/SectionCarousel';
 import { PageIntro } from '@/components/tong-chi-tu-hoc/PageIntro';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 
 // Các khối và lời mở đầu do máy chủ dựng từ D1 (page.tsx); trang không tự đi lấy gì thêm.
 export default function TongChiTuHocClient({
@@ -105,10 +104,6 @@ export default function TongChiTuHocClient({
             {sections.map((section) => (
               <SectionCarousel key={section.id} section={section} />
             ))}
-          </div>
-
-          <div className="pt-8">
-            <SmartSearchAIBar contextTitle="Tông Chỉ Tu Học Tùng Lâm Hòa Phúc" />
           </div>
         </main>
       </div>

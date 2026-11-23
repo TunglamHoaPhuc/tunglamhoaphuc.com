@@ -1,5 +1,8 @@
 'use client';
 
+// KHÔNG ĐƯỢC VẼ trên site công khai: đây là bản giả (câu trả lời cố định sau 900 ms, liên kết viết cứng).
+// Giữ lại để làm giao diện cho trợ lý thật sau này; chỉ vẽ lại khi đã nối vào tìm kiếm/AI thật.
+// `tests/unit/v3-public-hardening.test.ts` bắt lỗi nếu có nơi nào dùng lại.
 import React, { FC, useState } from 'react';
 import { Sparkles, BookOpen, ExternalLink, X, Mic, ChevronDown, Send } from 'lucide-react';
 import Link from 'next/link';

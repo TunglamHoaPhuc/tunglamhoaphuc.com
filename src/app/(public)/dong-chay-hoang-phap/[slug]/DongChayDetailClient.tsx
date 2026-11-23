@@ -6,7 +6,6 @@ import { Eye, Calendar, Play, Video, Clock, Landmark, Sparkles, Images, BookOpen
 import Header from '@/components/public/layout/Header';
 import Footer from '@/components/public/layout/Footer';
 import type { V3Post } from '@/lib/v3-data';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { SubNavbar } from '@/components/tong-chi-tu-hoc/SubNavbar';
 import { SidebarNav } from '@/components/tong-chi-tu-hoc/SidebarNav';
 import { HeroBanner } from '@/components/tong-chi-tu-hoc/HeroBanner';
@@ -304,11 +303,6 @@ export default function DongChayDetailClient({ article, relatedArticlesFormatted
           {/* ── 9. BLOCK TÌM HIỂU THÊM ── */}
           <div id="related-section" className="w-full">
             <DiscoverMore relatedArticles={relatedArticlesFormatted} />
-          </div>
-
-          {/* ── Smart Search AI Bar ── */}
-          <div className="my-10">
-            <SmartSearchAIBar contextTitle={article?.title} />
           </div>
         </main>
         </>

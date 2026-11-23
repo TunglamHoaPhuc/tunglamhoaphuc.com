@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { ArrowLeft, ArrowRight, Calendar, Sparkles, Scroll, Landmark, User, HeartHandshake, BookOpen } from 'lucide-react';
 import type { GioiThieuTopicDetail } from '@/data/gioi-thieu-data';
 import { InfographicArticleRenderer } from '@/components/tong-chi-tu-hoc/chi-tiet/InfographicArticleRenderer';
@@ -260,11 +259,6 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
                 </Link>
               ))}
             </div>
-          </div>
-
-          {/* 7. SMART SEARCH AI BAR */}
-          <div className="pt-8">
-            <SmartSearchAIBar contextTitle={`Tra cứu về ${topic.title}`} />
           </div>
         </div>
       </div>

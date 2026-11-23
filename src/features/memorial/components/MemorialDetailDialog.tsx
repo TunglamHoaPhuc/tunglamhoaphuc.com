@@ -85,7 +85,6 @@ export function MemorialDetailDialog({ record, onClose }: MemorialDetailDialogPr
       record.lineageType ? `Phân loại: ${record.lineageType}` : '',
       `Khu vực: ${record.category}`,
       record.deathDate ? `Ngày mất: ${record.deathDate}${record.age ? ` (Hưởng ${record.age} tuổi)` : ''}` : '',
-      record.address ? `Địa chỉ / An táng: ${record.address}` : '',
     ].filter(Boolean);
 
     try {
@@ -193,20 +192,6 @@ export function MemorialDetailDialog({ record, onClose }: MemorialDetailDialogPr
               <div className="py-2 flex justify-between gap-4">
                 <dt className="text-[#c9b896] shrink-0">Giới tính:</dt>
                 <dd className="text-white text-right">{record.gender}</dd>
-              </div>
-            )}
-            {(record.address || record.burialLocation) && (
-              <div className="py-2 flex justify-between gap-4">
-                <dt className="text-[#c9b896] shrink-0">Địa chỉ / An táng:</dt>
-                <dd className="text-[#FFE5A3] text-right">
-                  {record.address || record.burialLocation}
-                </dd>
-              </div>
-            )}
-            {record.contactMasked && (
-              <div className="py-2 flex justify-between gap-4">
-                <dt className="text-[#c9b896] shrink-0">Thân nhân:</dt>
-                <dd className="text-[#e3d2c1] text-right">{record.contactMasked}</dd>
               </div>
             )}
           </dl>

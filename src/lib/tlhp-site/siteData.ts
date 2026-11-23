@@ -6,7 +6,8 @@
 // anywhere else the callers get `null`/`{}` and V3 keeps its built-in menu and details.
 // A fresh read is made every minute, like the content repository.
 import { MEDIA_BASE } from "@/lib/tlhp-content/media";
-import { contentSource, renewing } from "@/lib/tlhp-content/repository";
+import { renewingAsync } from "@/lib/renew-async";
+import { contentSource } from "@/lib/tlhp-content/repository";
 import type { D1Like } from "@/lib/tlhp-content/sources/d1";
 
 type Row = Record<string, unknown>;
@@ -67,9 +68,10 @@ export async function readMenu(db: D1Like, menuId: string): Promise<MenuNode[] |
 type Loaded = { settings: SettingsMap; menus: Map<string, MenuNode[] | null>; failed: boolean };
 
 async function load(db: D1Like): Promise<Loaded> {
-	const settings = await readSettings(db);
-	const menus = new Map<string, MenuNode[] | null>();
-	for (const id of ["header", "footer", "sidebar"]) menus.set(id, await readMenu(db, id));
+	// Four independent reads: asked together, not one after another (a cold Worker waited for four round trips to D1 before any page could start).
+	const ids = ["header", "footer", "sidebar"] as const;
+	const [settings, ...read] = await Promise.all([readSettings(db), ...ids.map((id) => readMenu(db, id))]);
+	const menus = new Map<string, MenuNode[] | null>(ids.map((id, i) => [id, read[i]]));
 	return { settings, menus, failed: false };
 }
 
@@ -83,10 +85,18 @@ const loaded = (async () => {
 	const workers = (await (import("cloudflare:workers" as string) as Promise<{ env?: { DB?: D1Like } }>).catch(() => ({}) as { env?: { DB?: D1Like } })) as { env?: { DB?: D1Like } };
 	const db = workers.env?.DB;
 	if (!db) return () => Promise.resolve(EMPTY);
-	return renewing(() => load(db).catch((error: unknown) => {
-		console.error("siteData: read failed", error);
-		return FAILED;
-	}), 60_000);
+	// A failed read is not kept for the minute (it used to be: one D1 hiccup emptied the menus and details of every page, edge-cached
+	// ones included, for 60 s). With an earlier good read in hand that is served; without one this call shows the empty state and
+	// the next call reads again.
+	const read = renewingAsync(() => load(db), 60_000);
+	return async () => {
+		try {
+			return await read();
+		} catch (error) {
+			console.error("siteData: read failed", error);
+			return FAILED;
+		}
+	};
 });
 
 let pending: Promise<() => Promise<Loaded>> | undefined;

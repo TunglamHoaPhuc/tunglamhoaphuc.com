@@ -5,7 +5,6 @@ import Header from '@/components/public/layout/Header';
 import Footer from '@/components/public/layout/Footer';
 import { InteractiveMap2D } from '@/features/universe/components/InteractiveMap2D';
 import { UniverseGridMode } from '@/features/universe/components/UniverseGridMode';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import type { V3Area } from '@/lib/v3-data';
 import type { MapSpot } from '@/lib/v3-areas';
 import { getImageUrl } from '@/utils/image';
@@ -77,11 +76,6 @@ export default function VuTruPhatGiaoClient({ areas, spots }: { areas: V3Area[];
 
           <main className="max-w-[1280px] mx-auto px-4 md:px-10 pb-16 w-full flex-1">
             <UniverseGridMode areas={areas} viewMode={viewMode} onToggleViewMode={setViewMode} />
-
-            {/* Smart Search AI Bar */}
-            <div className="mt-16">
-              <SmartSearchAIBar contextTitle="Khung Cảnh &amp; Bảo Tượng Vũ Trụ Phật Giáo" />
-            </div>
           </main>
         </div>
       )}

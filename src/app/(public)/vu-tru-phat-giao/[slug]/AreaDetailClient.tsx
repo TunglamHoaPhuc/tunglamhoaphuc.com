@@ -26,7 +26,6 @@ import { ThapDaiDeTuCards } from '@/features/universe/components/ThapDaiDeTuCard
 import { GiangDuongPhapThoai } from '@/features/universe/components/GiangDuongPhapThoai';
 import { DanhTangMap } from '@/features/universe/components/DanhTangMap';
 import { TuAnFlipbook } from '@/features/universe/components/TuAnFlipbook';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { areaBodyHtml } from '@/lib/area-body';
 
 function matchesArea(itemAreaSlug: string, pageSlug: string, areaSlug: string): boolean {
@@ -91,7 +90,6 @@ export default function AreaDetailClient({
     },
     { id: 'khong-gian', label: 'KHÔNG GIAN' },
     { id: 'khu-vuc-khac', label: 'KHU VỰC KHÁC' },
-    { id: 'hoi-dap-ai', label: 'HỎI ĐÁP AI' },
   ];
 
   useEffect(() => {
@@ -273,11 +271,6 @@ export default function AreaDetailClient({
           {/* SECTION 5 — KHÁM PHÁ KHU VỰC KHÁC */}
           <section id="khu-vuc-khac" className="max-w-4xl mx-auto px-4 scroll-mt-24">
             <OtherAreasSection currentSlug={area.slug} areas={areas} />
-          </section>
-
-          {/* SECTION 6 — HỎI ĐÁP AI */}
-          <section id="hoi-dap-ai" className="max-w-4xl mx-auto px-4 scroll-mt-24 mb-12">
-            <SmartSearchAIBar contextTitle={`Không Gian Tâm Linh ${area.name}`} />
           </section>
         </main>
       </div>

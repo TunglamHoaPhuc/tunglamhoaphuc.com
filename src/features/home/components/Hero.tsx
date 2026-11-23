@@ -255,13 +255,6 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
     };
   }, [videoOn, hero.videoId, hero.cutIntro]);
 
-  const scrollToAiSearch = () => {
-    const el = document.getElementById("smart-search-ai-bar");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   return (
     <section className="relative w-full overflow-hidden flex flex-col items-center justify-between" style={{ minHeight: "100vh", background: "#1A120B" }}>
       {/* ── Background Video YouTube API (Khóa hoàn toàn chuột, không hiện Pause) ── */}
@@ -407,8 +400,8 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
           </Link>
 
           {/* 5. TÌM KIẾM & THAM VẤN */}
-          <button
-            onClick={scrollToAiSearch}
+          <Link
+            href="/tim-kiem"
             className="px-4 md:px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
             style={{
               background: "rgba(42,29,20,0.85)",
@@ -419,7 +412,7 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
           >
             <Search className="w-4 h-4 text-[#F2C14E] flex-shrink-0" />
             <span className="whitespace-nowrap">TÌM KIẾM &amp; THAM VẤN</span>
-          </button>
+          </Link>
         </div>
       </div>
 

@@ -2,7 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import Header from '@/components/public/layout/Header';
 import { Footer } from '@/components/public/layout/Footer';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { Home, Compass, Landmark, BookOpen } from 'lucide-react';
 
 export default function NotFound() {
@@ -84,11 +83,6 @@ export default function NotFound() {
               <BookOpen className="w-4 h-4 text-[#F2C14E]" />
               <span>TÔNG CHỈ TU HỌC</span>
             </Link>
-          </div>
-
-          {/* Integrated AI Search Bar */}
-          <div className="w-full mt-4">
-            <SmartSearchAIBar contextTitle="Tìm kiếm nội dung tại Tùng Lâm Hòa Phúc" />
           </div>
         </div>
       </main>

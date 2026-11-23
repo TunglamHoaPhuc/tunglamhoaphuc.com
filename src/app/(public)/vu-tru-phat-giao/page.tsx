@@ -4,8 +4,16 @@ import { mapSpotsOf } from '@/lib/v3-areas';
 import { liveStatueRecords } from '@/lib/v3-statues';
 import { liveAreas } from '@/lib/v3-live';
 import VuTruPhatGiaoClient from './VuTruPhatGiaoClient';
+import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/v3-seo';
 
 export const revalidate = 60;
+
+export const metadata: Metadata = pageMetadata({
+  title: "Vũ Trụ Phật Giáo",
+  description: "Sơ đồ không gian kiến trúc & hệ thống tự viện Tùng Lâm Hòa Phúc.",
+  path: '/vu-tru-phat-giao',
+});
 
 export default async function VuTruPhatGiaoPage() {
   const [areas, statues] = await Promise.all([liveAreas(), liveStatueRecords()]);

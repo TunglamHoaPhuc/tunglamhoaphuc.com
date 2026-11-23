@@ -1,6 +1,6 @@
 "use client";
 import { FC, useState } from "react";
-import { ChevronRight, Menu, X } from "lucide-react";
+import { ChevronRight, Menu, Search, X } from "lucide-react";
 import { NAV_LINKS, DROPDOWN } from "@/features/home/data/home-data";
 import { useSiteChrome } from "@/components/public/SiteChrome";
 import type { ChromeNavItem } from "@/lib/v3-menu";
@@ -77,11 +77,11 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
           title="Tùng Lâm Hòa Phúc"
         >
           <img
-            src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-moc-an.webp"
+            src="/brand/logo-moc-an.webp"
             alt="Logo Mộc Ấn Tùng Lâm Hòa Phúc"
             className="h-24 md:h-32 lg:h-36 w-auto object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.7)] transition-transform duration-300 group-hover:scale-105"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
+              (e.currentTarget as HTMLImageElement).src = '/brand/logo-tung-lam-hoa-phuc-tron.webp';
             }}
           />
         </Link>
@@ -194,9 +194,21 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
         {/* Vạch phân cách 2 (Kết thúc Nav Bar) */}
         <div className="w-[1px] h-6 bg-gradient-to-b from-transparent via-[#F2C14E]/50 to-transparent shrink-0 hidden lg:block" />
 
+        {/* Tìm kiếm: liên kết thường tới /tim-kiem (chạy cả khi không có JS) */}
+        <Link
+          href="/tim-kiem"
+          aria-label="Tìm kiếm"
+          title="Tìm kiếm"
+          className={`ml-auto -mr-2 lg:mr-0 p-2 rounded-lg transition-colors ${
+            pathname === '/tim-kiem' ? 'text-[#FFDE59]' : 'text-[#F2C14E] hover:text-[#FFDE59]'
+          }`}
+        >
+          <Search className="w-5 h-5" aria-hidden="true" />
+        </Link>
+
         {/* Mobile Hamburger Button */}
         <button
-          className="lg:hidden ml-auto p-1.5 rounded-lg border border-[#F2C14E]/40 text-[#F2C14E] hover:text-[#FFDE59] hover:border-[#FFDE59] transition-colors"
+          className="lg:hidden p-1.5 rounded-lg border border-[#F2C14E]/40 text-[#F2C14E] hover:text-[#FFDE59] hover:border-[#FFDE59] transition-colors"
           onClick={() => setMob(!mob)}
           aria-label="Menu"
         >

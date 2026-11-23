@@ -63,17 +63,22 @@ const record = (extra: Partial<MemorialRecord>): MemorialRecord => ({
 	...extra,
 });
 
-test("tìm bài vị: không khớp số điện thoại gốc, vẫn khớp tên, mã, địa chỉ và phần số đã che", () => {
-	const records = [record({ contactName: "Chị Lan 0912345678", contactPhone: "0912 345 678", address: "Hà Nội" }), record({ id: "2", code: "TA002", name: "Trần Thị Bình", contactPhone: "0987654321" })];
+test("tìm bài vị: chỉ khớp trường công khai (tên, mã, pháp danh, ngày, tuổi), không khớp SĐT, địa chỉ, nơi an táng, người liên hệ", () => {
+	const records = [
+		record({ contactName: "Chị Lan 0912345678", contactPhone: "0912 345 678", address: "Hà Nội", burialLocation: "Nghĩa trang Hữu Bằng" }),
+		record({ id: "2", code: "TA002", name: "Trần Thị Bình", contactPhone: "0987654321" }),
+	];
 	assert.deepEqual(filterMemorialRecords(records, "0912345678"), [], "SĐT gốc không tìm được");
 	assert.deepEqual(filterMemorialRecords(records, "345678"), [], "một đoạn SĐT gốc cũng không");
 	assert.deepEqual(filterMemorialRecords(records, "987654321"), []);
 	assert.deepEqual(filterMemorialRecords(records, "nguyen van an").map((r) => r.id), ["1"]);
 	assert.deepEqual(filterMemorialRecords(records, "TA002").map((r) => r.id), ["2"]);
-	assert.deepEqual(filterMemorialRecords(records, "ha noi").map((r) => r.id), ["1"]);
-	assert.deepEqual(filterMemorialRecords(records, "0912").map((r) => r.id), ["1"], "bốn số đầu còn hiện ở bản che nên tìm được");
-	const found = filterMemorialRecords(records, "lan");
+	assert.deepEqual(filterMemorialRecords(records, "ha noi"), [], "địa chỉ không còn là trường công khai nên không tìm được");
+	assert.deepEqual(filterMemorialRecords(records, "huu bang"), [], "nơi an táng cũng vậy");
+	assert.deepEqual(filterMemorialRecords(records, "lan"), [], "tên người liên hệ cũng vậy");
+	assert.deepEqual(filterMemorialRecords(records, "0912"), [], "phần số đã che cũng không còn");
+	const found = filterMemorialRecords(records, "nguyen");
 	assert.equal(found.length, 1);
-	assert.doesNotMatch(JSON.stringify(found), /0912345678|0912 345 678|contactPhone/, "kết quả không có SĐT gốc");
+	assert.doesNotMatch(JSON.stringify(found), /0912|contact|address|burial|Hà Nội|Hữu Bằng|Lan/, "kết quả không có trường riêng nào");
 	assert.equal(filterMemorialRecords(records, "").length, 2);
 });
