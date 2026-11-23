@@ -25,7 +25,7 @@ export const TuAnVangSinhSystem: FC = () => {
 
           <Link
             href="/tra-cuu-bai-vi"
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#D4A017] to-[#F2C14E] text-[#1C1008] font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all shadow-md shrink-0 self-start sm:self-center"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 min-h-11 rounded-xl bg-gradient-to-r from-[#D4A017] to-[#F2C14E] text-[#1C1008] font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all shadow-md shrink-0 self-start sm:self-center"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             <span>Mở trang tra cứu</span>
@@ -50,7 +50,7 @@ export const TuAnVangSinhSystem: FC = () => {
             autoCorrect="off"
             maxLength={80}
             placeholder="Gõ tên hương linh, họ tộc hoặc pháp danh rồi nhấn Enter..."
-            className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#120A05] border border-[#F2C14E]/40 text-sm text-[#FFE5A3] placeholder-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E] transition-colors"
+            className="w-full pl-10 pr-3 py-2.5 rounded-xl bg-[#120A05] border border-[#F2C14E]/40 text-base sm:text-sm text-[#FFE5A3] placeholder-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E] transition-colors"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           />
         </form>

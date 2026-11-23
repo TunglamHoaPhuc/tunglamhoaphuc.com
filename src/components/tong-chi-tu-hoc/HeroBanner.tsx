@@ -108,7 +108,7 @@ export function HeroBanner({
       <div
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
-        className={`relative w-full min-h-[500px] sm:min-h-[560px] md:min-h-[640px] lg:min-h-[720px] h-[70vh] sm:h-[75vh] md:h-[78vh] lg:h-[82vh] max-h-[860px] overflow-hidden flex items-end justify-center bg-[#2c1c11] ${
+        className={`relative w-full min-h-[440px] sm:min-h-[560px] md:min-h-[640px] lg:min-h-[720px] h-[64svh] sm:h-[75svh] md:h-[78svh] lg:h-[82svh] max-h-[860px] overflow-hidden flex items-end justify-center bg-[#2c1c11] ${
           isEditable ? 'cursor-grab active:cursor-grabbing group/banner' : ''
         }`}
       >
@@ -160,7 +160,7 @@ export function HeroBanner({
             <div className="absolute top-3 left-3 z-40">
               <span
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                className="px-3 py-1 rounded-full bg-black/85 border border-[#F2C14E]/70 text-[#ffde59] text-[11px] font-bold shadow-lg backdrop-blur-md flex items-center gap-1.5"
+                className="px-3 py-1 rounded-full bg-black/85 border border-[#F2C14E]/70 text-[#ffde59] text-xs sm:text-[11px] font-bold shadow-lg sm:backdrop-blur-md flex items-center gap-1.5"
               >
                 <MoveVertical className="w-3.5 h-3.5 text-[#ffde59] shrink-0" />
                 <span>{isDragging ? currentPos : 'Kéo để căn chỉnh'}</span>
@@ -214,7 +214,7 @@ export function HeroBanner({
           {/* 3. Dấu kẻ trang trí hoa văn hoàng kim tỏa sang 2 bên */}
           <div className="relative w-full max-w-2xl sm:max-w-3xl flex items-center justify-center my-1 sm:my-1.5 px-4">
             <div className="flex-1 h-[1.5px]" style={{ background: "linear-gradient(to right, transparent, rgba(242,204,143,0.85))" }} />
-            <div className="mx-3 text-[#f2cc8f] text-[10px] bg-[#2c1c11] px-1 border border-[#f2cc8f]/80 rotate-45 w-3 h-3 flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(242,204,143,0.6)]" />
+            <div className="mx-3 text-[#f2cc8f] text-xs sm:text-[10px] bg-[#2c1c11] px-1 border border-[#f2cc8f]/80 rotate-45 w-3 h-3 flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(242,204,143,0.6)]" />
             <div className="flex-1 h-[1.5px]" style={{ background: "linear-gradient(to left, transparent, rgba(242,204,143,0.85))" }} />
           </div>
 
@@ -232,7 +232,7 @@ export function HeroBanner({
           {backLink && (
             <a
               href={backLink}
-              className="inline-flex items-center gap-2 text-[11px] sm:text-xs uppercase tracking-widest text-[#F2C14E] border border-[#F2C14E]/40 px-5 py-1.5 rounded-full bg-[#1C130D]/90 hover:bg-[#F2C14E] hover:text-[#2A1D14] transition-all shadow-xl mt-2 cursor-pointer z-20 hover:scale-105"
+              className="inline-flex items-center gap-2 text-xs sm:text-xs uppercase tracking-widest text-[#F2C14E] border border-[#F2C14E]/40 px-5 py-1.5 rounded-full bg-[#1C130D]/90 hover:bg-[#F2C14E] hover:text-[#2A1D14] transition-all shadow-xl mt-2 cursor-pointer z-20 hover:scale-105"
               style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: 'bold' }}
             >
               <svg className="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">

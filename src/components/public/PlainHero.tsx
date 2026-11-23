@@ -5,9 +5,16 @@ import type { ReactNode } from "react";
 export default function PlainHero({ title, children }: { title: string; children?: ReactNode }) {
   return (
     <div className="relative w-full overflow-hidden bg-[#2A1D14] pt-28 pb-10">
-      <div
-        className="absolute inset-0 bg-cover bg-center opacity-30 blur-[2px] pointer-events-none"
-        style={{ backgroundImage: "url('/images/hero/toan-canh-chua-1280.webp')" }}
+      {/* Ảnh nền trang trí (mờ 30%): tải với ưu tiên thấp để không tranh băng thông với chữ và phông đầu trang. 1280 px là bậc nhỏ nhất ngang có sẵn. */}
+      <img
+        src="/images/hero/toan-canh-chua-1280.webp"
+        alt=""
+        aria-hidden="true"
+        width={1280}
+        height={720}
+        fetchPriority="low"
+        decoding="async"
+        className="absolute inset-0 h-full w-full object-cover object-center opacity-30 blur-[2px] pointer-events-none"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-[#2A1D14]/40 via-[#2A1D14]/80 to-[#2A1D14] pointer-events-none" />
       <div className="relative z-10 max-w-[1280px] mx-auto px-4 md:px-10 flex flex-col items-center justify-center text-center">

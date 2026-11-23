@@ -71,7 +71,7 @@ export const VietnamMiniMap: FC<VietnamMiniMapProps> = ({
       </div>
 
       {/* ── 4 Region Buttons ── */}
-      <div className="flex items-center gap-1">
+      <div className="flex flex-wrap items-center gap-2 md:gap-1">
         {[
           { id: 'ALL' as RegionType, label: 'Toàn Quốc', color: 'border-[#F2C14E]/60 text-[#F2C14E]' },
           { id: 'BAC' as RegionType, label: 'Miền Bắc', color: 'border-[#F2C14E]/60 text-[#F2C14E]' },
@@ -83,7 +83,7 @@ export const VietnamMiniMap: FC<VietnamMiniMapProps> = ({
             <button
               key={tab.id}
               onClick={() => onSelectRegion(tab.id)}
-              className={`px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center gap-1 ${
+              className={`px-3 py-1 min-h-11 md:min-h-0 rounded-full text-xs md:text-[11px] font-bold uppercase tracking-wider transition-all duration-200 cursor-pointer flex items-center gap-1 ${
                 isActive
                   ? 'bg-[#F2C14E] text-[#1A110B] shadow-[0_0_12px_rgba(242,193,78,0.5)] scale-105'
                   : 'bg-[#2A1D14]/70 text-[#C4B5A5] hover:text-[#FFE5A3] hover:bg-[#3D2B1F] border border-transparent'

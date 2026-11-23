@@ -61,7 +61,7 @@ export const BaoTangGrid: FC = () => {
                   type="button"
                   onClick={() => setIsHeritageMapOpen(true)}
                   style={{ fontFamily: "'UTM ClassizismAntiqua', serif" }}
-                  className="inline-flex items-center justify-center border border-[#c8aa6e]/80 bg-[#2a1a0e]/90 hover:bg-[#ffde59] text-[#ffde59] hover:text-[#2c1c11] font-normal px-8 sm:px-10 py-2.5 sm:py-3 rounded-xl transition-all duration-300 shadow-2xl group/btn uppercase text-sm sm:text-base tracking-wider backdrop-blur-xs cursor-pointer"
+                  className="inline-flex items-center justify-center border border-[#c8aa6e]/80 bg-[#2a1a0e]/90 hover:bg-[#ffde59] text-[#ffde59] hover:text-[#2c1c11] font-normal px-8 sm:px-10 py-2.5 sm:py-3 min-h-11 rounded-xl transition-all duration-300 shadow-2xl group/btn uppercase text-sm sm:text-base tracking-wider backdrop-blur-xs cursor-pointer"
                 >
                   <Compass className="w-4 h-4 mr-2" />
                   <span>KHÁM PHÁ BẢN ĐỒ DI SẢN</span>
@@ -120,7 +120,7 @@ export const BaoTangGrid: FC = () => {
                   type="button"
                   onClick={() => setComingSoonModal('ÂN ĐỨC TỔ THẦY')}
                   style={{ fontFamily: "'UTM ClassizismAntiqua', serif" }}
-                  className="inline-flex items-center justify-center border border-[#c8aa6e]/80 bg-[#2a1a0e]/90 hover:bg-[#ffde59] text-[#ffde59] hover:text-[#2c1c11] font-normal px-8 sm:px-10 py-2.5 sm:py-3 rounded-xl transition-all duration-300 shadow-2xl group/btn uppercase text-sm sm:text-base tracking-wider backdrop-blur-xs cursor-pointer"
+                  className="inline-flex items-center justify-center border border-[#c8aa6e]/80 bg-[#2a1a0e]/90 hover:bg-[#ffde59] text-[#ffde59] hover:text-[#2c1c11] font-normal px-8 sm:px-10 py-2.5 sm:py-3 min-h-11 rounded-xl transition-all duration-300 shadow-2xl group/btn uppercase text-sm sm:text-base tracking-wider backdrop-blur-xs cursor-pointer"
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
                   <span>KHÁM PHÁ TRIỂN LÃM</span>
@@ -136,7 +136,7 @@ export const BaoTangGrid: FC = () => {
       {comingSoonModal && (
         <div
           onClick={() => setComingSoonModal(null)}
-          className="fixed inset-0 z-[150] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-[150] bg-black/80 sm:backdrop-blur-md flex items-center justify-center p-4"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -152,7 +152,7 @@ export const BaoTangGrid: FC = () => {
               TRIỂN LÃM {comingSoonModal}
             </h3>
             <p
-              className="text-xs text-[#E3D2C1] leading-relaxed"
+              className="text-sm text-[#E3D2C1] leading-relaxed"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
               Nội dung tư liệu và không gian triển lãm số về Sư Tổ Ngộ Chân Tử và Bồ Tát Thích Quảng Đức đang được ban biên tập hoàn thiện và sẽ sớm ra mắt Quý Phật tử.

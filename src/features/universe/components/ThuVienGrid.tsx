@@ -37,7 +37,7 @@ const BookCard = React.memo(({ book, onSelect }: BookCardProps) => {
         />
 
         {/* Category Badge */}
-        <div className="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-[#F2C14E] bg-[#1C130D]/90 border border-[#F2C14E]/40 backdrop-blur-md">
+        <div className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs sm:text-[10px] font-bold uppercase tracking-wider text-[#F2C14E] bg-[#1C130D]/90 border border-[#F2C14E]/40 sm:backdrop-blur-md">
           {book.category}
         </div>
       </div>
@@ -60,7 +60,7 @@ const BookCard = React.memo(({ book, onSelect }: BookCardProps) => {
           </p>
 
           <p
-            className="text-[#c9b896] text-[11px] leading-relaxed line-clamp-2"
+            className="text-[#c9b896] text-xs sm:text-[11px] leading-relaxed line-clamp-2"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             {book.description}
@@ -71,7 +71,7 @@ const BookCard = React.memo(({ book, onSelect }: BookCardProps) => {
         <div>
           <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/30 to-transparent my-2" />
           <div
-            className="flex items-center justify-between text-[11px] text-[#FFE5A3]/70 font-bold px-1"
+            className="flex items-center justify-between text-xs sm:text-[11px] text-[#FFE5A3]/70 font-bold px-1"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             <span className="flex items-center gap-1 truncate max-w-[140px]">
@@ -189,7 +189,7 @@ export const ThuVienGrid: FC = () => {
                 <button
                   key={prompt}
                   onClick={() => handleAiPromptClick(prompt)}
-                  className="px-2.5 py-1 rounded-lg bg-[#2A1D14] border border-[#F2C14E]/30 hover:border-[#F2C14E] text-[#FFE5A3] hover:text-white text-xs transition-all cursor-pointer flex items-center gap-1.5"
+                  className="px-3 py-2.5 min-h-11 sm:min-h-0 sm:px-2.5 sm:py-1 rounded-lg bg-[#2A1D14] border border-[#F2C14E]/30 hover:border-[#F2C14E] text-[#FFE5A3] hover:text-white text-xs transition-all cursor-pointer flex items-center gap-1.5"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
                   <Search className="w-3 h-3 text-[#F2C14E] shrink-0" />
@@ -201,7 +201,7 @@ export const ThuVienGrid: FC = () => {
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <span
-              className="text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5"
+              className="text-xs sm:text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
               LỰA CHỌN:
@@ -217,7 +217,7 @@ export const ThuVienGrid: FC = () => {
                   setDisplayCount(8);
                 }}
                 placeholder="Nhập nhu cầu tu học hoặc tên kinh sách..."
-                className="w-full pl-9 pr-8 py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 rounded-xl text-xs md:text-sm text-[#FFE5A3] placeholder-[#c9b896]/60 focus:outline-none focus:border-[#F2C14E] hover:border-[#F2C14E]/70 transition-all shadow-inner"
+                className="w-full pl-9 pr-8 py-2.5 sm:py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 rounded-xl text-base md:text-sm text-[#FFE5A3] placeholder-[#c9b896]/60 focus:outline-none focus:border-[#F2C14E] hover:border-[#F2C14E]/70 transition-all shadow-inner"
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
               />
               {searchQuery && (
@@ -402,7 +402,7 @@ export const ThuVienGrid: FC = () => {
 
                   <div className="h-[1px] bg-gradient-to-r from-[#F2C14E]/60 via-[#F2C14E]/20 to-transparent my-1" style={{ width: '61.8%' }} />
 
-                  <p className="text-xs md:text-sm text-[#D3C0AD] leading-relaxed text-justify" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                  <p className="text-sm text-[#D3C0AD] leading-relaxed text-left sm:text-justify" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                     {selectedBook.description}
                   </p>
 

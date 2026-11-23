@@ -169,9 +169,11 @@ test("thân bài HTML đầy đủ (có bảng): ảnh /anh-goc/ trong khối tl
 	assert.ok(tags(html).some((tag) => tag === '<img src="/brand/logo-moc-an.webp" alt="Logo" loading="lazy">'));
 });
 
-test("danh sách Dòng Chảy: hình nền đầu trang là bản 1280, không phải ảnh gốc", () => {
+test("danh sách Dòng Chảy: hình nền đầu trang là bản vừa (640, 1280 cho máy tính), tải mức thấp, không phải ảnh gốc", () => {
 	const source = read("src/app/(public)/dong-chay-hoang-phap/DongChayHoangPhapClient.tsx");
-	assert.match(source, /HEADER_BG_WIDTH = 1280/);
+	assert.match(source, /HEADER_BG_WIDTH = 640/);
+	assert.match(source, /HEADER_BG_WIDTHS = \[640, 1280\]/);
+	assert.match(source, /fetchPriority="low"/);
 	assert.match(source, /const headerBgImage = fitImage\(/);
 	assert.doesNotMatch(source, /headerBgImage = getImageUrl\(/);
 });

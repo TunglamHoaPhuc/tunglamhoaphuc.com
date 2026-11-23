@@ -39,7 +39,7 @@ export const WoodShutterCard: FC<WoodShutterCardProps> = ({
         <div className="flex items-center gap-2">
           {/* Shutter Theme Tag */}
           <span
-            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#264e4c]/80 text-[#8CE8DE] border border-[#8CE8DE]/40 shadow-sm"
+            className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs md:text-[11px] font-bold uppercase tracking-wider bg-[#264e4c]/80 text-[#8CE8DE] border border-[#8CE8DE]/40 shadow-sm"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             <span className="w-1.5 h-1.5 rounded-full bg-[#8CE8DE] animate-pulse" />
@@ -48,7 +48,7 @@ export const WoodShutterCard: FC<WoodShutterCardProps> = ({
 
           {/* Region Badge */}
           <span
-            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#3D2517] text-[#F2C14E] border border-[#F2C14E]/30"
+            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs md:text-[11px] font-bold uppercase tracking-wider bg-[#3D2517] text-[#F2C14E] border border-[#F2C14E]/30"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             <MapPin className="w-3 h-3 text-[#F2C14E]" />
@@ -65,7 +65,7 @@ export const WoodShutterCard: FC<WoodShutterCardProps> = ({
             <Calendar className="w-3 h-3 text-[#F2C14E]" />
             {cluster.eraStr}
           </span>
-          <span className="text-[11px] font-bold text-[#F2C14E] px-2.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40">
+          <span className="text-xs md:text-[11px] font-bold text-[#F2C14E] px-2.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40">
             +{cluster.totalDocuments} tư liệu quý
           </span>
         </div>
@@ -99,7 +99,7 @@ export const WoodShutterCard: FC<WoodShutterCardProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-[#150C07] via-[#150C07]/40 to-transparent opacity-90 group-hover/hero:opacity-75 transition-opacity" />
 
           {/* Golden Corner Stamp */}
-          <div className="absolute top-3 left-3 bg-[#1A110B]/90 backdrop-blur-md px-3 py-1 rounded-lg border border-[#F2C14E]/40 text-[#F2C14E] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-lg">
+          <div className="absolute top-3 left-3 bg-[#1A110B]/90 backdrop-blur-md px-3 py-1 rounded-lg border border-[#F2C14E]/40 text-[#F2C14E] text-xs md:text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-lg">
             <Sparkles className="w-3 h-3 text-[#F2C14E]" />
             <span>TƯ LIỆU TIÊU ĐIỂM</span>
           </div>
@@ -137,10 +137,10 @@ export const WoodShutterCard: FC<WoodShutterCardProps> = ({
               <div className="absolute inset-0 bg-gradient-to-t from-[#150C07] via-[#150C07]/30 to-transparent" />
 
               <div className="relative z-10 p-2.5">
-                <p className="text-[11px] sm:text-xs font-bold text-[#FFE5A3] line-clamp-1 group-hover/sub:text-[#F2C14E]">
+                <p className="text-xs sm:text-xs font-bold text-[#FFE5A3] line-clamp-1 group-hover/sub:text-[#F2C14E]">
                   {sub.title}
                 </p>
-                <span className="text-[9px] text-[#A8988A] flex items-center gap-1 mt-0.5">
+                <span className="text-xs md:text-[9px] text-[#A8988A] flex items-center gap-1 mt-0.5">
                   <Eye className="w-2.5 h-2.5" />
                   Xem ảnh
                 </span>
@@ -157,7 +157,7 @@ export const WoodShutterCard: FC<WoodShutterCardProps> = ({
             "{cluster.historicalQuote}"
           </p>
           {cluster.quoteAuthor && (
-            <p className="text-[10px] sm:text-[11px] text-[#F2C14E] font-bold uppercase tracking-wider">
+            <p className="text-xs sm:text-[11px] text-[#F2C14E] font-bold uppercase tracking-wider">
               — {cluster.quoteAuthor}
             </p>
           )}

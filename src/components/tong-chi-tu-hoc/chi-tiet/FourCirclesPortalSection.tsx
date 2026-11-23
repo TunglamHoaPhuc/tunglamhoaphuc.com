@@ -181,7 +181,7 @@ export function FourCirclesPortalSection() {
               key={cat.key}
               type="button"
               onClick={() => setSelectedCategory(cat.key)}
-              className={`px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs font-bold transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3.5 py-2.5 min-h-11 sm:min-h-0 sm:px-4 sm:py-2 rounded-full text-xs font-bold transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                 isActive
                   ? 'bg-gradient-to-r from-[#F2C14E] to-[#FFDE59] text-[#1A120B] shadow-[0_0_20px_rgba(242,193,78,0.45)] scale-105'
                   : 'bg-[#2A180E]/90 hover:bg-[#3B2315] text-[#FFE5A3] border border-[#F2C14E]/30 hover:border-[#F2C14E]/70'
@@ -210,7 +210,7 @@ export function FourCirclesPortalSection() {
                     <span>{group.icon}</span>
                     <span>{group.name}</span>
                   </h4>
-                  <p className="text-xs text-[#FFE5A3]/75 italic">
+                  <p className="text-[13px] sm:text-xs text-[#FFE5A3]/75 italic">
                     {group.subtitle}
                   </p>
                   <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/60 to-transparent mx-auto mt-2" />
@@ -263,6 +263,7 @@ function CirclePortalCard({
 }) {
   return (
     <Link
+      prefetch={false}
       href={item.link}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
@@ -306,11 +307,11 @@ function CirclePortalCard({
       >
         <h5
           style={{ fontFamily: "'UTM Avo', sans-serif" }}
-          className="text-xs sm:text-sm font-bold text-[#FFDE59] uppercase tracking-wider line-clamp-1 drop-shadow-md"
+          className="text-[13px] sm:text-sm font-bold text-[#FFDE59] uppercase tracking-wider line-clamp-1 drop-shadow-md"
         >
           {item.name}
         </h5>
-        <p className="text-[11px] text-[#FFE5A3]/85 uppercase tracking-widest font-medium">
+        <p className="text-xs text-[#FFE5A3]/85 uppercase tracking-widest font-medium">
           {item.subtitle}
         </p>
       </div>

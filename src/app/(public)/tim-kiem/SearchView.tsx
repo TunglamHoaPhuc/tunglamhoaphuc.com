@@ -27,15 +27,15 @@ const PILL_ON = "border-[#F2C14E] bg-[#F2C14E] text-[#1A120B]";
 
 function Result({ item }: { item: SearchItem }) {
   return (
-    <li className="rounded-xl border border-[#F2C14E]/20 bg-[#25170E] p-4 flex flex-col gap-1">
+    <li className="rounded-xl border border-[#F2C14E]/20 bg-[#25170E] p-4 flex flex-col gap-1 relative active:bg-[#2E1D10]">
       <p className="text-lg leading-snug" style={AVO}>
-        <Link className="font-bold text-[#F2C14E] hover:text-white hover:underline underline-offset-4" href={item.href}>
+        <Link prefetch={false} className="font-bold text-[#F2C14E] hover:text-white hover:underline underline-offset-4 after:absolute after:inset-0 after:content-['']" href={item.href}>
           {item.title}
         </Link>
       </p>
-      {item.text ? <p className="text-sm text-[#e3d2c1]/85 leading-relaxed line-clamp-3" style={AVO}>{item.text}</p> : null}
+      {item.text ? <p className="text-[15px] md:text-sm text-[#e3d2c1]/85 leading-relaxed line-clamp-3" style={AVO}>{item.text}</p> : null}
       {item.date ? (
-        <p className="text-xs text-[#E2C89B]" style={AVO}>
+        <p className="text-sm md:text-xs text-[#E2C89B]" style={AVO}>
           <time dateTime={item.date}>{dateText(item.date)}</time>
         </p>
       ) : null}
@@ -50,7 +50,7 @@ function Suggestions() {
       <ul className="flex flex-wrap gap-3 list-none p-0 m-0">
         {SEARCH_SECTIONS.map((section) => (
           <li key={section.slug}>
-            <Link className={`${PILL} ${PILL_OFF}`} style={AVO} href={section.href}>
+            <Link prefetch={false} className={`${PILL} ${PILL_OFF}`} style={AVO} href={section.href}>
               {section.name}
             </Link>
           </li>
@@ -74,7 +74,7 @@ function Pager({ page, pageCount, hrefFor }: { page: number; pageCount: number; 
       <ul className="flex flex-wrap items-center gap-2 list-none p-0 m-0">
         {page > 1 ? (
           <li>
-            <Link className={`${PILL} ${PILL_OFF}`} style={AVO} href={hrefFor(page - 1)} rel="prev">
+            <Link prefetch={false} className={`${PILL} ${PILL_OFF}`} style={AVO} href={hrefFor(page - 1)} rel="prev">
               Trang trước
             </Link>
           </li>
@@ -84,7 +84,7 @@ function Pager({ page, pageCount, hrefFor }: { page: number; pageCount: number; 
             <li key={`gap-${i}`} aria-hidden="true" className="px-1">…</li>
           ) : (
             <li key={n}>
-              <Link className={`${PILL} ${n === page ? PILL_ON : PILL_OFF} min-w-11 justify-center`} style={AVO} href={hrefFor(n)} aria-current={n === page ? "page" : undefined}>
+              <Link prefetch={false} className={`${PILL} ${n === page ? PILL_ON : PILL_OFF} min-w-11 justify-center`} style={AVO} href={hrefFor(n)} aria-current={n === page ? "page" : undefined}>
                 <span className="sr-only">Trang </span>
                 {n}
               </Link>
@@ -93,7 +93,7 @@ function Pager({ page, pageCount, hrefFor }: { page: number; pageCount: number; 
         )}
         {page < pageCount ? (
           <li>
-            <Link className={`${PILL} ${PILL_OFF}`} style={AVO} href={hrefFor(page + 1)} rel="next">
+            <Link prefetch={false} className={`${PILL} ${PILL_OFF}`} style={AVO} href={hrefFor(page + 1)} rel="next">
               Trang sau
             </Link>
           </li>
@@ -147,7 +147,7 @@ export default function SearchView({ query, results }: { query: SearchQuery; res
                 Tìm
               </button>
             </div>
-            <p className="text-xs text-[#e3d2c1]/70" style={AVO}>Gõ có dấu hay không dấu đều được.</p>
+            <p className="text-sm md:text-xs text-[#e3d2c1]/75" style={AVO}>Gõ có dấu hay không dấu đều được.</p>
           </form>
 
           <h2 id="ket-qua" tabIndex={-1} className="sr-only">
@@ -161,13 +161,14 @@ export default function SearchView({ query, results }: { query: SearchQuery; res
             <nav aria-label="Chuyên mục">
               <ul className="flex flex-wrap gap-3 list-none p-0 m-0">
                 <li>
-                  <Link className={`${PILL} ${!query.section ? PILL_ON : PILL_OFF}`} style={AVO} href={href({ section: "", page: 1 })} aria-current={!query.section ? "page" : undefined}>
+                  <Link prefetch={false} className={`${PILL} ${!query.section ? PILL_ON : PILL_OFF}`} style={AVO} href={href({ section: "", page: 1 })} aria-current={!query.section ? "page" : undefined}>
                     Tất cả <span className="opacity-80">{number(results.length)}</span>
                   </Link>
                 </li>
                 {groups.map((item) => (
                   <li key={item.section.slug}>
                     <Link
+                      prefetch={false}
                       className={`${PILL} ${item.section.slug === query.section ? PILL_ON : PILL_OFF}`}
                       style={AVO}
                       href={href({ section: item.section.slug, page: 1 })}

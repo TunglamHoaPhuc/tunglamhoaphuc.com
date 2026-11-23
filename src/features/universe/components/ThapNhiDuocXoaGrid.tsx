@@ -43,7 +43,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
             </div>
           </div>
 
-          <p className="text-xs sm:text-sm text-[#FFE5A3]/90 max-w-3xl leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+          <p className="text-sm text-[#FFE5A3]/90 max-w-3xl leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
             12 Vị Dược Xoa Đại Tướng • Thủ Hộ Thần 12 Con Giáp &amp; Hóa Thân Chư Phật Bồ Tát (Kinh Dược Sư Bổn Nguyện Công Đức)
           </p>
         </div>
@@ -88,17 +88,17 @@ export const ThapNhiDuocXoaGrid: FC = () => {
 
                   {/* SUBTITLE WITH ZODIAC ICON */}
                   <p
-                    className="text-[#FFE5A3] text-[10px] font-medium line-clamp-1 flex items-center justify-center gap-1"
+                    className="text-[#FFE5A3] text-xs sm:text-[10px] font-medium line-clamp-1 flex items-center justify-center gap-1"
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                   >
-                    <ZodiacGoldIcon sign={item.zodiacSign} className="text-[10px] py-0 px-1" />
+                    <ZodiacGoldIcon sign={item.zodiacSign} className="text-xs sm:text-[10px] py-0 px-1" />
                     <span className="truncate">{item.subtitle}</span>
                   </p>
 
                   {/* BUTTON */}
                   <div className="pt-2">
                     <span
-                      className="px-4 py-1 rounded-full text-[10px] font-bold text-[#1C130D] bg-gradient-to-r from-[#F2C14E] via-[#E5A93B] to-[#F2C14E] shadow-[0_4px_12px_rgba(242,193,78,0.5)] inline-flex items-center gap-1 uppercase tracking-wider cursor-pointer"
+                      className="px-4 py-1 rounded-full text-xs sm:text-[10px] font-bold text-[#1C130D] bg-gradient-to-r from-[#F2C14E] via-[#E5A93B] to-[#F2C14E] shadow-[0_4px_12px_rgba(242,193,78,0.5)] inline-flex items-center gap-1 uppercase tracking-wider cursor-pointer"
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     >
                       XEM CHI TIẾT ➔
@@ -118,7 +118,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/25 backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto"
+            className="fixed inset-0 z-[200] bg-black/25 sm:backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto"
             onClick={() => setSelectedItem(null)}
           >
             <motion.div
@@ -178,7 +178,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
 
                   {/* SUBTITLE */}
                   <p
-                    className="text-xs sm:text-sm text-[#FFE5A3]/90 font-semibold leading-relaxed"
+                    className="text-sm text-[#FFE5A3]/90 font-semibold leading-relaxed"
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                   >
                     {selectedItem.subtitle}
@@ -193,7 +193,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
 
                   {/* FULL HISTORY HTML */}
                   <div
-                    className="text-xs sm:text-sm text-[#D3C0AD] leading-relaxed font-normal space-y-2"
+                    className="text-sm text-[#D3C0AD] leading-relaxed font-normal space-y-2"
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                   >
                     <p>{selectedItem.fullHistoryHtml}</p>
@@ -201,7 +201,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
 
                   {/* MEANING BOX */}
                   <div
-                    className="bg-[#1C130D]/90 p-4 rounded-xl border border-[#F2C14E]/30 text-xs sm:text-sm text-[#FFE5A3] italic leading-relaxed shadow-sm"
+                    className="bg-[#1C130D]/90 p-4 rounded-xl border border-[#F2C14E]/30 text-sm text-[#FFE5A3] italic leading-relaxed shadow-sm"
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                   >
                     <span className="not-italic font-bold text-[#F2C14E] block mb-1">Ý Nghĩa &amp; Công Đức:</span>
@@ -211,7 +211,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
                   {/* SOURCE */}
                   <div className="pt-1">
                     <p
-                      className="text-[11px] text-[#c9b896]/70 italic tracking-wide"
+                      className="text-xs sm:text-[11px] text-[#c9b896]/70 italic tracking-wide"
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     >
                       Nguồn tư liệu: {selectedItem.source}

@@ -71,7 +71,7 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
           <div className="flex flex-wrap items-center justify-between gap-4 pb-6 border-b border-[#F2C14E]/25">
             <div className="flex items-center gap-2.5">
               <span
-                className={`text-xs sm:text-sm font-bold uppercase tracking-wider px-3.5 py-1 rounded-full border shadow-sm ${
+                className={`text-xs sm:text-sm font-bold uppercase tracking-wider px-3.5 py-1.5 rounded-full border shadow-sm ${
                   eventInfo.category === 'Cộng Tu'
                     ? 'bg-emerald-950 text-emerald-300 border-emerald-500/60 shadow-[0_0_12px_rgba(16,185,129,0.3)]'
                     : eventInfo.category === 'Khóa Lễ Truyền Thống'
@@ -84,17 +84,17 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
               <span className="text-xs text-amber-200/70 hidden sm:inline">• Chốn Tùng Lâm Tịnh Độ</span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={handleShare}
-                className="px-3.5 py-1.5 rounded-lg bg-[#2A170F] hover:bg-[#3D2210] border border-[#F2C14E]/40 text-[#FFE5A3] text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                className="px-4 py-2 min-h-11 sm:min-h-0 sm:px-3.5 sm:py-1.5 rounded-lg bg-[#2A170F] hover:bg-[#3D2210] border border-[#F2C14E]/40 text-[#FFE5A3] text-sm sm:text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
               >
                 <Share2 className="w-3.5 h-3.5" />
                 <span>{copied ? 'Đã sao chép liên kết!' : 'Chia sẻ'}</span>
               </button>
               <Link
                 href="/#calendar"
-                className="px-3.5 py-1.5 rounded-lg bg-[#2A170F] hover:bg-[#3D2210] border border-[#F2C14E]/40 text-[#FFE5A3] text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
+                className="px-4 py-2 min-h-11 sm:min-h-0 sm:px-3.5 sm:py-1.5 rounded-lg bg-[#2A170F] hover:bg-[#3D2210] border border-[#F2C14E]/40 text-[#FFE5A3] text-sm sm:text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Bảng Lịch</span>
@@ -103,7 +103,7 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
           </div>
 
           {/* 2.2 Bảng Thẻ Thông Tin Thời Khóa (Tỉ Lệ Vàng, Viền Vàng Hoàng Kim) */}
-          <div className="rounded-3xl p-6 sm:p-8 bg-gradient-to-b from-[#2A170F]/95 via-[#1D0F08]/95 to-[#150A04]/98 border border-[#F2C14E]/40 shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-md">
+          <div className="rounded-3xl p-5 sm:p-8 bg-gradient-to-b from-[#2A170F]/95 via-[#1D0F08]/95 to-[#150A04]/98 border border-[#F2C14E]/40 shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-md">
             <h2
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
               className="text-lg sm:text-xl font-bold text-[#FFDE59] uppercase tracking-wide mb-6 flex items-center gap-2.5"
@@ -117,13 +117,13 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
               <div className="p-4 rounded-2xl bg-black/40 border border-[#F2C14E]/25 space-y-2">
                 <div className="flex items-center gap-2 text-[#F2C14E]">
                   <CalendarIcon className="w-4 h-4 shrink-0" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Thời Gian</span>
+                  <span className="text-sm sm:text-xs font-bold uppercase tracking-wider">Thời Gian</span>
                 </div>
                 <p className="text-sm sm:text-base font-bold text-white leading-snug">
                   {eventInfo.solarDateStr}
                 </p>
                 {eventInfo.lunarDate && (
-                  <p className="text-xs text-amber-200/80 font-medium">
+                  <p className="text-sm sm:text-xs text-amber-200/80 font-medium">
                     {eventInfo.lunarDate}
                   </p>
                 )}
@@ -134,13 +134,13 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
               <div className="p-4 rounded-2xl bg-black/40 border border-[#F2C14E]/25 space-y-2">
                 <div className="flex items-center gap-2 text-[#F2C14E]">
                   <Clock className="w-4 h-4 shrink-0" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Khung Giờ</span>
+                  <span className="text-sm sm:text-xs font-bold uppercase tracking-wider">Khung Giờ</span>
                 </div>
                 <p className="text-sm sm:text-base font-bold text-white leading-snug">
                   {eventInfo.timeSlot}
                 </p>
                 {eventInfo.timeSlot2 && (
-                  <p className="text-xs text-amber-200/80 font-medium">
+                  <p className="text-sm sm:text-xs text-amber-200/80 font-medium">
                     {eventInfo.timeSlot2}
                   </p>
                 )}
@@ -152,9 +152,9 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
               <div className="p-4 rounded-2xl bg-black/40 border border-[#F2C14E]/25 space-y-2">
                 <div className="flex items-center gap-2 text-[#F2C14E]">
                   <MapPin className="w-4 h-4 shrink-0" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Địa Điểm</span>
+                  <span className="text-sm sm:text-xs font-bold uppercase tracking-wider">Địa Điểm</span>
                 </div>
-                <p className="text-sm font-bold text-white leading-snug">
+                <p className="text-base sm:text-sm font-bold text-white leading-snug">
                   {eventInfo.location}
                 </p>
               </div>
@@ -164,12 +164,12 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
               <div className="p-4 rounded-2xl bg-black/40 border border-[#F2C14E]/25 space-y-2">
                 <div className="flex items-center gap-2 text-[#F2C14E]">
                   <Users className="w-4 h-4 shrink-0" />
-                  <span className="text-xs font-bold uppercase tracking-wider">Đối Tượng</span>
+                  <span className="text-sm sm:text-xs font-bold uppercase tracking-wider">Đối Tượng</span>
                 </div>
-                <p className="text-sm font-bold text-white leading-snug">
+                <p className="text-base sm:text-sm font-bold text-white leading-snug">
                   Đại Chúng Phật Tử
                 </p>
-                <p className="text-xs text-amber-200/80 font-medium">
+                <p className="text-sm sm:text-xs text-amber-200/80 font-medium">
                   Thiện nam tín nữ gần xa
                 </p>
               </div>
@@ -178,7 +178,7 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
 
           {/* 2.3 Thuyết Minh Nội Dung & Ý Nghĩa Khóa Lễ */}
           {eventInfo.description && (
-          <div className="rounded-3xl p-6 sm:p-8 bg-[#1F1109]/90 border border-[#F2C14E]/30 space-y-6">
+          <div className="rounded-3xl p-5 sm:p-8 bg-[#1F1109]/90 border border-[#F2C14E]/30 space-y-6">
             <div className="flex items-center gap-3">
               <span className="text-xl">🪷</span>
               <h3
@@ -189,8 +189,8 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
               </h3>
             </div>
 
-            <div className="space-y-4 text-sm sm:text-base leading-relaxed text-white/90">
-              <p className="text-justify font-normal">
+            <div className="space-y-4 text-base leading-relaxed text-white/90">
+              <p className="text-left sm:text-justify font-normal">
                 {eventInfo.description}
               </p>
             </div>
@@ -198,7 +198,7 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
           )}
 
           {/* 2.4 Lưu Ý Dành Cho Phật Tử Tham Dự (Khung Nổi Bật) */}
-          <div className="rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-[#2A1608] via-[#351C0C] to-[#2A1608] border-2 border-amber-500/50 shadow-[0_10px_30px_rgba(242,193,78,0.2)] space-y-4">
+          <div className="rounded-3xl p-5 sm:p-8 bg-gradient-to-r from-[#2A1608] via-[#351C0C] to-[#2A1608] border-2 border-amber-500/50 shadow-[0_10px_30px_rgba(242,193,78,0.2)] space-y-4">
             <div className="flex items-center gap-3 text-amber-300">
               <Info className="w-5 h-5 shrink-0" />
               <h3
@@ -209,7 +209,7 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
               </h3>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs sm:text-sm text-amber-100/90 leading-relaxed">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-amber-100/90 leading-relaxed">
               <div className="flex items-start gap-2.5">
                 <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
                 <span>
@@ -241,7 +241,7 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
 
           {/* 2.5 Video & Ảnh (nếu có) */}
           {eventInfo.videoUrl && (
-            <div className="rounded-3xl p-6 bg-black/40 border border-[#F2C14E]/30 space-y-4">
+            <div className="rounded-3xl p-4 sm:p-6 bg-black/40 border border-[#F2C14E]/30 space-y-4">
               <div className="flex items-center gap-2 text-[#FFDE59]">
                 <Video className="w-5 h-5" />
                 <h3 className="font-bold text-base uppercase">Video Hướng Dẫn & Tư Liệu Khóa Tu</h3>
@@ -274,14 +274,14 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
                 >
                   Ký Sự & Hình Ảnh Các Khóa Tu Tương Tự
                 </h3>
-                <p className="text-xs sm:text-sm text-amber-200/80 mt-1">
+                <p className="text-sm text-amber-200/80 mt-1">
                   Được hệ thống tự động gợi ý thông minh từ các bài viết và phóng sự của Dòng Chảy Hoằng Pháp
                 </p>
               </div>
 
               <Link
                 href="/dong-chay-hoang-phap"
-                className="text-xs font-bold text-[#FFDE59] hover:text-white flex items-center gap-1.5 transition-colors self-start sm:self-end"
+                className="text-sm sm:text-xs font-bold text-[#FFDE59] hover:text-white inline-flex items-center gap-1.5 min-h-11 sm:min-h-0 transition-colors self-start sm:self-end"
               >
                 <span>Xem tất cả bài viết</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -310,7 +310,7 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
                         }}
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                      <span className="absolute bottom-2 left-2 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-black/75 border border-[#F2C14E]/40 text-[#FFE5A3]">
+                      <span className="absolute bottom-2 left-2 text-xs sm:text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-black/75 border border-[#F2C14E]/40 text-[#FFE5A3]">
                         {art.subCategory || 'KÝ SỰ KHÓA TU'}
                       </span>
                     </div>
@@ -318,13 +318,13 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
                     {/* Tiêu Đề Bài Viết */}
                     <h4
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                      className="text-xs sm:text-sm font-bold text-[#FFDE59] uppercase tracking-wide group-hover:text-white transition-colors line-clamp-2 leading-snug"
+                      className="text-sm font-bold text-[#FFDE59] uppercase tracking-wide group-hover:text-white transition-colors line-clamp-2 leading-snug"
                     >
                       {art.title}
                     </h4>
 
                     {/* Tóm tắt */}
-                    <p className="text-[11px] sm:text-xs text-[#FFE5A3]/80 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-[#FFE5A3]/80 line-clamp-2 leading-relaxed">
                       {art.summary}
                     </p>
                   </div>
@@ -332,7 +332,8 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
                   {/* Nút Xem Ký Sự */}
                   <Link
                     href={`/dong-chay-hoang-phap/${art.slug}`}
-                    className="w-full py-2 px-3 rounded-lg bg-[#3D2210] hover:bg-[#F2C14E] text-[#FFE5A3] hover:text-[#1A120B] border border-[#F2C14E]/40 font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm"
+                    prefetch={false}
+                    className="w-full py-2 px-3 min-h-11 sm:min-h-0 rounded-lg bg-[#3D2210] hover:bg-[#F2C14E] text-[#FFE5A3] hover:text-[#1A120B] border border-[#F2C14E]/40 font-bold text-sm sm:text-xs flex items-center justify-center gap-1.5 transition-all shadow-sm"
                   >
                     <span>Đọc Ký Sự</span>
                     <ArrowRight className="w-3 h-3" />
@@ -346,7 +347,7 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
           {/* ══════════════════════════════════════════════════════════════════════
               4. KHỐI CTA QUAY LẠI LỊCH TU HỌC & ĐĂNG KÝ
           ══════════════════════════════════════════════ */}
-          <div className="rounded-3xl p-8 bg-gradient-to-r from-[#201007] via-[#2D1609] to-[#201007] border border-[#F2C14E]/40 text-center space-y-4 shadow-2xl">
+          <div className="rounded-3xl p-5 sm:p-8 bg-gradient-to-r from-[#201007] via-[#2D1609] to-[#201007] border border-[#F2C14E]/40 text-center space-y-4 shadow-2xl">
             <div className="inline-flex p-3 rounded-full bg-[#F2C14E]/10 border border-[#F2C14E]/30 text-[#F2C14E]">
               <HeartHandshake className="w-8 h-8" />
             </div>
@@ -358,20 +359,20 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
               Phát Tâm Tinh Tấn Hành Trì Chánh Pháp
             </h3>
 
-            <p className="max-w-xl mx-auto text-xs sm:text-sm text-amber-200/90 leading-relaxed">
+            <p className="max-w-xl mx-auto text-sm text-amber-200/90 leading-relaxed">
               Mọi thời khóa tu học tại Tùng Lâm Hòa Phúc đều rộng mở đón chào quý thiện nam tín nữ Phật tử gần xa về chùa kết duyên lành, nuôi dưỡng an lạc cho tự thân và gia đình.
             </p>
 
             <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
               <Link
                 href="/#calendar"
-                className="py-2.5 px-6 rounded-xl bg-gradient-to-r from-[#A3520A] via-[#C87515] to-[#A3520A] hover:from-[#B85D0B] hover:to-[#C87515] text-white font-bold text-xs sm:text-sm tracking-wide uppercase border border-[#F2C14E] shadow-[0_4px_15px_rgba(200,117,21,0.4)] transition-all hover:scale-105 cursor-pointer"
+                className="py-3 sm:py-2.5 px-6 rounded-xl bg-gradient-to-r from-[#A3520A] via-[#C87515] to-[#A3520A] hover:from-[#B85D0B] hover:to-[#C87515] text-white font-bold text-xs sm:text-sm tracking-wide uppercase border border-[#F2C14E] shadow-[0_4px_15px_rgba(200,117,21,0.4)] transition-all hover:scale-105 cursor-pointer"
               >
                 Quay Lại Lịch Tu Học
               </Link>
               <Link
                 href="/dong-chay-hoang-phap"
-                className="py-2.5 px-6 rounded-xl bg-black/60 hover:bg-[#3D2210] text-[#FFE5A3] font-bold text-xs sm:text-sm tracking-wide uppercase border border-[#F2C14E]/40 transition-all hover:scale-105 cursor-pointer"
+                className="py-3 sm:py-2.5 px-6 rounded-xl bg-black/60 hover:bg-[#3D2210] text-[#FFE5A3] font-bold text-xs sm:text-sm tracking-wide uppercase border border-[#F2C14E]/40 transition-all hover:scale-105 cursor-pointer"
               >
                 Dòng Chảy Hoằng Pháp
               </Link>

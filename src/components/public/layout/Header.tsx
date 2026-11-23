@@ -56,13 +56,13 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-[100] transition-all duration-300 border-b overflow-visible py-1.5 md:py-2 bg-[#1A120B]"
+      // backdrop-blur là lớp (không phải style nội tuyến) để globals.css hạ xuống 4 px trên điện thoại: thanh này luôn nằm trên màn hình khi cuộn.
+      className="fixed top-0 left-0 right-0 z-[100] transition-all duration-300 border-b overflow-visible py-1.5 md:py-2 bg-[#1A120B] backdrop-blur-[14px]"
       style={{
         height: 64,
         background: scrolled
           ? "rgba(26,15,8,0.96)"
           : "linear-gradient(to bottom, rgba(26,15,8,0.95) 0%, rgba(26,15,8,0.82) 100%)",
-        backdropFilter: "blur(14px)",
         borderColor: "rgba(242,193,78,0.28)",
         boxShadow: "0 4px 28px rgba(0,0,0,0.55)",
       }}
@@ -207,7 +207,7 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
           href="/tim-kiem"
           aria-label="Tìm kiếm"
           title="Tìm kiếm"
-          className={`ml-auto -mr-2 lg:mr-0 p-2 rounded-lg transition-colors ${
+          className={`ml-auto -mr-2 lg:mr-0 inline-flex items-center justify-center w-11 h-11 lg:w-9 lg:h-9 rounded-lg transition-colors ${
             pathname === '/tim-kiem' ? 'text-[#FFDE59]' : 'text-[#F2C14E] hover:text-[#FFDE59]'
           }`}
         >
@@ -216,9 +216,10 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
 
         {/* Mobile Hamburger Button */}
         <button
-          className="lg:hidden p-1.5 rounded-lg border border-[#F2C14E]/40 text-[#F2C14E] hover:text-[#FFDE59] hover:border-[#FFDE59] transition-colors"
+          className="lg:hidden inline-flex items-center justify-center w-11 h-11 rounded-lg border border-[#F2C14E]/40 text-[#F2C14E] hover:text-[#FFDE59] hover:border-[#FFDE59] transition-colors"
           onClick={() => setMob(!mob)}
           aria-label="Menu"
+          aria-expanded={mob}
         >
           {mob ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
         </button>
@@ -227,7 +228,7 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
       {/* Mobile Menu Dropdown */}
       {mob && (
         <div
-          className="lg:hidden border-t px-6 py-6 flex flex-col gap-4 shadow-2xl max-h-[calc(100vh-70px)] overflow-y-auto relative z-[100] animate-in fade-in slide-in-from-top-4 duration-300"
+          className="lg:hidden border-t px-6 pt-3 pb-[max(1.5rem,env(safe-area-inset-bottom))] flex flex-col gap-1 shadow-2xl max-h-[calc(100dvh-64px)] overflow-y-auto overscroll-contain relative z-[100] animate-in fade-in slide-in-from-top-4 duration-300"
           style={{
             background: "linear-gradient(180deg, rgba(26,15,8,0.98) 0%, rgba(18,10,5,0.99) 100%)",
             borderColor: "rgba(242,193,78,0.35)",
@@ -235,18 +236,18 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
         >
           {items.map((item) =>
             item.children.length > 0 ? (
-              <div key={item.label} className="flex flex-col gap-2 border-b border-[#F2C14E]/15 pb-3">
+              <div key={item.label} className="flex flex-col gap-1 border-b border-[#F2C14E]/15 pb-2">
                 <Link
                   href={item.href || "#"}
                   {...newTabProps(item.newTab)}
                   onClick={() => setMob(false)}
-                  className="text-xs uppercase font-bold tracking-widest text-[#FFDE59] flex items-center justify-between whitespace-nowrap hover:text-[#FFE5A3] transition-colors"
+                  className="min-h-11 text-sm uppercase font-bold tracking-widest text-[#FFDE59] flex items-center justify-between hover:text-[#FFE5A3] transition-colors"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
                   <span>{item.label}</span>
                   <ChevronRight className="w-4 h-4 text-[#F2C14E]" />
                 </Link>
-                <div className="flex flex-col gap-1.5 pl-3 border-l-2 border-[#F2C14E]/30 mt-1">
+                <div className="flex flex-col gap-0.5 pl-3 border-l-2 border-[#F2C14E]/30">
                   {item.children.map((d) => {
                     const isSubActive = pathname === d.href;
                     return (
@@ -254,7 +255,7 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
                         key={d.label}
                         href={d.href}
                         {...newTabProps(d.newTab)}
-                        className={`text-xs font-bold tracking-wide whitespace-nowrap transition-colors py-1 ${
+                        className={`min-h-11 flex items-center text-sm font-bold tracking-wide transition-colors ${
                           isSubActive
                             ? 'text-[#FFDE59]'
                             : 'text-[#e3d2c1] hover:text-[#FFDE59]'
@@ -273,7 +274,7 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
                 key={item.label}
                 href={item.href || "#"}
                 {...newTabProps(item.newTab)}
-                className={`text-xs uppercase tracking-widest font-bold whitespace-nowrap py-2 border-b border-[#F2C14E]/15 transition-colors ${
+                className={`min-h-11 flex items-center text-sm uppercase tracking-widest font-bold border-b border-[#F2C14E]/15 transition-colors ${
                   isLinkActive(item.href)
                     ? 'text-[#FFDE59] drop-shadow-[0_0_8px_rgba(242,193,78,0.6)]'
                     : 'text-[#e3d2c1] hover:text-[#FFDE59]'

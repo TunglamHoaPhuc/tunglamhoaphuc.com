@@ -49,6 +49,7 @@ const OtherAreaCard = React.memo(({ area }: OtherAreaCardProps) => {
 
   return (
     <Link
+      prefetch={false}
       href={`/vu-tru-phat-giao/${area.slug}`}
       className="group relative overflow-hidden rounded-2xl border border-[#e5a93b]/40 bg-[#25170e] hover:border-[#ffde59] transition-all duration-300 shadow-2xl flex flex-col cursor-pointer"
     >

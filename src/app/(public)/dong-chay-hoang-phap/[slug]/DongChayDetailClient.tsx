@@ -102,25 +102,25 @@ export default function DongChayDetailClient({ article, relatedArticlesFormatted
       <div className={`w-full transition-all duration-500 ${isScrolled ? 'pl-4 md:pl-24' : 'pl-4'} pr-4 md:pr-12`}>
         <>
             {/* Breadcrumb & Nút Quay Lại Đầu Trang */}
-            <div className="max-w-5xl mx-auto pt-3 pb-2 flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm">
-              <div className="flex items-center gap-2 text-[#FFE5A3]/80">
-                <Link href="/" className="hover:text-[#F2C14E] transition-colors flex items-center gap-1">
+            <div className="max-w-5xl mx-auto pt-3 pb-2 flex flex-wrap items-center justify-between gap-3 text-sm md:text-sm">
+              <div className="flex flex-wrap items-center gap-x-2 text-[#FFE5A3]/80 min-w-0">
+                <Link href="/" className="hover:text-[#F2C14E] transition-colors flex items-center gap-1 py-3 sm:py-0">
                   <span>Trang Chủ</span>
                 </Link>
                 <span className="text-[#F2C14E]/50">/</span>
-                <Link href="/dong-chay-hoang-phap" className="hover:text-[#F2C14E] transition-colors">
+                <Link href="/dong-chay-hoang-phap" className="hover:text-[#F2C14E] transition-colors py-3 sm:py-0">
                   <span>Dòng Chảy Hoằng Pháp</span>
                 </Link>
                 <span className="text-[#F2C14E]/50">/</span>
-                <span className="text-[#F2C14E] font-medium truncate max-w-[180px] sm:max-w-xs md:max-w-md">{article.title}</span>
+                <span className="text-[#F2C14E] font-medium truncate max-w-[40vw] sm:max-w-xs md:max-w-md">{article.title}</span>
               </div>
 
               <Link
                 href="/dong-chay-hoang-phap"
-                className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#3A2718]/90 border border-[#F2C14E]/50 hover:border-[#F2C14E] text-[#FFE5A3] hover:text-[#FFDE59] text-xs font-semibold shadow-md transition-all hover:-translate-x-0.5"
+                className="inline-flex items-center gap-2 px-4 py-2 min-h-11 sm:min-h-0 sm:px-3.5 sm:py-1.5 rounded-full bg-[#3A2718]/90 border border-[#F2C14E]/50 hover:border-[#F2C14E] text-[#FFE5A3] hover:text-[#FFDE59] text-sm sm:text-xs font-semibold shadow-md transition-all hover:-translate-x-0.5"
               >
                 <ArrowLeft className="w-4 h-4 text-[#F2C14E]" />
-                <span>Quay lại Dòng Chảy Hoằng Pháp</span>
+                <span className="min-w-0">Quay lại Dòng Chảy Hoằng Pháp</span>
               </Link>
             </div>
 
@@ -190,14 +190,14 @@ export default function DongChayDetailClient({ article, relatedArticlesFormatted
                 <div className="w-10 h-8 border border-[#ffde59]/80 rounded-md bg-[#3a2613] flex items-center justify-center shadow-[0_0_12px_rgba(255,222,89,0.3)] z-10">
                   <Clock className="w-5 h-5 text-[#ffde59]" />
                 </div>
-                <div className="flex items-center justify-center w-full my-2">
+                <div className="flex items-center justify-center w-full my-2 gap-0">
                   <div className="flex-1 flex items-center justify-end">
                     <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#c8aa6e]/80 to-[#ffde59]" />
                     <div className="w-2.5 h-2.5 rounded-full bg-[#ffde59] shadow-[0_0_10px_#ffde59] flex-shrink-0" />
                   </div>
                   <h2
                     style={{ fontFamily: "'UTM Niagara', serif" }}
-                    className="text-3xl sm:text-5xl font-normal text-[#ffde59] uppercase px-4 sm:px-6 drop-shadow-[0_0_16px_rgba(255,222,89,0.85)] whitespace-nowrap"
+                    className="text-2xl sm:text-5xl font-normal text-[#ffde59] uppercase px-3 sm:px-6 text-center drop-shadow-[0_0_16px_rgba(255,222,89,0.85)] sm:whitespace-nowrap"
                   >
                     KHÓA TU & SỰ KIỆN CÁC KỲ TRƯỚC
                   </h2>
@@ -213,16 +213,17 @@ export default function DongChayDetailClient({ article, relatedArticlesFormatted
                   <Link
                     key={edIdx}
                     href={`/dong-chay-hoang-phap/${ed.slug || ''}`}
+                    prefetch={false}
                     className="p-5 rounded-2xl bg-[#3A2718]/80 border border-[#F2C14E]/30 hover:border-[#F2C14E] transition-all duration-300 hover:-translate-y-1 block shadow-lg group"
                   >
-                    <span className="text-xs font-bold text-[#F2C14E] uppercase tracking-wider">{ed.period}</span>
+                    <span className="text-sm sm:text-xs font-bold text-[#F2C14E] uppercase tracking-wider">{ed.period}</span>
                     <h4
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
                       className="text-base font-bold text-white group-hover:text-[#ffde59] transition-colors mt-2 leading-snug line-clamp-2"
                     >
                       {ed.title}
                     </h4>
-                    <div className="flex items-center gap-1 text-xs text-[#FFE5A3]/70 group-hover:text-[#F2C14E] mt-4 font-semibold">
+                    <div className="flex items-center gap-1 text-sm sm:text-xs text-[#FFE5A3]/70 group-hover:text-[#F2C14E] mt-4 font-semibold">
                       <span>Xem lại thời khóa</span>
                       <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                     </div>
@@ -239,14 +240,14 @@ export default function DongChayDetailClient({ article, relatedArticlesFormatted
                 <div className="w-10 h-8 border border-[#ffde59]/80 rounded-md bg-[#3a2613] flex items-center justify-center shadow-[0_0_12px_rgba(255,222,89,0.3)] z-10">
                   <Calendar className="w-5 h-5 text-[#ffde59] animate-pulse" />
                 </div>
-                <div className="flex items-center justify-center w-full my-2">
+                <div className="flex items-center justify-center w-full my-2 gap-0">
                   <div className="flex-1 flex items-center justify-end">
                     <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-[#c8aa6e]/80 to-[#ffde59]" />
                     <div className="w-2.5 h-2.5 rounded-full bg-[#ffde59] shadow-[0_0_10px_#ffde59] flex-shrink-0" />
                   </div>
                   <h2
                     style={{ fontFamily: "'UTM Niagara', serif" }}
-                    className="text-3xl sm:text-5xl font-normal text-[#ffde59] uppercase px-4 sm:px-6 drop-shadow-[0_0_16px_rgba(255,222,89,0.85)] whitespace-nowrap"
+                    className="text-2xl sm:text-5xl font-normal text-[#ffde59] uppercase px-3 sm:px-6 text-center drop-shadow-[0_0_16px_rgba(255,222,89,0.85)] sm:whitespace-nowrap"
                   >
                     CHƯƠNG TRÌNH / KHÓA TU SẮP DIỄN RA
                   </h2>
@@ -261,7 +262,7 @@ export default function DongChayDetailClient({ article, relatedArticlesFormatted
                 {article.upcomingEvents.map((ev: any, evIdx: number) => (
                   <div
                     key={evIdx}
-                    className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-[#3A2718] to-[#25170E] border-2 border-[#F2C14E]/60 shadow-[0_0_30px_rgba(242,193,78,0.2)] space-y-3 relative overflow-hidden"
+                    className="p-5 sm:p-8 rounded-3xl bg-gradient-to-br from-[#3A2718] to-[#25170E] border-2 border-[#F2C14E]/60 shadow-[0_0_30px_rgba(242,193,78,0.2)] space-y-3 relative overflow-hidden"
                   >
                     <div className="absolute top-0 right-0 w-32 h-32 bg-[#F2C14E]/5 rounded-full blur-2xl pointer-events-none" />
                     <h3
@@ -270,16 +271,16 @@ export default function DongChayDetailClient({ article, relatedArticlesFormatted
                     >
                       {ev.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-[#FFE5A3] font-medium flex items-center gap-2">
+                    <p className="text-sm text-[#FFE5A3] font-medium flex items-center gap-2">
                       <Clock className="w-4 h-4 text-[#F2C14E] shrink-0" />
                       <span>{ev.timeString}</span>
                     </p>
-                    <p className="text-xs sm:text-sm text-[#D3C0AD] flex items-center gap-2">
+                    <p className="text-sm text-[#D3C0AD] flex items-center gap-2">
                       <Landmark className="w-4 h-4 text-[#F2C14E] shrink-0" />
                       <span>{ev.location}</span>
                     </p>
                     {ev.description && (
-                      <p className="text-xs sm:text-sm text-white/90 pt-2 leading-relaxed border-t border-[#F2C14E]/20">
+                      <p className="text-sm text-white/90 pt-2 leading-relaxed border-t border-[#F2C14E]/20">
                         {ev.description}
                       </p>
                     )}
@@ -287,7 +288,7 @@ export default function DongChayDetailClient({ article, relatedArticlesFormatted
                       <div className="pt-3">
                         <Link
                           href={ev.registrationLink}
-                          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#F2C14E] to-[#E5A93C] text-black text-xs font-bold shadow-[0_0_15px_rgba(242,193,78,0.4)] hover:scale-105 transition-transform cursor-pointer"
+                          className="inline-flex items-center gap-2 px-5 py-3 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#F2C14E] to-[#E5A93C] text-black text-sm sm:text-xs font-bold shadow-[0_0_15px_rgba(242,193,78,0.4)] hover:scale-105 transition-transform cursor-pointer"
                         >
                           <span>Đăng Ký Tham Gia Khóa Tu</span>
                           <ArrowRight className="w-4 h-4" />

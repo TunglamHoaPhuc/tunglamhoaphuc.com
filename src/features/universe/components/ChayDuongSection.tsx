@@ -107,14 +107,14 @@ export const ChayDuongSection: FC = () => {
                 
                 {/* Category badge */}
                 <span
-                  className="absolute top-3 left-3 px-3 py-1 rounded-md text-[10px] font-bold text-[#FFE5A3] bg-[#8B1E0F]/90 border border-[#F2C14E]/50 uppercase tracking-wider backdrop-blur-sm"
+                  className="absolute top-3 left-3 px-3 py-1 rounded-md text-xs sm:text-[10px] font-bold text-[#FFE5A3] bg-[#8B1E0F]/90 border border-[#F2C14E]/50 uppercase tracking-wider sm:backdrop-blur-sm"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
                   {art.category}
                 </span>
 
                 {/* Read time */}
-                <div className="absolute bottom-3 left-3 flex items-center gap-1 text-[11px] text-[#FFE5A3]/90 bg-black/70 px-2 py-0.5 rounded backdrop-blur-sm">
+                <div className="absolute bottom-3 left-3 flex items-center gap-1 text-xs sm:text-[11px] text-[#FFE5A3]/90 bg-black/70 px-2 py-0.5 rounded sm:backdrop-blur-sm">
                   <Clock className="w-3 h-3 text-[#F2C14E]" />
                   <span>{art.readTime}</span>
                 </div>
@@ -130,7 +130,7 @@ export const ChayDuongSection: FC = () => {
               <p className="text-xs text-[#F2C14E] font-bold mb-2 line-clamp-1" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 {art.subtitle}
               </p>
-              <p className="text-xs text-[#e3d2c1]/85 leading-relaxed line-clamp-2" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+              <p className="text-sm text-[#e3d2c1]/85 leading-relaxed line-clamp-2" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 {art.excerpt}
               </p>
             </div>
@@ -140,7 +140,7 @@ export const ChayDuongSection: FC = () => {
               <span className="group-hover:underline flex items-center gap-1">
                 Đọc toàn văn bài viết <ChevronRight className="w-3.5 h-3.5" />
               </span>
-              <div className="flex items-center gap-1 text-[11px] text-[#c9b896]/70">
+              <div className="flex items-center gap-1 text-xs sm:text-[11px] text-[#c9b896]/70">
                 <Eye className="w-3 h-3 text-[#F2C14E]" />
                 <span>{art.views}</span>
               </div>
@@ -153,14 +153,14 @@ export const ChayDuongSection: FC = () => {
       <AnimatePresence>
         {selectedArticle && (
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 sm:backdrop-blur-xl animate-in fade-in"
             onClick={() => setSelectedArticle(null)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative max-w-2xl w-full max-h-[85vh] overflow-y-auto rounded-3xl border-2 border-[#F2C14E] bg-gradient-to-b from-[#2C180E] via-[#1E1108] to-[#120904] p-6 sm:p-8 shadow-[0_0_60px_rgba(242,193,78,0.4)] text-white space-y-5 scrollbar-none"
+              className="relative max-w-2xl w-full max-h-[85svh] overflow-y-auto rounded-3xl border-2 border-[#F2C14E] bg-gradient-to-b from-[#2C180E] via-[#1E1108] to-[#120904] p-6 sm:p-8 shadow-[0_0_60px_rgba(242,193,78,0.4)] text-white space-y-5 scrollbar-none"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
@@ -173,7 +173,7 @@ export const ChayDuongSection: FC = () => {
 
               <div className="space-y-2">
                 <span
-                  className="px-3 py-1 rounded-full text-[10px] font-bold text-[#FFE5A3] bg-[#8B1E0F] border border-[#F2C14E] uppercase"
+                  className="px-3 py-1 rounded-full text-xs sm:text-[10px] font-bold text-[#FFE5A3] bg-[#8B1E0F] border border-[#F2C14E] uppercase"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
                   {selectedArticle.category}
@@ -199,14 +199,14 @@ export const ChayDuongSection: FC = () => {
               </div>
 
               {/* Full Article Content */}
-              <div className="space-y-4 text-xs sm:text-sm text-[#e3d2c1] leading-relaxed text-justify" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+              <div className="space-y-4 text-sm text-[#e3d2c1] leading-relaxed text-left sm:text-justify" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 {selectedArticle.content.map((p, idx) => (
                   <p key={idx}>{p}</p>
                 ))}
               </div>
 
               <div className="text-center pt-4 border-t border-[#F2C14E]/25">
-                <span className="text-[11px] text-[#c9b896]/80 uppercase font-bold" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                <span className="text-xs sm:text-[11px] text-[#c9b896]/80 uppercase font-bold" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                   ❖ HƯƠNG TÍCH BẾP • CHAY ĐƯỜNG TÙNG LÂM HÒA PHÚC ❖
                 </span>
               </div>

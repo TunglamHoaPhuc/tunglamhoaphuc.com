@@ -78,7 +78,7 @@ export const CongTamQuanSection: FC = () => {
           <h3 className="text-2xl font-bold text-[#F2C14E]" style={{ fontFamily: "'UTM Niagara', serif" }}>
             CỔNG TAM QUAN — TAM GIẢI THOÁT MÔN
           </h3>
-          <p className="text-xs md:text-sm text-[#D3C0AD] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+          <p className="text-sm text-[#D3C0AD] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
             Cửa ngõ đầu tiên dẫn lối vào chốn thiêng gồm 3 cửa tượng trưng cho Tam Giải Thoát Môn: Không Môn, Vô Tướng Môn và Vô Nguyện Môn. Giúp bước chân hành giả rũ bỏ mọi trần lụy, hướng tâm về cội nguồn giác ngộ.
           </p>
         </div>
@@ -92,7 +92,7 @@ export const CongTamQuanSection: FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
             {batChanhDao.map((item, idx) => (
               <div key={idx} className="bg-[#2A1D14] p-4 rounded-xl border border-[#F2C14E]/30 text-left">
-                <span className="text-[10px] font-bold text-[#F2C14E] bg-[#1C130D] px-2 py-0.5 rounded border border-[#F2C14E]/20">
+                <span className="text-xs sm:text-[10px] font-bold text-[#F2C14E] bg-[#1C130D] px-2 py-0.5 rounded border border-[#F2C14E]/20">
                   NHÁNH {idx + 1}
                 </span>
                 <h4 className="text-lg font-bold text-[#F2C14E] mt-1" style={{ fontFamily: "'UTM Niagara', serif" }}>

@@ -221,14 +221,14 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-[400] bg-black/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 md:p-6 select-none animate-in fade-in duration-200"
+      className="fixed inset-0 z-[400] bg-black/90 sm:backdrop-blur-md flex items-center justify-center p-2 sm:p-4 md:p-6 select-none animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
         ref={containerRef}
         onClick={(e) => e.stopPropagation()}
-        className={`w-full max-w-6xl rounded-3xl bg-gradient-to-b from-[#1C1008] via-[#2A180E] to-[#120803] border-2 border-[#F2C14E]/60 p-4 sm:p-6 md:p-8 shadow-[0_0_80px_rgba(0,0,0,0.95)] flex flex-col justify-between max-h-[96vh] overflow-hidden ${
-          isFullscreen ? 'fixed inset-0 z-[9999] rounded-none max-h-screen p-4' : ''
+        className={`w-full max-w-6xl rounded-3xl bg-gradient-to-b from-[#1C1008] via-[#2A180E] to-[#120803] border-2 border-[#F2C14E]/60 p-4 sm:p-6 md:p-8 shadow-[0_0_80px_rgba(0,0,0,0.95)] flex flex-col justify-between max-h-[96svh] overflow-hidden ${
+          isFullscreen ? 'fixed inset-0 z-[9999] rounded-none max-h-dvh p-4' : ''
         }`}
       >
         {/* ── 1. TOOLBAR HEADER TRANG TRỌNG HOÀNG KIM ── */}
@@ -262,7 +262,7 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
             <button
               type="button"
               onClick={handleZoomOut}
-              className="w-8 h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/40 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xs"
+              className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/40 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xs"
               title="Thu nhỏ (-)"
             >
               <ZoomOut className="w-4 h-4" />
@@ -270,7 +270,7 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
             <button
               type="button"
               onClick={handleZoomIn}
-              className="w-8 h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/40 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xs"
+              className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/40 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xs"
               title="Phóng to (+)"
             >
               <ZoomIn className="w-4 h-4" />
@@ -279,7 +279,7 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
               <button
                 type="button"
                 onClick={handleResetZoom}
-                className="w-8 h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/40 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xs"
+                className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/40 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xs"
                 title="Đặt lại kích thước"
               >
                 <RotateCcw className="w-4 h-4" />
@@ -301,7 +301,7 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
             <button
               type="button"
               onClick={toggleFullscreen}
-              className="w-8 h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/40 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xs"
+              className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/40 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xs"
               title={isFullscreen ? 'Thu nhỏ' : 'Toàn màn hình'}
             >
               {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -311,7 +311,7 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="w-8 h-8 rounded-lg bg-[#3A1E11] border border-[#F2C14E]/60 text-[#FFDE59] hover:bg-[#F2C14E] hover:text-[#170C06] flex items-center justify-center transition-all cursor-pointer shadow-sm ml-1"
+              className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#3A1E11] border border-[#F2C14E]/60 text-[#FFDE59] hover:bg-[#F2C14E] hover:text-[#170C06] flex items-center justify-center transition-all cursor-pointer shadow-sm ml-1"
               title="Đóng (ESC)"
             >
               <X className="w-5 h-5" />
@@ -330,14 +330,14 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
           className={`relative w-full flex-1 flex items-center justify-center py-2 overflow-hidden ${
             zoomScale > 1 ? (isDragging ? 'cursor-grabbing' : 'cursor-grab') : 'cursor-default'
           }`}
-          style={{ minHeight: '440px', height: '62vh' }}
+          style={{ minHeight: '440px', height: '62svh' }}
         >
           {/* Mũi tên lật trang trái */}
           <button
             type="button"
             onClick={handlePrev}
             disabled={currentPage === 1}
-            className={`absolute left-1 sm:left-4 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-[#1C1008]/90 border-2 border-[#F2C14E]/70 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center shadow-2xl transition-all cursor-pointer backdrop-blur-md ${
+            className={`absolute left-1 sm:left-4 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-[#1C1008]/90 border-2 border-[#F2C14E]/70 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center shadow-2xl transition-all cursor-pointer sm:backdrop-blur-md ${
               currentPage === 1 ? 'opacity-25 cursor-not-allowed pointer-events-none' : 'hover:scale-110 active:scale-95'
             }`}
             aria-label="Lật trang trước"
@@ -360,7 +360,7 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
               /* ── 2 TRANG MỞ ĐÔI (DESKTOP) ── */
               isCover ? (
                 /* BÌA TRƯỚC (ĐỨNG ĐƠN ĐỘC Ở CHÍNH GIỮA) */
-                <div className="relative rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.95)] border-2 border-[#F2C14E]/60 bg-[#120803] max-w-[460px] max-h-[58vh] aspect-[3/4] flex items-center justify-center transition-all duration-300">
+                <div className="relative rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.95)] border-2 border-[#F2C14E]/60 bg-[#120803] max-w-[460px] max-h-[58svh] aspect-[3/4] flex items-center justify-center transition-all duration-300">
                   <img
                     src={pages[0].src}
                     alt={pages[0].title}
@@ -372,7 +372,7 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
               ) : (
                 /* HAI TRANG MỞ ĐÔI KÈM GÁY SÁCH & HIỆU ỨNG LẬT 3D */
                 <div
-                  className={`relative flex items-center rounded-2xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.95)] border-2 border-[#F2C14E]/60 bg-[#120803] max-w-[940px] max-h-[58vh] aspect-[3/2] transition-transform duration-300 ${
+                  className={`relative flex items-center rounded-2xl overflow-hidden shadow-[0_30px_70px_rgba(0,0,0,0.95)] border-2 border-[#F2C14E]/60 bg-[#120803] max-w-[940px] max-h-[58svh] aspect-[3/2] transition-transform duration-300 ${
                     flippingDirection === 'next'
                       ? 'animate-in spin-in-1 [transform:rotateY(-4deg)]'
                       : flippingDirection === 'prev'
@@ -419,7 +419,7 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
               )
             ) : (
               /* ── 1 TRANG DUY NHẤT (MOBILE) ── */
-              <div className="relative rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.95)] border-2 border-[#F2C14E]/60 bg-[#120803] max-w-[460px] max-h-[58vh] aspect-[3/4] flex items-center justify-center">
+              <div className="relative rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.95)] border-2 border-[#F2C14E]/60 bg-[#120803] max-w-[460px] max-h-[58svh] aspect-[3/4] flex items-center justify-center">
                 <img
                   src={pages[currentPage - 1].src}
                   alt={pages[currentPage - 1].title}
@@ -436,7 +436,7 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
             type="button"
             onClick={handleNext}
             disabled={isDualView ? (currentPage >= totalPages - 1 && !isCover) : (currentPage >= totalPages)}
-            className={`absolute right-1 sm:right-4 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-[#1C1008]/90 border-2 border-[#F2C14E]/70 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center shadow-2xl transition-all cursor-pointer backdrop-blur-md ${
+            className={`absolute right-1 sm:right-4 z-40 w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-[#1C1008]/90 border-2 border-[#F2C14E]/70 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center shadow-2xl transition-all cursor-pointer sm:backdrop-blur-md ${
               (isDualView && currentPage >= totalPages - 1 && !isCover) || (!isDualView && currentPage >= totalPages)
                 ? 'opacity-25 cursor-not-allowed pointer-events-none'
                 : 'hover:scale-110 active:scale-95'
@@ -464,7 +464,7 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
               )}
             </span>
             {zoomScale > 1 && (
-              <span className="text-[11px] font-mono text-[#F2C14E] bg-black/40 px-2 py-0.5 rounded border border-[#F2C14E]/30 ml-1">
+              <span className="text-xs sm:text-[11px] font-mono text-[#F2C14E] bg-black/40 px-2 py-0.5 rounded border border-[#F2C14E]/30 ml-1">
                 Zoom {Math.round(zoomScale * 100)}%
               </span>
             )}
@@ -478,7 +478,7 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
               max={totalPages}
               value={currentPage}
               onChange={(e) => setCurrentPage(Number(e.target.value))}
-              className="w-full accent-[#F2C14E] cursor-pointer"
+              className="w-full h-11 sm:h-auto accent-[#F2C14E] cursor-pointer"
             />
           </div>
 
@@ -487,7 +487,7 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
             <button
               type="button"
               onClick={() => setCurrentPage(1)}
-              className="px-3 py-1 rounded bg-[#2D1B10] border border-[#F2C14E]/40 text-[11px] font-bold text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black transition-all cursor-pointer shadow-xs"
+              className="px-3 py-1 rounded bg-[#2D1B10] border border-[#F2C14E]/40 text-xs sm:text-[11px] font-bold text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black transition-all cursor-pointer shadow-xs"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
               Đầu sách
@@ -495,7 +495,7 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
             <button
               type="button"
               onClick={() => setCurrentPage(totalPages)}
-              className="px-3 py-1 rounded bg-[#2D1B10] border border-[#F2C14E]/40 text-[11px] font-bold text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black transition-all cursor-pointer shadow-xs"
+              className="px-3 py-1 rounded bg-[#2D1B10] border border-[#F2C14E]/40 text-xs sm:text-[11px] font-bold text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black transition-all cursor-pointer shadow-xs"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
               Cuối sách

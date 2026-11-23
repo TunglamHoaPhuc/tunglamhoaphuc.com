@@ -125,7 +125,7 @@ const getCategoryIcon = (category?: string, subCategory?: string, title?: string
  * - Golden Typography Scale:
  *   - Title: text-[18px] md:text-[20px] (Font UTM Avo Bold, Gold #F2C14E)
  *   - Summary: text-[13px] md:text-[14px] (Font UTM Avo Normal, Cream #D3C0AD)
- *   - Tag & Meta: text-[11px] md:text-[12px]
+ *   - Tag & Meta: text-xs md:text-[12px]
  * - Golden Padding & Spacing: p-4 md:p-6 (16px ~ 24px)
  * - Art Boundary Junction: 1px Gradient line + Floating Centered Temple Logo (z-20)
  */
@@ -137,7 +137,8 @@ export const PostCard: FC<PostCardProps> = ({
   priority = false,
 }) => {
   const CardWrapper = post.targetUrl ? Link : 'div';
-  const wrapperProps = post.targetUrl ? { href: post.targetUrl } : {};
+  // prefetch={false}: một lưới có 12–24 thẻ, prefetch cả lưới ngay sau khi trang chạy tốn ~150 KB RSC; trang chi tiết tải khi bấm.
+  const wrapperProps = post.targetUrl ? { href: post.targetUrl, prefetch: false } : {};
 
   const formattedViews =
     typeof post.viewsCount === 'number'
@@ -192,7 +193,7 @@ export const PostCard: FC<PostCardProps> = ({
           {(post.subtitle || post.category2) && (
             <p
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
-              className="text-[11.5px] sm:text-xs md:text-[13px] text-[#E5A93C] font-medium italic normal-case line-clamp-1 leading-normal w-full text-center tracking-wide"
+              className="text-xs sm:text-xs md:text-[13px] text-[#E5A93C] font-medium italic normal-case line-clamp-1 leading-normal w-full text-center tracking-wide"
             >
               {post.subtitle || post.category2}
             </p>
@@ -216,14 +217,14 @@ export const PostCard: FC<PostCardProps> = ({
                 {/* Mô tả ngắn bài viết */}
                 {post.description && (
                   <p
-                    className="text-[#c9b896] leading-relaxed line-clamp-2 md:line-clamp-3 text-justify text-[11.5px] md:text-[12.5px]"
+                    className="text-[#c9b896] leading-relaxed line-clamp-2 md:line-clamp-3 text-justify text-xs md:text-[12.5px]"
                   >
                     {post.description}
                   </p>
                 )}
 
                 {/* Meta: Ngày đăng + Lượt xem */}
-                <div className={`flex items-center ${post.publishedDate ? 'justify-between' : 'justify-end'} text-[10.5px] md:text-[11px] text-[#A69383] pt-2 border-t border-[#F2C14E]/15 mt-0.5`}>
+                <div className={`flex items-center ${post.publishedDate ? 'justify-between' : 'justify-end'} text-xs md:text-[11px] text-[#A69383] pt-2 border-t border-[#F2C14E]/15 mt-0.5`}>
                   {post.publishedDate && (
                     <div className="flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5 text-[#F2C14E]/70" />
@@ -279,7 +280,7 @@ export const PostCard: FC<PostCardProps> = ({
         {/* Sub Tiêu Đề - Viết thường, bold nhẹ & nghiêng */}
         <div
           style={{ fontFamily: "'UTM Avo', sans-serif" }}
-          className="text-[10.5px] sm:text-[11px] md:text-[12px] font-medium italic text-[#E5A93C] tracking-wide normal-case truncate w-full text-center"
+          className="text-xs sm:text-[11px] md:text-[12px] font-medium italic text-[#E5A93C] tracking-wide normal-case truncate w-full text-center"
         >
           {post.subtitle || categoryTag}
         </div>
@@ -305,7 +306,7 @@ export const PostCard: FC<PostCardProps> = ({
               {post.description && (
                 <p
                   className={`text-[#c9b896] leading-relaxed line-clamp-2 text-justify ${
-                    large ? 'text-xs md:text-[13px] md:line-clamp-3' : 'text-[10.5px] md:text-[11px]'
+                    large ? 'text-xs md:text-[13px] md:line-clamp-3' : 'text-xs md:text-[11px]'
                   }`}
                 >
                   {post.description}
@@ -313,7 +314,7 @@ export const PostCard: FC<PostCardProps> = ({
               )}
 
               {/* Meta: Ngày đăng + Lượt xem */}
-              <div className={`flex items-center ${post.publishedDate ? 'justify-between' : 'justify-end'} text-[10px] text-[#A69383] pt-1.5 border-t border-[#F2C14E]/15 mt-0.5`}>
+              <div className={`flex items-center ${post.publishedDate ? 'justify-between' : 'justify-end'} text-xs md:text-[10px] text-[#A69383] pt-1.5 border-t border-[#F2C14E]/15 mt-0.5`}>
                 {post.publishedDate && (
                   <div className="flex items-center gap-1">
                     <Calendar className="w-3 h-3 text-[#F2C14E]/70" />

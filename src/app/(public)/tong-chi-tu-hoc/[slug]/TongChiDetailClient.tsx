@@ -263,7 +263,7 @@ export default function TongChiDetailClient({ article, related }: { article: V3T
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#2c1c11] text-[#FFE5A3] font-sans relative selection:bg-[#f2cc8f] selection:text-black overflow-x-hidden">
+    <div className="w-full min-h-screen bg-[#2c1c11] text-[#FFE5A3] font-sans relative selection:bg-[#f2cc8f] selection:text-black overflow-x-clip md:overflow-x-hidden">
       <SubNavbar
         activeSection={activeSection}
         isScrolled={isScrolled}
@@ -280,7 +280,7 @@ export default function TongChiDetailClient({ article, related }: { article: V3T
       />
 
       <div
-        className={`w-full transition-all duration-500 ${isScrolled ? 'pl-16 md:pl-24' : 'pl-4'} pr-4 md:pr-12`}
+        className={`w-full transition-all duration-500 ${isScrolled ? 'pl-4 md:pl-24' : 'pl-4'} pr-4 md:pr-12`}
       >
         <HeroBanner
           id="tong-chi-tu-hoc"

@@ -93,15 +93,15 @@ export function TongChiArticleSwitcherModal({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/90 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-black/90 sm:backdrop-blur-md animate-in fade-in duration-200"
       onClick={onClose}
     >
       <div
-        className="bg-[#1C120A] border-2 border-[#F2C14E] rounded-3xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-[0_0_80px_rgba(242,193,78,0.35)] overflow-hidden text-[#FFE5A3]"
+        className="bg-[#1C120A] border-2 border-[#F2C14E] rounded-3xl w-full max-w-5xl max-h-[90svh] flex flex-col shadow-[0_0_80px_rgba(242,193,78,0.35)] overflow-hidden text-[#FFE5A3]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Top Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#F2C14E]/30 bg-[#25170E] shrink-0">
+        <div className="flex items-center justify-between gap-3 px-4 sm:px-6 py-3 sm:py-4 border-b border-[#F2C14E]/30 bg-[#25170E] shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-[#3A2718] border border-[#F2C14E] flex items-center justify-center text-[#ffde59] shadow-md shrink-0">
               <BookOpen className="w-5 h-5" />
@@ -115,7 +115,7 @@ export function TongChiArticleSwitcherModal({
               </h2>
               <p
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                className="text-[11px] text-[#c9b896]/80 font-medium"
+                className="text-xs sm:text-[11px] text-[#c9b896]/80 font-medium"
               >
                 Chọn bài để chuyển nhanh đến nội dung tu học tương ứng ({articles.length} bài)
               </p>
@@ -125,7 +125,7 @@ export function TongChiArticleSwitcherModal({
           <button
             type="button"
             onClick={onClose}
-            className="w-9 h-9 rounded-xl bg-[#2A1D14] hover:bg-red-900/60 border border-[#F2C14E]/40 text-[#c9b896] hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-sm"
+            className="w-11 h-11 sm:w-9 sm:h-9 shrink-0 rounded-xl bg-[#2A1D14] hover:bg-red-900/60 border border-[#F2C14E]/40 text-[#c9b896] hover:text-white flex items-center justify-center transition-all cursor-pointer shadow-sm"
             title="Đóng danh sách (Esc)"
           >
             <X className="w-5 h-5" />
@@ -143,14 +143,14 @@ export function TongChiArticleSwitcherModal({
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm kiếm bài thơ, bài viết theo tiêu đề hoặc từ khóa..."
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
-              className="w-full pl-10 pr-10 py-2.5 bg-[#25170E] border border-[#F2C14E]/40 rounded-xl text-xs sm:text-sm text-white placeholder:text-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E] focus:ring-1 focus:ring-[#F2C14E]/50 shadow-inner"
-              autoFocus
+              className="w-full pl-10 pr-10 py-2.5 bg-[#25170E] border border-[#F2C14E]/40 rounded-xl text-base sm:text-sm text-white placeholder:text-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E] focus:ring-1 focus:ring-[#F2C14E]/50 shadow-inner"
+              autoFocus={typeof window !== 'undefined' && window.matchMedia('(pointer: fine)').matches}
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-[#c9b896] hover:text-white"
+                className="absolute right-1 sm:right-3 top-1/2 -translate-y-1/2 p-3 sm:p-1 text-[#c9b896] hover:text-white"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -172,7 +172,7 @@ export function TongChiArticleSwitcherModal({
                   type="button"
                   onClick={() => setActiveCategory(cat.id)}
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                  className={`px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
+                  className={`px-3.5 py-2.5 sm:px-3 sm:py-1.5 rounded-xl text-xs sm:text-[11px] font-bold whitespace-nowrap transition-all flex items-center gap-1.5 cursor-pointer shrink-0 ${
                     isActive
                       ? 'bg-[#F2C14E] text-[#1A120B] shadow-[0_0_15px_rgba(242,193,78,0.4)] scale-105'
                       : 'bg-[#25170E] hover:bg-[#352012] text-[#c9b896] hover:text-white border border-[#F2C14E]/30'
@@ -180,7 +180,7 @@ export function TongChiArticleSwitcherModal({
                 >
                   <span>{cat.name}</span>
                   <span
-                    className={`px-1.5 py-0.2 rounded-full text-[9px] font-mono ${
+                    className={`px-1.5 py-0.2 rounded-full text-xs sm:text-[9px] font-mono ${
                       isActive ? 'bg-[#1A120B]/20 text-[#1A120B]' : 'bg-[#1C120A] text-[#FFE5A3]'
                     }`}
                   >
@@ -216,6 +216,7 @@ export function TongChiArticleSwitcherModal({
 
                 return (
                   <Link
+                    prefetch={false}
                     key={item.id || item.slug || idx}
                     href={`/tong-chi-tu-hoc/${item.slug}`}
                     onClick={() => onClose()}
@@ -235,7 +236,7 @@ export function TongChiArticleSwitcherModal({
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                         />
-                        <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/80 text-[9px] font-bold text-[#ffde59] border border-[#F2C14E]/50">
+                        <div className="absolute top-1 left-1 px-1.5 py-0.5 rounded bg-black/80 text-xs sm:text-[9px] font-bold text-[#ffde59] border border-[#F2C14E]/50">
                           #{item.id}
                         </div>
                       </div>
@@ -245,14 +246,14 @@ export function TongChiArticleSwitcherModal({
                         <div className="flex items-center justify-between gap-1 mb-0.5">
                           <span
                             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                            className="text-[9px] font-bold tracking-wider text-[#F2C14E] uppercase truncate"
+                            className="text-xs sm:text-[9px] font-bold tracking-wider text-[#F2C14E] uppercase truncate"
                           >
                             {item.categoryName || 'TÔNG CHỈ'}
                           </span>
                           {isCurrent && (
                             <span
                               style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#F2C14E] text-[#1A120B] text-[9px] font-bold uppercase shrink-0"
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-[#F2C14E] text-[#1A120B] text-xs sm:text-[9px] font-bold uppercase shrink-0"
                             >
                               <CheckCircle2 className="w-2.5 h-2.5" />
                               <span>Đang xem</span>
@@ -270,7 +271,7 @@ export function TongChiArticleSwitcherModal({
                         {item.subtitle && (
                           <p
                             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                            className="text-[10px] text-[#c9b896] italic truncate mt-0.5"
+                            className="text-xs sm:text-[10px] text-[#c9b896] italic truncate mt-0.5"
                           >
                             {item.subtitle}
                           </p>
@@ -279,7 +280,7 @@ export function TongChiArticleSwitcherModal({
                     </div>
 
                     {/* Bottom Action Footer */}
-                    <div className="mt-2.5 pt-2 border-t border-[#F2C14E]/15 flex items-center justify-between text-[10px] text-[#c9b896]/70 group-hover:text-[#FFE5A3] transition-colors">
+                    <div className="mt-2.5 pt-2 border-t border-[#F2C14E]/15 flex items-center justify-between text-xs sm:text-[10px] text-[#c9b896]/70 group-hover:text-[#FFE5A3] transition-colors">
                       <span style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                         Bấm để xem nội dung bài thơ
                       </span>
@@ -293,10 +294,10 @@ export function TongChiArticleSwitcherModal({
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-3 bg-[#25170E] border-t border-[#F2C14E]/30 flex items-center justify-between shrink-0">
+        <div className="px-4 sm:px-6 py-2 sm:py-3 bg-[#25170E] border-t border-[#F2C14E]/30 flex items-center justify-between shrink-0">
           <span
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className="text-[11px] text-[#c9b896]/80"
+            className="text-xs sm:text-[11px] text-[#c9b896]/80"
           >
             Đang hiển thị <span className="text-[#FFE5A3] font-bold">{filteredArticles.length}</span> / {articles.length} bài
           </span>
@@ -305,7 +306,7 @@ export function TongChiArticleSwitcherModal({
             type="button"
             onClick={onClose}
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className="px-4 py-1.5 rounded-xl bg-[#2A1D14] hover:bg-[#3A2718] border border-[#F2C14E]/40 text-[#FFE5A3] hover:text-white text-xs font-bold transition-all cursor-pointer"
+            className="px-4 py-2.5 sm:py-1.5 min-h-11 sm:min-h-0 rounded-xl bg-[#2A1D14] hover:bg-[#3A2718] border border-[#F2C14E]/40 text-[#FFE5A3] hover:text-white text-xs font-bold transition-all cursor-pointer"
           >
             Đóng
           </button>

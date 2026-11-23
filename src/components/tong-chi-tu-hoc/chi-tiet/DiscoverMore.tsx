@@ -94,7 +94,7 @@ export function DiscoverMore({ relatedArticles }: PropsTimHieuThem) {
               <button
                 type="button"
                 onClick={() => handleScroll('left')}
-                className="w-9 h-9 rounded-lg border border-[#c8aa6e]/60 bg-[#3a2613]/80 hover:bg-[#ffde59] text-[#ffde59] hover:text-[#2c1c11] flex items-center justify-center transition-all duration-300 shadow-md cursor-pointer"
+                className="w-11 h-11 sm:w-9 sm:h-9 rounded-lg border border-[#c8aa6e]/60 bg-[#3a2613]/80 hover:bg-[#ffde59] text-[#ffde59] hover:text-[#2c1c11] flex items-center justify-center transition-all duration-300 shadow-md cursor-pointer"
                 title="Trượt sang trái"
               >
                 &larr;
@@ -103,7 +103,7 @@ export function DiscoverMore({ relatedArticles }: PropsTimHieuThem) {
               <button
                 type="button"
                 onClick={() => handleScroll('right')}
-                className="w-9 h-9 rounded-lg border border-[#c8aa6e]/60 bg-[#3a2613]/80 hover:bg-[#ffde59] text-[#ffde59] hover:text-[#2c1c11] flex items-center justify-center transition-all duration-300 shadow-md cursor-pointer"
+                className="w-11 h-11 sm:w-9 sm:h-9 rounded-lg border border-[#c8aa6e]/60 bg-[#3a2613]/80 hover:bg-[#ffde59] text-[#ffde59] hover:text-[#2c1c11] flex items-center justify-center transition-all duration-300 shadow-md cursor-pointer"
                 title="Trượt sang phải"
               >
                 &rarr;
@@ -132,6 +132,7 @@ export function DiscoverMore({ relatedArticles }: PropsTimHieuThem) {
           >
             {items.map((item, idx) => (
               <Link
+                prefetch={false}
                 key={idx}
                 href={item.link || '#'}
                 className="group relative flex-shrink-0 w-[260px] sm:w-[300px] h-[360px] sm:h-[380px] overflow-hidden rounded-xl border border-[#593b26] hover:border-[#f2cc8f] shadow-2xl block transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_0_30px_rgba(242,204,143,0.35)]"
@@ -162,7 +163,7 @@ export function DiscoverMore({ relatedArticles }: PropsTimHieuThem) {
                 <div className="absolute bottom-0 inset-x-0 p-4 sm:p-5 text-left z-20">
                   <span
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                    className="text-[11px] sm:text-xs font-medium italic text-[#E5A93C] normal-case tracking-wide block mb-1"
+                    className="text-xs sm:text-xs font-medium italic text-[#E5A93C] normal-case tracking-wide block mb-1"
                   >
                     {item.category || 'Tông Chỉ Tu Học'}
                   </span>

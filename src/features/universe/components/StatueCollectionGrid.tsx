@@ -27,6 +27,7 @@ interface StatueCardProps {
 const StatueCard = React.memo(({ statue }: StatueCardProps) => {
   return (
     <Link
+      prefetch={false}
       href={`/bao-tuong/${statue.slug}`}
       className="group relative w-full max-w-[300px] mx-auto overflow-hidden rounded-2xl border border-[#F2C14E]/30 bg-[#25170E] hover:border-[#F2C14E] transition-all duration-300 shadow-xl h-[415px] cursor-pointer flex flex-col justify-between block transform-gpu will-change-transform"
     >

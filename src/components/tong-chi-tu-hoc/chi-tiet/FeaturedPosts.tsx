@@ -75,7 +75,7 @@ export function FeaturedPosts({ heroBanner, featuredArticle }: PropsBaiVietNoiBa
             <Link
               href={featuredArticle?.linkUrl || '#'}
               style={{ fontFamily: "'UTM ClassizismAntiqua', serif" }}
-              className="inline-flex items-center justify-center border border-[#c8aa6e]/80 bg-[#2a1a0e]/90 hover:bg-[#ffde59] text-[#ffde59] hover:text-[#2c1c11] font-normal px-8 sm:px-10 py-2.5 sm:py-3 rounded-xl transition-all duration-300 shadow-2xl group/btn uppercase text-sm sm:text-base tracking-wider backdrop-blur-xs"
+              className="inline-flex items-center justify-center border border-[#c8aa6e]/80 bg-[#2a1a0e]/90 hover:bg-[#ffde59] text-[#ffde59] hover:text-[#2c1c11] font-normal px-8 sm:px-10 py-2.5 sm:py-3 min-h-11 rounded-xl transition-all duration-300 shadow-2xl group/btn uppercase text-sm sm:text-base tracking-wider backdrop-blur-xs"
             >
               ĐỌC BÀI VIẾT
               <span className="ml-2 group-hover/btn:translate-x-1.5 transition-transform">&rarr;</span>

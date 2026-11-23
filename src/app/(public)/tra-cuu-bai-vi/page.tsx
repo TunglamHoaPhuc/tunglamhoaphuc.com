@@ -46,7 +46,7 @@ export default async function TraCuuBaiViPage({ searchParams }: PageProps) {
           <div className="flex items-center justify-center gap-3">
             <div className="h-px flex-1 max-w-[60px] bg-gradient-to-r from-transparent to-[#F2C14E]/60" />
             <span
-              className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#F2C14E]/85"
+              className="text-xs font-bold uppercase tracking-[0.2em] text-[#F2C14E]/85"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
               Tùng Lâm Hòa Phúc
@@ -63,7 +63,7 @@ export default async function TraCuuBaiViPage({ searchParams }: PageProps) {
 
           <p
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className="text-xs sm:text-sm text-[#c9b896]"
+            className="text-sm text-[#c9b896]"
           >
             Nhà Tứ Ân • Vãng Sinh Đường
           </p>
@@ -74,15 +74,15 @@ export default async function TraCuuBaiViPage({ searchParams }: PageProps) {
 
       {/* Footer siêu nhỏ gọn */}
       <footer
-        className="py-4 px-4 text-center text-[11px] text-[#c9b896]/70 border-t border-[#F2C14E]/15"
+        className="py-2 px-4 text-center text-xs text-[#c9b896]/80 border-t border-[#F2C14E]/15"
         style={{ fontFamily: "'UTM Avo', sans-serif" }}
       >
         <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-          <Link href="/" className="hover:text-[#F2C14E] transition-colors">
+          <Link href="/" className="inline-flex items-center min-h-11 hover:text-[#F2C14E] transition-colors">
             ← Trang chủ Tùng Lâm Hòa Phúc
           </Link>
           <span aria-hidden="true">•</span>
-          <Link href="/vu-tru-phat-giao/tu-an" className="hover:text-[#F2C14E] transition-colors">
+          <Link href="/vu-tru-phat-giao/tu-an" className="inline-flex items-center min-h-11 hover:text-[#F2C14E] transition-colors">
             Không gian Nhà Tứ Ân
           </Link>
         </div>

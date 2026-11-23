@@ -52,20 +52,29 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
   const [heroProgress, setHeroProgress] = useState(0);
 
   useEffect(() => {
-    const handleScroll = () => {
+    // Mỗi lần đổi tiến độ là dựng lại cả trang: gộp theo khung hình và làm tròn 0,01 (tối đa ~100 lần dựng lại cho cả đoạn hero).
+    let frame = 0;
+    const update = () => {
+      frame = 0;
       if (!heroRef.current) return;
       const rect = heroRef.current.getBoundingClientRect();
       const totalDist = heroRef.current.offsetHeight - window.innerHeight;
       if (totalDist > 0) {
         const scrolled = -rect.top;
         const p = Math.min(Math.max(scrolled / totalDist, 0), 1);
-        setHeroProgress(p);
+        setHeroProgress(Math.round(p * 100) / 100);
       }
+    };
+    const handleScroll = () => {
+      if (!frame) frame = window.requestAnimationFrame(update);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    update();
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
   }, []);
 
   // Prevent parent scroll when lightbox is open
@@ -155,10 +164,10 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
       {/* ══════════════════════════════════════════════════════════════
           1. PINNED HERO VIEWPORT (KHÓA 100VH, KHI CHỮ BIẾN MẤT THÌ NỘI DUNG HIỆN NGAY)
       ══════════════════════════════════════════════════════════════ */}
-      <div ref={heroRef} className="relative w-full h-[125vh]">
+      <div ref={heroRef} className="relative w-full h-[125svh]">
         
-        {/* Sticky Pinned 100vh Viewport */}
-        <div className="sticky top-0 w-full h-screen overflow-hidden bg-[#2A1D14] flex flex-col justify-end items-center text-center p-6 sm:p-12 select-none">
+        {/* Sticky Pinned 100svh Viewport */}
+        <div className="sticky top-0 w-full h-svh overflow-hidden bg-[#2A1D14] flex flex-col justify-end items-center text-center p-6 sm:p-12 select-none">
           
           {/* Full Viewport Background Image - Focus [center 28%] rõ hào quang và mặt tượng */}
           <div
@@ -215,7 +224,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
             className="relative z-10 pb-6 flex flex-col items-center gap-1.5 text-[#FFE5A3] opacity-80 hover:opacity-100 transition-opacity"
             style={{ opacity: Math.max(0, 1 - heroProgress / 0.3) }}
           >
-            <span className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+            <span className="text-xs sm:text-[10px] font-bold uppercase tracking-[0.25em]" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
               CUỘN XUỐNG KHÁM PHÁ
             </span>
             <div className="flex flex-col items-center -space-y-1.5 animate-bounce">
@@ -258,12 +267,13 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                 </div>
 
                 {/* Danh sách các tượng trong cụm - Focus [center 28%] rõ mặt tượng */}
-                <div className="space-y-6 max-h-[380px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-[#F2C14E]/40">
+                <div className="space-y-6 max-sm:space-y-0 max-sm:flex max-sm:flex-wrap max-sm:justify-center max-sm:gap-x-4 max-sm:gap-y-5 max-sm:max-h-none max-h-[380px] overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-[#F2C14E]/40">
                   {clusterMembers.map((member, idx) => (
                     <Link
+                      prefetch={false}
                       key={idx}
                       href={`/bao-tuong/${member.slug}`}
-                      className="group relative flex flex-col items-center cursor-pointer block"
+                      className="group relative flex flex-col items-center cursor-pointer block max-sm:w-[96px]"
                     >
                       {/* Avatar tròn viền vàng phát sáng - object-[center_28%] */}
                       <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full border-2 border-[#F2C14E] p-0.5 overflow-hidden bg-[#1C130D] shadow-[0_0_20px_rgba(242,193,78,0.5)] group-hover:scale-105 group-hover:shadow-[0_0_25px_rgba(242,193,78,0.9)] transition-all duration-300">
@@ -275,9 +285,9 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                       </div>
 
                       {/* Tên tượng hiện ra fade in mềm mại bỏ viền khi hover - Font UTM Niagara */}
-                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 mt-2 text-center">
+                      <div className="sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-300 mt-2 text-center">
                         <span
-                          className="text-sm sm:text-base text-[#FFE5A3] font-bold uppercase tracking-wide drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
+                          className="text-xs sm:text-base text-[#FFE5A3] font-bold uppercase tracking-wide drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]"
                           style={{ fontFamily: "var(--font-playfair), 'Playfair Display', serif" }}
                         >
                           {member.name}
@@ -289,7 +299,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
               </div>
 
               {/* Ghi chú rê chuột */}
-              <div className="mt-4 pt-3 border-t border-[#F2C14E]/20 text-[10px] text-[#FFE5A3]/60 italic" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+              <div className="hidden sm:block mt-4 pt-3 border-t border-[#F2C14E]/20 text-xs sm:text-[10px] text-[#FFE5A3]/60 italic" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 ❖ Rê chuột vào ảnh để xem danh xưng
               </div>
             </div>
@@ -297,6 +307,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
             {/* Nút Quay lại trang bảo tượng ở Cột 1 (Căn mép dưới cùng bằng phẳng với 2 cột bên cạnh) */}
             {showBackButtonInCol1 && (
               <Link
+                prefetch={false}
                 href="/bao-tuong-phat-giao"
                 className="rounded-2xl border border-[#F2C14E]/50 bg-gradient-to-b from-[#3A2718]/95 to-[#1C130D]/95 p-3.5 text-center flex flex-col items-center justify-center gap-1.5 hover:border-[#F2C14E] hover:brightness-110 transition-all duration-300 shadow-2xl cursor-pointer group shrink-0"
               >
@@ -320,7 +331,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
           </div>
 
           {/* ── CỘT 2 (CHÍNH GIỮA - QUOTE & TÓM TẮT CÓ ẢNH NỀN) ── */}
-          <div className="lg:col-span-6 flex flex-col justify-between h-full gap-4">
+          <div className="lg:col-span-6 flex flex-col justify-between h-full gap-4 mt-14 lg:mt-0">
             
             {/* Card 1: Khối Pháp Ngữ với Avatar Thuần Viền Trắng / Vàng Phát Sáng */}
             <div className="relative rounded-2xl border border-[#F2C14E]/50 bg-gradient-to-b from-[#3A2718]/95 to-[#1C130D]/95 px-6 pt-16 pb-6 text-center shadow-2xl shrink-0">
@@ -342,7 +353,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
               {/* Nội dung Quote */}
               {statue.quote && (
                 <p
-                  className="text-sm sm:text-base md:text-lg leading-relaxed text-[#FFE5A3] font-normal mb-2.5 italic text-justify sm:text-center"
+                  className="text-sm sm:text-base md:text-lg leading-relaxed text-[#FFE5A3] font-normal mb-2.5 italic text-left sm:text-justify sm:text-center"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
                   &ldquo;{statue.quote}&rdquo;
@@ -363,17 +374,24 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
             <div className="group/summary flex-1 rounded-2xl border border-[#F2C14E]/50 bg-gradient-to-b from-[#3A2718]/95 to-[#1C130D]/95 p-6 sm:p-7 flex flex-col justify-between shadow-2xl relative overflow-hidden">
               
               {/* Ảnh nền mờ sau khối tóm tắt */}
-              <div
-                className="absolute inset-0 bg-cover bg-center opacity-15 pointer-events-none scale-105"
-                style={{
-                  // Ảnh nền mờ 15% dưới lớp phủ tối: bậc 960.
-                  backgroundImage: `url('${fitImage(statue.areaImgUrl || '/images/hero/toan-canh-chua-1280.webp', 960)}')`,
-                }}
-              />
+              <div className="absolute inset-0 opacity-15 pointer-events-none scale-105">
+                {/* Ảnh nền mờ 15% dưới lớp phủ tối: bản 640, tải lười, ưu tiên thấp. */}
+                <img
+                  width={640}
+                  height={427}
+                  src={fitImage(statue.areaImgUrl || '/images/hero/toan-canh-chua-1280.webp', 640)}
+                  alt=""
+                  aria-hidden="true"
+                  loading="lazy"
+                  decoding="async"
+                  fetchPriority="low"
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <div className="absolute inset-0 bg-gradient-to-b from-[#2A1D14]/70 via-[#2A1D14]/90 to-[#1C130D] pointer-events-none" />
 
               <div
-                className={`relative z-10 text-xs sm:text-sm text-[#FFE5A3] leading-relaxed text-justify space-y-4 ${
+                className={`relative z-10 text-sm text-[#FFE5A3] leading-relaxed text-left sm:text-justify space-y-4 ${
                   expandedSummary ? "" : "line-clamp-6"
                 }`}
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
@@ -398,7 +416,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                 <button
                   type="button"
                   onClick={() => setExpandedSummary(!expandedSummary)}
-                  className="px-8 py-2 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#5C3F28] hover:bg-[#7A5435] border border-[#F2C14E] text-[#FFE5A3] hover:text-white transition-all duration-300 shadow-md cursor-pointer flex items-center gap-1.5"
+                  className="px-8 py-2.5 min-h-11 rounded-xl text-xs font-bold uppercase tracking-wider bg-[#5C3F28] hover:bg-[#7A5435] border border-[#F2C14E] text-[#FFE5A3] hover:text-white transition-all duration-300 shadow-md cursor-pointer flex items-center gap-1.5"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
                   <span>{expandedSummary ? "THU GỌN" : "XEM THÊM"}</span>
@@ -463,12 +481,13 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
 
               {/* Bottom Info Bar - Khu vực căn giữa + Khoang Logo To bên phải có hover nhẹ */}
               <Link
+                prefetch={false}
                 href={statue.areaSlug ? `/vu-tru-phat-giao/${statue.areaSlug}` : '/vu-tru-phat-giao'}
                 className="relative z-10 p-3 bg-gradient-to-r from-[#3A2718]/95 via-[#1C130D]/95 to-[#3A2718]/95 border-t border-[#F2C14E]/50 flex items-center justify-between hover:brightness-125 transition-all cursor-pointer group/area gap-3 shrink-0"
               >
                 {/* Chữ Khu vực & Tên khu vực căn chính giữa */}
                 <div className="flex-1 text-center pl-2">
-                  <span className="text-[10px] text-[#FFE5A3]/80 uppercase block tracking-wider font-semibold" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                  <span className="text-xs sm:text-[10px] text-[#FFE5A3]/80 uppercase block tracking-wider font-semibold" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                     KHU VỰC
                   </span>
                   <span
@@ -494,6 +513,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
             {/* Nút Quay lại trang bảo tượng ở Cột 3 (nếu cụm tượng có nhiều vị) */}
             {!showBackButtonInCol1 && (
               <Link
+                prefetch={false}
                 href="/bao-tuong-phat-giao"
                 className="rounded-2xl border border-[#F2C14E]/50 bg-gradient-to-b from-[#3A2718]/95 to-[#1C130D]/95 p-3.5 text-center flex flex-col items-center justify-center gap-1.5 hover:border-[#F2C14E] hover:brightness-110 transition-all duration-300 shadow-2xl cursor-pointer group shrink-0"
               >
@@ -581,12 +601,12 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
             </div>
 
             {/* Cột 2: Khám thờ / tượng đứng giữa cao */}
-            <div className="md:col-span-4 h-[496px]">
+            <div className="md:col-span-4 h-[380px] md:h-[496px]">
               <BentoCard item={artisticWorks[2]} idx={2} openLightbox={setLightboxIndex} focusPosition="object-[center_28%]" heightClass="h-full" />
             </div>
 
             {/* Cột 3: Tượng đứng cao bên phải */}
-            <div className="md:col-span-4 h-[496px]">
+            <div className="md:col-span-4 h-[380px] md:h-[496px]">
               <BentoCard item={artisticWorks[3]} idx={3} openLightbox={setLightboxIndex} focusPosition="object-[center_28%]" heightClass="h-full" />
             </div>
 
@@ -615,7 +635,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
       ══════════════════════════════════════════════════════════════ */}
       {lightboxIndex !== null && currentLightboxItem && (
         <div
-          className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 select-none"
+          className="fixed inset-0 z-[9999] bg-black/85 sm:backdrop-blur-md flex items-center justify-center p-3 sm:p-5 select-none"
           onClick={() => setLightboxIndex(null)}
           onWheel={(e) => {
             e.preventDefault();
@@ -624,7 +644,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
         >
           {/* Modal Container */}
           <div
-            className="relative max-w-3xl w-full rounded-2xl border border-[#F2C14E]/60 bg-[#25170E] p-4 sm:p-6 md:p-8 shadow-[0_0_60px_rgba(0,0,0,0.95)] flex flex-col items-center max-h-[95vh] overflow-y-auto"
+            className="relative max-w-3xl w-full rounded-2xl border border-[#F2C14E]/60 bg-[#25170E] p-4 sm:p-6 md:p-8 shadow-[0_0_60px_rgba(0,0,0,0.95)] flex flex-col items-center max-h-[95svh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
             onWheel={handleWheel}
           >
@@ -641,7 +661,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                 type="button"
                 onClick={() => setLightboxIndex(null)}
                 aria-label="Đóng"
-                className="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl border border-[#F2C14E]/50 bg-[#1C120B]/80 flex items-center justify-center text-[#F2C14E] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-md"
+                className="absolute right-0 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-9 sm:h-9 rounded-xl border border-[#F2C14E]/50 bg-[#1C120B]/80 flex items-center justify-center text-[#F2C14E] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-md"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -682,7 +702,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                   setPanOffset({ x: 0, y: 0 });
                 }}
                 aria-label="Ảnh trước"
-                className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-[#F2C14E]/60 bg-[#25170E]/80 backdrop-blur-md flex items-center justify-center text-[#ffde59] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.7)] z-20"
+                className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-10 sm:h-10 rounded-full border border-[#F2C14E]/60 bg-[#25170E]/80 sm:backdrop-blur-md flex items-center justify-center text-[#ffde59] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.7)] z-20"
               >
                 <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
               </button>
@@ -696,13 +716,13 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                   setPanOffset({ x: 0, y: 0 });
                 }}
                 aria-label="Ảnh sau"
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-[#F2C14E]/60 bg-[#25170E]/80 backdrop-blur-md flex items-center justify-center text-[#ffde59] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.7)] z-20"
+                className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-10 sm:h-10 rounded-full border border-[#F2C14E]/60 bg-[#25170E]/80 sm:backdrop-blur-md flex items-center justify-center text-[#ffde59] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.7)] z-20"
               >
                 <ChevronRight className="w-6 h-6 stroke-[2.5]" />
               </button>
 
               {/* Zoom Controls Overlay */}
-              <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-[#1C120B]/90 backdrop-blur-md p-1.5 rounded-xl border border-[#F2C14E]/50 opacity-90 group-hover:opacity-100 transition-opacity z-20">
+              <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-[#1C120B]/90 sm:backdrop-blur-md p-1.5 rounded-xl border border-[#F2C14E]/50 opacity-90 group-hover:opacity-100 transition-opacity z-20">
                 <button
                   type="button"
                   onClick={(e) => {
@@ -710,7 +730,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                     setZoomScale((prev) => Math.min(prev + 0.35, 4));
                   }}
                   title="Phóng to (Lăn chuột lên)"
-                  className="w-8 h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors cursor-pointer"
                 >
                   <ZoomIn className="w-4 h-4" />
                 </button>
@@ -725,7 +745,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                     });
                   }}
                   title="Thu nhỏ (Lăn chuột xuống)"
-                  className="w-8 h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors cursor-pointer"
+                  className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors cursor-pointer"
                 >
                   <ZoomOut className="w-4 h-4" />
                 </button>
@@ -738,7 +758,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                       setPanOffset({ x: 0, y: 0 });
                     }}
                     title="Khôi phục gốc"
-                    className="w-8 h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors cursor-pointer"
+                    className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors cursor-pointer"
                   >
                     <RotateCcw className="w-4 h-4" />
                   </button>
@@ -747,7 +767,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
 
               {/* Hint Badge when zoomed */}
               {zoomScale > 1 && (
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/80 border border-[#F2C14E]/40 text-[11px] text-[#ffde59] font-medium backdrop-blur-md pointer-events-none z-20">
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/80 border border-[#F2C14E]/40 text-xs sm:text-[11px] text-[#ffde59] font-medium sm:backdrop-blur-md pointer-events-none z-20">
                   Nhấp giữ &amp; Kéo để xem các góc tượng
                 </div>
               )}
@@ -784,6 +804,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
             {/* Tác phẩm thể hiện một tượng của bộ sưu tập (đang hiển thị): dẫn tới trang của tượng đó */}
             {currentLightboxItem.href && (
               <Link
+                prefetch={false}
                 href={currentLightboxItem.href}
                 className="inline-flex items-center gap-1.5 px-5 py-1 mb-3 rounded-full bg-gradient-to-r from-[#D4A017] to-[#F2C14E] text-[#1C130D] font-bold text-xs uppercase shadow-md hover:brightness-110 transition-all"
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
@@ -830,7 +851,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                   Ý NGHĨA
                 </span>
                 <p
-                  className="text-xs sm:text-sm text-[#c9b896] leading-relaxed italic"
+                  className="text-sm text-[#c9b896] leading-relaxed italic"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
                   &ldquo;{currentLightboxItem.meaning}&rdquo;
@@ -901,7 +922,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
               </h3>
               <div className="w-16 h-[1.5px] bg-[#F2C14E]" />
               <p
-                className="text-xs sm:text-sm text-[#FFE5A3] leading-relaxed text-justify font-normal"
+                className="text-sm text-[#FFE5A3] leading-relaxed text-left sm:text-justify font-normal"
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
               >
                 {videoSummary}
@@ -952,7 +973,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
           <div className="pt-3 sm:pt-4">
             <Link
               href={statue.article?.url || `/bao-tuong/${statue.slug}`}
-              className="inline-flex items-center justify-center gap-2 px-8 sm:px-10 py-2 sm:py-2.5 rounded-full border border-[#F2C14E] bg-[#3A2718]/80 hover:bg-[#F2C14E] text-[#FFE5A3] hover:text-[#1C130D] text-xs sm:text-sm font-bold tracking-widest uppercase transition-all duration-300 shadow-[0_0_15px_rgba(242,193,78,0.3)] hover:shadow-[0_0_25px_rgba(242,193,78,0.6)] cursor-pointer"
+              className="inline-flex items-center justify-center gap-2 px-8 sm:px-10 py-2 sm:py-2.5 min-h-11 rounded-full border border-[#F2C14E] bg-[#3A2718]/80 hover:bg-[#F2C14E] text-[#FFE5A3] hover:text-[#1C130D] text-xs sm:text-sm font-bold tracking-widest uppercase transition-all duration-300 shadow-[0_0_15px_rgba(242,193,78,0.3)] hover:shadow-[0_0_25px_rgba(242,193,78,0.6)] cursor-pointer"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
               <span>ĐỌC BÀI VIẾT</span>
@@ -989,6 +1010,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
 
             return (
               <Link
+                prefetch={false}
                 key={rel.id}
                 href={`/bao-tuong/${rel.slug}`}
                 className="group rounded-2xl overflow-hidden border border-[#F2C14E]/50 bg-[#25170E] hover:border-[#F2C14E] transition-all duration-300 shadow-xl flex flex-col justify-between cursor-pointer block hover:scale-[1.03]"
@@ -1103,7 +1125,7 @@ const BentoCard: FC<BentoCardProps> = ({
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#1C120B]/95 via-[#1C120B]/50 to-transparent pointer-events-none" />
 
       {/* Hover Modal Overlay - Đồng bộ chuẩn giao diện Nghệ thuật Phật giáo Vũ trụ */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#25170E]/90 via-[#3D2817]/65 to-transparent backdrop-blur-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex flex-col items-center justify-center p-3 sm:p-5 text-center pointer-events-none z-20">
+      <div className="absolute inset-0 bg-gradient-to-t from-[#25170E]/90 via-[#3D2817]/65 to-transparent sm:backdrop-blur-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex flex-col items-center justify-center p-3 sm:p-5 text-center pointer-events-none z-20">
         <div className="absolute inset-3 sm:inset-4 md:inset-5 rounded-xl md:rounded-2xl border border-[#ffde59]/70 bg-[#452a15]/85 flex flex-col items-center justify-center p-3 sm:p-5 text-center shadow-[0_0_30px_rgba(242,193,78,0.3)]">
           <h3
             style={{ fontFamily: "'UTM ClassizismAntiqua', 'UTM Classic Antiqua', serif" }}
@@ -1116,7 +1138,7 @@ const BentoCard: FC<BentoCardProps> = ({
 
           <p
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className="text-[#e3d2c1] text-xs sm:text-sm font-normal leading-relaxed tracking-wide px-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] text-center line-clamp-3 sm:line-clamp-4"
+            className="text-[#e3d2c1] text-sm font-normal leading-relaxed tracking-wide px-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] text-center line-clamp-3 sm:line-clamp-4"
           >
             {item.subtitle || item.meaning || 'Nghệ Thuật Phật Giáo Tùng Lâm Hòa Phúc'}
           </p>

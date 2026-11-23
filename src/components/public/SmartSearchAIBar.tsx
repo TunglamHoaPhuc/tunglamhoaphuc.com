@@ -253,7 +253,7 @@ export const SmartSearchAIBar: FC<SmartSearchAIBarProps> = ({
                     className="p-3 rounded-xl border flex flex-col justify-between transition-all hover:border-[#F2C14E] hover:-translate-y-0.5 group bg-[#2A1D14]/60 border-[#F2C14E]/20"
                   >
                     <span
-                      className="text-[10px] uppercase font-bold text-[#F2C14E] mb-1"
+                      className="text-xs md:text-[10px] uppercase font-bold text-[#F2C14E] mb-1"
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     >
                       {link.category}
@@ -264,7 +264,7 @@ export const SmartSearchAIBar: FC<SmartSearchAIBarProps> = ({
                     >
                       {link.title}
                     </span>
-                    <span className="text-[10px] text-[#F2C14E] mt-2 flex items-center gap-1">
+                    <span className="text-xs md:text-[10px] text-[#F2C14E] mt-2 flex items-center gap-1">
                       <span>Xem chi tiết</span>
                       <ExternalLink className="w-2.5 h-2.5" />
                     </span>

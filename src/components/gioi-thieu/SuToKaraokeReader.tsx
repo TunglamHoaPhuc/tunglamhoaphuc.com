@@ -499,7 +499,7 @@ export function SuToKaraokeReader({
                 {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
               </button>
 
-              <div className="flex items-center rounded-lg border border-[#F2C14E]/35 bg-[#1A1009] p-0.5 text-[11px] font-bold">
+              <div className="flex items-center rounded-lg border border-[#F2C14E]/35 bg-[#1A1009] p-0.5 text-xs md:text-[11px] font-bold">
                 {([0.9, 1.0, 1.2] as const).map((rate) => (
                   <button
                     key={rate}
@@ -533,7 +533,7 @@ export function SuToKaraokeReader({
                 setViewMode('karaoke');
               }
             }}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#F2C14E]/45 bg-[#23150C] text-[#FFDE59] text-[11px] font-bold uppercase tracking-wider hover:bg-[#F2C14E] hover:text-black transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#F2C14E]/45 bg-[#23150C] text-[#FFDE59] text-xs md:text-[11px] font-bold uppercase tracking-wider hover:bg-[#F2C14E] hover:text-black transition-colors cursor-pointer"
           >
             {viewMode === 'karaoke' ? (
               <>
@@ -551,7 +551,7 @@ export function SuToKaraokeReader({
 
         {viewMode === 'karaoke' && (
           <div className="space-y-1.5">
-            <div className="flex items-center justify-between text-[11px] text-[#FFE5A3]/80">
+            <div className="flex items-center justify-between text-xs md:text-[11px] text-[#FFE5A3]/80">
               <span className="inline-flex items-center gap-1.5">
                 <span
                   className={`inline-block w-2 h-2 rounded-full ${

@@ -58,7 +58,7 @@ export const BatBoKimCangGrid: FC = () => {
             </div>
           </div>
 
-          <p className="text-xs sm:text-sm text-[#FFE5A3]/90 max-w-3xl leading-relaxed font-normal" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+          <p className="text-sm text-[#FFE5A3]/90 max-w-3xl leading-relaxed font-normal" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
             Nghệ thuật Phật giáo bằng đồng phỏng cổ
           </p>
         </div>
@@ -85,7 +85,7 @@ export const BatBoKimCangGrid: FC = () => {
 
               {/* CODE BADGE */}
               <div
-                className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-[#F2C14E] bg-[#1C130D]/90 border border-[#F2C14E]/50 shadow-md z-10"
+                className="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-xs sm:text-[10px] font-bold text-[#F2C14E] bg-[#1C130D]/90 border border-[#F2C14E]/50 shadow-md z-10"
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
               >
                 {item.code}
@@ -123,7 +123,7 @@ export const BatBoKimCangGrid: FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/25 backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto"
+            className="fixed inset-0 z-[200] bg-black/25 sm:backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto"
             onClick={() => setSelectedItem(null)}
           >
             <motion.div
@@ -165,7 +165,7 @@ export const BatBoKimCangGrid: FC = () => {
                   </h3>
                   <p className="text-xs text-[#FFE5A3]/90 font-semibold">{selectedItem.sanskritName}</p>
                   <div className="h-[1px] bg-gradient-to-r from-[#F2C14E]/70 via-[#F2C14E]/30 to-transparent my-2" />
-                  <p className="text-xs text-[#D3C0AD] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                  <p className="text-sm text-[#D3C0AD] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                     {selectedItem.meaning}
                   </p>
                 </div>

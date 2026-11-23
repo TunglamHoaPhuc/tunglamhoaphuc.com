@@ -32,7 +32,7 @@ const fromAdmin = (list: HomeProgram[]): Card[] =>
   list.map((p, i) => ({ key: p.id, title: p.title, schedule: p.schedule, imgUrl: p.imgUrl, imgPosition: p.imgPosition, href: p.href, emoji: MARKS[i % MARKS.length] }));
 
 const buttonStyle = { borderColor: `rgba(242,193,78,.4)`, color: C.accent };
-const buttonClass = "mt-5 inline-block font-inter text-[11px] uppercase tracking-[.15em] border rounded-lg px-5 py-2 transition-colors";
+const buttonClass = "mt-5 inline-block font-inter text-xs md:text-[11px] uppercase tracking-[.15em] border rounded-lg px-5 py-2 transition-colors";
 const hoverOn = (e: React.MouseEvent) => ((e.currentTarget as HTMLElement).style.background = "rgba(242,193,78,.1)");
 const hoverOff = (e: React.MouseEvent) => ((e.currentTarget as HTMLElement).style.background = "transparent");
 

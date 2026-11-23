@@ -101,7 +101,7 @@ export function MemorialDetailDialog({ record, onClose }: MemorialDetailDialogPr
       ref={dialogRef}
       {...({ closedby: 'any' } as Record<string, string>)}
       aria-labelledby={titleId}
-      className="m-auto w-[calc(100%-1.5rem)] max-w-md rounded-2xl border border-[#F2C14E]/60 bg-gradient-to-b from-[#2A180D] via-[#1C1008] to-[#120904] p-0 text-[#e3d2c1] shadow-[0_0_50px_rgba(242,193,78,0.28)]"
+      className="m-auto w-[calc(100%-1.5rem)] max-w-md max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-2xl border border-[#F2C14E]/60 bg-gradient-to-b from-[#2A180D] via-[#1C1008] to-[#120904] p-0 text-[#e3d2c1] shadow-[0_0_50px_rgba(242,193,78,0.28)]"
     >
       {record && (
         <div className="p-5 sm:p-6 space-y-4">
@@ -109,7 +109,7 @@ export function MemorialDetailDialog({ record, onClose }: MemorialDetailDialogPr
           <div className="flex items-start justify-between gap-3">
             <div>
               <p
-                className="text-[11px] font-semibold uppercase tracking-widest text-[#F2C14E]/80"
+                className="text-xs font-semibold uppercase tracking-widest text-[#F2C14E]/80"
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
               >
                 {record.category}
@@ -119,7 +119,7 @@ export function MemorialDetailDialog({ record, onClose }: MemorialDetailDialogPr
               type="button"
               onClick={() => dialogRef.current?.close()}
               aria-label="Đóng hộp thoại chi tiết bài vị"
-              className="w-8 h-8 rounded-full bg-black/50 border border-[#F2C14E]/40 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-[#1C1008] flex items-center justify-center transition-colors shrink-0 cursor-pointer"
+              className="w-11 h-11 sm:w-8 sm:h-8 -mt-1.5 -mr-1.5 sm:m-0 rounded-full bg-black/50 border border-[#F2C14E]/40 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-[#1C1008] flex items-center justify-center transition-colors shrink-0 cursor-pointer"
             >
               <X className="w-4 h-4" />
             </button>
@@ -128,7 +128,7 @@ export function MemorialDetailDialog({ record, onClose }: MemorialDetailDialogPr
           {/* Mã Số Bài Vị Nổi Bật */}
           <div className="rounded-xl border border-[#F2C14E]/50 bg-[#140B05] px-4 py-4 text-center space-y-2">
             <span
-              className="inline-block text-[11px] uppercase tracking-widest text-[#c9b896]"
+              className="inline-block text-xs uppercase tracking-widest text-[#c9b896]"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
               Mã số bài vị
@@ -149,12 +149,12 @@ export function MemorialDetailDialog({ record, onClose }: MemorialDetailDialogPr
 
             {(record.dharmaName || record.lineageType) && (
               <div
-                className="flex flex-wrap items-center justify-center gap-2 text-xs text-[#F2C14E] font-semibold"
+                className="flex flex-wrap items-center justify-center gap-2 text-sm sm:text-xs text-[#F2C14E] font-semibold"
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
               >
                 {record.dharmaName && <span>Pháp danh: {record.dharmaName}</span>}
                 {record.lineageType && (
-                  <span className="px-2 py-0.5 rounded bg-[#F2C14E]/15 border border-[#F2C14E]/35 text-[11px]">
+                  <span className="px-2 py-0.5 rounded bg-[#F2C14E]/15 border border-[#F2C14E]/35 text-xs">
                     {record.lineageType}
                   </span>
                 )}
@@ -164,7 +164,7 @@ export function MemorialDetailDialog({ record, onClose }: MemorialDetailDialogPr
 
           {/* Thông tin đối chiếu cơ bản */}
           <dl
-            className="divide-y divide-[#F2C14E]/15 rounded-xl bg-[#180E08] border border-[#F2C14E]/20 px-4 py-2 text-xs sm:text-sm"
+            className="divide-y divide-[#F2C14E]/15 rounded-xl bg-[#180E08] border border-[#F2C14E]/20 px-4 py-2 text-sm"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             {record.birthDate && (
@@ -200,7 +200,7 @@ export function MemorialDetailDialog({ record, onClose }: MemorialDetailDialogPr
           <button
             type="button"
             onClick={handleCopy}
-            className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-[#D4A017] to-[#F2C14E] text-[#1C130D] font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:brightness-110 transition-all cursor-pointer"
+            className="w-full py-3 px-4 min-h-12 rounded-xl bg-gradient-to-r from-[#D4A017] to-[#F2C14E] text-[#1C130D] font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:brightness-110 transition-all cursor-pointer"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             {copied ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}

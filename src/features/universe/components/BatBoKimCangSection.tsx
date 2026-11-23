@@ -78,7 +78,7 @@ export const BatBoKimCangSection: FC = () => {
                 />
 
                 {/* Number Badge Top-Left */}
-                <div className="absolute top-2.5 left-2.5 z-10 w-6 h-6 rounded-full bg-[#1C130D]/90 border border-[#F2C14E]/60 flex items-center justify-center text-[10px] font-bold text-[#FFDE59] shadow-md">
+                <div className="absolute top-2.5 left-2.5 z-10 w-6 h-6 rounded-full bg-[#1C130D]/90 border border-[#F2C14E]/60 flex items-center justify-center text-xs sm:text-[10px] font-bold text-[#FFDE59] shadow-md">
                   {idx + 1}
                 </div>
               </div>
@@ -109,7 +109,7 @@ export const BatBoKimCangSection: FC = () => {
                     </h3>
 
                     <p
-                      className="text-[#FFE5A3]/90 text-[9px] sm:text-[10px] font-bold line-clamp-1"
+                      className="text-[#FFE5A3]/90 text-xs sm:text-[10px] font-bold line-clamp-1"
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     >
                       {item.sanskritName}
@@ -119,7 +119,7 @@ export const BatBoKimCangSection: FC = () => {
                   {/* Hover Button */}
                   <div className="w-full mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex justify-center shrink-0">
                     <span
-                      className="inline-flex items-center justify-center gap-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-[#D4A017] to-[#F2C14E] text-[#1C130D] font-bold text-[9px] uppercase shadow-md hover:brightness-110 transition-all cursor-pointer"
+                      className="inline-flex items-center justify-center gap-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-[#D4A017] to-[#F2C14E] text-[#1C130D] font-bold text-xs sm:text-[9px] uppercase shadow-md hover:brightness-110 transition-all cursor-pointer"
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     >
                       <span>CHI TIẾT</span>
@@ -140,7 +140,7 @@ export const BatBoKimCangSection: FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/25 backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto"
+            className="fixed inset-0 z-[200] bg-black/25 sm:backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto"
             onClick={() => setSelectedStatue(null)}
           >
             <motion.div
@@ -205,7 +205,7 @@ export const BatBoKimCangSection: FC = () => {
 
                   {/* MEANING / BỔN NGUYỆN */}
                   <p
-                    className="text-xs sm:text-sm text-[#FFE5A3]/90 font-semibold leading-relaxed"
+                    className="text-sm text-[#FFE5A3]/90 font-semibold leading-relaxed"
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                   >
                     {selectedStatue.meaning}
@@ -220,13 +220,13 @@ export const BatBoKimCangSection: FC = () => {
                   {/* QUOTE BOX */}
                   {selectedStatue.quote && (
                     <div
-                      className="bg-[#1C130D]/90 p-4 rounded-xl border border-[#F2C14E]/30 text-xs sm:text-sm text-[#FFE5A3] italic leading-relaxed shadow-sm"
+                      className="bg-[#1C130D]/90 p-4 rounded-xl border border-[#F2C14E]/30 text-sm text-[#FFE5A3] italic leading-relaxed shadow-sm"
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     >
                       <span className="not-italic font-bold text-[#F2C14E] block mb-1">Hạnh Nguyện Kim Cang:</span>
                       &ldquo;{selectedStatue.quote}&rdquo;
                       {selectedStatue.quoteAuthor && (
-                        <span className="block not-italic text-right text-[11px] text-[#F2C14E]/80 mt-1">
+                        <span className="block not-italic text-right text-xs sm:text-[11px] text-[#F2C14E]/80 mt-1">
                           — {selectedStatue.quoteAuthor}
                         </span>
                       )}
@@ -235,7 +235,7 @@ export const BatBoKimCangSection: FC = () => {
 
                   {/* FULL HISTORY / DESCRIPTION */}
                   <div
-                    className="text-xs sm:text-sm text-[#D3C0AD] leading-relaxed font-normal space-y-2 text-justify"
+                    className="text-sm text-[#D3C0AD] leading-relaxed font-normal space-y-2 text-left sm:text-justify"
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     dangerouslySetInnerHTML={{
                       __html: selectedStatue.fullHistoryHtml || `<p>${selectedStatue.description}</p>`

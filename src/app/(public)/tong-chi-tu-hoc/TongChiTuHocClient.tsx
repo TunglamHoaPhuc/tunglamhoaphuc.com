@@ -73,7 +73,7 @@ export default function TongChiTuHocClient({
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#2c1c11] text-[#e3d2c1] font-sans relative selection:bg-[#f2cc8f] selection:text-black overflow-x-hidden">
+    <div className="min-h-screen bg-[#2c1c11] text-[#e3d2c1] font-sans relative selection:bg-[#f2cc8f] selection:text-black overflow-x-clip md:overflow-x-hidden">
       <SubNavbar
         activeSection={activeSection}
         isScrolled={isScrolled}

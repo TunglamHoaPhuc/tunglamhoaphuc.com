@@ -140,7 +140,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
 
                 {/* Node Name Tag underneath */}
                 <span
-                  className="px-2 py-0.5 rounded text-[10px] font-bold uppercase whitespace-nowrap shadow-md transition-all group-hover:scale-105"
+                  className="px-2 py-0.5 rounded text-xs sm:text-[10px] font-bold uppercase whitespace-nowrap shadow-md transition-all group-hover:scale-105"
                   style={{
                     fontFamily: "'UTM Avo', sans-serif",
                     fontWeight: "bold",
@@ -167,7 +167,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
       >
         {/* 1. Tên Input */}
         <div>
-          <label className="text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
+          <label className="text-xs sm:text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
             <Search className="w-3.5 h-3.5 text-[#F2C14E]" />
             <span>1. TÊN TỔ SƯ</span>
           </label>
@@ -176,7 +176,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
             value={searchName}
             onChange={(e) => setSearchName(e.target.value)}
             placeholder="Nhập tên vị Tổ Sư..."
-            className="w-full py-2 px-3 rounded-lg text-xs focus:outline-none transition-all"
+            className="w-full py-2.5 sm:py-2 px-3 rounded-lg text-base sm:text-xs focus:outline-none transition-all"
             style={{
               background: "rgba(26,15,8,0.8)",
               border: "1px solid rgba(242,193,78,0.3)",
@@ -188,7 +188,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
 
         {/* 2. Thời kỳ Dropdown */}
         <div>
-          <label className="text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
+          <label className="text-xs sm:text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
             <Clock className="w-3.5 h-3.5 text-[#F2C14E]" />
             <span>2. THỜI KỲ</span>
           </label>
@@ -210,7 +210,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
 
         {/* 3. Hệ phái Dropdown */}
         <div>
-          <label className="text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
+          <label className="text-xs sm:text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
             <Sparkles className="w-3.5 h-3.5 text-[#F2C14E]" />
             <span>3. HỆ PHÁI / VÙNG MIỀN</span>
           </label>
@@ -233,7 +233,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
 
         {/* 4. Quote chứa từ khóa Input */}
         <div>
-          <label className="text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
+          <label className="text-xs sm:text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
             <BookOpen className="w-3.5 h-3.5 text-[#F2C14E]" />
             <span>4. PHÁP NGỮ / TỪ KHÓA</span>
           </label>
@@ -242,7 +242,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
             value={searchQuote}
             onChange={(e) => setSearchQuote(e.target.value)}
             placeholder="Tìm theo câu pháp ngữ..."
-            className="w-full py-2 px-3 rounded-lg text-xs focus:outline-none transition-all"
+            className="w-full py-2.5 sm:py-2 px-3 rounded-lg text-base sm:text-xs focus:outline-none transition-all"
             style={{
               background: "rgba(26,15,8,0.8)",
               border: "1px solid rgba(242,193,78,0.3)",
@@ -254,7 +254,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
 
         {/* 5. Mức độ Zoom Slider */}
         <div>
-          <div className="flex items-center justify-between text-[10px] uppercase font-bold text-[#F2C14E] mb-1" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
+          <div className="flex items-center justify-between text-xs sm:text-[10px] uppercase font-bold text-[#F2C14E] mb-1" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
             <span className="flex items-center gap-1.5">
               <ZoomIn className="w-3.5 h-3.5 text-[#F2C14E]" />
               <span>5. ĐỘ ZOOM BẢN ĐỒ</span>
@@ -267,7 +267,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
             max="140"
             value={zoomLevel}
             onChange={(e) => setZoomLevel(Number(e.target.value))}
-            className="w-full accent-[#F2C14E] cursor-pointer mt-1"
+            className="w-full h-11 sm:h-auto accent-[#F2C14E] cursor-pointer mt-1"
           />
         </div>
       </div>
@@ -318,7 +318,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
                 >
                   <img {...fitProps(selectedNode.portraitUrl, { width: 640, widths: [360, 640], sizes: '(min-width: 768px) 240px, 90vw' })} alt={selectedNode.name} className="w-full h-full object-cover" />
                 </div>
-                <span className="text-[10px] uppercase font-bold text-[#F2C14E] tracking-widest" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
+                <span className="text-xs sm:text-[10px] uppercase font-bold text-[#F2C14E] tracking-widest" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
                   {selectedNode.clusterName}
                 </span>
                 <span className="text-xs text-[#c9b896] mt-0.5" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
@@ -330,7 +330,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
               <div className="md:col-span-7 space-y-4">
                 {/* Quote phát sáng */}
                 <div className="p-4 rounded-xl border" style={{ background: "rgba(242,193,78,0.08)", borderColor: "rgba(242,193,78,0.3)" }}>
-                  <span className="text-[10px] uppercase font-bold text-[#F2C14E] block mb-1" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
+                  <span className="text-xs sm:text-[10px] uppercase font-bold text-[#F2C14E] block mb-1" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
                     📜 CÂU PHÁP NGỮ BẤT HỦ:
                   </span>
                   <p
@@ -349,7 +349,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
                   <h4 className="text-xs font-bold uppercase text-[#F2C14E] mb-1" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
                     TÍCH THUẬT &amp; CÔNG HẠNH:
                   </h4>
-                  <p className="text-xs text-[#e3d2c1] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                  <p className="text-sm text-[#e3d2c1] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                     {selectedNode.summary}
                   </p>
                 </div>
@@ -360,7 +360,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
                     <h4 className="text-xs font-bold uppercase text-[#F2C14E] mb-1" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
                       DẤU ẤN LỊCH SỬ:
                     </h4>
-                    <p className="text-xs text-[#c9b896] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                    <p className="text-sm text-[#c9b896] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                       {selectedNode.historicalMarks}
                     </p>
                   </div>

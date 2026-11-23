@@ -24,7 +24,7 @@ export function ReferenceBooksSection({ books = [] }: ReferenceBooksSectionProps
 
   return (
     <div className="my-12 w-full max-w-4xl mx-auto">
-      <div className="rounded-3xl border border-[#F2C14E]/35 bg-[#170C06]/90 backdrop-blur-md p-5 sm:p-7 md:p-8 shadow-[0_15px_45px_rgba(0,0,0,0.85)] relative overflow-hidden">
+      <div className="rounded-3xl border border-[#F2C14E]/35 bg-[#170C06]/90 sm:backdrop-blur-md p-5 sm:p-7 md:p-8 shadow-[0_15px_45px_rgba(0,0,0,0.85)] relative overflow-hidden">
         {/* Subtle decorative glow */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#F2C14E]/5 rounded-full blur-3xl pointer-events-none" />
 

@@ -166,9 +166,9 @@ export const WelcomeSection: FC<{ welcome: HomeWelcome | null }> = ({ welcome })
                 {text}
               </p>
             ) : null}
-            <Link
+            <Link prefetch={false}
               href={link.href}
-              className="mt-8 inline-flex items-center gap-2 rounded-lg border px-6 py-3 text-xs uppercase tracking-[0.15em] transition-colors hover:bg-[rgba(242,193,78,0.12)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F2C14E] motion-reduce:transition-none"
+              className="mt-8 inline-flex min-h-11 items-center gap-2 rounded-lg border px-6 py-3 text-xs uppercase tracking-[0.15em] transition-colors hover:bg-[rgba(242,193,78,0.12)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F2C14E] motion-reduce:transition-none"
               style={{ borderColor: "rgba(242,193,78,.5)", color: C.accent, fontFamily: "'UTM Avo', sans-serif" }}
             >
               {link.label}

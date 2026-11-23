@@ -38,7 +38,7 @@ export const HeritageArchCard: FC<HeritageArchCardProps> = ({
         <div className="flex items-center gap-2">
           {/* Imperial Arch Theme Tag */}
           <span
-            className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#681B16] text-[#FFE5A3] border border-[#F2C14E]/60 shadow-[0_0_12px_rgba(212,160,23,0.3)]"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs md:text-[11px] font-bold uppercase tracking-wider bg-[#681B16] text-[#FFE5A3] border border-[#F2C14E]/60 shadow-[0_0_12px_rgba(212,160,23,0.3)]"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             <Shield className="w-3 h-3 text-[#F2C14E]" />
@@ -47,7 +47,7 @@ export const HeritageArchCard: FC<HeritageArchCardProps> = ({
 
           {/* Region Badge */}
           <span
-            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#3B1512] text-[#F2C14E] border border-[#F2C14E]/40"
+            className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs md:text-[11px] font-bold uppercase tracking-wider bg-[#3B1512] text-[#F2C14E] border border-[#F2C14E]/40"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             <MapPin className="w-3 h-3 text-[#F2C14E]" />
@@ -64,7 +64,7 @@ export const HeritageArchCard: FC<HeritageArchCardProps> = ({
             <Calendar className="w-3 h-3 text-[#F2C14E]" />
             {cluster.eraStr}
           </span>
-          <span className="text-[11px] font-bold text-[#F2C14E] px-2.5 py-1 rounded-full bg-[#F2C14E]/20 border border-[#F2C14E]/50">
+          <span className="text-xs md:text-[11px] font-bold text-[#F2C14E] px-2.5 py-1 rounded-full bg-[#F2C14E]/20 border border-[#F2C14E]/50">
             +{cluster.totalDocuments} tư liệu quý
           </span>
         </div>
@@ -98,7 +98,7 @@ export const HeritageArchCard: FC<HeritageArchCardProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-[#150605] via-[#150605]/45 to-transparent opacity-90 group-hover/hero:opacity-75 transition-opacity" />
 
           {/* Imperial Arch Stamp */}
-          <div className="absolute top-3 left-3 bg-[#2D100D]/95 backdrop-blur-md px-3.5 py-1 rounded-lg border border-[#F2C14E]/60 text-[#F2C14E] text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-xl">
+          <div className="absolute top-3 left-3 bg-[#2D100D]/95 backdrop-blur-md px-3.5 py-1 rounded-lg border border-[#F2C14E]/60 text-[#F2C14E] text-xs md:text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-xl">
             <Sparkles className="w-3.5 h-3.5 text-[#F2C14E]" />
             <span>DI SẢN TÔN QUÝ</span>
           </div>
@@ -136,10 +136,10 @@ export const HeritageArchCard: FC<HeritageArchCardProps> = ({
               <div className="absolute inset-0 bg-gradient-to-t from-[#150605] via-[#150605]/30 to-transparent" />
 
               <div className="relative z-10 p-2.5">
-                <p className="text-[11px] sm:text-xs font-bold text-[#FFE5A3] line-clamp-1 group-hover/sub:text-[#F2C14E]">
+                <p className="text-xs sm:text-xs font-bold text-[#FFE5A3] line-clamp-1 group-hover/sub:text-[#F2C14E]">
                   {sub.title}
                 </p>
-                <span className="text-[9px] text-[#C4AFA0] flex items-center gap-1 mt-0.5">
+                <span className="text-xs md:text-[9px] text-[#C4AFA0] flex items-center gap-1 mt-0.5">
                   <Eye className="w-2.5 h-2.5" />
                   Xem ảnh
                 </span>
@@ -156,7 +156,7 @@ export const HeritageArchCard: FC<HeritageArchCardProps> = ({
             "{cluster.historicalQuote}"
           </p>
           {cluster.quoteAuthor && (
-            <p className="text-[10px] sm:text-[11px] text-[#F2C14E] font-bold uppercase tracking-wider">
+            <p className="text-xs sm:text-[11px] text-[#F2C14E] font-bold uppercase tracking-wider">
               — {cluster.quoteAuthor}
             </p>
           )}

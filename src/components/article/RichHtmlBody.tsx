@@ -36,7 +36,12 @@ export function RichHtmlBody({
     if (hit) onKeywordClick(hit.keyword);
   };
 
-  return <div className="tlhp-rich" onClick={handleClick} dangerouslySetInnerHTML={{ __html: safe }} />;
+  // Khối ngoài chỉ để ghi đè ở điện thoại (chữ trái thay vì căn đều, tiêu đề vừa cỡ); luật gốc của .tlhp-rich ở globals.css.
+  return (
+    <div className="max-sm:[&_p]:!text-left max-sm:[&_h2]:!text-[1.875rem] max-sm:[&_h3]:!text-[1.625rem] max-sm:[&_h4]:!text-[1.375rem]">
+      <div className="tlhp-rich" onClick={handleClick} dangerouslySetInnerHTML={{ __html: safe }} />
+    </div>
+  );
 }
 
 export default RichHtmlBody;

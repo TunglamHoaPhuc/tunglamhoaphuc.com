@@ -276,6 +276,50 @@
   }
 }
 
+/* ── Điện thoại (rộng ≤ 767 px). Chỉ thu hẹp hiệu ứng nặng và sửa cỡ chữ ô nhập; máy tính (md trở lên) giữ nguyên. ── */
+@media (max-width: 767px) {
+  /* Ô nhập dưới 16 px khiến iOS tự phóng to trang khi chạm vào. Quy tắc này nằm ngoài @layer nên thắng các lớp `text-sm`, `text-xs`. */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  /* Làm mờ nền (backdrop-blur) tốn GPU khi cuộn; trên điện thoại giữ tối đa 4 px. Khung bật lên đã có nền tối 80–98% nên hầu như không đổi diện mạo. */
+  [class*="backdrop-blur"] {
+    --tw-backdrop-blur: blur(4px);
+  }
+  dialog::backdrop {
+    backdrop-filter: none;
+  }
+}
+
+/* Bỏ độ trễ chạm đúp và vệt sáng khi chạm trên màn hình cảm ứng. */
+a,
+button,
+summary,
+[role="button"],
+input,
+select,
+textarea,
+label {
+  touch-action: manipulation;
+}
+
+/* Người dùng bật "giảm chuyển động" thì dừng các hiệu ứng chạy lặp và cuộn mượt. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto !important;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 /* Ẩn thanh cuộn cho slider/carousel */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

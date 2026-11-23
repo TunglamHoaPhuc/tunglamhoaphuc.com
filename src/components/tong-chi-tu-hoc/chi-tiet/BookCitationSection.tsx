@@ -71,7 +71,7 @@ export function BookCitationSection({ sourceBook }: BookCitationProps) {
     <section id="trich-nguon-sach" className="scroll-mt-24 max-w-4xl mx-auto px-4 my-10">
       <div
         style={{ fontFamily: "'UTM Avo', sans-serif" }}
-        className="relative rounded-3xl p-5 sm:p-7 md:p-8 bg-[#170C06]/90 border border-[#F2C14E]/30 shadow-[0_15px_45px_rgba(0,0,0,0.85)] backdrop-blur-md overflow-hidden space-y-6"
+        className="relative rounded-3xl p-5 sm:p-7 md:p-8 bg-[#170C06]/90 border border-[#F2C14E]/30 shadow-[0_15px_45px_rgba(0,0,0,0.85)] sm:backdrop-blur-md overflow-hidden space-y-6"
       >
         {/* Subtle decorative glow */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#F2C14E]/5 rounded-full blur-3xl pointer-events-none" />
@@ -101,7 +101,7 @@ export function BookCitationSection({ sourceBook }: BookCitationProps) {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Tìm kiếm tác phẩm..."
-                  className="w-full pl-8 pr-3 py-1 bg-[#1C120A] border border-[#F2C14E]/30 rounded-xl text-xs text-[#FFE5A3] placeholder-[#c9b896]/40 focus:outline-none focus:border-[#F2C14E]"
+                  className="w-full pl-8 pr-3 py-2.5 sm:py-1 bg-[#1C120A] border border-[#F2C14E]/30 rounded-xl text-base sm:text-xs text-[#FFE5A3] placeholder-[#c9b896]/40 focus:outline-none focus:border-[#F2C14E]"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 />
               </div>
@@ -181,7 +181,7 @@ export function BookCitationSection({ sourceBook }: BookCitationProps) {
               {displayedList[0].description && (
                 <p 
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                  className="text-xs sm:text-sm text-[#FFE5A3]/90 leading-relaxed sm:leading-loose text-justify [text-align-last:left] whitespace-pre-line"
+                  className="text-sm text-[#FFE5A3]/90 leading-relaxed sm:leading-loose text-left sm:text-justify [text-align-last:left] whitespace-pre-line"
                 >
                   {displayedList[0].description}
                 </p>

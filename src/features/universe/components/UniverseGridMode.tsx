@@ -65,6 +65,7 @@ const UniverseAreaCard = React.memo(({ area, eager = false }: UniverseAreaCardPr
 
   return (
     <Link
+      prefetch={false}
       href={`/vu-tru-phat-giao/${area.slug}`}
       className="group relative rounded-xl overflow-hidden border border-[#F2C14E]/30 bg-[#25170E] hover:border-[#F2C14E] transition-all duration-300 shadow-xl flex flex-col h-full hover:-translate-y-1 transform-gpu will-change-transform"
     >
@@ -105,7 +106,7 @@ const UniverseAreaCard = React.memo(({ area, eager = false }: UniverseAreaCardPr
 
         {/* Subtitle ONLY visible on Hover - GOLDEN COLOR text-[#F2C14E] with Smooth Opacity & Height */}
         {area.subtitle && (
-          <div className="max-h-0 opacity-0 group-hover:max-h-8 group-hover:opacity-100 transition-all duration-300 ease-out overflow-hidden mt-0 group-hover:mt-1">
+          <div className="max-h-10 opacity-100 mt-1 sm:max-h-0 sm:opacity-0 sm:mt-0 sm:group-hover:max-h-8 sm:group-hover:opacity-100 sm:group-hover:mt-1 transition-all duration-300 ease-out overflow-hidden">
             <p
               className="text-[#F2C14E] text-xs font-bold font-sans tracking-wide drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
@@ -172,7 +173,7 @@ export const UniverseGridMode: FC<UniverseGridModeProps> = ({ areas, viewMode, o
           <button
             type="button"
             onClick={() => onToggleViewMode("2d")}
-            className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${is2dActive
+            className={`px-4 sm:px-5 py-2 min-h-11 sm:min-h-0 rounded-full text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${is2dActive
                 ? "bg-[#F2C14E] text-[#2A1D14] shadow-md"
                 : "bg-transparent text-[#FFE5A3]/60 hover:text-[#FFE5A3]"
               }`}
@@ -187,7 +188,7 @@ export const UniverseGridMode: FC<UniverseGridModeProps> = ({ areas, viewMode, o
           <button
             type="button"
             onClick={() => onToggleViewMode("grid")}
-            className={`px-5 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${viewMode === "grid"
+            className={`px-4 sm:px-5 py-2 min-h-11 sm:min-h-0 rounded-full text-xs font-bold uppercase tracking-wider transition-all flex items-center gap-2 cursor-pointer ${viewMode === "grid"
                 ? "bg-[#F2C14E] text-[#2A1D14] shadow-md"
                 : "bg-transparent text-[#FFE5A3]/60 hover:text-[#FFE5A3]"
               }`}
@@ -240,7 +241,7 @@ export const UniverseGridMode: FC<UniverseGridModeProps> = ({ areas, viewMode, o
               <button
                 type="button"
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="px-8 py-3 rounded-full bg-[#2C1C11] border border-[#F2C14E]/60 text-[#F2C14E] text-xs font-bold hover:bg-[#F2C14E] hover:text-[#2C1C11] transition-all cursor-pointer shadow-lg uppercase tracking-wider"
+                className="px-8 py-3 min-h-11 rounded-full bg-[#2C1C11] border border-[#F2C14E]/60 text-[#F2C14E] text-sm sm:text-xs font-bold hover:bg-[#F2C14E] hover:text-[#2C1C11] transition-all cursor-pointer shadow-lg uppercase tracking-wider"
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
               >
                 {isExpanded ? "THU GỌN KHU VỰC" : "XEM THÊM KHU VỰC"}

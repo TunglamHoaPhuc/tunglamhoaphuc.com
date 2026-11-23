@@ -59,7 +59,7 @@ export const ThapBatLaHanGrid: FC = () => {
             </div>
           </div>
 
-          <p className="text-xs sm:text-sm text-[#FFE5A3]/90 max-w-3xl leading-relaxed font-normal" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+          <p className="text-sm text-[#FFE5A3]/90 max-w-3xl leading-relaxed font-normal" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
             Nghệ thuật Phật giáo bằng gỗ mít
           </p>
         </div>
@@ -106,7 +106,7 @@ export const ThapBatLaHanGrid: FC = () => {
 
                       <p
                         style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                        className="text-[#FFE5A3] text-[10px] sm:text-[11px] font-semibold leading-tight tracking-wide text-center line-clamp-2"
+                        className="text-[#FFE5A3] text-xs sm:text-[11px] font-semibold leading-tight tracking-wide text-center line-clamp-2"
                       >
                         {item.sanskritName}
                       </p>
@@ -156,7 +156,7 @@ export const ThapBatLaHanGrid: FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/25 backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto"
+            className="fixed inset-0 z-[200] bg-black/25 sm:backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto"
             onClick={() => setSelectedItem(null)}
           >
             <motion.div
@@ -198,7 +198,7 @@ export const ThapBatLaHanGrid: FC = () => {
                   </h3>
                   <p className="text-xs text-[#FFE5A3]/90 font-semibold">{selectedItem.sanskritName}</p>
                   <div className="h-[1px] bg-gradient-to-r from-[#F2C14E]/70 via-[#F2C14E]/30 to-transparent my-2" />
-                  <p className="text-xs text-[#D3C0AD] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                  <p className="text-sm text-[#D3C0AD] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                     {selectedItem.meaning}
                   </p>
                 </div>

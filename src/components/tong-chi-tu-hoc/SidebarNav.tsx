@@ -80,7 +80,7 @@ export function SidebarNav({
         isScrolled ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-20 pointer-events-none'
       }`}
     >
-      <div ref={dropdownRef} className="relative bg-[#382417]/90 border border-[#f2cc8f]/40 px-2.5 py-4 rounded-3xl flex flex-col items-center shadow-2xl backdrop-blur-md">
+      <div ref={dropdownRef} className="relative bg-[#382417]/90 border border-[#f2cc8f]/40 px-2.5 py-4 rounded-3xl flex flex-col items-center shadow-2xl sm:backdrop-blur-md">
         <Link
           href={homeHref}
           title={homeTitle}
@@ -183,7 +183,7 @@ export function SidebarNav({
 
                   <span
                     style={{ fontFamily: "'UTM Niagara', sans-serif" }}
-                    className={`absolute left-full ml-3 px-2.5 py-1 rounded-md bg-[#21140b]/95 border border-[#f2cc8f]/50 text-lg sm:text-xl whitespace-nowrap uppercase tracking-wider shadow-xl backdrop-blur-md pointer-events-none transition-all duration-300 transform origin-left ${
+                    className={`absolute left-full ml-3 px-2.5 py-1 rounded-md bg-[#21140b]/95 border border-[#f2cc8f]/50 text-lg sm:text-xl whitespace-nowrap uppercase tracking-wider shadow-xl sm:backdrop-blur-md pointer-events-none transition-all duration-300 transform origin-left ${
                       isActive
                         ? 'opacity-100 translate-x-0 text-[#ffde59] drop-shadow-[0_0_6px_rgba(255,222,89,0.4)]'
                         : 'opacity-0 -translate-x-2 text-[#f2cc8f] group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-[#ffde59]'

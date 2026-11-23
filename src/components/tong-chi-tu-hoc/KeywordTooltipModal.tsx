@@ -113,7 +113,7 @@ export const KeywordTooltipModal: FC<KeywordTooltipModalProps> = ({ popup, onClo
         <div className="p-6 space-y-3.5 text-left">
           {/* Subtitle / Chuyên mục */}
           {popup.subtitle && (
-            <div className="text-[11px] font-bold text-[#F2C14E] uppercase tracking-widest flex items-center gap-1.5">
+            <div className="text-xs sm:text-[11px] font-bold text-[#F2C14E] uppercase tracking-widest flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#F2C14E]" />
               <span>{popup.subtitle}</span>
             </div>
@@ -128,7 +128,7 @@ export const KeywordTooltipModal: FC<KeywordTooltipModalProps> = ({ popup, onClo
           </h3>
 
           {/* Description */}
-          <p className="text-xs sm:text-sm text-[#e3d2c1] leading-relaxed">
+          <p className="text-sm text-[#e3d2c1] leading-relaxed">
             {popup.description}
           </p>
 

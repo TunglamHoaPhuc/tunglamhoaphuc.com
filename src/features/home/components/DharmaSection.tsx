@@ -217,7 +217,7 @@ const DharmaSection: FC<DharmaSectionProps> = ({ sectionRef, posts }) => {
 
         {/* ── Nút Khám Phá Toàn Bộ Dòng Chảy Hoằng Pháp ── */}
         <div className="mt-12 md:mt-16 flex items-center justify-center">
-          <Link
+          <Link prefetch={false}
             href="/dong-chay-hoang-phap"
             className="group inline-flex items-center gap-2.5 px-6 md:px-8 py-3.5 rounded-full border border-[#F2C14E]/50 bg-[#2A1D14]/90 text-[#F2C14E] hover:text-[#2A1D14] hover:bg-[#F2C14E] transition-all duration-300 shadow-lg hover:shadow-[0_0_24px_rgba(242,193,78,0.5)] font-semibold text-xs md:text-sm tracking-wider uppercase"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}

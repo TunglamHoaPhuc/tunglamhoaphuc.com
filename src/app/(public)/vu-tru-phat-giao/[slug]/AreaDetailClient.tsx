@@ -1,32 +1,36 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import Header from '@/components/public/layout/Header';
 import Footer from '@/components/public/layout/Footer';
 import type { V3Area } from '@/lib/v3-data';
 import type { StatueItem } from '@/lib/statue-types';
-import { TAM_BAO_VIDEOS } from '@/data/tam-bao-detail-data';
 import { SubNavbar } from '@/components/tong-chi-tu-hoc/SubNavbar';
 import { SidebarNav } from '@/components/tong-chi-tu-hoc/SidebarNav';
 import { HeroBanner } from '@/components/tong-chi-tu-hoc/HeroBanner';
 import { StatueCollectionGrid } from '@/features/universe/components/StatueCollectionGrid';
 import { ArtisticStatueSection } from '@/features/universe/components/ArtisticStatueSection';
-import { RelatedStoriesSection } from '@/features/universe/components/RelatedStoriesSection';
 import { SpaceGallerySection } from '@/features/universe/components/SpaceGallerySection';
 import { OtherAreasSection } from '@/features/universe/components/OtherAreasSection';
-import { ThuVienGrid } from '@/features/universe/components/ThuVienGrid';
-import { TuAnVangSinhSystem } from '@/features/universe/components/TuAnVangSinhSystem';
-import { BaoThapGrid } from '@/features/universe/components/BaoThapGrid';
-import { BaoTangGrid } from '@/features/universe/components/BaoTangGrid';
-import { DaiNamQuocMauGrid } from '@/features/universe/components/DaiNamQuocMauGrid';
-import { CongTamQuanSection } from '@/features/universe/components/CongTamQuanSection';
-import { ChayDuongSection } from '@/features/universe/components/ChayDuongSection';
-import { ThapBatLaHanGrid } from '@/features/universe/components/ThapBatLaHanGrid';
-import { ThapDaiDeTuCards } from '@/features/universe/components/ThapDaiDeTuCards';
-import { GiangDuongPhapThoai } from '@/features/universe/components/GiangDuongPhapThoai';
-import { DanhTangMap } from '@/features/universe/components/DanhTangMap';
-import { TuAnFlipbook } from '@/features/universe/components/TuAnFlipbook';
 import { areaBodyHtml } from '@/lib/area-body';
+
+// Mỗi khu vực chỉ nạp lưới riêng của nó (dữ liệu của các lưới này rất nặng, ví dụ thu-vien-data ~300 KB): trang vẫn dựng sẵn trên máy chủ,
+// nhưng trình duyệt chỉ tải mã của khối đang xem thay vì của cả ~18 lưới.
+const ThuVienGrid = dynamic(() => import('@/features/universe/components/ThuVienGrid').then((m) => m.ThuVienGrid));
+const TuAnVangSinhSystem = dynamic(() => import('@/features/universe/components/TuAnVangSinhSystem').then((m) => m.TuAnVangSinhSystem));
+const BaoThapGrid = dynamic(() => import('@/features/universe/components/BaoThapGrid').then((m) => m.BaoThapGrid));
+const BaoTangGrid = dynamic(() => import('@/features/universe/components/BaoTangGrid').then((m) => m.BaoTangGrid));
+const DaiNamQuocMauGrid = dynamic(() => import('@/features/universe/components/DaiNamQuocMauGrid').then((m) => m.DaiNamQuocMauGrid));
+const CongTamQuanSection = dynamic(() => import('@/features/universe/components/CongTamQuanSection').then((m) => m.CongTamQuanSection));
+const ChayDuongSection = dynamic(() => import('@/features/universe/components/ChayDuongSection').then((m) => m.ChayDuongSection));
+const ThapBatLaHanGrid = dynamic(() => import('@/features/universe/components/ThapBatLaHanGrid').then((m) => m.ThapBatLaHanGrid));
+const ThapDaiDeTuCards = dynamic(() => import('@/features/universe/components/ThapDaiDeTuCards').then((m) => m.ThapDaiDeTuCards));
+const GiangDuongPhapThoai = dynamic(() => import('@/features/universe/components/GiangDuongPhapThoai').then((m) => m.GiangDuongPhapThoai));
+const DanhTangMap = dynamic(() => import('@/features/universe/components/DanhTangMap').then((m) => m.DanhTangMap));
+const TuAnFlipbook = dynamic(() => import('@/features/universe/components/TuAnFlipbook').then((m) => m.TuAnFlipbook));
+const TamBaoStories = dynamic(() => import('@/features/universe/components/TamBaoStories').then((m) => m.TamBaoStories));
+const RelatedStoriesSection = dynamic(() => import('@/features/universe/components/RelatedStoriesSection').then((m) => m.RelatedStoriesSection));
 
 function matchesArea(itemAreaSlug: string, pageSlug: string, areaSlug: string): boolean {
   const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '_');
@@ -122,7 +126,7 @@ export default function AreaDetailClient({
   };
 
   return (
-    <div className="w-full min-h-screen bg-[#2c1c11] text-[#e3d2c1] font-sans relative selection:bg-[#f2cc8f] selection:text-black overflow-x-hidden">
+    <div className="w-full min-h-screen bg-[#2c1c11] text-[#e3d2c1] font-sans relative selection:bg-[#f2cc8f] selection:text-black overflow-x-clip md:overflow-x-hidden">
       {/* ── TOP STICKY SUBNAVBAR & SIDEBAR NAV ── */}
       <SubNavbar
         activeSection={activeSection}
@@ -139,7 +143,7 @@ export default function AreaDetailClient({
         navItems={navItems}
       />
 
-      <div className={`w-full transition-all duration-500 ${isScrolled ? 'pl-16 md:pl-24' : 'pl-4'} pr-4 md:pr-12`}>
+      <div className={`w-full transition-all duration-500 ${isScrolled ? 'pl-4 md:pl-24' : 'pl-4'} pr-4 md:pr-12`}>
         {/* ── HEROBANNER ── */}
         <HeroBanner
           id="herobanner"
@@ -158,8 +162,8 @@ export default function AreaDetailClient({
                 text-base sm:text-lg md:text-xl text-[#ffde59]
                 leading-relaxed md:leading-loose tracking-wide
                 space-y-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]
-                text-justify
-                [&>p]:text-justify [&>p]:mb-6
+                text-left sm:text-justify
+                [&>p]:text-left sm:[&>p]:text-justify [&>p]:mb-6
                 [&>p:not(:first-of-type)]:indent-6 md:[&>p:not(:first-of-type)]:indent-8
                 [&>p:first-of-type::first-letter]:[font-family:'UTM_ClassizismAntiqua','UTM_ClassicAntiqua',serif]
                 [&>p:first-of-type::first-letter]:text-6xl md:[&>p:first-of-type::first-letter]:text-7xl
@@ -240,21 +244,11 @@ export default function AreaDetailClient({
               <DanhTangMap />
             ) : (
               <div className="max-w-4xl mx-auto px-4">
-                <RelatedStoriesSection
-                  areaTitle={area.name}
-                  stories={
-                    slug === 'tam-bao'
-                      ? TAM_BAO_VIDEOS.map((v) => ({
-                          id: v.id,
-                          title: v.title,
-                          subtitle: 'Tùng Lâm Hòa Phúc',
-                          summary: v.summary,
-                          thumbnailUrl: v.thumbnailUrl,
-                          videoUrl: v.videoUrl,
-                        }))
-                      : undefined
-                  }
-                />
+                {slug === 'tam-bao' ? (
+                  <TamBaoStories areaTitle={area.name} />
+                ) : (
+                  <RelatedStoriesSection areaTitle={area.name} />
+                )}
               </div>
             )}
           </section>

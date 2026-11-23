@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import Header from "@/components/public/layout/Header";
 import Footer from "@/components/public/layout/Footer";
 import Hero from "@/features/home/components/Hero";
@@ -45,12 +45,18 @@ type HomeProps = {
 };
 
 const Home: FC<HomeProps> = ({ gallery, hero, dharma, welcome, quotes, news }) => {
-  const [scrollY, setScrollY] = useState<number>(0);
+  const hasWelcome = !!welcome;
+  const hasQuotes = !!quotes?.items.length;
+  // Cùng một mảng giữa các lần dựng: VerticalAnchorNav gắn lại bộ nghe cuộn mỗi khi `sections` đổi danh tính.
+  const sections = useMemo(() => homeSections(hasWelcome, hasQuotes), [hasWelcome, hasQuotes]);
+  // Header chỉ cần biết đã cuộn quá 64 px hay chưa: state là boolean nên chỉ dựng lại khi qua ngưỡng, không phải ở mỗi sự kiện cuộn.
+  const [scrolled, setScrolled] = useState<boolean>(false);
 
   useEffect(() => {
     const onScroll = () => {
-      setScrollY(window.scrollY);
+      setScrolled(window.scrollY > 64);
     };
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -58,15 +64,15 @@ const Home: FC<HomeProps> = ({ gallery, hero, dharma, welcome, quotes, news }) =
   return (
     <div
       style={{ background: "#1A120B" }}
-      className="min-h-screen overflow-x-hidden relative font-sans text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black"
+      className="min-h-svh overflow-x-hidden relative font-sans text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black"
     >
       {/* ── THANH NEO DỌC SANG BÊN PHẢI MÀN HÌNH ── */}
-      <VerticalAnchorNav pageTitle="TRANG CHỦ" sections={homeSections(!!welcome, !!quotes?.items.length)} />
+      <VerticalAnchorNav pageTitle="TRANG CHỦ" sections={sections} />
 
       {/* ── POPUP THÔNG BÁO LẦN ĐẦU MỞ WEB (V1.0.0) ── */}
       <WelcomeNoticeModal />
 
-      <Header scrolled={scrollY > 64} />
+      <Header scrolled={scrolled} />
 
       <main>
         {/* Section 0: Hero Video Banner */}

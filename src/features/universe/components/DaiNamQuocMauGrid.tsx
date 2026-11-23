@@ -23,7 +23,7 @@ export const DaiNamQuocMauGrid: FC = () => {
         <div className="mb-10 text-left">
           <div className="flex items-center gap-2 mb-2">
             <span
-              className="px-3.5 py-1 rounded-full text-[11px] font-bold text-[#F2C14E] bg-[#1C130D] border border-[#F2C14E]/40 uppercase tracking-wider"
+              className="px-3.5 py-1 rounded-full text-xs sm:text-[11px] font-bold text-[#F2C14E] bg-[#1C130D] border border-[#F2C14E]/40 uppercase tracking-wider"
               style={{ fontFamily: "'UTM Avo', 'UTM_Avo', sans-serif" }}
             >
               ĐẠI NAM QUỐC MẪU (NHÀ MẪU)
@@ -35,7 +35,7 @@ export const DaiNamQuocMauGrid: FC = () => {
           >
             BẢO VẬT 12 ẤN TRIỀU VUA THỜI NGUYỄN
           </h2>
-          <p className="text-xs md:text-sm text-[#c9b896] leading-relaxed" style={{ fontFamily: "'UTM Avo', 'UTM_Avo', sans-serif" }}>
+          <p className="text-sm text-[#c9b896] leading-relaxed" style={{ fontFamily: "'UTM Avo', 'UTM_Avo', sans-serif" }}>
             Trưng bày hình ảnh &amp; ý nghĩa lịch sử của 12 chiếc ấn vàng, ngọc tỷ quý giá thuộc Triều Nguyễn (mô hình phỏng cổ)
           </p>
         </div>
@@ -60,7 +60,7 @@ export const DaiNamQuocMauGrid: FC = () => {
 
                 {/* Code Badge: Top-Left */}
                 <div
-                  className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold text-[#F2C14E] bg-[#1C130D]/90 border border-[#F2C14E]/50 shadow-md backdrop-blur-sm z-10"
+                  className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs font-bold text-[#F2C14E] bg-[#1C130D]/90 border border-[#F2C14E]/50 shadow-md sm:backdrop-blur-sm z-10"
                   style={{ fontFamily: "'UTM Avo', 'UTM_Avo', sans-serif" }}
                 >
                   {seal.codeNumber}
@@ -125,7 +125,7 @@ export const DaiNamQuocMauGrid: FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/25 backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto"
+            className="fixed inset-0 z-[200] bg-black/25 sm:backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto"
             onClick={() => setSelectedSeal(null)}
           >
             <motion.div
@@ -185,7 +185,7 @@ export const DaiNamQuocMauGrid: FC = () => {
 
                   {/* Material: UTM Avo Regular (NOT Bold) */}
                   <p
-                    className="text-xs sm:text-sm text-[#FFE5A3]/90 font-normal leading-relaxed"
+                    className="text-sm text-[#FFE5A3]/90 font-normal leading-relaxed"
                     style={{ fontFamily: "'UTM Avo', 'UTM_Avo', sans-serif" }}
                   >
                     <span className="text-[#F2C14E]/80">Chất liệu:</span> {selectedSeal.material}
@@ -199,7 +199,7 @@ export const DaiNamQuocMauGrid: FC = () => {
 
                   {/* Description / Full History */}
                   <div
-                    className="text-xs sm:text-sm text-[#D3C0AD] leading-relaxed font-normal space-y-2"
+                    className="text-sm text-[#D3C0AD] leading-relaxed font-normal space-y-2"
                     style={{ fontFamily: "'UTM Avo', 'UTM_Avo', sans-serif" }}
                   >
                     <p>{selectedSeal.fullHistoryHtml}</p>
@@ -207,7 +207,7 @@ export const DaiNamQuocMauGrid: FC = () => {
 
                   {/* Meaning Box */}
                   <div
-                    className="bg-[#1C130D]/90 p-4 rounded-xl border border-[#F2C14E]/30 text-xs sm:text-sm text-[#FFE5A3] italic leading-relaxed shadow-sm mt-3"
+                    className="bg-[#1C130D]/90 p-4 rounded-xl border border-[#F2C14E]/30 text-sm text-[#FFE5A3] italic leading-relaxed shadow-sm mt-3"
                     style={{ fontFamily: "'UTM Avo', 'UTM_Avo', sans-serif" }}
                   >
                     <span className="not-italic font-bold text-[#F2C14E] block mb-1">Ý nghĩa lịch sử &amp; tâm linh:</span>
@@ -217,7 +217,7 @@ export const DaiNamQuocMauGrid: FC = () => {
                   {/* Source */}
                   <div className="pt-1">
                     <p
-                      className="text-[11px] text-[#c9b896]/70 italic tracking-wide"
+                      className="text-xs sm:text-[11px] text-[#c9b896]/70 italic tracking-wide"
                       style={{ fontFamily: "'UTM Avo', 'UTM_Avo', sans-serif" }}
                     >
                       Nguồn tư liệu: {selectedSeal.source}

@@ -45,7 +45,7 @@ interface StoryCardProps {
 
 const StoryCard = React.memo(({ story, isPlaying, onPlay }: StoryCardProps) => {
   return (
-    <div className="relative bg-[#3a2613]/80 border border-[#c8aa6e]/70 rounded-2xl p-6 sm:p-8 md:p-10 shadow-2xl backdrop-blur-md w-full">
+    <div className="relative bg-[#3a2613]/80 border border-[#c8aa6e]/70 rounded-2xl p-6 sm:p-8 md:p-10 shadow-2xl sm:backdrop-blur-md w-full">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 items-center">
         {/* Left: Thumbnail / Video */}
         <div className="lg:col-span-7 relative aspect-video w-full rounded-xl overflow-hidden border border-[#c8aa6e]/50 shadow-2xl bg-black group">

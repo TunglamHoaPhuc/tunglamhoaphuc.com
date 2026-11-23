@@ -95,7 +95,7 @@ const QuanAmCard = React.memo(({ item, onSelect }: CardProps) => {
         {/* Number Badge Top-Left */}
         <div
           style={{ fontFamily: "'UTM Avo', sans-serif" }}
-          className="absolute top-3 left-3 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider text-[#F2C14E] bg-[#1C120B]/90 border border-[#F2C14E]/50 backdrop-blur-md shadow-md z-10"
+          className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#F2C14E] bg-[#1C120B]/90 border border-[#F2C14E]/50 sm:backdrop-blur-md shadow-md z-10"
         >
           QUẺ SỐ {item.number}
         </div>
@@ -146,7 +146,7 @@ const QuanAmCard = React.memo(({ item, onSelect }: CardProps) => {
         <div className="absolute inset-x-0 bottom-2 flex justify-center opacity-0 group-hover:opacity-100 translate-y-3 group-hover:translate-y-0 transition-all duration-300 ease-out z-20 pointer-events-none group-hover:pointer-events-auto">
           <span
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className="px-4 py-1 rounded-full text-[11px] font-bold text-[#1C130D] bg-gradient-to-r from-[#F2C14E] via-[#FFDE59] to-[#F2C14E] shadow-[0_4px_15px_rgba(242,193,78,0.6)] flex items-center gap-1.5 uppercase tracking-wider cursor-pointer hover:brightness-110"
+            className="px-4 py-1 rounded-full text-xs sm:text-[11px] font-bold text-[#1C130D] bg-gradient-to-r from-[#F2C14E] via-[#FFDE59] to-[#F2C14E] shadow-[0_4px_15px_rgba(242,193,78,0.6)] flex items-center gap-1.5 uppercase tracking-wider cursor-pointer hover:brightness-110"
           >
             <span>Xem lời dạy và chiêm bái</span>
           </span>
@@ -349,7 +349,7 @@ export const QuanAm33Grid: FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[300] bg-black/92 backdrop-blur-xl flex flex-col items-center justify-center p-4 select-none"
+            className="fixed inset-0 z-[300] bg-black/92 sm:backdrop-blur-xl flex flex-col items-center justify-center p-4 select-none"
           >
             {/* Luminous aura */}
             <div className="w-64 h-64 bg-radial from-[#F2C14E]/30 to-transparent rounded-full blur-3xl animate-pulse pointer-events-none" />
@@ -392,7 +392,7 @@ export const QuanAm33Grid: FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[250] bg-black/94 backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 select-none overscroll-contain"
+            className="fixed inset-0 z-[250] bg-black/94 sm:backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 select-none overscroll-contain"
             onClick={() => setSelectedItem(null)}
             onWheel={(e) => {
               e.stopPropagation();
@@ -425,7 +425,7 @@ export const QuanAm33Grid: FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedItem(null)}
-                className="absolute -top-12 right-0 sm:right-2 z-30 w-10 h-10 rounded-full bg-[#1C120B]/90 border border-[#F2C14E]/60 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xl backdrop-blur-md"
+                className="absolute -top-12 right-0 sm:right-2 z-30 w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[#1C120B]/90 border border-[#F2C14E]/60 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xl sm:backdrop-blur-md"
                 title="Đóng chiêm bái"
               >
                 <X className="w-5 h-5" />
@@ -477,7 +477,7 @@ export const QuanAm33Grid: FC = () => {
                     {/* Badge: Mặt trước Tôn Tượng */}
                     <div
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                      className="absolute top-4 left-4 px-3.5 py-1 rounded-full text-[11px] font-bold text-[#F2C14E] bg-[#1C120B]/90 border border-[#F2C14E]/50 shadow-md backdrop-blur-md uppercase"
+                      className="absolute top-4 left-4 px-3.5 py-1 rounded-full text-xs sm:text-[11px] font-bold text-[#F2C14E] bg-[#1C120B]/90 border border-[#F2C14E]/50 shadow-md sm:backdrop-blur-md uppercase"
                     >
                       Mặt trước • Tôn Tượng
                     </div>
@@ -504,7 +504,7 @@ export const QuanAm33Grid: FC = () => {
                     {/* Badge: Mặt sau Lời Dạy */}
                     <div
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                      className="absolute top-4 left-4 px-3.5 py-1 rounded-full text-[11px] font-bold text-[#FFE5A3] bg-[#3B0000]/90 border border-[#F2C14E]/60 shadow-md backdrop-blur-md uppercase"
+                      className="absolute top-4 left-4 px-3.5 py-1 rounded-full text-xs sm:text-[11px] font-bold text-[#FFE5A3] bg-[#3B0000]/90 border border-[#F2C14E]/60 shadow-md sm:backdrop-blur-md uppercase"
                     >
                       Mặt sau • Lời Dạy Quẻ Số {selectedItem.number}
                     </div>
@@ -513,7 +513,7 @@ export const QuanAm33Grid: FC = () => {
               </div>
 
               {/* ── CONTROLS BAR: TỐI GIẢN GỌN GÀNG, BỎ NÚT XỐC LẠI ── */}
-              <div className="w-full mt-3 flex items-center justify-between gap-3 bg-[#1C120B]/90 border border-[#F2C14E]/40 p-2.5 rounded-2xl shadow-2xl backdrop-blur-md">
+              <div className="w-full mt-3 flex items-center justify-between gap-3 bg-[#1C120B]/90 border border-[#F2C14E]/40 p-2.5 rounded-2xl shadow-2xl sm:backdrop-blur-md">
                 {/* Button: Lật Thẻ 3D */}
                 <button
                   type="button"
@@ -535,7 +535,7 @@ export const QuanAm33Grid: FC = () => {
                   <button
                     type="button"
                     onClick={() => setZoom((prev) => Math.min(prev + 0.3, 3.0))}
-                    className="w-8 h-8 rounded-lg hover:bg-[#F2C14E] text-[#FFDE59] hover:text-black flex items-center justify-center transition-colors cursor-pointer"
+                    className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg hover:bg-[#F2C14E] text-[#FFDE59] hover:text-black flex items-center justify-center transition-colors cursor-pointer"
                     title="Phóng to để đọc chữ rõ hơn"
                   >
                     <ZoomIn className="w-4 h-4" />
@@ -549,7 +549,7 @@ export const QuanAm33Grid: FC = () => {
                         return next;
                       });
                     }}
-                    className="w-8 h-8 rounded-lg hover:bg-[#F2C14E] text-[#FFDE59] hover:text-black flex items-center justify-center transition-colors cursor-pointer"
+                    className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg hover:bg-[#F2C14E] text-[#FFDE59] hover:text-black flex items-center justify-center transition-colors cursor-pointer"
                     title="Thu nhỏ"
                   >
                     <ZoomOut className="w-4 h-4" />
@@ -561,7 +561,7 @@ export const QuanAm33Grid: FC = () => {
                         setZoom(1);
                         setPan({ x: 0, y: 0 });
                       }}
-                      className="w-8 h-8 rounded-lg hover:bg-[#F2C14E] text-[#FFDE59] hover:text-black flex items-center justify-center transition-colors cursor-pointer"
+                      className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg hover:bg-[#F2C14E] text-[#FFDE59] hover:text-black flex items-center justify-center transition-colors cursor-pointer"
                       title="Khôi phục góc nhìn"
                     >
                       <RotateCcw className="w-4 h-4" />

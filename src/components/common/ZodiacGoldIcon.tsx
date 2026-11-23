@@ -10,7 +10,7 @@ export const ZodiacGoldIcon: FC<ZodiacGoldIconProps> = ({ sign, className = "w-5
 
   // Vector Badge based on Zodiac Sign
   return (
-    <span className={`inline-flex items-center justify-center font-bold px-1.5 py-0.5 rounded bg-[#F2C14E]/15 border border-[#F2C14E]/50 text-[#F2C14E] text-[11px] leading-none shadow-[0_0_8px_rgba(242,193,78,0.3)] ${className}`}>
+    <span className={`inline-flex items-center justify-center font-bold px-1.5 py-0.5 rounded bg-[#F2C14E]/15 border border-[#F2C14E]/50 text-[#F2C14E] text-xs md:text-[11px] leading-none shadow-[0_0_8px_rgba(242,193,78,0.3)] ${className}`}>
       {normSign.includes('TÝ') && '🐭 TÝ'}
       {normSign.includes('SỬU') && '🐂 SỬU'}
       {normSign.includes('DẦN') && '🐅 DẦN'}

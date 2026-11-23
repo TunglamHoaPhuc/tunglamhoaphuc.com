@@ -169,7 +169,7 @@ export const ThapDaiDeTuCards: FC = () => {
               {/* Badge Đệ nhất */}
               <div className="absolute top-2 left-2 right-2">
                 <span
-                  className="inline-block w-full text-center text-[10px] font-bold text-[#FFE5A3] bg-[#8B1E0F]/90 px-2 py-0.5 rounded border border-[#F2C14E]/50 uppercase tracking-wider backdrop-blur-sm"
+                  className="inline-block w-full text-center text-xs sm:text-[10px] font-bold text-[#FFE5A3] bg-[#8B1E0F]/90 px-2 py-0.5 rounded border border-[#F2C14E]/50 uppercase tracking-wider sm:backdrop-blur-sm"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
                   {item.titleBadge}
@@ -190,13 +190,13 @@ export const ThapDaiDeTuCards: FC = () => {
               >
                 {item.name}
               </h3>
-              <p className="text-[11px] text-[#c9b896]/80 italic truncate" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+              <p className="text-xs sm:text-[11px] text-[#c9b896]/80 italic truncate" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 {item.sanskritName}
               </p>
             </div>
 
             {/* View detail hover action */}
-            <div className="mt-2 pt-2 border-t border-[#F2C14E]/15 flex items-center justify-center text-[11px] text-[#F2C14E] font-bold">
+            <div className="mt-2 pt-2 border-t border-[#F2C14E]/15 flex items-center justify-center text-xs sm:text-[11px] text-[#F2C14E] font-bold">
               <span className="group-hover:underline flex items-center gap-1">
                 <span>Chi tiết công hạnh</span>
                 <ArrowRight className="w-3 h-3" />
@@ -210,7 +210,7 @@ export const ThapDaiDeTuCards: FC = () => {
       <AnimatePresence>
         {selectedDeTu && (
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 sm:backdrop-blur-xl animate-in fade-in"
             onClick={() => setSelectedDeTu(null)}
           >
             <motion.div
@@ -255,12 +255,12 @@ export const ThapDaiDeTuCards: FC = () => {
               </div>
 
               {/* Description */}
-              <p className="text-xs text-[#e3d2c1] leading-relaxed text-justify" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+              <p className="text-sm text-[#e3d2c1] leading-relaxed text-left sm:text-justify" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 {selectedDeTu.description}
               </p>
 
               <div className="text-center pt-2 border-t border-[#F2C14E]/20">
-                <span className="text-[11px] text-[#c9b896]/70 uppercase flex items-center justify-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                <span className="text-xs sm:text-[11px] text-[#c9b896]/70 uppercase flex items-center justify-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                   <Sparkles className="w-3 h-3 text-[#F2C14E]" />
                   <span>TÔN TRÍ TẠI LẦU KINH LUÂN • TÙNG LÂM HÒA PHÚC</span>
                   <Sparkles className="w-3 h-3 text-[#F2C14E]" />

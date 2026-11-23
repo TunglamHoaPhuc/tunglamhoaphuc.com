@@ -164,7 +164,7 @@ export const TuAnFlipbook: FC = () => {
             >
               KỶ YẾU PHỤC DỰNG NHÀ TỨ ÂN
             </h3>
-            <p className="text-[11px] text-[#c9b896]/80 hidden sm:block" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+            <p className="text-xs sm:text-[11px] text-[#c9b896]/80 hidden sm:block" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
               Tư liệu lịch sử &amp; công trình kiến trúc Tùng Lâm Hòa Phúc
             </p>
           </div>
@@ -175,14 +175,14 @@ export const TuAnFlipbook: FC = () => {
           {/* Zoom In/Out */}
           <button
             onClick={() => setZoomLevel((z) => Math.max(0.8, z - 0.2))}
-            className="w-8 h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/30 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer"
+            className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/30 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer"
             title="Thu nhỏ"
           >
             <ZoomOut className="w-4 h-4" />
           </button>
           <button
             onClick={() => setZoomLevel((z) => Math.min(4, z + 0.2))}
-            className="w-8 h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/30 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer"
+            className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/30 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer"
             title="Phóng to"
           >
             <ZoomIn className="w-4 h-4" />
@@ -190,7 +190,7 @@ export const TuAnFlipbook: FC = () => {
           {zoomLevel > 1 && (
             <button
               onClick={handleResetZoom}
-              className="w-8 h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/30 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer"
+              className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/30 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer"
               title="Đặt lại kích thước"
             >
               <RotateCcw className="w-4 h-4" />
@@ -210,7 +210,7 @@ export const TuAnFlipbook: FC = () => {
           {/* Fullscreen */}
           <button
             onClick={toggleFullscreen}
-            className="w-8 h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/30 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer"
+            className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#2D1B10] border border-[#F2C14E]/30 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer"
             title={isFullscreen ? 'Thu nhỏ' : 'Toàn màn hình'}
           >
             {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -234,7 +234,7 @@ export const TuAnFlipbook: FC = () => {
         <button
           onClick={handlePrev}
           disabled={currentPage === 1}
-          className={`absolute left-1 sm:left-3 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#1C1008]/90 border-2 border-[#F2C14E]/60 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center shadow-2xl transition-all cursor-pointer backdrop-blur-md ${
+          className={`absolute left-1 sm:left-3 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#1C1008]/90 border-2 border-[#F2C14E]/60 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center shadow-2xl transition-all cursor-pointer sm:backdrop-blur-md ${
             currentPage === 1 ? 'opacity-30 cursor-not-allowed' : 'hover:scale-110 active:scale-95'
           }`}
           aria-label="Trang trước"
@@ -244,7 +244,7 @@ export const TuAnFlipbook: FC = () => {
 
         {/* Book Container with 3D Spine and Page Shadow */}
         <div
-          className={`flex items-center justify-center max-w-full max-h-[75vh] ease-out ${
+          className={`flex items-center justify-center max-w-full max-h-[75svh] ease-out ${
             isDragging ? 'duration-0' : 'duration-200'
           }`}
           style={{ 
@@ -256,7 +256,7 @@ export const TuAnFlipbook: FC = () => {
             /* ── DUAL PAGE VIEW (DESKTOP) ── */
             isCover ? (
               /* BÌA TRƯỚC (ĐỨNG ĐƠN ĐỘC Ở GIỮA) */
-              <div className="relative rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.9)] border-2 border-[#F2C14E]/50 bg-[#120803] max-w-[480px] max-h-[68vh] aspect-[3/4] flex items-center justify-center">
+              <div className="relative rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.9)] border-2 border-[#F2C14E]/50 bg-[#120803] max-w-[480px] max-h-[68svh] aspect-[3/4] flex items-center justify-center">
                 <img
                   src={fitImage(PAGES[0].src, PAGE_WIDTH)}
                   alt={PAGES[0].title}
@@ -266,7 +266,7 @@ export const TuAnFlipbook: FC = () => {
               </div>
             ) : (
               /* HAI TRANG MỞ ĐÔI KÈM ĐƯỜNG GÁY SÁCH */
-              <div className="relative flex items-center rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.95)] border-2 border-[#F2C14E]/50 bg-[#120803] max-w-[960px] max-h-[68vh] aspect-[3/2]">
+              <div className="relative flex items-center rounded-2xl overflow-hidden shadow-[0_25px_60px_rgba(0,0,0,0.95)] border-2 border-[#F2C14E]/50 bg-[#120803] max-w-[960px] max-h-[68svh] aspect-[3/2]">
                 {/* Left Page */}
                 {leftPageNum && leftPageNum <= TOTAL_PAGES ? (
                   <div className="relative w-1/2 h-full overflow-hidden bg-[#1A1009] flex items-center justify-center">
@@ -303,7 +303,7 @@ export const TuAnFlipbook: FC = () => {
             )
           ) : (
             /* ── SINGLE PAGE VIEW (MOBILE) ── */
-            <div className="relative rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.9)] border-2 border-[#F2C14E]/50 bg-[#120803] max-w-[480px] max-h-[68vh] aspect-[3/4] flex items-center justify-center">
+            <div className="relative rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.9)] border-2 border-[#F2C14E]/50 bg-[#120803] max-w-[480px] max-h-[68svh] aspect-[3/4] flex items-center justify-center">
               <img
                 src={fitImage(PAGES[currentPage - 1].src, PAGE_WIDTH)}
                 alt={PAGES[currentPage - 1].title}
@@ -318,7 +318,7 @@ export const TuAnFlipbook: FC = () => {
         <button
           onClick={handleNext}
           disabled={isDualView ? (currentPage >= TOTAL_PAGES - 1 && !isCover) : (currentPage >= TOTAL_PAGES)}
-          className={`absolute right-1 sm:right-3 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#1C1008]/90 border-2 border-[#F2C14E]/60 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center shadow-2xl transition-all cursor-pointer backdrop-blur-md ${
+          className={`absolute right-1 sm:right-3 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#1C1008]/90 border-2 border-[#F2C14E]/60 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center shadow-2xl transition-all cursor-pointer sm:backdrop-blur-md ${
             (isDualView && currentPage >= TOTAL_PAGES - 1 && !isCover) || (!isDualView && currentPage >= TOTAL_PAGES)
               ? 'opacity-30 cursor-not-allowed'
               : 'hover:scale-110 active:scale-95'
@@ -351,7 +351,7 @@ export const TuAnFlipbook: FC = () => {
             max={TOTAL_PAGES}
             value={currentPage}
             onChange={(e) => setCurrentPage(Number(e.target.value))}
-            className="w-full accent-[#F2C14E] cursor-pointer"
+            className="w-full h-11 sm:h-auto accent-[#F2C14E] cursor-pointer"
           />
         </div>
 
@@ -359,14 +359,14 @@ export const TuAnFlipbook: FC = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setCurrentPage(1)}
-            className="px-2.5 py-1 rounded bg-[#2D1B10] border border-[#F2C14E]/30 text-[11px] font-bold text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black transition-all cursor-pointer"
+            className="px-3 py-2.5 min-h-11 sm:min-h-0 sm:px-2.5 sm:py-1 rounded bg-[#2D1B10] border border-[#F2C14E]/30 text-xs sm:text-[11px] font-bold text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black transition-all cursor-pointer"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             Đầu sách
           </button>
           <button
             onClick={() => setCurrentPage(TOTAL_PAGES)}
-            className="px-2.5 py-1 rounded bg-[#2D1B10] border border-[#F2C14E]/30 text-[11px] font-bold text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black transition-all cursor-pointer"
+            className="px-3 py-2.5 min-h-11 sm:min-h-0 sm:px-2.5 sm:py-1 rounded bg-[#2D1B10] border border-[#F2C14E]/30 text-xs sm:text-[11px] font-bold text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black transition-all cursor-pointer"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             Cuối sách

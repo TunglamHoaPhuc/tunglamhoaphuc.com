@@ -26,7 +26,7 @@ export const MemorialSearchEngine: FC<MemorialSearchEngineProps> = ({ search, ca
         <form action="/tra-cuu-bai-vi" method="get" className="space-y-2" role="search">
           <label
             htmlFor={inputId}
-            className="block text-xs font-semibold uppercase tracking-wider text-[#F2C14E]"
+            className="block text-xs font-semibold uppercase tracking-wide sm:tracking-wider text-[#F2C14E] leading-relaxed"
             style={FONT}
           >
             Tìm mã số bài vị (Tên hương linh, dòng họ, pháp danh hoặc tuổi)
@@ -49,13 +49,13 @@ export const MemorialSearchEngine: FC<MemorialSearchEngineProps> = ({ search, ca
                 maxLength={80}
                 defaultValue={query}
                 placeholder="Ví dụ: Nguyễn Văn..., Trần Tộc, Liên Vân..."
-                className="w-full pl-11 pr-3 py-3 rounded-xl bg-[#130B06] border border-[#F2C14E]/45 text-sm sm:text-base text-[#FFE5A3] placeholder-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E] focus:ring-2 focus:ring-[#F2C14E]/25 transition-all"
+                className="w-full pl-11 pr-3 py-3 rounded-xl bg-[#130B06] border border-[#F2C14E]/45 text-base text-[#FFE5A3] placeholder-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E] focus:ring-2 focus:ring-[#F2C14E]/25 transition-all"
                 style={FONT}
               />
             </div>
             <button
               type="submit"
-              className="px-4 sm:px-5 rounded-xl bg-gradient-to-r from-[#D4A017] to-[#F2C14E] text-[#1C130D] font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all cursor-pointer"
+              className="px-4 sm:px-5 min-h-12 rounded-xl bg-gradient-to-r from-[#D4A017] to-[#F2C14E] text-[#1C130D] font-bold text-xs uppercase tracking-wider hover:brightness-110 transition-all cursor-pointer"
               style={FONT}
             >
               Tra cứu
@@ -82,9 +82,9 @@ export const MemorialSearchEngine: FC<MemorialSearchEngineProps> = ({ search, ca
 
       {search.state === 'done' && (
         <div className="space-y-3">
-          <div className="flex items-center justify-between px-1 text-xs text-[#c9b896]" style={FONT}>
+          <div className="flex items-center justify-between px-1 text-sm text-[#c9b896]" style={FONT}>
             <span>
-              Tìm thấy <strong className="text-[#F2C14E] text-sm">{search.total}</strong> bài vị phù hợp
+              Tìm thấy <strong className="text-[#F2C14E] text-base">{search.total}</strong> bài vị phù hợp
               {search.total > search.records.length ? ` (hiện ${search.records.length} bài vị đầu, mời gõ cụ thể hơn)` : ''}
             </span>
           </div>
@@ -104,7 +104,7 @@ export const MemorialSearchEngine: FC<MemorialSearchEngineProps> = ({ search, ca
                 >
                   {/* Ô MÃ SỐ BÀI VỊ NỔI BẬT */}
                   <div className="shrink-0 min-w-[74px] sm:min-w-[84px] rounded-lg bg-[#7A1B0E] border border-[#F2C14E]/75 px-2.5 py-2 text-center shadow-inner">
-                    <span className="block text-[9px] uppercase tracking-wider text-[#FFE5A3]/85 leading-none mb-1" style={FONT}>
+                    <span className="block text-xs uppercase tracking-wide text-[#FFE5A3]/85 leading-none mb-1" style={FONT}>
                       Mã số
                     </span>
                     <span className="block font-mono text-lg sm:text-xl font-bold text-[#FFE5A3] leading-none">
@@ -122,13 +122,13 @@ export const MemorialSearchEngine: FC<MemorialSearchEngineProps> = ({ search, ca
                         {item.name}
                       </h3>
                       {item.lineageType && (
-                        <span className="text-[10px] px-2 py-0.5 rounded bg-[#F2C14E]/15 text-[#F2C14E] border border-[#F2C14E]/30 font-semibold shrink-0">
+                        <span className="text-xs px-2 py-0.5 rounded bg-[#F2C14E]/15 text-[#F2C14E] border border-[#F2C14E]/30 font-semibold shrink-0">
                           {item.lineageType}
                         </span>
                       )}
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-[#e3d2c1]/85" style={FONT}>
+                    <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-sm sm:text-xs text-[#e3d2c1]/85" style={FONT}>
                       <span className="text-[#F2C14E]/95 font-medium">{item.category}</span>
                       {item.dharmaName && (
                         <span className="inline-flex items-center gap-1 text-[#FFE5A3]">
@@ -166,6 +166,6 @@ export const MemorialSearchEngine: FC<MemorialSearchEngineProps> = ({ search, ca
 const Notice: FC<{ title: string; children: React.ReactNode }> = ({ title, children }) => (
   <div className="rounded-2xl border border-[#F2C14E]/20 bg-[#1A1009]/80 px-5 py-7 text-center space-y-2" style={FONT}>
     <p className="text-sm font-semibold text-[#FFE5A3]">{title}</p>
-    <p className="text-xs text-[#c9b896]/85 max-w-md mx-auto leading-relaxed">{children}</p>
+    <p className="text-sm sm:text-xs text-[#c9b896]/85 max-w-md mx-auto leading-relaxed">{children}</p>
   </div>
 );

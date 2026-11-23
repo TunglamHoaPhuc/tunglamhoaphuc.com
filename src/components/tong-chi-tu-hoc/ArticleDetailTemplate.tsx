@@ -101,7 +101,7 @@ const ArticleDetailTemplate: FC<ArticleDetailTemplateProps> = ({
       {/* ── 1. HERO BANNER ── */}
       <div
         className="relative overflow-hidden"
-        style={{ height: 'clamp(300px, 55vh, 580px)' }}
+        style={{ height: 'clamp(300px, 55svh, 580px)' }}
       >
         <img width={640} height={480}
           src={fitImage(getImageUrl(heroBannerUrl) || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp', 1280)}
@@ -325,7 +325,7 @@ const ArticleDetailTemplate: FC<ArticleDetailTemplateProps> = ({
                   )}
                   <div className="p-4">
                     <span
-                      className="text-[10px] uppercase tracking-widest font-bold block mb-1"
+                      className="text-xs sm:text-[10px] uppercase tracking-widest font-bold block mb-1"
                       style={{ color: '#F2C14E', fontFamily: "'UTM Avo', sans-serif", fontWeight: 'bold' }}
                     >
                       {art.category}

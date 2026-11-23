@@ -14,11 +14,11 @@ export default function PublicLayout({
   const isStandaloneLookup = pathname?.startsWith("/tra-cuu-bai-vi");
 
   if (isStandaloneLookup) {
-    return <main className="min-h-screen">{children}</main>;
+    return <main className="min-h-svh">{children}</main>;
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-svh flex flex-col">
       {/* scrolled={true}: header luôn có nền, dễ đọc trên trang con */}
       <Header scrolled={true} />
 
