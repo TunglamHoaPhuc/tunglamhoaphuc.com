@@ -232,13 +232,13 @@ export function PhotoGallery({
               onClick={() => {
                 setLightboxIndex(idx);
               }}
-              className={`group relative ${spanClass} rounded-2xl overflow-hidden border border-[#f2c14e]/35 hover:border-[#ffde59] shadow-xl hover:shadow-[0_0_20px_rgba(255,222,89,0.25)] cursor-pointer bg-[#1C120A] transition-all duration-500`}
+              className={`group relative aspect-[4/3] md:aspect-auto ${spanClass} rounded-2xl overflow-hidden border border-[#f2c14e]/35 hover:border-[#ffde59] shadow-xl hover:shadow-[0_0_20px_rgba(255,222,89,0.25)] cursor-pointer bg-[#1C120A] transition-all duration-500`}
             >
               {/* Hình ảnh tối ưu hóa AVIF/WebP vừa cỡ ô */}
               <img width={640} height={480}
                 {...tile}
                 alt={titleText || captionText || `Ảnh tư liệu ${idx + 1}`}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                 style={{ objectPosition: item.imagePosition || 'center 50%' }}
                 loading="lazy"
                 decoding="async"
