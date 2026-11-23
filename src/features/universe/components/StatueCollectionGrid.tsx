@@ -3,7 +3,7 @@
 import React, { FC, useState, useMemo } from "react";
 import Link from "next/link";
 import { ChevronDown, ChevronUp, ArrowRight } from "lucide-react";
-import { OFFICIAL_TUONG_CHINH_LIST, StatueItem, normalizeAreaId } from "@/data/statue-data";
+import { type StatueItem, normalizeAreaId } from "@/lib/statue-types";
 
 interface StatueCollectionGridProps {
   statues?: StatueItem[];
@@ -116,7 +116,7 @@ const StatueCard = React.memo(({ statue }: StatueCardProps) => {
 StatueCard.displayName = "StatueCard";
 
 export const StatueCollectionGrid: FC<StatueCollectionGridProps> = ({
-  statues = OFFICIAL_TUONG_CHINH_LIST,
+  statues = [],
   areaTitle = "TAM BẢO",
   areaSlug,
 }) => {

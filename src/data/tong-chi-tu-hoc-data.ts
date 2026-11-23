@@ -1,4 +1,4 @@
-import { NavItem, SectionData } from '@/types/tong-chi-tu-hoc';
+import type { NavItem, SectionData } from '@/types/tong-chi-tu-hoc';
 
 // ─── Navigation Items ───────────────────────────────────────────────────────
 export const NAV_ITEMS: NavItem[] = [

@@ -6,7 +6,8 @@ import Image from 'next/image';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { SuToKaraokeReader } from './SuToKaraokeReader';
-import { GioiThieuTopicDetail, GIOI_THIEU_DETAILS } from '@/data/gioi-thieu-data';
+import type { GioiThieuTopicDetail } from '@/data/gioi-thieu-data';
+import type { OtherAboutTopic } from './GioiThieuDetailLayout';
 import {
   EventQrPanel,
   LedCornerQrBadge,
@@ -33,7 +34,10 @@ import {
 import './tieu-su-odyssey.css';
 
 interface Props {
+  /** Chủ đề đọc từ D1 (đã là chủ đề đang hiển thị); phần còn lại của trang là thiết kế riêng. */
   detail: GioiThieuTopicDetail;
+  /** Các chủ đề khác đang hiển thị, để liên kết "Các mục giới thiệu khác". */
+  others: OtherAboutTopic[];
   slug?: string;
 }
 
@@ -643,8 +647,7 @@ function OdysseyNativeDialog({
   );
 }
 
-export function TieuSuSuToOdysseyView({ detail: initialDetail, slug }: Props) {
-  const [topic, setTopic] = useState<GioiThieuTopicDetail>(initialDetail);
+export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
   const [activeChapterIdx, setActiveChapterIdx] = useState<number>(0);
   const [activeDossierTab, setActiveDossierTab] = useState<'bio' | 'vow'>('bio');
   const [spotlightMode, setSpotlightMode] = useState<'artwork' | 'photo' | 'video'>('artwork');
@@ -679,7 +682,6 @@ export function TieuSuSuToOdysseyView({ detail: initialDetail, slug }: Props) {
   const [qrPublicUrl, setQrPublicUrl] = useState<string>('https://tunglamhoaphuc.com/gioi-thieu/tieu-su-su-to');
 
   const prefersReducedMotion = useReducedMotion();
-  const topicSlug = slug || initialDetail?.slug || initialDetail?.id || 'tieu-su-su-to';
   const heroRef = useRef<HTMLDivElement>(null);
   const chronicleRef = useRef<HTMLElement>(null);
 
@@ -762,39 +764,6 @@ export function TieuSuSuToOdysseyView({ detail: initialDetail, slug }: Props) {
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
   }, [prefersReducedMotion]);
-
-  useEffect(() => {
-    if (initialDetail) {
-      setTopic(initialDetail);
-    }
-  }, [initialDetail]);
-
-  // Chỉ tải làm mới khi có ?preview=1 để tránh 1.000+ người dự lễ gọi API WordPress đồng thời
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('preview') !== '1') return;
-
-    let isMounted = true;
-    async function loadDynamicTopic() {
-      if (!topicSlug) return;
-      try {
-        const res = await fetch(`/api/admin/gioi-thieu/${topicSlug}?sync=true`, { cache: 'no-store' });
-        if (res.ok) {
-          const json = await res.json();
-          if (isMounted && json.success && json.topic) {
-            setTopic(json.topic);
-          }
-        }
-      } catch {
-        // Fallback smoothly to ISR initialDetail
-      }
-    }
-    loadDynamicTopic();
-    return () => {
-      isMounted = false;
-    };
-  }, [topicSlug]);
 
   // Track active scroll section for the floating telemetry rail
   useEffect(() => {
@@ -927,10 +896,7 @@ export function TieuSuSuToOdysseyView({ detail: initialDetail, slug }: Props) {
       : archiveTab === 'relics'
       ? 'KỶ VẬT CỦA SƯ TỔ'
       : 'VĂN BIA TƯỞNG NIỆM & BẢO THÁP';
-  const otherTopics = useMemo(
-    () => Object.values(GIOI_THIEU_DETAILS).filter((t) => t.id !== topic.id && t.slug !== topic.slug),
-    [topic.id, topic.slug]
-  );
+  const otherTopics = others;
 
   const handleSelectChapter = useCallback((idx: number) => {
     setActiveChapterIdx(idx);

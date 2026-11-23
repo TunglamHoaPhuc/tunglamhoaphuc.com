@@ -210,3 +210,12 @@ export function isUnsavedUpload(url: string | null | undefined): boolean {
 	const path = wordpressPath(url);
 	return path !== null && !path.includes("/");
 }
+
+/**
+ * Where the editors centred a picture ("center 44%") as CSS may read it: the old admin wrote six Tông Chỉ banners with the site's address in
+ * front ("https://admin…/center 44%"), which is neither valid CSS nor accepted by the admin's own form. What is not a position becomes the centre.
+ */
+export function cleanPosition(value: string | null | undefined): string {
+	const position = (value ?? "").trim().replace(/^https?:\/\/[^/\s]+\//i, "");
+	return /^[a-z0-9.%\s-]{1,40}$/i.test(position) ? position : "center 50%";
+}

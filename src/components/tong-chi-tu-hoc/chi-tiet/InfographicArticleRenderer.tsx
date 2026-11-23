@@ -22,6 +22,8 @@ import {
 } from 'lucide-react';
 import { getImageUrl } from '@/utils/image';
 import { FourCirclesPortalSection } from './FourCirclesPortalSection';
+import { RichHtmlBody } from '@/components/article/RichHtmlBody';
+import { htmlToRendererText, needsRichHtml, splitLinks } from '@/lib/article-html';
 
 interface PopupKeyword {
   keyword: string;
@@ -96,7 +98,7 @@ function isShortVerseLine(text: string): boolean {
 }
 
 // 🪷 Helper: Format inline text (Bold, Italic, Underline, Keywords) tuân thủ trực tiếp theo khung soạn thảo
-function highlightText(
+function highlightInline(
   text: string,
   popups: PopupKeyword[] = [],
   onKeywordClick: (kw: string) => void
@@ -161,6 +163,51 @@ function highlightText(
     const cleanPart = part.replace(/<\/?(?:b|strong|i|em|u)>/gi, '');
     return <React.Fragment key={pIdx}>{renderKeywordPopups(cleanPart, popups, onKeywordClick, false)}</React.Fragment>;
   });
+}
+
+// Liên kết dạng [chữ](địa chỉ) (tách bởi splitLinks): bộ lọc của admin chỉ cho qua https, mailto, # và địa chỉ trong trang.
+const OWN_HOSTS = ['tunglamhoaphuc.com', 'www.tunglamhoaphuc.com', 'v3.tunglamhoaphuc.com'];
+
+function inlineLink(label: React.ReactNode, href: string, key: number): React.ReactNode {
+  const className = 'font-semibold text-[#F2C14E] underline decoration-[#F2C14E]/60 underline-offset-2 hover:text-white transition-colors';
+  let own = href.startsWith('/') || href.startsWith('#');
+  if (!own && href.startsWith('https://')) {
+    try {
+      own = OWN_HOSTS.includes(new URL(href).hostname.toLowerCase());
+    } catch {
+      own = false;
+    }
+  }
+  if (href.startsWith('/')) {
+    return (
+      <Link key={key} href={href} className={className}>
+        {label}
+      </Link>
+    );
+  }
+  return (
+    <a key={key} href={href} className={className} {...(own || href.startsWith('mailto:') ? {} : { target: '_blank', rel: 'noopener noreferrer' })}>
+      {label}
+    </a>
+  );
+}
+
+// 🪷 Chữ trong dòng: liên kết, rồi đậm, nghiêng, gạch chân và từ khóa
+function highlightText(
+  text: string,
+  popups: PopupKeyword[] = [],
+  onKeywordClick: (kw: string) => void
+): React.ReactNode {
+  if (!text) return '';
+  const parts = splitLinks(text);
+  if (parts.length === 1 && !parts[0].href) return highlightInline(text, popups, onKeywordClick);
+  return parts.map((part, i) =>
+    part.href ? (
+      inlineLink(highlightInline(part.text, popups, onKeywordClick), part.href, i)
+    ) : (
+      <React.Fragment key={i}>{highlightInline(part.text, popups, onKeywordClick)}</React.Fragment>
+    )
+  );
 }
 
 // 🪷 Gắn sự kiện chú thích cho từ khóa — tự động in đậm ánh vàng kim nổi bật
@@ -1444,7 +1491,10 @@ export function InfographicArticleRenderer({
 
   if (!rawContent) return null;
 
-  const { sections, endQuote } = parseSections(rawContent);
+  // Thân bài có bảng, video, âm thanh hay chữ gạch: hiển thị bằng HTML đã lọc. Còn lại giữ dáng cũ, nhưng HTML
+  // được đổi thành dòng chữ đúng nghĩa trước (tiêu đề, danh sách, trích dẫn, ảnh, liên kết không còn bị bỏ).
+  const rich = needsRichHtml(rawContent);
+  const { sections, endQuote } = rich ? { sections: [] as SectionBlock[], endQuote: undefined } : parseSections(htmlToRendererText(rawContent));
   let globalParagraphIndex = 0;
 
   return (
@@ -1675,20 +1725,30 @@ export function InfographicArticleRenderer({
         </section>
       ))}
 
+      {rich && <RichHtmlBody html={rawContent} popups={popups} onKeywordClick={onKeywordClick} />}
+
       {/* 🌟 7. HUY HIỆU TÁC GIẢ (ĐẶT TRÊN ĐƯỜNG KẺ, KHÔNG CÓ CHỮ TÁC GIẢ, KHÔNG GẠCH CHÂN, KHÔNG ICON EXTERNAL LINK) */}
       {author && (
         <div className="pt-2 pr-4 sm:pr-8 text-right my-4">
-          <Link
-            href={authorLink || '/gioi-thieu/su-phu-tru-tri'}
-            className="inline-flex items-center group cursor-pointer bg-[#3A2718]/80 hover:bg-[#4A3220] px-5 py-2 rounded-full border border-[#F2C14E]/40 hover:border-[#F2C14E] transition-all shadow-sm"
-          >
-            <span
-              style={{ fontFamily: "var(--font-montserrat), 'Montserrat', 'UTM Avo', sans-serif" }}
-              className="text-sm sm:text-base font-bold italic text-[#F2C14E] group-hover:text-[#ffde59] transition-colors tracking-wide"
-            >
-              {author.replace(/[—–]/g, '-')}
-            </span>
-          </Link>
+          {/* Có liên kết tác giả (do admin nhập) thì bấm được; không có thì chỉ là tên, không dẫn tới trang nào bịa sẵn. */}
+          {(() => {
+            const badge = (
+              <span
+                style={{ fontFamily: "var(--font-montserrat), 'Montserrat', 'UTM Avo', sans-serif" }}
+                className="text-sm sm:text-base font-bold italic text-[#F2C14E] group-hover:text-[#ffde59] transition-colors tracking-wide"
+              >
+                {author.replace(/[—–]/g, '-')}
+              </span>
+            );
+            const className = 'inline-flex items-center group bg-[#3A2718]/80 px-5 py-2 rounded-full border border-[#F2C14E]/40 shadow-sm';
+            return authorLink ? (
+              <Link href={authorLink} className={`${className} cursor-pointer hover:bg-[#4A3220] hover:border-[#F2C14E] transition-all`}>
+                {badge}
+              </Link>
+            ) : (
+              <span className={className}>{badge}</span>
+            );
+          })()}
         </div>
       )}
 

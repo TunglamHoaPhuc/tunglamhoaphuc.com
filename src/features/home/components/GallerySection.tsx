@@ -30,91 +30,13 @@ interface StatueItem {
   imgPosition?: string;
 }
 
-const FEATURED_AREAS: AreaItem[] = [
-  {
-    id: "a1",
-    name: "TAM BẢO",
-    subtitle: "Trung tâm tâm linh cao nhất của tự viện Tùng Lâm Hòa Phúc",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/tam-bao.webp",
-    targetUrl: "/vu-tru-phat-giao/tam-bao",
-    iconName: "Landmark",
-  },
-  {
-    id: "a2",
-    name: "TỔ ĐƯỜNG",
-    subtitle: "Nơi tôn thờ Ngộ Chân Tử Sư Tổ & Chư Lịch Đại Tổ Sư Tông Phong",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/to-duong.webp",
-    targetUrl: "/vu-tru-phat-giao/to-duong",
-    iconName: "Sun",
-  },
-  {
-    id: "a3",
-    name: "BẢO TÀNG",
-    subtitle: "Không gian lưu giữ di sản văn hóa, cổ vật & pháp khí Phật giáo",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/bao-tang.webp",
-    targetUrl: "/vu-tru-phat-giao/bao-tang",
-    iconName: "Compass",
-  },
-  {
-    id: "a4",
-    name: "BẢO THÁP",
-    subtitle: "Bảo tháp tôn trí xá lợi Phật & Mandala chư Phật Bồ Tát mười phương",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/bao-thap.webp",
-    targetUrl: "/vu-tru-phat-giao/bao-thap",
-    iconName: "Scroll",
-  },
-  {
-    id: "a5",
-    name: "GIẢNG ĐƯỜNG",
-    subtitle: "Nơi tổ chức các khóa tu học, pháp hội cộng tu & lưu thông pháp bảo",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/giang-duong.webp",
-    targetUrl: "/vu-tru-phat-giao/giang-duong",
-    iconName: "BookOpen",
-  },
-];
+// Khu vực và tượng nổi bật do máy chủ chọn từ D1 (page.tsx, lib/v3-home.ts): cái nào ẩn hay đã xóa thì không có ở đây.
+interface GallerySectionProps {
+  areas: AreaItem[];
+  statues: StatueItem[];
+}
 
-const FEATURED_STATUES: StatueItem[] = [
-  {
-    id: "s1",
-    name: "ĐỨC PHẬT THÍCH CA",
-    cluster: "CHƯ PHẬT HẢI HỘI",
-    area: "ĐẠI HÙNG BẢO ĐIỆN",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/05-bao-tuong-phat-giao/chu_phat_hai_hoi/duc_phat_thich_ca/tuong_chinh/duc_phat_thich_ca_tuongchinh.webp",
-    targetUrl: "/bao-tuong/duc_phat_thich_ca_mau_ni_vo_thuong_nang_nhan_tp0001",
-    iconName: "Landmark",
-  },
-  {
-    id: "s2",
-    name: "ĐỨC PHẬT DI ĐÀ",
-    cluster: "TÂY PHƯƠNG TAM THÁNH",
-    area: "ĐẠI GIẢNG ĐƯỜNG",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/05-bao-tuong-phat-giao/chu_phat_hai_hoi/duc_phat_di_da/duc_phat_di_da_tuong_chinh-JPG.webp",
-    targetUrl: "/bao-tuong/duc_phat_a_di_da_loi_nguyen_vuot_thoi_gian_tp0012",
-    iconName: "Sun",
-    imgPosition: "center 15%",
-  },
-  {
-    id: "s3",
-    name: "THẬP ĐẠI ĐỆ TỬ",
-    cluster: "THANH VĂN THÁNH CHÚNG",
-    area: "LẦU KINH LUÂN",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/05-bao-tuong-phat-giao/thanh_van_thanh_chung/thap_dai_de_tu/ton_gia_dai_ca_diep.webp",
-    targetUrl: "/bao-tuong/thap_dai_de_tu_nhung_nguoi_con_truong_thanh_tu_giao_phap_tp0045",
-    iconName: "Scroll",
-  },
-  {
-    id: "s4",
-    name: "THẬP BÁT LA HÁN",
-    cluster: "NGHỆ THUẬT PHẬT GIÁO",
-    area: "TAM BẢO & SÂN LA HÁN",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/05-bao-tuong-phat-giao/thanh_van_thanh_chung/thap_bat_la_han/tuong_chinh/hang_long_la_han.webp",
-    targetUrl: "/bao-tuong/thap_bat_la_han_tuong_da_tp0051",
-    iconName: "Compass",
-    imgPosition: "center 15%",
-  },
-];
-
-export const GallerySection: FC = () => {
+export const GallerySection: FC<GallerySectionProps> = ({ areas: FEATURED_AREAS, statues: FEATURED_STATUES }) => {
   const [areaIdx, setAreaIdx] = useState(0);
   const [statueIdx, setStatueIdx] = useState(0);
 
@@ -140,6 +62,7 @@ export const GallerySection: FC = () => {
       {/* ══════════════════════════════════════════════════════
           1. SECTION CÁC KHU VỰC NỔI BẬT (Slider Tỉ Lệ Vàng Mở Rộng)
       ══════════════════════════════════════════════════════ */}
+      {FEATURED_AREAS.length > 0 && (
       <section className="relative overflow-visible w-full pt-2">
 
         {/* ── 1. Header Section ── */}
@@ -275,10 +198,12 @@ export const GallerySection: FC = () => {
           </Link>
         </div>
       </section>
+      )}
 
       {/* ══════════════════════════════════════════════════════
           2. SECTION CÁC BẢO TƯỢNG NỔI BẬT (Slider Tỉ Lệ Vàng & Thanh Chú Thích 4 Khoang)
       ══════════════════════════════════════════════════════ */}
+      {FEATURED_STATUES.length > 0 && (
       <section className="relative overflow-visible w-full pt-2">
         <SectionHeader
           title="CÁC BẢO TƯỢNG NỔI BẬT"
@@ -417,6 +342,7 @@ export const GallerySection: FC = () => {
           </Link>
         </div>
       </section>
+      )}
 
     </div>
   );

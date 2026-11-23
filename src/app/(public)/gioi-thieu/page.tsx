@@ -1,71 +1,30 @@
-'use client';
-
+// Trang Giới thiệu: các chủ đề đang hiển thị ở D1 của www (chủ đề nháp, trong thùng rác thì không có thẻ; chủ đề mới
+// tạo ở admin có thẻ và địa chỉ ngay). Không còn danh sách sáu chủ đề đóng gói.
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
-import Header from '@/components/public/layout/Header';
-import Footer from '@/components/public/layout/Footer';
 import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
-import { Scroll, Landmark, User, HeartHandshake, BookOpen, Compass, ArrowRight } from 'lucide-react';
+import { Scroll, Landmark, User, HeartHandshake, ArrowRight } from 'lucide-react';
+import { liveAbout } from '@/lib/v3-live';
 
-const INTRO_TOPICS = [
-  {
-    id: 'lich-su',
-    title: 'Lịch Sử Tùng Lâm Hòa Phúc',
-    subtitle: 'Nguồn gốc hình thành, các giai đoạn trùng tu và phát triển chốn thiền môn.',
-    href: '/gioi-thieu/lich-su-tung-lam-hoa-phuc',
-    icon: Landmark,
-    image: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp',
-    tag: 'Lịch Sử Bổn Tự',
-  },
-  {
-    id: 'dai-su-lien-dang',
-    title: 'Đại Sư Liên Đăng',
-    subtitle: 'Viện chủ Viện Tịnh Luật chùa Đại Từ Ân – Bậc Cao tăng Giới sư, Giám đốc Trung tâm Tư liệu Phật giáo Việt Nam.',
-    href: '/gioi-thieu/dai-su-lien-dang',
-    icon: User,
-    image: 'https://b1.congngheviet.com.vn/file/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2025/08/dai-su-lien-dang-to.jpg',
-    tag: 'Bậc Tiền Bối',
-  },
-  {
-    id: 'su-ong-hoang-phap',
-    title: 'Sư Ông Hoằng Pháp',
-    subtitle: 'Đại Sư Thanh Lương – Đạo trưởng Tông phong Tổ đình Hoằng Pháp, bậc Tôn sư chấn hưng phong trào Tịnh Độ.',
-    href: '/gioi-thieu/su-ong-hoang-phap',
-    icon: Scroll,
-    image: 'https://b1.congngheviet.com.vn/file/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2025/04/su-thanh-luong-1.jpg',
-    tag: 'Đạo Trưởng Tông Phong',
-  },
-  {
-    id: 'su-phu-tru-tri',
-    title: 'Sư Phụ Trụ Trì',
-    subtitle: 'Sa môn Thích Tâm Hòa – Trụ trì chùa Hòa Phúc, người kiến thiết đạo tràng tu học Tịnh Độ thanh tịnh.',
-    href: '/gioi-thieu/su-phu-tru-tri',
-    icon: User,
-    image: 'https://b1.congngheviet.com.vn/file/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2025/04/thay-thich-tam-hoa-2.jpg',
-    tag: 'Trụ Trì Bổn Tự',
-  },
-  {
-    id: 'tieu-su-su-to',
-    title: 'Tiểu Sử Sư Tổ',
-    subtitle: 'Cố Lão Hòa Thượng Ngộ Chân Tử – Sư tổ khai sơn Tông phong Hoằng Pháp, tấm lòng Bồ Tát cứu khổ nhân gian.',
-    href: '/gioi-thieu/tieu-su-su-to',
-    icon: BookOpen,
-    image: 'https://b1.congngheviet.com.vn/file/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2025/04/tieu-su-hoa-thuong-ngo-chan-tu-1.jpg',
-    tag: 'Sư Tổ Khai Sơn',
-  },
-  {
-    id: 'van-hoa-ung-xu',
-    title: 'Văn Hóa Ứng Xử Thiền Môn',
-    subtitle: 'Quy củ, oai nghi tế hạnh và nếp sống đạo đức dành cho Phật tử viếng chùa.',
-    href: '/gioi-thieu/van-hoa-ung-xu',
-    icon: HeartHandshake,
-    image: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp',
-    tag: 'Thanh Quy Tự Viện',
-  },
-];
+export const revalidate = 60;
 
-export default function GioiThieuOverviewPage() {
+// Biểu tượng theo nhóm là phần thiết kế; nhóm lạ dùng biểu tượng chung.
+const GROUP_ICON: Record<string, typeof Scroll> = {
+  'lich-su-chua': Landmark,
+  'nguoi-lien-quan': User,
+  'thanh-quy-van-hoa': HeartHandshake,
+};
+
+export default async function GioiThieuOverviewPage() {
+  const topics = (await liveAbout()).map((t) => ({
+    id: t.id,
+    title: t.title,
+    subtitle: t.subtitle || t.overviewSummary,
+    href: `/gioi-thieu/${t.slug}`,
+    icon: GROUP_ICON[t.groupCategory] ?? Scroll,
+    image: t.heroBanner || t.portraitImage || '/images/toan-canh-chua.jpg',
+    tag: t.tag || t.groupCategoryName,
+  }));
   return (
     <div className="min-h-screen bg-[#2A1D14] text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black flex flex-col justify-between">
       <main className="flex-1 pb-16">
@@ -108,7 +67,7 @@ export default function GioiThieuOverviewPage() {
         {/* ── 6 TOPICS GRID ── */}
         <div className="max-w-[1280px] mx-auto px-4 md:px-10 mt-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-            {INTRO_TOPICS.map((topic) => {
+            {topics.map((topic) => {
               const IconComp = topic.icon;
               return (
                 <Link

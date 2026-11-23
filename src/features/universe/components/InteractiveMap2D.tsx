@@ -22,249 +22,8 @@ import {
   VolumeX,
 } from "lucide-react";
 
-export interface MapSpot {
-  id: string;
-  number: number;
-  name: string;
-  subtitle: string;
-  slug: string;
-  mapPos: { x: number; y: number };
-  imgUrl: string;
-  description: string;
-  quote: string;
-  statues: Array<{ name: string; imgUrl: string }>;
-  stories: Array<{ title: string; imgUrl: string; summary: string }>;
-}
-
-export const locationNodes = [
-  { id: 1, name: "Lầu Kinh Luân", x: 6, y: 46 },
-  { id: 2, name: "Con Đường Bình An", x: 30, y: 52 },
-  { id: 3, name: "Tổ Đường", x: 50, y: 42 },
-  { id: 4, name: "Tam Bảo", x: 50, y: 49 },
-  { id: 5, name: "Đại Nam Quốc Mẫu", x: 53, y: 66 },
-  { id: 6, name: "Bảo Tượng Quan Thế Âm", x: 56, y: 76 },
-  { id: 7, name: "Bảo Tháp Vạn Phật Xá Lợi", x: 47, y: 15 },
-  { id: 8, name: "Giảng Đường (Khu A)", x: 71, y: 39 },
-  { id: 9, name: "Giảng Đường (Khu B)", x: 76, y: 23 },
-  { id: 10, name: "Phòng Phát Hành", x: 67, y: 27 },
-  { id: 11, name: "Khu Vệ Sinh", x: 64, y: 14 },
-  { id: 12, name: "Sân Chụp Ảnh Xuân An Lành", x: 65, y: 52 },
-  { id: 13, name: "Sân Di Đà", x: 57, y: 33 },
-  { id: 14, name: "Cổng Tam Quan - Sân Di Lặc", x: 42, y: 57 },
-  { id: 15, name: "Đình Làng", x: 42, y: 79 },
-];
-
-export const MAP_SPOTS_15: MapSpot[] = [
-  {
-    id: "1",
-    number: 1,
-    name: "LẦU KINH LUÂN",
-    subtitle: "PHÁP LUÂN THƯỜNG CHUYỂN",
-    slug: "ho-phong-sinh",
-    mapPos: { x: 6, y: 46 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/lau-kinh-luan.webp",
-    description: "Là biểu tượng cho Tam Bảo hiện hữu giữa nhân gian, nơi Phật, Pháp và Tăng cùng soi sáng con đường giác ngộ. Mỗi vòng xoay của Kinh Luân thể hiện sứ mệnh cao quý của Tăng Bảo - thay Đức Phật hoằng dương chánh pháp, lan tỏa ánh sáng từ bi và trí tuệ rộng khắp thế gian.",
-    quote: "“Thả từng giọt thương yêu xuống dòng nước thanh tịnh, nuôi dưỡng lòng từ bi với muôn loài chúng sinh.”",
-    statues: [{ name: "Kinh Luân Đá Cẩm Thạch", imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp" }],
-    stories: [{ title: "Kinh Luân Xoay Chuyển Từ Bi", imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp", summary: "Ý nghĩa thiêng liêng của Kinh Luân đối với người con Phật." }]
-  },
-  {
-    id: "2",
-    number: 2,
-    name: "CỔNG TAM QUAN - SÂN DI LẶC",
-    subtitle: "TAM GIẢI THOÁT MÔN & SÂN DI LẶC",
-    slug: "cong-tam-quan",
-    mapPos: { x: 30, y: 52 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/cong-tam-quan.webp",
-    description: "Cửa ngõ đầu tiên dẫn lối vào chốn thiêng gồm hệ thống Cổng Tam Quan uy nghi, kết nối qua cây Cầu Bát Chánh Đạo vượt dòng nước tịnh, dẫn lên Thềm Thất Thánh Tài và Sân Di Lặc - nơi tôn trí tôn tượng Bồ Tát Di Lặc hoan hỷ vô lượng.",
-    quote: "“Bước qua cổng lớn, buông bỏ mọi phiền lụy nhân gian để an trú trong hiện tại thanh tịnh.”",
-    statues: [
-      { name: "Di Lặc Bồ Tát (Tượng Chính)", imgUrl: "/images/bao_tuong_phat_giao/thanh_tinh_dai_hai_chung/BO_TAT_DI_LAC/di_lac_bo_tat_tuong_chinh.jpg" },
-      { name: "Phật Di Lặc (Tượng Gỗ)", imgUrl: "/images/bao_tuong_phat_giao/thanh_tinh_dai_hai_chung/BO_TAT_DI_LAC/Phật Di Lặc - tượng gỗ.JPG" }
-    ],
-    stories: []
-  },
-  {
-    id: "3",
-    number: 3,
-    name: "TỔ ĐƯỜNG",
-    subtitle: "TỔ ẤN TRÙNG QUANG",
-    slug: "to-duong",
-    mapPos: { x: 50, y: 42 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/to-duong.webp",
-    description: "Không gian tôn nghiêm phụng thờ chư vị Tổ Sư qua các thời kỳ, tổ sư có công khai sơn và truyền thừa dòng mạch Phật pháp tại bổn tự. Nơi đón tiếp quý thiện nam tín nữ và ghi dấu tinh thần tri ân sâu sắc.",
-    quote: "“Uống nước nhớ nguồn, ăn quả nhớ người trồng cây. Tôn vinh đạo lý truyền thừa ngàn đời của chốn thiền môn.”",
-    statues: [
-      { name: "Sư Tổ Ma Ha Ca Diếp", imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp" },
-      { name: "Chư Vị Tiền Bối Tổ Sư", imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp" }
-    ],
-    stories: [{ title: "Hành Trình Truyền Thừa Tâm Linh", imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp", summary: "Những di huấn quý giá của chư vị Tổ sư." }]
-  },
-  {
-    id: "4",
-    number: 4,
-    name: "TAM BẢO",
-    subtitle: "ĐẠI HÙNG BẢO ĐIỆN",
-    slug: "tam-bao",
-    mapPos: { x: 50, y: 49 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/tam-bao.webp",
-    description: "Trung tâm tâm linh của toàn Chùa, được xây dựng theo lối kiến trúc truyền thống chữ CÔNG (工), hội tụ tinh hoa Phật giáo 3 miền Bắc - Trung - Nam. Nơi đại chúng trang nghiêm lễ bái cúng dường, mang nhiều ý nghĩa biểu tượng sâu sắc.",
-    quote: "“Tâm bình thế giới bình, tâm an vạn sự an. Về dưới mái Tam Bảo tìm lại sự tĩnh lặng trong ngần.”",
-    statues: [
-      { name: "Đức Phật Thích Ca Mâu Ni", imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp" },
-      { name: "Tôn Giả Ca Diếp", imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp" },
-      { name: "Tôn Giả A Nạn", imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp" },
-      { name: "Bộ Tượng Dược Sư", imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp" }
-    ],
-    stories: [
-      { title: "Khai Sáng Ngọn Lửa Tâm Linh", imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp", summary: "Hành trình kiến tạo chánh điện Tam Bảo." },
-      { title: "Ý Nghĩa Thếp Vàng Tôn Tượng", imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp", summary: "Kỹ thuật dát vàng của làng nghề truyền thống." }
-    ]
-  },
-  {
-    id: "5",
-    number: 5,
-    name: "ĐẠI NAM QUỐC MẪU",
-    subtitle: "MẪU NGHI THIÊN HẠ",
-    slug: "dai-nam-quoc-mau",
-    mapPos: { x: 53, y: 66 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/dai-nam-quoc-mau.webp",
-    description: "Với kiến trúc nguyên bản nhà đá ong nổi tiếng của vùng văn hóa xứ Đoài, nhà Đại Nam Quốc Mẫu được xây dựng để nhắc nhở mỗi người ý thức về truyền thống \"Uống nước nhớ nguồn\" của dân tộc Việt.",
-    quote: "“Mẫu tâm bao la như biển cả, che chở nuôi dưỡng muôn dân Việt Nam qua bao thế hệ thanh bình.”",
-    statues: [{ name: "Bảo Tượng Quốc Mẫu", imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp" }],
-    stories: []
-  },
-  {
-    id: "6",
-    number: 6,
-    name: "BẢO TÀNG",
-    subtitle: "DẤU XƯA LƯU TRUYỀN",
-    slug: "bao-tang",
-    mapPos: { x: 56, y: 76 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/bao-tang.webp",
-    description: "Bảo tàng là nơi lưu giữ và tái hiện dòng chảy lịch sử, đồng thời phản ánh sinh động hành trình đồng hành của Phật giáo cùng dân tộc qua các thời kỳ. Còn Tượng đài Nguyệt Trí Quan Âm là một trong những hóa thân của Bồ Tát Quán Âm, tay phải cầm minh châu, tay trái cầm bình tịnh thủy tượng trưng cho sự trí tuệ và từ bi của Ngài, luôn soi sáng và làm dịu mát lửa não phiền của hết thảy chúng sinh.",
-    quote: "“Dấu xưa lưu truyền, soi sáng bước chân hành giả trên con đường giải thoát.”",
-    statues: [{ name: "Tượng Quan Âm Nguyệt Trí", imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp" }],
-    stories: []
-  },
-  {
-    id: "7",
-    number: 7,
-    name: "BẢO THÁP VẠN PHẬT XÁ LỢI HÒA BÌNH",
-    subtitle: "VẠN PHẬT QUANG MINH",
-    slug: "bao-thap-van-phat-xa-loi",
-    mapPos: { x: 47, y: 15 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/bao-thap.webp",
-    description: "Ngôi bảo tháp uy nghiêm, nơi tôn trí tượng Phật, kinh sách, biểu tượng cho ánh sáng tuệ giác. Đúng như tên gọi của bảo tháp, mặt trong và ngoài bảo tháp được tôn trí với gần một vạn tượng Phật - chế tác bởi thợ gốm Bát Tràng lấy mẫu từ vườn Nai Sannath-Varanasi nơi Đức Phật chuyển Pháp Luân. Bên trong chứa cấu trúc MẠN ĐÀ LA (Mandala) linh thiêng, đồng tâm vũ trụ với vạn Phật quang minh.",
-    quote: "“Vạn Phật đồng tâm, ngọn tháp uy nghiêm vươn tới trời cao soi sáng con đường giải thoát.”",
-    statues: [{ name: "Tượng Xá Lợi Phật", imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp" }],
-    stories: []
-  },
-  {
-    id: "8",
-    number: 8,
-    name: "GIẢNG ĐƯỜNG",
-    subtitle: "CHƯ PHẬT HẢI HỘI",
-    slug: "giang-duong",
-    mapPos: { x: 71, y: 39 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/giang-duong.webp",
-    description: "Khu vực giảng đường với diện tích 700m vuông chia làm hai tầng, tầng trên làm giảng đường, tầng dưới làm trai đường. Giảng đường là nơi tu tập, sinh hoạt và học hỏi giáo lý nhà Phật theo các khóa tu được tổ chức định kỳ tại Tùng Lâm.",
-    quote: "“Mở rộng cửa từ bi, truyền trao trí tuệ. Nơi hàng ngàn trái tim cùng hướng về chánh pháp an lạc.”",
-    statues: [],
-    stories: []
-  },
-  {
-    id: "9",
-    number: 9,
-    name: "THƯ VIỆN",
-    subtitle: "PHÁP BẢO LƯU THÔNG",
-    slug: "thu-vien",
-    mapPos: { x: 76, y: 23 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/tang-kinh-cac-v2.webp",
-    description: "Thư viện là không gian lưu giữ Pháp tạng và những trang kinh, sách quý, góp phần lan tỏa đạo đức, trí tuệ Phật pháp đến mọi người.",
-    quote: "“Học Phật là ngọn đuốc soi sáng tâm trí, đưa hành giả tiến bước trên lộ trình giải thoát.”",
-    statues: [],
-    stories: []
-  },
-  {
-    id: "10",
-    number: 10,
-    name: "TỨ ÂN - VÃNG SINH ĐƯỜNG",
-    subtitle: "CHƯ HƯƠNG LINH VỀ MIỀN TỊNH ĐỘ",
-    slug: "tu-an",
-    mapPos: { x: 67, y: 27 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/tu-an.webp",
-    description: "Khu vực Nhà Tứ Ân để thờ chư Hương Linh, Cửu Huyền Thất Tổ của bách gia trăm họ, với ý nghĩa nhắc nhở mọi người hằng nhớ đến công ơn của Tam Bảo, Tổ Thầy, cha mẹ và quốc gia, dân tộc. Còn nhà vãng sinh là nơi để quý Phật tử, thiện nam, tín nữ ký gửi tro cốt của người thân đã khuất để chư Hương Linh được nghe kinh, nghe Pháp chuyển hóa và siêu tiến về các cảnh giới an lành.",
-    quote: "“Uống nước nhớ nguồn, nguyện cầu chư hương linh siêu sanh Tịnh độ.”",
-    statues: [],
-    stories: []
-  },
-  {
-    id: "11",
-    number: 11,
-    name: "TRAI ĐƯỜNG",
-    subtitle: "HÒA CHÍNH TRAI ĐƯỜNG",
-    slug: "trai-duong",
-    mapPos: { x: 64, y: 14 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/trai-duong.webp",
-    description: "Nơi đại chúng và Phật tử thực hành nghi thức quá đường, thọ trai trong chánh niệm. Không gian nuôi dưỡng lòng biết ơn đối với đàn na tín thí và nuôi lớn tình pháp lữ, thực hành ăn trong tỉnh thức.",
-    quote: "“Ăn trong chánh niệm, nuôi dưỡng lòng từ bi và trân trọng từng hạt cơm cúng dường.”",
-    statues: [],
-    stories: []
-  },
-  {
-    id: "12",
-    number: 12,
-    name: "LÂM TỲ NI",
-    subtitle: "ĐẢN SANH THỊ HIỆN",
-    slug: "lam-ty-ni",
-    mapPos: { x: 65, y: 52 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/san-di-da.webp",
-    description: "Giữa không gian thanh tịnh, Sân Lâm Tỳ Ni tái hiện khoảnh khắc Đức Phật ra đời, mở ra hành trình giác ngộ cho nhân loại. Nơi đây, mỗi người con Phật có dịp lắng lòng, cảm nhận niềm hân hoan và tỉnh thức nơi chính tự tâm.",
-    quote: "“Đức Phật ra đời khai mở nguồn tuệ giác, đưa muôn loài thoát khỏi cõi u mê.”",
-    statues: [],
-    stories: []
-  },
-  {
-    id: "13",
-    number: 13,
-    name: "SÂN DI ĐÀ",
-    subtitle: "QUANG MINH DI ĐÀ",
-    slug: "san-di-da",
-    mapPos: { x: 57, y: 33 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/san-di-da.webp",
-    description: "Không gian sân rộng lớn phía trước Chánh điện, trung tâm diễn ra các đại lễ truyền thống hoành tráng của Chùa, có tôn trí tôn tượng Đức Phật A Di Đà phóng quang tiếp dẫn đại chúng.",
-    quote: "“Mỗi bước chân bước đi trên mặt đất là mỗi bước chân chạm vào bình an.”",
-    statues: [],
-    stories: []
-  },
-  {
-    id: "14",
-    number: 14,
-    name: "KHÔNG GIAN TÂM LINH VĂN HÓA LÀNG XÃ BẮC BỘ",
-    subtitle: "DI SẢN TÂM LINH VIỆT",
-    slug: "lang-xa-tam-linh",
-    mapPos: { x: 42, y: 57 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/lang-xa-tam-linh.webp",
-    description: "Khuôn viên đền thờ mang đậm nét kiến trúc thuần Việt cổ kính, kết nối với gốc cây Đa, sân đình và cổng đình. Nơi tôn vinh giá trị văn hóa lịch sử, làm nổi bật lên nét đẹp làng xã xưa gắn liền với mảnh đất bổn tự.",
-    quote: "“Hồn quê Việt Nam đọng lại dưới mái đình cổ kính thanh bình.”",
-    statues: [],
-    stories: []
-  },
-  {
-    id: "15",
-    number: 15,
-    name: "SÂN LA HÁN",
-    subtitle: "THÁNH TĂNG ỨNG HÓA",
-    slug: "san-la-han",
-    mapPos: { x: 42, y: 79 },
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/san-la-han-v2.webp",
-    description: "Nằm ngay dưới chân Lầu Chuyển Kinh Luân, Sân La Hán được kiến tạo theo lối vườn cảnh thiền, kết hợp hài hòa giữa những khối đá nguyên sơ và sắc xanh của cỏ cây để Phật tử tĩnh tâm thiền hành, chiêm bái các chư vị Thập Bát La Hán.",
-    quote: "“Tĩnh lặng thiền hành giữa chốn vườn đá La Hán, lắng nghe xào xạc lá rơi tan mọi ưu phiền.”",
-    statues: [],
-    stories: []
-  }
-];
+// Các điểm trên sơ đồ do máy chủ dựng từ khu vực đang hiển thị ở D1 (lib/v3-areas.ts): khu vực ẩn hay đã xóa không có điểm.
+import type { MapSpot } from '@/lib/v3-areas';
 
 function toSentenceCase(str?: string): string {
   if (!str) return '';
@@ -274,10 +33,11 @@ function toSentenceCase(str?: string): string {
 }
 
 interface InteractiveMap2DProps {
+  spots: MapSpot[];
   onExit2DMode?: () => void;
 }
 
-export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ onExit2DMode }) => {
+export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMode }) => {
   // Screen State: 'loading' | 'welcome' | 'map'
   const [screenState, setScreenState] = useState<'loading' | 'welcome' | 'map'>('loading');
   const [loadingProgress, setLoadingProgress] = useState<number>(0);
@@ -510,7 +270,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ onExit2DMode }) =>
       let reply = "Cảm ơn quý vị đã đặt câu hỏi. Tùng Lâm Hòa Phúc là chốn thiền môn thanh tịnh hội tụ 15 khu vực bảo tượng và chánh điện trang nghiêm.";
       const lower = query.toLowerCase();
 
-      const matchedSpot = MAP_SPOTS_15.find(
+      const matchedSpot = spots.find(
         (s) => lower.includes(s.name.toLowerCase()) || lower.includes(s.slug)
       );
 
@@ -826,7 +586,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ onExit2DMode }) =>
           />
 
           {/* 15 Flat Sharp Hotspot Pin Buttons with Active Selection Glowing Ring Boundary */}
-          {MAP_SPOTS_15.map((spot) => {
+          {spots.map((spot) => {
             const isSelected = selectedSpot?.id === spot.id;
             return (
               <div
@@ -989,12 +749,14 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ onExit2DMode }) =>
                 </p>
 
                 {/* Zen Meditation Quote Blockquote */}
-                <blockquote
-                  className="border-l-2 border-[#F2C14E] bg-[#3a2718]/60 p-3 italic text-xs md:text-sm text-[#FFE5A3] rounded-r-lg mb-6 leading-relaxed"
-                  style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                >
-                  {selectedSpot.quote}
-                </blockquote>
+                {selectedSpot.quote && (
+                  <blockquote
+                    className="border-l-2 border-[#F2C14E] bg-[#3a2718]/60 p-3 italic text-xs md:text-sm text-[#FFE5A3] rounded-r-lg mb-6 leading-relaxed"
+                    style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                  >
+                    {selectedSpot.quote}
+                  </blockquote>
+                )}
 
                 {/* Stories */}
                 {selectedSpot.stories.length > 0 && (

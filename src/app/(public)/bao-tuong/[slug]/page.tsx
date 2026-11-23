@@ -1,68 +1,13 @@
-'use client';
-
-import { useParams, notFound } from 'next/navigation';
-import { BAO_TUONG_CHINH_LIST, BaoTuongChinhItem } from '@/data/baoTuongFullData';
+// Một bảo tượng, đọc ở máy chủ từ D1 của www. Tượng đang nháp, ẩn, hẹn giờ hay đã xóa: 404 (không còn bản đóng gói để thay vào).
 import { StatueDetailCoreLayout } from '@/features/statues/components/StatueDetailCoreLayout';
-import { STATUE_LIST, OFFICIAL_STATUE_DATASET, StatueItem } from '@/data/statue-data';
+import { notFoundOrMoved } from '@/lib/v3-redirect';
+import { liveStatuePage } from '@/lib/v3-statues';
 
-export default function SingleBaoTuongPage() {
-  const params = useParams();
-  const slug = (params.slug as string) || '';
+export const revalidate = 60;
 
-  // 1. First search in official statue datasets
-  const directStatue =
-    STATUE_LIST.find(
-      (s) => s.slug === slug || s.id.toLowerCase() === slug.toLowerCase() || s.code?.toLowerCase() === slug.toLowerCase()
-    ) ||
-    OFFICIAL_STATUE_DATASET.find(
-      (s) => s.slug === slug || s.id.toLowerCase() === slug.toLowerCase() || s.code?.toLowerCase() === slug.toLowerCase()
-    );
-
-  if (directStatue) {
-    return <StatueDetailCoreLayout statue={directStatue} />;
-  }
-
-  // 2. Fallback to BAO_TUONG_CHINH_LIST
-  const item: BaoTuongChinhItem | undefined = BAO_TUONG_CHINH_LIST.find(
-    (s) => s.slug === slug || s.id.toLowerCase() === slug.toLowerCase() || s.code?.toLowerCase() === slug.toLowerCase()
-  );
-
-  if (!item) {
-    notFound();
-  }
-
-  // Map to StatueItem format for core layout
-  const statueItem: StatueItem = {
-    code: item.code || item.id,
-    assembly: item.assembly || item.assemblyName,
-    group: item.group || item.clusterName,
-    title: item.title || item.name,
-    categoryType: item.categoryType || 'TƯỢNG CHÍNH',
-    characterGroup: item.characterGroup || item.slug,
-    areaId: item.areaId || item.areaSlug.toUpperCase().replace(/-/g, '_'),
-
-    id: item.id,
-    slug: item.slug,
-    name: item.name,
-    titleName: item.titleName,
-    subtitle: item.subtitle,
-    assemblyId: item.assemblyId,
-    assemblyName: item.assemblyName,
-    clusterName: item.clusterName,
-    type: "TƯỢNG CHÍNH",
-    hasSinglePage: true,
-    clusterMembers: item.clusterMembers || [],
-    areaSlug: item.areaSlug,
-    areaName: item.areaName,
-    location: item.location,
-    areaImgUrl: (item as any).areaImgUrl || item.imgUrl,
-    imgUrl: item.imgUrl,
-    avatarUrl: item.avatarUrl,
-    quoteAuthor: item.quoteAuthor || "VÔ TRÍ - TÂM HÒA",
-    quote: item.quote,
-    summary: item.summary,
-    fullHistoryHtml: item.fullHistoryHtml,
-  };
-
-  return <StatueDetailCoreLayout statue={statueItem} />;
+export default async function SingleBaoTuongPage({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
+  const page = await liveStatuePage(slug);
+  if (!page) return notFoundOrMoved(`/bao-tuong/${slug}`);
+  return <StatueDetailCoreLayout statue={page.statue} clusterMembers={page.clusterMembers} artisticWorks={page.artWorks} relatedStatues={page.related} />;
 }

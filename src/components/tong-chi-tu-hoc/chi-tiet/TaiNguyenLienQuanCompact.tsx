@@ -63,20 +63,17 @@ export function TaiNguyenLienQuanCompact({
     ? [sourceBook]
     : [];
 
-  const mainBook: SourceBookData = books[0] || {
-    title: 'KHUYẾN PHÁT BỒ ĐỀ TÂM GIẢNG LUẬN',
-    author: 'Đại Đức Thích Tâm Hòa',
-    description: 'Giảng giải chi tiết về phương pháp phát khởi và nuôi dưỡng Bồ Đề tâm kiên cố.',
-    coverImage: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/uploads/chua-pho-chieu-hai-phong-1787464212629.webp',
-    linkUrl: '/vu-tru-phat-giao/tang-kinh-cac',
-  };
+  // Chỉ có những gì D1 giữ: không có sách hay video thì không có thẻ tương ứng.
+  const mainBook: SourceBookData | null = books[0] ?? null;
 
-  const videoUrl = videoBlock?.videoUrl || 'https://www.youtube.com/watch?v=MKt_sLwxmNU&t=5547s';
+  const videoUrl = videoBlock?.videoUrl || '';
   const videoEmbed = formatYoutubeEmbed(videoUrl);
-  const videoTitle = videoBlock?.title || 'Pháp Thoại Ý Nghĩa Bồ Đề Tâm';
-  const videoThumb = getImageUrl(heroBanner) || 'https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/07/bg-chua.jpg';
+  const videoTitle = videoBlock?.title || '';
+  const videoThumb = getImageUrl(heroBanner) || '/images/toan-canh-chua.jpg';
 
   const previewPhotos = photoGallery.slice(0, 4);
+
+  if (!videoUrl && !mainBook && photoGallery.length === 0) return null;
 
   return (
     <section id="tai-nguyen-lien-quan" className="scroll-mt-28 py-10 w-full relative">
@@ -101,6 +98,7 @@ export function TaiNguyenLienQuanCompact({
       {/* ── 3 CARD NGĂN KÉO NGANG NHỎ GỌN, TINH TẾ ── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* CARD 1: VIDEO PHÁP THOẠI */}
+        {videoUrl && (
         <div className="rounded-2xl bg-gradient-to-b from-[#2A180E] to-[#1A0E07] border border-[#F2C14E]/35 hover:border-[#F2C14E] transition-all p-4 flex flex-col justify-between group shadow-lg hover:shadow-[0_8px_30px_rgba(242,193,78,0.18)]">
           <div>
             <div className="relative aspect-video rounded-xl overflow-hidden mb-3.5 border border-[#F2C14E]/30 bg-black/60 group-hover:border-[#F2C14E]/60 transition-colors">
@@ -136,7 +134,7 @@ export function TaiNguyenLienQuanCompact({
               {videoTitle}
             </h4>
             <p className="text-xs text-[#FFE5A3]/75 mt-1.5 line-clamp-2 italic">
-              {videoBlock?.description || 'Lắng nghe Thầy giảng giải sâu sắc về tâm hạnh bồ đề và con đường tự giác giác tha.'}
+              {videoBlock?.description || ''}
             </p>
           </div>
 
@@ -162,7 +160,10 @@ export function TaiNguyenLienQuanCompact({
           </div>
         </div>
 
+        )}
+
         {/* CARD 2: KINH SÁCH ẤN PHẨM TÀNG KINH CÁC */}
+        {mainBook && (
         <div className="rounded-2xl bg-gradient-to-b from-[#2A180E] to-[#1A0E07] border border-[#F2C14E]/35 hover:border-[#F2C14E] transition-all p-4 flex flex-col justify-between group shadow-lg hover:shadow-[0_8px_30px_rgba(242,193,78,0.18)]">
           <div>
             <div className="relative aspect-video rounded-xl overflow-hidden mb-3.5 border border-[#F2C14E]/30 bg-black/40 p-2 flex items-center justify-center group-hover:border-[#F2C14E]/60 transition-colors">
@@ -178,7 +179,7 @@ export function TaiNguyenLienQuanCompact({
                     Tàng Kinh Các
                   </span>
                   <p className="text-[11px] text-[#FFE5A3]/90 font-medium line-clamp-2">
-                    {mainBook.author || 'Đại Đức Thích Tâm Hòa'}
+                    {mainBook.author || ''}
                   </p>
                 </div>
               </div>
@@ -195,7 +196,7 @@ export function TaiNguyenLienQuanCompact({
               {mainBook.bookTitle || mainBook.title}
             </h4>
             <p className="text-xs text-[#FFE5A3]/75 mt-1.5 line-clamp-2 italic">
-              {mainBook.description || 'Tài liệu kinh sách tham khảo chính thống tại kho tư liệu Tàng Kinh Các.'}
+              {mainBook.description || ''}
             </p>
           </div>
 
@@ -218,7 +219,10 @@ export function TaiNguyenLienQuanCompact({
           </div>
         </div>
 
+        )}
+
         {/* CARD 3: BỘ ẢNH TƯ LIỆU */}
+        {photoGallery.length > 0 && (
         <div className="rounded-2xl bg-gradient-to-b from-[#2A180E] to-[#1A0E07] border border-[#F2C14E]/35 hover:border-[#F2C14E] transition-all p-4 flex flex-col justify-between group shadow-lg hover:shadow-[0_8px_30px_rgba(242,193,78,0.18)]">
           <div>
             <div
@@ -247,7 +251,7 @@ export function TaiNguyenLienQuanCompact({
               )}
               <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
                 <span className="px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-xs text-[#FFDE59] text-[11px] font-bold border border-[#F2C14E]/50 shadow-md">
-                  +{photoGallery.length || 12} hình ảnh
+                  +{photoGallery.length} hình ảnh
                 </span>
               </div>
             </div>
@@ -263,7 +267,7 @@ export function TaiNguyenLienQuanCompact({
               Hình Ảnh Huân Tập & Sinh Hoạt
             </h4>
             <p className="text-xs text-[#FFE5A3]/75 mt-1.5 line-clamp-2 italic">
-              Khoảnh khắc trang nghiêm trong các thời khóa tu tập nuôi dưỡng Bồ Đề tâm tại Tùng Lâm Hòa Phúc.
+              
             </p>
           </div>
 
@@ -279,6 +283,7 @@ export function TaiNguyenLienQuanCompact({
             <span className="text-xs text-[#FFE5A3]/60">Sắc nét HD</span>
           </div>
         </div>
+        )}
       </div>
 
       {/* ── MODAL VIDEO PLAYER PHÓNG TO NỀN ĐEN ── */}

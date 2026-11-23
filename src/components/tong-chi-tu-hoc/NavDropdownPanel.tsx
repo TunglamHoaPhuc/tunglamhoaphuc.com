@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { ChevronRight, CheckCircle2, BookOpen, MapPin, Compass, Sparkles } from 'lucide-react';
 import tongChiData from '@/data/tong-chi-data.json';
 import { HOANG_PHAP_ARTICLES } from '@/data/dong-chay-hoang-phap-data';
-import { UNIVERSE_AREAS } from '@/data/universe-data';
+import { useSiteChrome } from '@/components/public/SiteChrome';
 
 interface NavDropdownPanelProps {
   pageTitle?: string;
@@ -24,6 +24,8 @@ const TONG_CHI_CATEGORIES = [
 
 export function NavDropdownPanel({ pageTitle = '', activeSection = '', onClose }: NavDropdownPanelProps) {
   const pathname = usePathname() || '';
+  // Khu vực đang hiển thị ở D1 (bố cục gốc đọc một lần); khu vực ẩn hay đã xóa không có trong bảng này.
+  const { areas: visibleAreas } = useSiteChrome();
 
   // 1. Nhận diện phân hệ hiện tại
   const isUniverse = pathname.includes('/vu-tru-phat-giao');
@@ -57,14 +59,6 @@ export function NavDropdownPanel({ pageTitle = '', activeSection = '', onClose }
 
   // ── TRƯỜNG HỢP 1: VŨ TRỤ PHẬT GIÁO ──────────────────────────────────────────
   if (isUniverse) {
-    const specialRoutes: Record<string, string> = {
-      'tam-bao': '/vu-tru-phat-giao/tam-bao',
-      'to-duong': '/vu-tru-phat-giao/to-duong',
-      'tu-an': '/vu-tru-phat-giao/tu-an',
-      'giang-duong': '/vu-tru-phat-giao/giang-duong',
-      'thu-vien': '/vu-tru-phat-giao/thu-vien',
-    };
-
     return (
       <div className="w-80 sm:w-96 bg-[#1C120A]/98 border-2 border-[#F2C14E] rounded-2xl shadow-[0_12px_40px_rgba(0,0,0,0.85),0_0_30px_rgba(242,193,78,0.3)] backdrop-blur-xl p-3 z-[100] text-left">
         {/* Dropdown Header */}
@@ -82,14 +76,14 @@ export function NavDropdownPanel({ pageTitle = '', activeSection = '', onClose }
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
             className="px-2 py-0.5 rounded-full bg-[#3A2718] border border-[#F2C14E]/40 text-[10px] font-bold text-[#ffde59]"
           >
-            {UNIVERSE_AREAS.length} khu vực
+            {visibleAreas.length} khu vực
           </span>
         </div>
 
         {/* Danh sách các khu vực */}
         <div className="space-y-1.5 max-h-80 overflow-y-auto custom-scrollbar pr-1">
-          {UNIVERSE_AREAS.map((area, idx) => {
-            const href = specialRoutes[area.slug] || `/vu-tru-phat-giao/${area.slug}`;
+          {visibleAreas.map((area, idx) => {
+            const href = `/vu-tru-phat-giao/${area.slug}`;
             const isCurrent =
               pathname === href ||
               pathname.endsWith(`/${area.slug}`) ||

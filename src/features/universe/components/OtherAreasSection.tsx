@@ -2,13 +2,15 @@
 
 import React, { FC } from 'react';
 import Link from 'next/link';
-import { UNIVERSE_AREAS, UniverseArea } from '@/data/universe-data';
+import type { V3Area } from '@/lib/v3-data';
 
 interface OtherAreasSectionProps {
   currentSlug?: string;
+  /** Các khu vực đang hiển thị (D1); khu vực bị ẩn hay xóa không có ở đây nên không hiện. */
+  areas?: V3Area[];
 }
 
-export function getShortAreaTitle(area: UniverseArea): string {
+export function getShortAreaTitle(area: Pick<V3Area, 'slug' | 'name'>): string {
   const lower = (area.slug || '').toLowerCase();
   const nameLower = (area.name || '').toLowerCase();
 
@@ -38,7 +40,7 @@ export function getShortAreaTitle(area: UniverseArea): string {
 }
 
 interface OtherAreaCardProps {
-  area: UniverseArea;
+  area: V3Area;
 }
 
 const OtherAreaCard = React.memo(({ area }: OtherAreaCardProps) => {
@@ -81,23 +83,22 @@ OtherAreaCard.displayName = "OtherAreaCard";
 
 export const OtherAreasSection: FC<OtherAreasSectionProps> = ({
   currentSlug = 'tam-bao',
+  areas = [],
 }) => {
-  let otherAreas = UNIVERSE_AREAS.filter(
+  let otherAreas = areas.filter(
     (a) => a.temple === 'tung-lam-hoa-phuc' && a.slug !== currentSlug
   );
 
   if (currentSlug === 'tam-bao') {
-    const nhaMau = UNIVERSE_AREAS.find((a) => a.slug === 'dai-nam-quoc-mau');
-    const baoTang = UNIVERSE_AREAS.find(
-      (a) => a.slug === 'bao-tang-phat-giao-va-tuong-dai-nguyet-tri-quan-am'
-    );
+    const nhaMau = areas.find((a) => a.slug === 'dai-nam-quoc-mau');
+    const baoTang = areas.find((a) => a.slug === 'bao-tang');
     const rest = otherAreas.filter(
       (a) =>
         a.slug !== 'dai-nam-quoc-mau' &&
-        a.slug !== 'bao-tang-phat-giao-va-tuong-dai-nguyet-tri-quan-am'
+        a.slug !== 'bao-tang'
     );
 
-    const ordered: UniverseArea[] = [];
+    const ordered: V3Area[] = [];
     if (nhaMau) ordered.push(nhaMau);
     if (baoTang) ordered.push(baoTang);
     otherAreas = [...ordered, ...rest];

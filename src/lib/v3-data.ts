@@ -50,6 +50,9 @@ export function toPostRecord(post: PostSummary | Post) {
 		contentHtml: full?.contentHtml ?? "",
 		keywords: full ? full.keywords.map((k) => ({ ...k })) : [],
 		videoBlock: full?.videos[0] ? { videoUrl: full.videos[0].url, title: post.title, summary: "" } : undefined,
+		// What the editors fill in for a category: the book of an "Ấn phẩm & Sách" post and the sound of a "Pháp Âm" post (as www shows them).
+		sourceBook: full?.extra.book ? { bookTitle: full.extra.book.title, author: full.extra.book.author, coverImage: full.extra.book.cover ? absUrl(full.extra.book.cover) : "", description: "", linkUrl: full.extra.book.link ?? undefined } : undefined,
+		audio: full?.extra.audio ? { src: absUrl(full.extra.audio.src), duration: full.extra.audio.duration } : undefined,
 		photoGallery: full ? gallery(full.gallery) : [],
 		galleryCount: post.galleryCount,
 		previousEditions: [],
@@ -99,16 +102,20 @@ export function toTongChiRecord(a: TongChiSummary | TongChiArticle, index = 0) {
 		contentHtml: full?.contentHtml ?? "",
 		author: full?.author ?? "",
 		authorLink: full?.authorHref ?? undefined,
-		publishedAt: full?.publishedDate ? `${full.publishedDate}T08:00:00.000Z` : undefined,
+		// YYYY-MM-DD as D1 holds it: no invented time of day.
+		publishedAt: full?.publishedDate || undefined,
 		viewsCount: full?.views ?? 0,
 		status: "published",
-		videoBlock: full?.video ? { title: full.video.title, videoUrl: full.video.url, summary: full.video.description } : undefined,
+		// The pages read `description`; `summary` stays for the callers written against the old admin's file.
+		videoBlock: full?.video ? { title: full.video.title, videoUrl: full.video.url, description: full.video.description, summary: full.video.description } : undefined,
 		featuredArticle: full?.featured ? { label: full.featured.label, title: full.featured.title, author: full.featured.author, linkUrl: full.featured.href ?? undefined } : undefined,
 		sourceBook: full?.book ? { bookTitle: full.book.title, author: full.book.author, coverImage: absUrl(full.book.cover), description: full.book.description, linkUrl: full.book.href ?? undefined } : undefined,
 		photoGallery: full ? gallery(full.gallery) : [],
 		keywords: full ? full.keywords.map((k) => ({ ...k })) : [],
 	};
 }
+
+export type V3TongChi = ReturnType<typeof toTongChiRecord>;
 
 export async function allTongChi() {
 	const r = await repo();
@@ -154,6 +161,20 @@ export async function allAbout(): Promise<V3About[]> {
 
 // ── Vũ Trụ Phật Giáo ────────────────────────────────────────────────────────
 
+/** The temples the admin knows (its `temple` field is a slug); an unknown slug is written out in capitals-and-spaces. */
+const TEMPLE_NAMES: Record<string, string> = {
+	"tung-lam-hoa-phuc": "Tùng Lâm Hòa Phúc",
+	"quynh-nhai-cam-lo-tu": "Quỳnh Nhai Cam Lộ Tự",
+};
+
+export const templeName = (temple: string) =>
+	TEMPLE_NAMES[temple] ?? temple.split("-").filter(Boolean).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+
+/**
+ * An area as the V3 pages read it. `description` is the admin's plain-text intro; `contentHtml` the body the admin saved
+ * (cleaned with special/html.ts there, and again where it is shown). D1 keeps no pin number: `pinNumber` is the area's place
+ * among the visible areas in the editors' order. The temple's name comes from its slug.
+ */
 export function toAreaRecord(a: Area, index = 0) {
 	return {
 		id: a.id,
@@ -162,14 +183,17 @@ export function toAreaRecord(a: Area, index = 0) {
 		name: a.name,
 		subtitle: a.subtitle,
 		temple: a.temple,
-		templeName: "Tùng Lâm Hòa Phúc",
+		templeName: templeName(a.temple),
 		imgUrl: pic(a.cover),
+		imgPosition: pos(a.cover),
 		mapPos: a.mapPos ?? undefined,
 		description: a.intro,
 		fullContent: "",
-		fullContentHtml: a.contentHtml,
+		contentHtml: a.contentHtml,
 	};
 }
+
+export type V3Area = ReturnType<typeof toAreaRecord>;
 
 export async function allAreas() {
 	return (await (await repo()).listAreas()).map(toAreaRecord);

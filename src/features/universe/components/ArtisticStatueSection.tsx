@@ -2,7 +2,7 @@
 
 import React, { FC, useState, useMemo } from 'react';
 import { ArrowRight } from 'lucide-react';
-import { OFFICIAL_NTPG_LIST, normalizeAreaId } from '@/data/statue-data';
+import { normalizeAreaId } from '@/lib/statue-types';
 import { ArtisticStatueModal, NTPGModalItem } from './ArtisticStatueModal';
 import { ThapBatLaHanGrid } from './ThapBatLaHanGrid';
 
@@ -33,7 +33,7 @@ interface ArtisticStatueSectionProps {
 export const ArtisticStatueSection: FC<ArtisticStatueSectionProps> = ({
   areaTitle = 'TÙNG LÂM HÒA PHÚC',
   areaSlug,
-  items = OFFICIAL_NTPG_LIST,
+  items = [],
 }) => {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);

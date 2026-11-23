@@ -1,16 +1,17 @@
-'use client';
-
+// Trang Trí Tuệ Phật Pháp: các bài đang hiển thị ở D1 của www (đọc ở máy chủ). Không còn danh sách đóng gói,
+// không còn lời gọi WordPress; D1 không có bài thì trang trống.
 import { WisdomArchiveSection } from '@/features/wisdom/components/WisdomArchiveSection';
 import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
-import { WISDOM_ITEMS } from '@/data/wisdom-archive-data';
 import { getImageUrl } from '@/utils/image';
+import { livePosts } from '@/lib/v3-live';
+import { toWisdomItem, TRI_TUE_SECTION } from '@/lib/wisdom';
 
-export default function TriTuePhatPhapPage() {
-  // Lấy ảnh bài viết/pháp bảo tiêu biểu cho Header (ưu tiên mục đầu tiên của Kho tàng Trí Tuệ)
-  const headerBgImage = getImageUrl(
-    WISDOM_ITEMS[0]?.thumbnailUrl ||
-    'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/nen-tang-tu-hoc/tong-chi-tu-hoc-nen-tang-tu-hoc-bo-de-tam-herobanner-thumbnail.webp'
-  );
+export const revalidate = 60;
+
+export default async function TriTuePhatPhapPage() {
+  const items = (await livePosts(TRI_TUE_SECTION)).map(toWisdomItem);
+  // Ảnh nền của đầu trang: ảnh của bài mới nhất (không có bài thì không có ảnh nền).
+  const headerBgImage = getImageUrl(items[0]?.thumbnailUrl || '');
 
   return (
     <div className="min-h-screen bg-[#2A1D14] text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black">
@@ -68,7 +69,7 @@ export default function TriTuePhatPhapPage() {
       </div>
 
       <main className="max-w-[1280px] mx-auto px-4 md:px-10 py-6">
-        <WisdomArchiveSection />
+        <WisdomArchiveSection items={items} />
 
         {/* Smart Search AI Bar */}
         <div className="mt-16 mb-12">

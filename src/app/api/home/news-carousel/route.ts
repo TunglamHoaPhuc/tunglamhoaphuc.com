@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { loadServerlessJsonAsync } from '@/lib/serverless-db';
 import { getDeletedPostsAsync } from '@/lib/deleted-posts';
 import { PostRecord, SPECIAL_GIOI_THIEU_WP_IDS, SPECIAL_TONG_CHI_WP_IDS } from '@/app/api/admin/posts/route';
-import { StatueRecord, OFFICIAL_STATUE_DATASET } from '@/data/statue-data';
+import type { StatueRecord } from '@/lib/statue-types';
 import { getTopics } from '@/app/api/admin/gioi-thieu/route';
 
 const SU_TO_FALLBACK_IMG =
@@ -43,7 +43,7 @@ const STATUES_CONFIG = {
   fileName: 'statues-database.json',
   localRelativePath: 'src/data/statues-database.json',
   s3Key: 'tunglamhoaphuc2/database/statues-database.json',
-  defaultData: OFFICIAL_STATUE_DATASET,
+  defaultData: [] as StatueRecord[],
 };
 
 // 🌟 Tính toán thời gian bài viết chính xác theo ngày đăng & timestamp tạo mới (giống hệt 100% trang Admin /admin/posts)
@@ -220,7 +220,7 @@ export async function GET() {
       });
     }
 
-    // ── 2C. SLOT 3: BẢO TƯỢNG PHẬT GIÁO (Đức Phật Thích Ca Mâu Ni) ──
+    // ── 2C. SLOT 3: BẢO TƯỢNG PHẬT GIÁO (TP0001 nếu đang hiển thị ở D1, không thì tượng hiển thị đầu tiên) ──
     const statueThichCa = (allStatues || []).find((s) => s.code === 'TP0001') || (allStatues || [])[0];
     if (statueThichCa) {
       result.push({
@@ -228,8 +228,8 @@ export async function GET() {
         sourceType: 'bao-tuong',
         category: 'Bảo Tượng Phật Giáo',
         iconUrl: getIconForCategory('bao-tuong'),
-        title: (statueThichCa.title || statueThichCa.name || 'ĐỨC PHẬT THÍCH CA MÂU NI').toUpperCase(),
-        subtitle: statueThichCa.subtitle || 'Vô Thượng Năng Nhân',
+        title: (statueThichCa.title || statueThichCa.name || '').toUpperCase(),
+        subtitle: statueThichCa.subtitle || '',
         imgUrl: statueThichCa.imgUrl || statueThichCa.avatarUrl || '',
         imgPosition: statueThichCa.imgPosition || 'center 35%',
         targetUrl: `/bao-tuong/${statueThichCa.slug}`,

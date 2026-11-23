@@ -201,7 +201,7 @@ export function PhotoGallery({
       {/* ── LƯỚI ADAPTIVE BENTO BOX ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 w-full auto-rows-[minmax(180px,auto)]">
         {visibleItems.map((item, idx) => {
-          const rawSrc = getImageUrl(item.imageUrl || item.url) || 'https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/07/default-bg.jpg';
+          const rawSrc = getImageUrl(item.imageUrl || item.url) || '/images/toan-canh-chua.jpg';
           const directHighRes = getHighResImageUrl(item.imageUrl || item.url) || rawSrc;
           // Lưới Bento dùng ảnh WebP tối ưu qua GPU/SIMD Sharp (1080px, nén chỉ ~70-120KB)
           const previewSrc = getOptimizedNextImageUrl(item.imageUrl || item.url, 1080, 75) || directHighRes;

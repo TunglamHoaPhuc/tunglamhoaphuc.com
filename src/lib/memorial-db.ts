@@ -1,14 +1,10 @@
-import {
-  invalidateServerlessCache,
-  loadServerlessJsonAsync,
-  saveServerlessJson,
-} from './serverless-db';
+import { loadServerlessJsonAsync } from './serverless-db';
 import {
   DEFAULT_MEMORIAL_DRIVE_FILE_ID,
   DEFAULT_MEMORIAL_DRIVE_URL,
-  MemorialPublicRecord,
-  MemorialRecord,
-  MemorialSyncMeta,
+  type MemorialPublicRecord,
+  type MemorialRecord,
+  type MemorialSyncMeta,
   normalizeVietnamese,
   toPublicMemorialRecord,
 } from './memorial-types';
@@ -47,56 +43,40 @@ export async function getMemorialSyncMeta(): Promise<MemorialSyncMeta> {
   return await loadServerlessJsonAsync<MemorialSyncMeta>(MEMORIAL_META_CONFIG);
 }
 
-export async function saveMemorialSyncData(
-  records: MemorialRecord[],
-  meta: MemorialSyncMeta
-): Promise<boolean> {
-  const okRecords = await saveServerlessJson<MemorialRecord[]>(MEMORIAL_DB_CONFIG, records);
-  const okMeta = await saveServerlessJson<MemorialSyncMeta>(MEMORIAL_META_CONFIG, meta);
-  invalidateServerlessCache(MEMORIAL_DB_CONFIG.fileName);
-  invalidateServerlessCache(MEMORIAL_META_CONFIG.fileName);
-  return okRecords && okMeta;
-}
-
 /**
- * Tìm kiếm bài vị phía Server (hỗ trợ tìm cả SĐT gốc chưa che, bỏ dấu tiếng Việt).
+ * Tìm kiếm bài vị phía Server, bỏ dấu tiếng Việt. Chỉ so với các trường CÔNG KHAI (chính những gì
+ * toPublicMemorialRecord trả ra, SĐT đã che): không so với SĐT gốc, nên không dò ra số điện thoại bằng cách thử từng
+ * chữ số và không lộ bản ghi nào qua phần ẩn của nó.
  */
 export function filterMemorialRecords(
   records: MemorialRecord[],
   query: string
 ): MemorialPublicRecord[] {
   const normQ = normalizeVietnamese(query);
-  const digitsOnly = query.replace(/\D/g, '');
-  if (!normQ) return records.map(toPublicMemorialRecord);
+  const publicRecords = records.map(toPublicMemorialRecord);
+  if (!normQ) return publicRecords;
 
   const tokens = normQ.split(' ').filter(Boolean);
 
-  return records
-    .filter((rec) => {
-      if (digitsOnly.length >= 4 && rec.contactPhone) {
-        const cleanPhone = rec.contactPhone.replace(/\D/g, '');
-        if (cleanPhone.includes(digitsOnly)) return true;
-      }
+  return publicRecords.filter((rec) => {
+    const haystack = normalizeVietnamese(
+      [
+        rec.code,
+        rec.name,
+        rec.dharmaName,
+        rec.lineageType,
+        rec.age,
+        rec.deathDate,
+        rec.birthDate,
+        rec.address,
+        rec.burialLocation,
+        rec.contactName,
+        rec.contactMasked,
+      ]
+        .filter(Boolean)
+        .join(' ')
+    );
 
-      const haystack = normalizeVietnamese(
-        [
-          rec.code,
-          rec.name,
-          rec.dharmaName,
-          rec.lineageType,
-          rec.age,
-          rec.deathDate,
-          rec.birthDate,
-          rec.address,
-          rec.burialLocation,
-          rec.contactName,
-          rec.contact,
-        ]
-          .filter(Boolean)
-          .join(' ')
-      );
-
-      return tokens.every((tok) => haystack.includes(tok));
-    })
-    .map(toPublicMemorialRecord);
+    return tokens.every((tok) => haystack.includes(tok));
+  });
 }

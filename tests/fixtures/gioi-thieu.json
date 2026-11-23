@@ -1,0 +1,80 @@
+[
+  {
+    "id": "gt-01",
+    "slug": "lich-su-tung-lam-hoa-phuc",
+    "title": "LỊCH SỬ TÙNG LÂM HÒA PHÚC",
+    "subtitle": "Phụ đề lich-su-tung-lam-hoa-phuc",
+    "tag": "Nhãn lich-su-tung-lam-hoa-phuc",
+    "groupCategory": "lich-su-chua",
+    "groupCategoryName": "Lịch Sử Chùa",
+    "overviewSummary": "Tổng quan lich-su-tung-lam-hoa-phuc",
+    "content": "Nội dung của lich-su-tung-lam-hoa-phuc.",
+    "status": "published",
+    "orderIndex": 0
+  },
+  {
+    "id": "gt-02",
+    "slug": "dai-su-lien-dang",
+    "title": "ĐẠI SƯ LIÊN ĐĂNG",
+    "subtitle": "Phụ đề dai-su-lien-dang",
+    "tag": "Nhãn dai-su-lien-dang",
+    "groupCategory": "nguoi-lien-quan",
+    "groupCategoryName": "Người Liên Quan",
+    "overviewSummary": "Tổng quan dai-su-lien-dang",
+    "content": "Nội dung của dai-su-lien-dang.",
+    "status": "published",
+    "orderIndex": 1
+  },
+  {
+    "id": "gt-03",
+    "slug": "su-ong-hoang-phap",
+    "title": "SƯ ÔNG HOẰNG PHÁP",
+    "subtitle": "Phụ đề su-ong-hoang-phap",
+    "tag": "Nhãn su-ong-hoang-phap",
+    "groupCategory": "nguoi-lien-quan",
+    "groupCategoryName": "Người Liên Quan",
+    "overviewSummary": "Tổng quan su-ong-hoang-phap",
+    "content": "Nội dung của su-ong-hoang-phap.",
+    "status": "published",
+    "orderIndex": 2
+  },
+  {
+    "id": "gt-04",
+    "slug": "su-phu-tru-tri",
+    "title": "SƯ PHỤ TRỤ TRÌ",
+    "subtitle": "Phụ đề su-phu-tru-tri",
+    "tag": "Nhãn su-phu-tru-tri",
+    "groupCategory": "nguoi-lien-quan",
+    "groupCategoryName": "Người Liên Quan",
+    "overviewSummary": "Tổng quan su-phu-tru-tri",
+    "content": "Nội dung của su-phu-tru-tri.",
+    "status": "published",
+    "orderIndex": 3
+  },
+  {
+    "id": "gt-05",
+    "slug": "tieu-su-su-to",
+    "title": "TIỂU SỬ SƯ TỔ",
+    "subtitle": "Phụ đề tieu-su-su-to",
+    "tag": "Nhãn tieu-su-su-to",
+    "groupCategory": "nguoi-lien-quan",
+    "groupCategoryName": "Người Liên Quan",
+    "overviewSummary": "Tổng quan tieu-su-su-to",
+    "content": "Nội dung của tieu-su-su-to.",
+    "status": "published",
+    "orderIndex": 4
+  },
+  {
+    "id": "gt-06",
+    "slug": "van-hoa-ung-xu",
+    "title": "VĂN HÓA ỨNG XỬ THIỀN MÔN",
+    "subtitle": "Phụ đề van-hoa-ung-xu",
+    "tag": "Nhãn van-hoa-ung-xu",
+    "groupCategory": "thanh-quy-van-hoa",
+    "groupCategoryName": "Thanh Quy & Văn Hóa",
+    "overviewSummary": "Tổng quan van-hoa-ung-xu",
+    "content": "Nội dung của van-hoa-ung-xu.",
+    "status": "published",
+    "orderIndex": 5
+  }
+]
