@@ -320,6 +320,27 @@ export function RichEditor({ initial, onChange, label = "Nội dung bài", readO
 					return `${stats.words.toLocaleString("vi-VN")} từ · ${stats.chars.toLocaleString("vi-VN")} ký tự · đọc khoảng ${stats.minutes} phút`;
 				})()}
 			</p>
+			{(() => {
+				const heads: { level: number; text: string; pos: number }[] = [];
+				editor.state.doc.descendants((node, pos) => {
+					if (node.type.name === "heading") heads.push({ level: node.attrs.level as number, text: node.textContent, pos });
+				});
+				if (heads.length < 2) return null;
+				return (
+					<details style={{ padding: "6px 16px", borderTop: "1px solid var(--tq-line)" }}>
+						<summary>Mục lục bài ({heads.length} tiêu đề)</summary>
+						<ol style={{ margin: "6px 0 0", paddingLeft: 18, listStyle: "none" }}>
+							{heads.map((head) => (
+								<li key={head.pos} style={{ marginLeft: (head.level - 2) * 16 }}>
+									<button type="button" className="tq-btn tq-btn--link" onClick={() => editor.chain().focus().setTextSelection(head.pos + 1).scrollIntoView().run()}>
+										{head.text || "(tiêu đề trống)"}
+									</button>
+								</li>
+							))}
+						</ol>
+					</details>
+				);
+			})()}
 			{state.figure && !readOnly ? <FigureForm key={JSON.stringify(editor.getAttributes("figureImage"))} editor={editor} /> : null}
 
 			<EditorContent editor={editor} />

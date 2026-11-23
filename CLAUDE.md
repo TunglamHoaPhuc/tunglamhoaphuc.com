@@ -57,3 +57,12 @@ Tài khoản đăng nhập thử cục bộ nằm trong `.dev.vars` (`ADMIN_SEED
 ## Vận hành admin
 
 Xem `docs/admin-architecture.md` (thiết kế), `docs/van-hanh/` (D1, ảnh, sao lưu, chuyển www). Các tài khoản, vai trò và quyền quản lý tại `/quan-tri/tai-khoan` và `/quan-tri/vai-tro`; nhật ký tại `/quan-tri/nhat-ky`; thùng rác tại `/quan-tri/thung-rac`.
+
+## Trình soạn thảo bài viết (nhánh feat/admin-editor-optimization)
+
+- `src/components/admin/content/RichEditor.tsx` + `editorExtensions.ts`: TipTap với phông (3 phông cố định), cỡ chữ, màu chữ, tô sáng, căn lề, thụt lề, giãn dòng, sub/sup, bảng (gộp/tách ô), ảnh có độ rộng và căn lề, liên kết nofollow, dán sạch từ Word/Docs (`cleanPastedHtml`), đếm từ, mục lục tiêu đề.
+- Định dạng được lưu là `style` nội tuyến, và **chỉ** những thuộc tính trong `safeStyle` (`src/admin/content/html.ts`) được máy chủ giữ; thêm một kiểu định dạng mới phải thêm ở đó kèm test (`tests/unit/admin/content-style.test.ts`). Trang V3 là repo riêng, hiển thị các style này qua HTML đã lọc.
+- `localDraft.ts`: bản nháp thân bài trên trình duyệt (3 giây sau khi ngừng gõ), không bao giờ tự gửi lên máy chủ.
+- Danh sách bài có chọn nhiều và xuất bản/xóa hàng loạt; chạy từng bài qua endpoint đơn nên quyền và phiên bản kiểm từng bài.
+- e2e: `tests/e2e/admin/editor-format.spec.ts`. Chạy trên bản build (`TLHP_ADMIN=1 TLHP_CONTENT_SOURCE=d1 ADMIN_BASE_URL=http://localhost:3021 npx vite build --config vite.e2e.config.ts`, rồi `vite preview --config vite.e2e.config.ts --port 3021`, `.dev.vars` cùng địa chỉ). Dev server không dùng được cho e2e admin.
+- Chưa làm: checklist, mục lục tự động trên trang công khai, lazy-load riêng cho thư viện Media (danh sách đã `loading="lazy"`).
