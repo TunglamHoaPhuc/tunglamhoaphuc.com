@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { JSONContent } from "@tiptap/react";
+import { publicSiteUrl } from "@/config/site";
 import { api, ApiClientError } from "../api";
 import { useAdmin } from "../AdminProvider";
 import { MediaPicker } from "../media/MediaPicker";
@@ -360,7 +361,7 @@ export function ContentEditor({ kind, id }: { kind: KindName; id: string | null 
 	const orphans = orphanErrors(fields, SHOWN_ERRORS[kind], ["version"]);
 	const videoUrl = str((form.video as Form | null)?.url);
 	const videoProblem = videoUrl.trim() && !youtubeId(videoUrl) ? "Không nhận ra địa chỉ video YouTube. Hãy dán địa chỉ dạng https://www.youtube.com/watch?v=… hoặc https://youtu.be/…" : undefined;
-	const publicHref = detail ? ui.publicPath({ slug: detail.slug, section: detail.section }) : "";
+	const publicHref = detail ? publicSiteUrl(ui.publicPath({ slug: detail.slug, section: detail.section })) : "";
 
 	return (
 		<>

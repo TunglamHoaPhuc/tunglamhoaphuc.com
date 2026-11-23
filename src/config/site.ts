@@ -46,6 +46,18 @@ export function contactGroups(contacts: Contact[]): { role: string; people: Cont
 	return groups;
 }
 
+/**
+ * Where the public site lives. The admin runs on its own host (quantri.), so a link from the admin to a public page must be
+ * absolute: a relative one would open this Worker's own, older public copy. A plain constant (no environment variable)
+ * because the admin's browser code uses it too, and vinext has no NEXT_PUBLIC_* for that.
+ */
+export const PUBLIC_SITE_URL = "https://www.tunglamhoaphuc.com";
+
+/** The address of a public page for the admin's links: `/dong-chay-hoang-phap/abc` becomes `https://www.tunglamhoaphuc.com/dong-chay-hoang-phap/abc`. */
+export function publicSiteUrl(path: string): string {
+	return `${PUBLIC_SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
 export const site = {
 	name: "Tùng Lâm Hòa Phúc",
 	slogan: "Nơi để trở về – Chốn thiêng bình yên",
