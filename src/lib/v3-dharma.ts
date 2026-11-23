@@ -11,9 +11,9 @@ type Deleted = { id: string; wpPostId?: string | number; slug?: string };
 
 export type DharmaFeatured = { featured: PostItem[]; tongChi: PostItem[]; dongChay: PostItem[]; triTue: PostItem[] };
 
-const IMG_TONG_CHI = "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-hub-banner.webp";
-const IMG_DONG_CHAY = "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp";
-const IMG_TRI_TUE = "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp";
+const IMG_TONG_CHI = "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-hub-banner.webp";
+const IMG_DONG_CHAY = "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp";
+const IMG_TRI_TUE = "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp";
 
 /** "2026-11-03" or "2026/11/03 10:00" → "03/11/2026"; anything else as it is. */
 export function formatDate(rawDate?: string): string {

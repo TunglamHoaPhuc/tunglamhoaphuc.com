@@ -12,7 +12,7 @@ export const THAP_BAT_LA_HAN_DATA: ThapBatLaHanItem[] = [
     name: "Ba Tiêu La Hán",
     sanskritName: "Tôn giả Tầm-đặc-la",
     meaning: "Tầm-đặc-la Tôn Giả • Dưới cây chuối tu tập, tâm hương thanh thản",
-    imgUrl: "/images/bao_tuong_phat_giao/thanh_van_thanh_chung/THAP_BAT_LA_HAN/NGHE_THUAT_PHAT_GIAO/ba_tieu_la_han_go.jpg"
+    imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/05-bao-tuong-phat-giao/thanh_van_thanh_chung/thap_bat_la_han/nghe_thuat_phat_giao/ba_tieu_la_han_go.webp"
   },
   {
     code: "LH02",

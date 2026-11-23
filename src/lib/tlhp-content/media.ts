@@ -56,7 +56,7 @@ export function mediaKey(url: string | null | undefined): string | null {
  * `null` for an empty or unreadable value.
  */
 export function storedMediaAddress(url: string | null | undefined): string | null {
-	const address = mediaUrl(url);
+	const address = knownMediaUrl(url);
 	if (!address?.startsWith(`${ANH_GOC}/`)) return address;
 	const [bucket, ...rest] = address.slice(ANH_GOC.length + 1).split("/");
 	const path = rest.join("/");
@@ -91,6 +91,46 @@ function wordpressPath(url: string | null | undefined): string | null {
  * unreadable value.
  */
 export function mediaUrl(url: string | null | undefined): string | null {
+	return legacyPicturePath(url) ?? knownMediaUrl(url);
+}
+
+// Hosts of this very site: a picture written with one of them in front is the same /anh-goc/ path.
+const OWN_HOSTS = new Set(["tunglamhoaphuc.com", "www.tunglamhoaphuc.com", "quantri.tunglamhoaphuc.com", "v2.tunglamhoaphuc.com", "v3.tunglamhoaphuc.com"]);
+// The old WordPress server answered on these hosts too (admin. is the one the data names).
+const WORDPRESS_HOSTS = new Set([WORDPRESS_HOST, "old.tunglamhoaphuc.com"]);
+// Backblaze's S3 path style (s3.us-east-005.backblazeb2.com/<bucket>/<key>) and its friendly style (…/file/<bucket>/<key>).
+const B2_PATH_HOST = /^(s3\.us-east-005\.backblazeb2\.com|b1\.congngheviet\.com\.vn|f\d{3}\.backblazeb2\.com)$/;
+
+/**
+ * The /anh-goc/ path of a picture written as an absolute address that maps to it with certainty and that knownMediaUrl() leaves alone:
+ * this site's own host in front of an /anh-goc/ path, the second WordPress host (old.), and Backblaze's path-style and friendly addresses
+ * of either bucket. `null` for anything else, which keeps its address (hosts that cannot be mapped are not guessed at). Not used for
+ * storedMediaAddress(): a media row's id is the hash of the address it was filed under, and these forms never changed it.
+ */
+export function legacyPicturePath(url: string | null | undefined): string | null {
+	const value = url?.trim();
+	if (!value || (value.startsWith("/") && !value.startsWith("//"))) return null;
+	const parsed = parse(value);
+	if (!parsed || (parsed.protocol !== "https:" && parsed.protocol !== "http:") || parsed.username || parsed.password) return null;
+	const host = parsed.hostname.toLowerCase();
+	const path = parsed.pathname;
+	if (OWN_HOSTS.has(host) && path.startsWith(`${ANH_GOC}/`)) return path;
+	if (WORDPRESS_HOSTS.has(host) && host !== WORDPRESS_HOST && path.startsWith("/wp-content/uploads/")) {
+		const upload = path.slice("/wp-content/uploads/".length);
+		return upload && isImagePath(upload) ? `${WORDPRESS_BASE}/${upload}` : null;
+	}
+	if (B2_PATH_HOST.test(host)) {
+		const [, first, second, ...rest] = path.split("/");
+		const pathStyle = host === "s3.us-east-005.backblazeb2.com";
+		if (!pathStyle && first !== "file") return null;
+		const bucket = pathStyle ? first : second;
+		const key = pathStyle ? [second, ...rest] : rest;
+		if (bucket && B2_BUCKETS.has(bucket) && key.length > 0 && key.every(Boolean) && isImagePath(key[key.length - 1])) return `${ANH_GOC}/${bucket}/${key.join("/")}`;
+	}
+	return null;
+}
+
+function knownMediaUrl(url: string | null | undefined): string | null {
 	const value = url?.trim();
 	if (!value) return null;
 	if (value.startsWith("/") && !value.startsWith("//")) return value;

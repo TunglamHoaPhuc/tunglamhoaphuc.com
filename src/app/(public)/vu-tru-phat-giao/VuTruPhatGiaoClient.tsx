@@ -16,7 +16,7 @@ export default function VuTruPhatGiaoClient({ areas, spots }: { areas: V3Area[];
   // Lấy ảnh khu vực tiêu biểu (Tam Bảo - Đại Hùng Bảo Điện) làm nền Header
   const headerBgImage = getImageUrl(
     areas[0]?.imgUrl ||
-    'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/tam-bao.webp'
+    '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/tam-bao.webp'
   );
 
   return (

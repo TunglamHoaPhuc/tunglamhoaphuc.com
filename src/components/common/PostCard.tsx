@@ -13,7 +13,7 @@ export interface PostCardProps {
   variant?: 'portrait' | 'golden';
 }
 
-const DEFAULT_TEMPLE_LOGO = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/bieu-tuong-tong-chi-tu-hoc-tung-lam-hoa-phuc.webp';
+const DEFAULT_TEMPLE_LOGO = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/bieu-tuong-tong-chi-tu-hoc-tung-lam-hoa-phuc.webp';
 
 /**
  * Tự động ánh xạ biểu tượng đặc trưng theo từng danh mục bài viết
@@ -149,7 +149,7 @@ export const PostCard: FC<PostCardProps> = ({
         {/* 1. Khung ảnh Thumbnail: flex-1 min-h-0 co lại mượt mà vào trong khi hover */}
         <div className="relative w-full flex-1 min-h-0 overflow-hidden bg-[#1A120B] transition-all duration-500 ease-out">
           <img
-            src={fitImage(post.imageUrl || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp', 640)}
+            src={fitImage(post.imageUrl || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp', 640)}
             alt={post.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             style={{ objectPosition: post.thumbnailPosition || post.imagePosition || 'center 20%' }}
@@ -235,7 +235,7 @@ export const PostCard: FC<PostCardProps> = ({
       {/* 1. Khung ảnh Thumbnail tỷ lệ 3:4 linh hoạt */}
       <div className="relative w-full flex-1 min-h-0 overflow-hidden bg-[#1A120B]">
         <img
-          src={fitImage(post.imageUrl || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp', 640)}
+          src={fitImage(post.imageUrl || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp', 640)}
           alt={post.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           style={{ objectPosition: post.thumbnailPosition || post.imagePosition || 'center 20%' }}

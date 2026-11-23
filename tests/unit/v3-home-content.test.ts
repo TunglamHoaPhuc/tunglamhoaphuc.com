@@ -107,7 +107,7 @@ test("bài ở chuyên trang khác không lên Dấu ấn; bài trong danh sách
 
 test("thiếu ảnh thì dùng ảnh mặc định của chuyên trang; ngày ở dạng lạ giữ nguyên", () => {
 	const data = buildDharmaFeatured([post("a", "dong-chay-hoang-phap", 1, { thumbnailUrl: "", bannerUrl: "" })], []);
-	assert.match(data.dongChay[0].imageUrl, /^https:\/\/media-tunglamhoaphuc\./);
+	assert.match(data.dongChay[0].imageUrl, /^\/anh-goc\/media-tunglamhoaphuc\//);
 	assert.equal(formatDate("03/11/2026"), "03/11/2026");
 	assert.equal(formatDate("2026/1/5 10:00"), "05/01/2026");
 	assert.equal(formatDate("tuần trước"), "tuần trước");

@@ -107,11 +107,22 @@ const summaryOf = (row: Row): PostSummary => ({
 	pinned: row.pinned === 1 || row.pinned === true,
 });
 
-/** The albums of one kind of owner ("page", "teaching"): album id → pictures, in order. */
+/**
+ * The albums of one kind of owner ("page", "teaching"): album id → pictures, in order.
+ *
+ * Album ids are `<owner>:<id>` and the table's primary key (album_id, position) is a binary index, so the albums of one owner are
+ * the range [`<owner>:`, `<owner>;`) (";" is the character after ":"), which D1 reads from the index. The old `album_id like 'page:%'`
+ * could not use that index (LIKE ignores case, so it is a scan): it read the whole table, 21.1 thousand rows (all the posts' albums too)
+ * for the 27 rows of the pages and teachings, and was 85 % of the rows D1 read. The ids are written by the import and the admin
+ * with a lower-case owner, so the match is the same (tests/unit/content/d1Galleries.test.ts).
+ */
 async function galleries(all: <T extends Row>(sql: string, ...params: unknown[]) => Promise<T[]>, prefix: string): Promise<Map<string, GalleryImage[]>> {
+	const from = `${prefix}:`;
+	const until = `${prefix};`;
 	const rows = await all(
-		`select ai.album_id, ai.title, ai.caption, m.r2_key, m.url from album_item ai join media m on m.id = ai.media_id where ai.album_id like ? order by ai.album_id, ai.position`,
-		`${prefix}:%`,
+		`select ai.album_id, ai.title, ai.caption, m.r2_key, m.url from album_item ai join media m on m.id = ai.media_id where ai.album_id >= ? and ai.album_id < ? order by ai.album_id, ai.position`,
+		from,
+		until,
 	);
 	const byOwner = new Map<string, GalleryImage[]>();
 	for (const row of rows) {

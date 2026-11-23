@@ -121,7 +121,7 @@ export const ArtisticStatueSection: FC<ArtisticStatueSectionProps> = ({
         {/* ── AMBIENT BACKGROUND IMAGE POSITIONED DOWNWARDS WITH SOFT OPACITY & 4-EDGE GRADIENT MASKS ── */}
         <div className="absolute top-10 sm:top-14 inset-x-0 h-[420px] sm:h-[480px] z-0 pointer-events-none overflow-hidden">
           <img
-            src="/images/vu-tru-phat-giao/toan-canh-chua.jpg"
+            src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp"
             alt="Toàn cảnh chùa"
             className="w-full h-full object-cover opacity-12 sm:opacity-15 filter blur-[2px] scale-105"
             onError={(e) => {
@@ -144,11 +144,11 @@ export const ArtisticStatueSection: FC<ArtisticStatueSectionProps> = ({
           <div className="flex flex-col items-center text-center mb-10">
             <div className="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center" aria-hidden="true">
               <img
-                src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+                src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
                 alt=""
                 className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
                 onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
+                  (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
                 }}
               />
             </div>
@@ -289,7 +289,7 @@ const BentoCard: FC<BentoCardProps> = ({
         className={`w-full h-full object-cover ${focusPosition} transition-transform duration-700 group-hover:scale-105`}
         loading="lazy"
         onError={(e) => {
-          (e.target as HTMLImageElement).src = '/images/vu-tru-phat-giao/toan-canh-chua.jpg';
+          (e.target as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
         }}
       />
 

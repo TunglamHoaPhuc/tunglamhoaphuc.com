@@ -125,13 +125,13 @@ export function BookCitationSection({ sourceBook }: BookCitationProps) {
               className="relative w-32 h-44 sm:w-36 sm:h-48 md:w-44 md:h-60 rounded-2xl overflow-hidden border-2 border-[#F2C14E]/50 shadow-2xl shrink-0 bg-black/40 group cursor-pointer"
             >
               <img
-                src={getImageUrl(displayedList[0].coverImage) || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/uploads/chua-pho-chieu-hai-phong-1787464212629.webp'}
+                src={getImageUrl(displayedList[0].coverImage) || '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp'}
                 alt={displayedList[0].bookTitle}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 style={{ objectPosition: displayedList[0].coverPosition || 'center' }}
                 loading="lazy"
                 onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/uploads/chua-pho-chieu-hai-phong-1787464212629.webp';
+                  (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp';
                 }}
               />
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 text-xs font-bold text-[#FFDE59] backdrop-blur-xs">
@@ -207,13 +207,13 @@ export function BookCitationSection({ sourceBook }: BookCitationProps) {
                     className="relative w-16 h-20 sm:w-20 sm:h-24 rounded-xl overflow-hidden border border-[#F2C14E]/35 shadow-md flex-shrink-0 bg-black/40 cursor-pointer"
                   >
                     <img
-                      src={getImageUrl(item.coverImage) || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/uploads/chua-pho-chieu-hai-phong-1787464212629.webp'}
+                      src={getImageUrl(item.coverImage) || '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp'}
                       alt={item.bookTitle}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       style={{ objectPosition: item.coverPosition || 'center' }}
                       loading="lazy"
                       onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/uploads/chua-pho-chieu-hai-phong-1787464212629.webp';
+                        (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp';
                       }}
                     />
                   </div>

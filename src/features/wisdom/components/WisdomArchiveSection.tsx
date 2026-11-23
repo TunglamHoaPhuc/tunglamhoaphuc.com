@@ -29,7 +29,7 @@ const WisdomCard = React.memo(({ item, onClick }: WisdomCardProps) => {
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
           style={{ objectPosition: (item as any).thumbnailPosition || 'center center' }}
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
+            (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#2C1C11] via-transparent to-black/40" />

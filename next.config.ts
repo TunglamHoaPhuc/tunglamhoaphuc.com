@@ -43,32 +43,7 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 days GPU decoding cache
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'admin.tunglamhoaphuc.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'tunglamhoaphuc.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 's2-cnv03.s3.us-east-005.backblazeb2.com',
-        port: '',
-        pathname: '/**',
-      },
-    ],
+    // Không có remotePatterns: mọi ảnh nằm trên chính site (public/ và /anh-goc/ đọc R2), không host ngoài nào được tối ưu.
   },
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion', 'date-fns', 'dayjs'],

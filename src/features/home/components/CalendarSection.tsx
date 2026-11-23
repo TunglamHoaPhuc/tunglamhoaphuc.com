@@ -434,7 +434,7 @@ export const CalendarSection: FC = () => {
           className="w-full h-full object-cover opacity-15 blur-sm"
           loading="lazy"
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp';
+            (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp';
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#1A120B] via-transparent to-[#1A120B]" />
@@ -494,7 +494,7 @@ export const CalendarSection: FC = () => {
                     alt={monthTheme.title}
                     className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-102"
                     onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/vu-tru-phat-giao/bao-thap/bao-thap-banner.jpg';
+                      (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp';
                     }}
                   />
                   {/* Lớp gradient đáy chuyển tiếp mượt mà (h-12 sm:h-14), phủ dài hơn một xíu tạo độ hòa trộn êm ái mà không che mất chữ poster */}
@@ -1017,7 +1017,7 @@ export const CalendarSection: FC = () => {
                     objectPosition: `center ${selectedEvent.imgPositionY ?? 50}%`,
                   }}
                   onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = '/images/vu-tru-phat-giao/bao-thap/bao-thap-banner.jpg';
+                    (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp';
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1E1108] via-transparent to-black/40" />

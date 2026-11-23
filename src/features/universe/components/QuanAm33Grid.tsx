@@ -83,7 +83,7 @@ const QuanAmCard = React.memo(({ item, onSelect }: CardProps) => {
           className="w-full h-full object-cover object-[center_12%] transition-transform duration-700 ease-out group-hover:scale-108 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
           onError={(e) => {
             (e.target as HTMLImageElement).src =
-              'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-_-tong-phong-truyen-thua_-bai-tho-mien-nam-chon-to_thumbnail_herobanner-1787470412489.webp';
+              '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-_-tong-phong-truyen-thua_-bai-tho-mien-nam-chon-to_thumbnail_herobanner-1787470412489.webp';
           }}
         />
 
@@ -270,7 +270,7 @@ export const QuanAm33Grid: FC = () => {
               alt="Gieo Quẻ Quan Âm"
               className="w-full h-full object-contain filter drop-shadow-[0_0_16px_rgba(242,193,78,0.95)]"
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = '/images/icon-minh-hoa/bieu-tuong-bao-tuong-phat-giao.png';
+                (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-bao-tuong-phat-giao.webp';
               }}
             />
           </div>

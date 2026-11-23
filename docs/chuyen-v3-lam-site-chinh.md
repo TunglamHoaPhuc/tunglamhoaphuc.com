@@ -156,7 +156,7 @@ Danh sách www lấy từ `src/app/**/page.*` và `route.*` (không tính `quan-
 | `(mau-bexon)/*` (blogs, contact…), `/styleguide` | không có | www trả 404 ở host công khai; không cần |
 | `/anh-goc/[bucket]/[...key]` | có, mã giống nhau | cùng R2 `tlhp-media`, tệp cache 30 ngày + 7 ngày |
 | `/cdn-cgi/image/*` | route dự phòng giống nhau | biến đổi ảnh chạy ở rìa, theo zone: chạy với mọi host của zone; nguồn là `/anh-goc/` của chính host đang phục vụ |
-| `/images/[...path]` | V3 **riêng** (chuyển 307 về B2) | www không có; V3 vẫn cần cho đường dẫn cũ |
+| `/images/[...path]` | **đã bỏ 23/11/2026** (trước đây chuyển 307 về B2) | ảnh nay ở R2 qua `/anh-goc/`; `/images/*` chỉ còn tệp tĩnh trong `public/images` |
 | `/tibetan-study/*` tĩnh | có (cùng 22 MB, cùng nội dung) | chạy ngoài Worker (`runWorkerFirst` loại trừ) |
 | `/api/analyze`, `/ask-ai`, `/crop-analyze`, `/tts` | có nhưng **thiếu giới hạn** | 4.3 |
 | Thông báo chào mừng | có (`WelcomeNoticeModal`, đọc `site.announcement`) | |
@@ -280,7 +280,7 @@ Nghi phạm cụ thể:
 1. **`lunar-javascript` (~38 KB brotli, chunk `gd5RXz8G.js`) nằm trong gói tải trước của trang chủ**: `CalendarSection.tsx` (client) nhập `@/lib/lunar-calendar` (`:21-24`) và `@/lib/v3-calendar` (nhập `convertSolarToLunar`, `v3-calendar.ts:14`). Đề xuất: tính âm lịch của tháng đang hiển thị ở máy chủ rồi đưa xuống dạng dữ liệu, hoặc nạp động (`import()`) khi cuộn tới phần lịch.
 2. **Ảnh chặn LCP từ nguồn thứ ba**: hai `<link rel="preload" as="image">` trỏ thẳng B2 (`logo-moc-an.webp`, `bieu-tuong-tong-chi-tu-hoc-...webp`), nên mở thêm kết nối. Dùng `/brand/logo-moc-an-200.webp` cục bộ (có sẵn ở www) và `/images/icons/...`.
 3. **Phông**: Google Fonts hai miền + hai TTF chưa nén. Chuyển sang woff2 tự lưu (Montserrat/Playfair/Noto Serif, chỉ các trọng lượng dùng) và bỏ tải trước hai TTF; hoặc `font-display: swap` + subset latin/vietnamese.
-4. **Cache tệp tĩnh**: thêm `public/_headers` giống www (`/_next/static/*`, `/images/*`, `/brand/*`, `/tibetan-study/*`, `/fonts/*`, `/*.TTF`); thêm `!/images/*` và `!/brand/*` vào `runWorkerFirst` (`cloudflare.config.ts:22`) để không tốn CPU Worker cho ảnh tĩnh. `/images/[...path]/route.ts` của V3 vẫn còn cho đường dẫn không có tệp (Worker được gọi khi không tìm thấy tài sản).
+4. **Cache tệp tĩnh**: thêm `public/_headers` giống www (`/_next/static/*`, `/images/*`, `/brand/*`, `/tibetan-study/*`, `/fonts/*`, `/*.TTF`); thêm `!/images/*` và `!/brand/*` vào `runWorkerFirst` (`cloudflare.config.ts:22`) để không tốn CPU Worker cho ảnh tĩnh. (Route `/images/[...path]` từng đón đường dẫn không có tệp rồi chuyển sang B2; đã bỏ 23/11/2026, đường dẫn không có tệp nay là 404.)
 5. **Số tệp JS** (41 so với 22): nhiều chunk nhỏ; gộp bằng cấu hình chunk của Vite nếu cần. Ít ảnh hưởng điểm.
 6. HTML ~220 KB chưa nén (cả hai bằng nhau): dữ liệu RSC của trang chủ; theo dõi khi `loadHomeWelcome/Quotes/News` lớn lên.
 7. Trang 404 nặng (có Header, Footer, `SmartSearchAIBar`): ít ảnh hưởng.

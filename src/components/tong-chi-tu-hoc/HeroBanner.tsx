@@ -20,7 +20,7 @@ interface HeroBannerProps {
   backText?: string;
 }
 
-const DEFAULT_BANNER_IMAGE = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
+const DEFAULT_BANNER_IMAGE = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
 
 export function HeroBanner({
   id = 'tong-chi-tu-hoc',

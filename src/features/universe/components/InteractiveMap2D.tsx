@@ -289,7 +289,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
     }, 400);
   };
 
-  const MAP_IMAGE_URL = "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp";
+  const MAP_IMAGE_URL = "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp";
 
   return (
     <div className="w-screen h-screen fixed inset-0 z-50 bg-[#1C120C] overflow-hidden select-none">
@@ -332,7 +332,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
             {/* Seamless Anchor Background Image: toan-canh-chua.jpg */}
             <div className="absolute inset-0 z-0">
               <img
-                src="/images/vu-tru-phat-giao/toan-canh-chua.jpg"
+                src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp"
                 onError={(e) => {
                   e.currentTarget.src = "/images/toan-canh-chua.jpg";
                 }}

@@ -78,7 +78,7 @@ export const THAP_NHI_DUOC_XOA_FULL_DATA: ThapNhiDuocXoaItem[] = [
     meaning: "Cứu khổ cứu nạn, ban rải sự an tịnh, hòa hợp và giải trừ tranh chấp, hiềm thù.",
     source: "Kinh Dược Sư Bổn Nguyện Công Đức - Cổng Thông Tin Phật Giáo Việt Nam",
     fullHistoryHtml: "An Đế La Đại Tướng (Aṇḍīra) đại diện cho hạnh nguyện nhẫn nại và thấu cảm của Quán Thế Âm Bồ Tát. Ngài cầm giáo Kim Cang sẵn sàng đập tan hiểm nguy, gia hộ phúc thọ và gia hòa cho người sinh thuộc tuổi MÃO.",
-    imgUrl: "/images/bao_tuong_phat_giao/ho_phap_than_vuong/TUONG_CHINH/thap_nhi_duoc_xoa/an_de_la_dai_tuong.jpg"
+    imgUrl: "/anh-goc/s2-cnv03/tunglamhoaphuc2/05-bao-tuong-phat-giao/ho_phap_than_vuong/tuong_chinh/thap_nhi_duoc_xoa/an_de_la_dai_tuong.webp"
   },
   {
     code: "DX05",

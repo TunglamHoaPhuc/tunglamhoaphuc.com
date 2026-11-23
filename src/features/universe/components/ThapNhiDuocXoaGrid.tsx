@@ -16,11 +16,11 @@ export const ThapNhiDuocXoaGrid: FC = () => {
         <div className="flex flex-col items-center text-center mb-10">
           <div className="w-16 h-16 sm:w-20 sm:h-20 mb-3 flex items-center justify-center" aria-hidden="true">
             <img
-              src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+              src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
               alt="Thập Nhị Dược Xoa"
               className="w-full h-full object-contain filter drop-shadow-[0_0_18px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
+                (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
               }}
             />
           </div>
@@ -65,7 +65,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
                   alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
                   onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = '/images/vu-tru-phat-giao/toan-canh-chua.jpg';
+                    (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
                   }}
                 />
 
@@ -154,7 +154,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
                     alt={selectedItem.title}
                     className="w-full h-auto max-h-[340px] md:max-h-[420px] object-cover rounded-xl shadow-inner"
                     onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/vu-tru-phat-giao/toan-canh-chua.jpg';
+                      (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
                     }}
                   />
                   <div className="absolute inset-0 pointer-events-none rounded-xl border border-[#F2C14E]/20" />

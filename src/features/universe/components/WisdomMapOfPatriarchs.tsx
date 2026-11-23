@@ -75,7 +75,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
           }}
         >
           <img
-            src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp"
+            src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp"
             alt="Bản đồ Ngân hà Tuệ Giác Danh Tăng"
             className="w-full h-full object-cover opacity-35"
             style={{ minHeight: "580px" }}

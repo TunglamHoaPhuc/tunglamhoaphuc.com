@@ -136,7 +136,7 @@ const MonkGridCard = React.memo(({ monk, onSelect }: MonkGridCardProps) => {
           loading="lazy"
           decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          onError={(e) => { (e.target as HTMLImageElement).src = '/images/icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.png'; }}
+          onError={(e) => { (e.target as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp'; }}
         />
         <div
           className="absolute inset-0 pointer-events-none"
@@ -152,13 +152,13 @@ const MonkGridCard = React.memo(({ monk, onSelect }: MonkGridCardProps) => {
         <div className="relative w-full bg-gradient-to-b from-[#25170E] to-[#1C130D] px-3 pt-5 pb-4 text-center flex flex-col items-center justify-start">
           <div className="absolute top-[-24px] left-1/2 -translate-x-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#F2C14E] bg-[#25170E] flex items-center justify-center p-1 shadow-[0_0_18px_rgba(242,193,78,0.65)] overflow-hidden">
             <img
-              src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+              src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
               alt="Biểu tượng Bảo tượng"
               loading="lazy"
               decoding="async"
               className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
+                (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
               }}
             />
           </div>
@@ -965,7 +965,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                                 alt={monk.name}
                                 className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                                 loading="lazy"
-                                onError={(e) => { (e.target as HTMLImageElement).src = '/images/icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.png'; }}
+                                onError={(e) => { (e.target as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp'; }}
                               />
                             </div>
 
@@ -1059,7 +1059,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                           alt={selectedMapMonk.name}
                           className="w-full h-full object-cover object-top"
                           loading="lazy"
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/images/icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.png'; }}
+                          onError={(e) => { (e.target as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp'; }}
                         />
                       </div>
 
@@ -1403,7 +1403,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                     alt={selectedMonk.name}
                     loading="lazy"
                     className="w-full h-full object-cover object-top"
-                    onError={(e) => { (e.target as HTMLImageElement).src = '/images/icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.png'; }}
+                    onError={(e) => { (e.target as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp'; }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1C130D]/60 via-transparent to-transparent" />
                 </div>

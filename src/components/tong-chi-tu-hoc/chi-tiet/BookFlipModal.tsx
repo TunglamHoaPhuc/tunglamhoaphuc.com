@@ -47,7 +47,7 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
   const pages = React.useMemo(() => {
     return Array.from({ length: totalPages }, (_, i) => ({
       pageNumber: i + 1,
-      src: `https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/08-tu-an-book/page_${String(i + 1).padStart(2, '0')}.webp`,
+      src: `/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/08-tu-an-book/page_${String(i + 1).padStart(2, '0')}.webp`,
       title: i === 0 ? (book?.bookTitle || book?.title || 'Bìa Sách') : i === totalPages - 1 ? 'Bìa Sau' : `Trang ${i + 1}`,
     }));
   }, [totalPages, book]);

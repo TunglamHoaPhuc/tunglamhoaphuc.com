@@ -109,7 +109,7 @@ export const SpaceGallerySection: FC<SpaceGallerySectionProps> = ({
         {/* ── NỀN SECTION: DÙNG ẢNH TRIỂN LÃM SƯ TỔ NGỘ CHÂN TỬ VỚI LỚP PHỦ NÂU VÀNG THIỀN MÔN ── */}
         <div className="absolute top-10 sm:top-14 inset-x-0 h-[460px] sm:h-[540px] z-0 pointer-events-none overflow-hidden">
           <img
-            src={isBaoTang ? BAO_TANG_BACKGROUND_IMAGE : '/images/vu-tru-phat-giao/toan-canh-chua.jpg'}
+            src={isBaoTang ? BAO_TANG_BACKGROUND_IMAGE : '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp'}
             alt="Không gian bảo tàng"
             className="w-full h-full object-cover opacity-15 sm:opacity-20 filter blur-[2px] scale-105"
             onError={(e) => {
@@ -135,11 +135,11 @@ export const SpaceGallerySection: FC<SpaceGallerySectionProps> = ({
               aria-hidden="true"
             >
               <img
-                src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+                src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
                 alt=""
                 className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
                 onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
+                  (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
                 }}
               />
             </div>
@@ -292,7 +292,7 @@ const SpaceBentoCard: FC<SpaceBentoCardProps> = ({ item, idx, openLightbox }) =>
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         loading="lazy"
         onError={(e) => {
-          (e.target as HTMLImageElement).src = '/images/vu-tru-phat-giao/toan-canh-chua.jpg';
+          (e.target as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
         }}
       />
 

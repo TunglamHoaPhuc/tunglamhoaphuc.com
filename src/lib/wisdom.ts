@@ -5,7 +5,7 @@ import { chosenRelatedCards, type V3Post } from "@/lib/v3-data";
 
 export const TRI_TUE_SECTION = "tri-tue-phat-phap";
 
-const FALLBACK_THUMB = "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp";
+const FALLBACK_THUMB = "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp";
 
 /** "2026-11-22" → "22/11/2026" (not the browser's locale, so the server and the browser agree). */
 export function dmy(isoDate: string): string {

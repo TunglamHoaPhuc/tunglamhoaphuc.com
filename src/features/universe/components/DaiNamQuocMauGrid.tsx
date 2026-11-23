@@ -78,11 +78,11 @@ export const DaiNamQuocMauGrid: FC = () => {
                   {/* FLOATING CIRCULAR GOLD LOGO (Positioned at top-0 -translate-y-1/2, z-30 so NOT clipped) */}
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#1A120B] border-2 border-[#F2C14E] p-1 flex items-center justify-center shadow-[0_0_18px_rgba(242,193,78,0.75)] overflow-hidden">
                     <img
-                      src="/images/icon-minh-hoa/bieu-tuong-bao-vat-phat-giao.png"
+                      src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-bao-vat-phat-giao.webp"
                       alt="Bảo Vật Triều Nguyễn"
                       className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.95)] scale-145 sm:scale-150 transform-gpu"
                       onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = '/images/icon-minh-hoa/bieu-tuong-bao-tuong-phat-giao.png';
+                        (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-bao-tuong-phat-giao.webp';
                       }}
                     />
                   </div>
