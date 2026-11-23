@@ -15,7 +15,11 @@ export type Keyword = { keyword: string; title: string; description: string };
 /** A category inside a section, e.g. "Cộng Tu Định Kỳ" in Dòng Chảy Hoằng Pháp. */
 export type Category = { slug: string; name: string };
 
-export type CategoryCount = Category & { count: number };
+export type CategoryCount = Category & {
+	count: number;
+	/** The place the editors gave the category in the admin (smaller first); `listCategories` already sorts by it. Absent where the source has no such order (snapshot, B2). */
+	position?: number;
+};
 
 /** What list pages need: no body, no gallery. */
 export type PostSummary = {
@@ -184,6 +188,8 @@ export type TongChiSummary = {
 	subtitle: string;
 	/** One of the five groups, in the editors' order: "Phương Pháp Hành Trì". */
 	group: Category;
+	/** The place the editors gave the group in the admin (smaller first); `listTongChi` already comes group by group in this order. Absent where the source has no such order (snapshot, B2). */
+	groupPosition?: number;
 	banner: MediaImage | null;
 	excerpt: string;
 };
@@ -254,12 +260,25 @@ export type StatueSummary = {
 /** A work of Buddhist art showing the same figure, itself a statue of the collection. */
 export type ArtVariation = { id: string; title: string; location: string; meaning: string; image: MediaImage | null; href: string | null };
 
+/** One more picture of a statue, from another angle: "Chính diện", "Bên trái"… */
+export type StatueImage = MediaImage & { label: string };
+
+/** One line of a statue's specification (thông số): "Chất liệu" → "Đồng", in the editors' order. */
+export type StatueSpec = { name: string; value: string };
+
 export type Statue = StatueSummary & {
 	/** A teaching about the figure and who gave it; `null` where the data only repeats the name. */
 	quote: { text: string; author: string } | null;
 	/** Sanitised HTML, safe to render as is. */
 	contentHtml: string;
 	art: ArtVariation[];
+	/** The pictures from other angles the editors added, in their order. Always set by the sources, empty when there are none. */
+	images?: StatueImage[];
+	/** The specification the editors listed, in their order; empty when none. */
+	specs?: StatueSpec[];
+	/** The SEO title and description the editors wrote, empty when not: the page's metadata should prefer them. */
+	seoTitle?: string;
+	seoDescription?: string;
 };
 
 /** A monk or nun of the Vietnamese sangha, on the old admin's Danh Tăng list. */
@@ -283,6 +302,9 @@ export type Monk = {
 	coordinates: { x: number; y: number } | null;
 };
 
+/** A saying of "Lời Thầy dạy" the editors keep in the admin. */
+export type Quote = { id: string; text: string; author: string; /** The sutra or talk it comes from. */ source: string; sourceUrl: string };
+
 /** Read-only access to the temple's content, whatever the source. */
 export interface ContentRepository {
 	listPosts(query?: PostQuery): Promise<Page<PostSummary>>;
@@ -305,6 +327,8 @@ export interface ContentRepository {
 	listStatues(): Promise<StatueSummary[]>;
 	/** `null` when no statue has this slug (the old address: name, then its code). */
 	getStatue(slug: string): Promise<Statue | null>;
+	/** Lời Thầy dạy: the sayings the editors switched on, in their order. Empty from the sources that have none (snapshot, B2). */
+	listQuotes(): Promise<Quote[]>;
 }
 
 /** Something wrong or odd in the source data, for `npm run snapshot:check`. */

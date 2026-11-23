@@ -10,7 +10,7 @@ import type { StatueEntry } from "../baoTuong";
 import { cleanPosition, MEDIA_BASE, mediaUrl } from "../media";
 import { countCategories, createMemoryRepository, lazy, queryPosts, sectionSlugKey, slugKey } from "../repository";
 import type { TongChiEntry } from "../tongChi";
-import type { AboutTopic, Area, ContentRepository, GalleryImage, MediaImage, Post, PostExtra, PostSummary, Schedule, Video } from "../types";
+import type { AboutTopic, Area, ContentRepository, GalleryImage, MediaImage, Post, PostExtra, PostSummary, Quote, Schedule, StatueImage, StatueSpec, Video } from "../types";
 
 /** The part of a D1 database (or of anything shaped like one) this source uses. */
 export type D1Like = {
@@ -48,6 +48,13 @@ function srcOf(key: unknown, url: unknown): string | null {
 function imageOf(row: Row, prefix: string, position: unknown): MediaImage | null {
 	const src = srcOf(row[`${prefix}_key`], row[`${prefix}_url`]);
 	return src ? { src, position: cleanPosition(text(position)) } : null;
+}
+
+/** A statue's specification: the editors store `{ "Chất liệu": "Đồng" }`; here it is a list so the order and any key survive. */
+function specsOf(raw: unknown): StatueSpec[] {
+	const stored = json<Record<string, unknown>>(raw, {});
+	if (!stored || typeof stored !== "object" || Array.isArray(stored)) return [];
+	return Object.entries(stored).flatMap(([name, value]) => (name.trim() && typeof value !== "object" ? [{ name: name.trim(), value: String(value ?? "").trim() }] : []));
 }
 
 const category = (row: Row, prefix = "cat") => ({ slug: text(row[`${prefix}_slug`]), name: text(row[`${prefix}_name`]) });
@@ -270,11 +277,11 @@ export function createD1Repository(db: D1Like): ContentRepository {
 
 	async function loadTongChi(): Promise<TongChiEntry[]> {
 		const rows = await all(
-			`select a.*, a.legacy_views + coalesce(v.n, 0) as views, c.slug as cat_slug, c.name as cat_name, b.r2_key as banner_key, b.url as banner_url,
+			`select a.*, a.legacy_views + coalesce(v.n, 0) as views, c.slug as cat_slug, c.name as cat_name, c.position as cat_position, b.r2_key as banner_key, b.url as banner_url,
 				o.r2_key as og_key, o.url as og_url
 			from teaching_article a left join category c on c.id = a.group_id left join media b on b.id = a.banner_media_id left join media o on o.id = a.og_media_id
 			${viewsOf("tong-chi")}a.id
-			where ${live("a")} order by a.position, a.id`,
+			where ${live("a")} order by coalesce(c.position, 1e9), min(a.position) over (partition by a.group_id), c.id, a.position, a.id`,
 		);
 		const photos = await galleries(all, "teaching");
 		return rows.map((row) => ({
@@ -284,6 +291,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 			name: text(row.name) || text(row.title),
 			subtitle: text(row.subtitle),
 			group: category(row),
+			...(typeof row.cat_position === "number" ? { groupPosition: row.cat_position } : {}),
 			banner: imageOf(row, "banner", row.banner_position),
 			excerpt: text(row.excerpt),
 			author: text(row.author),
@@ -330,6 +338,13 @@ export function createD1Repository(db: D1Like): ContentRepository {
 			from art_variation v left join media m on m.id = v.image_media_id left join statue t on t.id = v.art_statue_id
 			order by v.statue_id, v.position`,
 		);
+		// The other angles the editors added, in their order; a picture whose file is in the trash is left out.
+		const angles = await all(
+			`select i.statue_id, i.label, i.image_position, m.r2_key as img_key, m.url as img_url
+			from statue_image i join media m on m.id = i.media_id
+			where m.deleted_at is null
+			order by i.statue_id, i.position`,
+		);
 		return rows.map((row) => {
 			const slug = text(row.slug);
 			return {
@@ -355,13 +370,38 @@ export function createD1Repository(db: D1Like): ContentRepository {
 						image: imageOf(item, "img", item.image_position),
 						href: item.art_slug ? `/bao-tuong/${text(item.art_slug)}` : null,
 					})),
+				images: angles.flatMap((item): StatueImage[] => {
+					if (item.statue_id !== row.id) return [];
+					const image = imageOf(item, "img", item.image_position);
+					return image ? [{ ...image, label: text(item.label) }] : [];
+				}),
+				specs: specsOf(row.specs),
+				seoTitle: text(row.seo_title),
+				seoDescription: text(row.seo_description),
 				text: text(row.body),
 			};
 		});
 	}
 
+	/** Lời Thầy dạy: the sayings switched on and not in the trash, in the order the admin sorts them. */
+	async function loadQuotes(): Promise<Quote[]> {
+		const rows = await all("select id, text, author, source, source_url from quote where deleted_at is null and active = 1 order by position, id");
+		return rows.filter((row) => text(row.text).trim()).map((row) => ({ id: text(row.id), text: text(row.text), author: text(row.author), source: text(row.source), sourceUrl: text(row.source_url) }));
+	}
+
+	/** The place the editors gave each post category, by category slug, per section (a slug is unique inside its section only). */
+	const categoryPlaces = lazy(async () => {
+		const bySection = new Map<string, Map<string, number>>();
+		for (const row of await all("select section, slug, position from category where kind = 'post' and deleted_at is null")) {
+			const places = bySection.get(text(row.section)) ?? new Map<string, number>();
+			places.set(text(row.slug), num(row.position));
+			bySection.set(text(row.section), places);
+		}
+		return bySection;
+	});
+
 	// The smaller kinds go through the same code as the other sources; only posts are answered here.
-	const rest = createMemoryRepository([], { loadSchedule, loadAbout, loadTongChi, loadAreas, loadStatues });
+	const rest = createMemoryRepository([], { loadSchedule, loadAbout, loadTongChi, loadAreas, loadStatues, loadQuotes });
 	return {
 		...rest,
 		async listPosts(query) {
@@ -369,7 +409,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 		},
 		getPostBySlug,
 		async listCategories(section) {
-			return countCategories(await summaries(), section);
+			return countCategories(await summaries(), section, (await categoryPlaces()).get(section));
 		},
 	};
 }

@@ -43,6 +43,19 @@ async function viaD1(): Promise<ContentRepository> {
 	return createD1Repository(asD1(db));
 }
 
+/**
+ * D1 alone knows the order the editors gave categories and Tông Chỉ groups (`position`, `groupPosition`), and lists categories in it;
+ * the files only have the order the old admin wrote them in. What must match is everything else.
+ */
+const withoutPlaces = <T extends object>(items: T[]): T[] =>
+	items.map((item) => {
+		const rest = { ...item } as T & { position?: number; groupPosition?: number };
+		delete rest.position;
+		delete rest.groupPosition;
+		return rest;
+	});
+const bySlug = <T extends { slug: string }>(items: T[]) => [...items].sort((a, b) => a.slug.localeCompare(b.slug));
+
 const SECTIONS = ["dong-chay-hoang-phap", "tri-tue-phat-phap", "vu-tru-phat-giao"];
 const SORTS: PostSort[] = ["newest", "oldest", "az", "za", "views"];
 
@@ -77,7 +90,7 @@ describe.skipIf(!hasSnapshot)("every source answers as the snapshot does", () =>
 			}
 			for (const section of SECTIONS) {
 				const categories = await reference.listCategories(section);
-				expect(await repo.listCategories(section), `${name} ${section}`).toEqual(categories);
+				expect(bySlug(withoutPlaces(await repo.listCategories(section))), `${name} ${section}`).toEqual(bySlug(withoutPlaces(categories)));
 				for (const { slug } of categories) expect(await repo.listPosts({ section, category: slug, pageSize: 60 }), `${name} ${slug}`).toEqual(await reference.listPosts({ section, category: slug, pageSize: 60 }));
 			}
 			expect(await repo.listPosts({ pageSize: 0 })).toEqual(await reference.listPosts({ pageSize: 0 }));
@@ -105,8 +118,8 @@ describe.skipIf(!hasSnapshot)("every source answers as the snapshot does", () =>
 			expect(await repo.listAreas(), `${name} areas`).toEqual(await reference.listAreas());
 
 			const articles = await reference.listTongChi();
-			expect(await repo.listTongChi(), `${name} tong chi`).toEqual(articles);
-			for (const { slug } of articles) expect(await repo.getTongChi(slug), `${name} ${slug}`).toEqual(await reference.getTongChi(slug));
+			expect(withoutPlaces(await repo.listTongChi()), `${name} tong chi`).toEqual(withoutPlaces(articles));
+			for (const { slug } of articles) expect(withoutPlaces([(await repo.getTongChi(slug))!]), `${name} ${slug}`).toEqual(withoutPlaces([(await reference.getTongChi(slug))!]));
 			expect(await repo.getTongChi("khong-co")).toBeNull();
 
 			const statues = await reference.listStatues();
