@@ -1,5 +1,7 @@
 # Chuyển `www.tunglamhoaphuc.com` sang site mới (T22)
 
+> **Đã thay thế** (23/11/2026) bởi [chuyen-v3-lam-site-chinh.md](chuyen-v3-lam-site-chinh.md): V3 thành trang chính, admin dời sang `quantri.`. Tài liệu này giữ lại như lịch sử của lần chuyển 20/11 từ Vercel sang `tlhp-web`.
+
 > Cập nhật 17/11/2026. Liên quan: [tasks/todo.md](../../tasks/todo.md) T22 và Checkpoint E, [admin-cu.md](admin-cu.md), [nguon-b2.md](nguon-b2.md).
 > **Chưa diễn tập và chưa chuyển.** Mục 3 và 4 ghi cách làm theo cấu hình hiện có; mọi bước đánh dấu ⚠️ cần kiểm lại khi diễn tập, vì chưa ai chạy chúng. Tiêu chí "quay lại trong 15 phút" chỉ được đánh dấu xong sau khi diễn tập thật.
 
