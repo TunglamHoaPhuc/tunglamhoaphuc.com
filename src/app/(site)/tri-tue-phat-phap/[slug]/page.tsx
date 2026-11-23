@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import PostArticle from "@/components/sections/posts/PostArticle";
+import PostExtras from "@/components/sections/posts/PostExtras";
 import ButtonPrimary from "@/components/shared/buttons/ButtonPrimary";
 import { TRI_TUE } from "@/config/sections";
 import { book } from "@/config/triTue";
@@ -22,8 +23,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 // A post of Trí Tuệ Phật Pháp, as Dòng Chảy shows its own. The post that presents the book
-// leads to the book. The data has no sound for Pháp Âm nor video for Video Phật Pháp (the
-// old pages show none either): those posts are their text and picture.
+// leads to the book. What the editors fill in for a category shows under the opening: the
+// sound of a Pháp Âm post and the book of an Ấn Phẩm & Sách post (the video of a Video Phật
+// Pháp post is among the post's videos).
 export default async function TriTueArticle({ params }: Props) {
 	const { slug } = await params;
 	const post = await findSectionPost(TRI_TUE, slug);
@@ -31,11 +33,15 @@ export default async function TriTueArticle({ params }: Props) {
 		await redirectIfMoved(`${TRI_TUE.path}/${slug}`);
 		notFound();
 	}
-	const extra =
-		post.slug === book.postSlug ? (
-			<div className="tlhp-article-actions">
-				<ButtonPrimary text="Đọc sách" url={book.path} />
-			</div>
-		) : null;
+	const extra = (
+		<>
+			{post.slug === book.postSlug ? (
+				<div className="tlhp-article-actions">
+					<ButtonPrimary text="Đọc sách" url={book.path} />
+				</div>
+			) : null}
+			<PostExtras extra={post.extra} />
+		</>
+	);
 	return <PostArticle section={TRI_TUE} post={post} extra={extra} />;
 }

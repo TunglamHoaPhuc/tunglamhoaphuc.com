@@ -9,7 +9,7 @@ test.setTimeout(300_000);
 
 const stamp = Date.now().toString(36);
 const SECTION = "dong-chay-hoang-phap";
-const CATEGORY = { video: "post:tri-tue-phat-phap:video", book: "post:tri-tue-phat-phap:an-pham-sach", plain: "post:dong-chay-hoang-phap:cong-tu" };
+const CATEGORY = { video: "post:tri-tue-phat-phap:video", sound: "post:tri-tue-phat-phap:phap-am", book: "post:tri-tue-phat-phap:an-pham-sach", plain: "post:dong-chay-hoang-phap:cong-tu" };
 let base: string;
 let root: AdminApi;
 let editor: AdminApi;
@@ -257,9 +257,21 @@ test("video, book and the fields of a category: normalised, kept, shown", async 
 	expect((book.extra as { book: { title: string } }).book.title).toBe(`Cuốn sách ${stamp}`);
 	const liveBook = unwrap<Detail>(await root.call("POST", `posts/${book.id}/publish`, { version: book.version }));
 	expect((await visit(pathOf(liveBook))).status).toBe(200);
-	// The reader (src/libs/content/sources/d1.ts) hands the book to the page, but the public post page (PostArticle) does not draw the book of an
-	// "Ấn phẩm & Sách" post nor the sound of a "Pháp Âm" post yet: an owner's decision on the look, noted in the QA report. Only the video is shown.
-	test.info().annotations.push({ type: "known-gap", description: "PostArticle does not render extra.book / extra.audio" });
+	// The public page draws the book of an "Ấn phẩm & Sách" post: label, title, author, the cover and a link that opens safely.
+	const bookPage = (await visit(pathOf(liveBook))).html;
+	expect(bookPage, "the book is on the page").toContain(`Cuốn sách ${stamp}`);
+	expect(bookPage).toContain("Tác giả thử");
+	expect(bookPage).toContain("tlhp-post-book");
+	expect(bookPage, "the cover is the library picture").toContain(`/cms/${cover}/`);
+	expect(bookPage, "the link opens in another tab and keeps the opener shut").toMatch(/<a[^>]*href="https:\/\/example\.test\/mua"[^>]*rel="noopener noreferrer"|<a[^>]*rel="noopener noreferrer"[^>]*href="https:\/\/example\.test\/mua"/);
+
+	// a Pháp Âm sound: a player with the sound's address and its length
+	const sound = await create(root, { title: `Bài pháp âm ${stamp}`, categoryId: CATEGORY.sound, section: "tri-tue-phat-phap", extra: { audioUrl: "/anh-goc/media/cms/am-thanh-thu/v1/am-thanh.mp3", duration: "12:34" } });
+	const liveSound = unwrap<Detail>(await root.call("POST", `posts/${sound.id}/publish`, { version: sound.version }));
+	const soundPage = (await visit(pathOf(liveSound))).html;
+	expect(soundPage, "the player is on the page").toMatch(/<audio[^>]*controls/);
+	expect(soundPage).toContain("am-thanh.mp3");
+	expect(soundPage).toContain("12:34");
 	const db = localDb();
 	expect((db.prepare("SELECT field FROM media_usage WHERE entity_type = 'post' AND entity_id = ? AND media_id = ?").get(book.id, cover) as { field: string }).field).toBe("extra.book.coverMediaId");
 	db.close();
