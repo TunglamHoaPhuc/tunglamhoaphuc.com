@@ -38,6 +38,6 @@ test("the admin sends a Content-Security-Policy and nothing on its screens break
 		await page.waitForLoadState("networkidle");
 	}
 	// `vite dev` runs its modules through eval(); the built Worker has none, so only that one kind is let go here.
-	const real = violations.filter((text) => !/blocked eval/.test(text) && !/unsafe-eval/.test(text));
+	const real = process.env.CSP_STRICT ? violations : violations.filter((text) => !/blocked eval/.test(text) && !/unsafe-eval/.test(text));
 	expect(real, "no screen of the admin is blocked by its own policy").toEqual([]);
 });
