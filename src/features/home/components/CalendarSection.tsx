@@ -26,12 +26,12 @@ import {
   CalendarEvent,
   MONTH_THEMES,
   MonthThemeInfo,
-  getEventsForMonth,
   getEventCategoryIcon,
   parseSolarDateStr,
   formatSolarDateStr,
   calcDaysDifference,
 } from "@/data/schedule-data";
+import { monthEvents, resolveMonthTheme, type CalendarPayload } from "@/lib/v3-calendar";
 
 function toSlug(str: string): string {
   return str
@@ -265,12 +265,10 @@ export const CalendarSection: FC = () => {
   const startDayOffset = getStartDayOffset(currentYear, currentMonth);
   const buddhistEra = getBuddhistEraYear(currentYear);
 
-  const [dbData, setDbData] = useState<{
-    featuredPrograms?: any[];
-    monthThemes?: Record<string, any>;
-    customEvents?: any[];
+  const [dbData, setDbData] = useState<(CalendarPayload & {
     quoteGallery?: Array<{ id: string; url: string; title?: string }>;
-  } | null>(null);
+  }) | null>(null);
+  const [scheduleState, setScheduleState] = useState<'loading' | 'ready' | 'failed'>('loading');
 
   useEffect(() => {
     async function loadSchedule() {
@@ -283,247 +281,29 @@ export const CalendarSection: FC = () => {
           const json = await res.json();
           if (json.success && json.data) {
             setDbData(json.data);
+            setScheduleState('ready');
+            return;
           }
         }
+        setScheduleState('failed');
       } catch {
-        // Fallback silently
+        // Không đọc được D1: dùng dự phòng
+        setScheduleState('failed');
       }
     }
     loadSchedule();
   }, []);
 
-  // Month Theme Info (Banner, Quote, Colors)
-  const monthTheme: MonthThemeInfo = useMemo(() => {
-    if (dbData?.monthThemes && dbData.monthThemes[String(currentMonth)]) {
-      const mt = dbData.monthThemes[String(currentMonth)];
-      return {
-        month: mt.month || currentMonth + 1,
-        bannerImg: mt.bannerImg || MONTH_THEMES[currentMonth]?.bannerImg || '',
-        title: mt.title || '',
-        quoteLines: Array.isArray(mt.quoteLines) ? mt.quoteLines : [],
-        author: mt.author || 'Vô Trí - Tâm Hòa',
-        primaryColor: mt.primaryColor || '#8B3A1C',
-        secondaryColor: mt.secondaryColor || '#F2C14E',
-        themeBg: mt.themeBg || '#2A170F',
-        quoteImg: mt.quoteImg || MONTH_THEMES[currentMonth]?.quoteImg,
-        quoteTitle: mt.quoteTitle || MONTH_THEMES[currentMonth]?.quoteTitle,
-      };
-    }
-    return MONTH_THEMES[currentMonth] || MONTH_THEMES[0];
-  }, [currentMonth, dbData]);
+  // Chủ đề tháng (tranh, câu thơ): lấy từ month_theme của D1 nếu admin đã nhập, không thì chủ đề đóng gói sẵn của V3.
+  const monthTheme: MonthThemeInfo = useMemo(() => resolveMonthTheme(dbData, currentMonth), [currentMonth, dbData]);
 
-  // Dynamic automatic calculation of all events for this month
-  const monthEventsMap = useMemo(() => {
-    const baseMap = getEventsForMonth(currentYear, currentMonth);
-    // Bổ sung slug mặc định cho các sự kiện cơ bản và cập nhật cấu hình từ featuredPrograms (nếu admin có sửa)
-    Object.keys(baseMap).forEach((dayKey) => {
-      const d = Number(dayKey);
-      baseMap[d] = baseMap[d].map((ev) => {
-        let enhancedEv = {
-          ...ev,
-          slug: ev.slug || toSlug(ev.title),
-        };
-
-        if (dbData?.featuredPrograms && Array.isArray(dbData.featuredPrograms)) {
-          const matchedProg = dbData.featuredPrograms.find((p: any) => {
-            const pTitle = (p.title || '').toLowerCase().trim();
-            const evTitle = (ev.title || '').toLowerCase().trim();
-            if (!pTitle) return false;
-            if (evTitle.includes(pTitle) || pTitle.includes(evTitle)) return true;
-            if (evTitle.includes('tiểu sám hối') && pTitle.includes('tiểu sám hối')) return true;
-            if (evTitle.includes('đại sám hối') && pTitle.includes('đại sám hối')) return true;
-            if ((evTitle.includes('cầu an') || evTitle.includes('quốc thái')) && (pTitle.includes('cầu an') || pTitle.includes('quốc thái'))) return true;
-            if (evTitle.includes('niệm phật') && pTitle.includes('niệm phật')) return true;
-            return false;
-          });
-          if (matchedProg) {
-            enhancedEv = {
-              ...enhancedEv,
-              title: (matchedProg.title && matchedProg.title.trim()) || enhancedEv.title,
-              subtitle: matchedProg.subtitle !== undefined ? matchedProg.subtitle : enhancedEv.subtitle,
-              subTitle1: matchedProg.subtitle || enhancedEv.subTitle1,
-              timeSlot1Time: (matchedProg.time && matchedProg.time.trim()) || (matchedProg.schedule && matchedProg.schedule.trim()) || enhancedEv.timeSlot1Time,
-              timeSlot2Time: (matchedProg.duration && matchedProg.duration.trim()) || enhancedEv.timeSlot2Time,
-              location: (matchedProg.location && matchedProg.location.trim()) ? matchedProg.location.trim() : enhancedEv.location,
-              description: (matchedProg.summary && matchedProg.summary.trim()) || enhancedEv.description,
-              imgUrl: (matchedProg.imgUrl && matchedProg.imgUrl.trim()) || enhancedEv.imgUrl,
-              imgPositionY: matchedProg.imgPositionY !== undefined ? matchedProg.imgPositionY : enhancedEv.imgPositionY,
-            };
-          }
-        }
-
-        return enhancedEv;
-      });
-    });
-
-    // Nếu người quản trị đã xóa khóa lễ khỏi featuredPrograms (ví dụ: Pháp Hội Niệm Phật), tự động lọc bỏ khỏi baseMap
-    if (dbData?.featuredPrograms && Array.isArray(dbData.featuredPrograms)) {
-      const hasNiemPhat = dbData.featuredPrograms.some((p: any) =>
-        (p.title || '').toLowerCase().includes('niệm phật') || (p.title || '').toLowerCase().includes('niem phat')
-      );
-      if (!hasNiemPhat) {
-        Object.keys(baseMap).forEach((dayKey) => {
-          const d = Number(dayKey);
-          baseMap[d] = baseMap[d].filter((ev) => !ev.title.toLowerCase().includes('niệm phật'));
-          if (baseMap[d].length === 0) {
-            delete baseMap[d];
-          }
-        });
-      }
-    }
-
-    if (dbData?.customEvents && Array.isArray(dbData.customEvents)) {
-      dbData.customEvents.forEach((ce: any) => {
-        const isMulti = !!(ce.isMultiDay || (ce.endDateStr && ce.endDateStr.trim() !== '' && ce.endDateStr.trim() !== ce.solarDateStr.trim()));
-        const startDate = parseSolarDateStr(ce.solarDateStr);
-        const endDate = isMulti && ce.endDateStr ? parseSolarDateStr(ce.endDateStr) : startDate;
-
-        if (!startDate) return;
-
-        const startTime = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).getTime();
-        const coreEndTime = endDate
-          ? new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()).getTime()
-          : startTime;
-
-        const continueUntilDate = (ce.continueChanting && ce.continueChantingUntil)
-          ? parseSolarDateStr(ce.continueChantingUntil)
-          : null;
-        const finalEndTime = continueUntilDate && continueUntilDate.getTime() > coreEndTime
-          ? new Date(continueUntilDate.getFullYear(), continueUntilDate.getMonth(), continueUntilDate.getDate()).getTime()
-          : coreEndTime;
-
-        // Phủ sự kiện vào tất cả các ngày d trong tháng hiện tại nằm trong khoảng [startDate, finalEndTime]
-        for (let d = 1; d <= daysInMonth; d++) {
-          const currentDate = new Date(currentYear, currentMonth, d);
-          const currentTime = currentDate.getTime();
-
-          if (currentTime >= startTime && currentTime <= finalEndTime) {
-            const ceTitleLower = (ce.title || '').toLowerCase().trim();
-
-            // Tìm xem trước khi lọc, trong ngày d đã có sự kiện multiDayInfo cùng tên chưa (để kế thừa cho ngày Tạ đàn)
-            const existingMatchingMultiEv = baseMap[d]?.find(
-              (ev) => (ev.title || '').toLowerCase().trim() === ceTitleLower && ev.multiDayInfo
-            );
-
-            // Loại bỏ sự kiện mặc định bị trùng lặp hoặc mâu thuẫn trong ngày d
-            if (baseMap[d]) {
-              baseMap[d] = baseMap[d].filter((ev) => {
-                const evTitleLower = (ev.title || '').toLowerCase().trim();
-                if (evTitleLower === ceTitleLower) return false;
-                if (
-                  (ceTitleLower.includes('ngũ bách danh') || ceTitleLower.includes('quan am') || ceTitleLower.includes('quán âm')) &&
-                  (evTitleLower.includes('quán thế âm') || evTitleLower.includes('ngũ bách danh'))
-                ) {
-                  return false;
-                }
-                return true;
-              });
-            }
-
-            const lunar = convertSolarToLunar(d, currentMonth, currentYear);
-            const isCongTu = ce.category === 'Cộng Tu';
-
-            // Phân biệt các giai đoạn:
-            // 1. Giai đoạn khóa tu chính: currentTime <= coreEndTime
-            // 2. Giai đoạn tụng kinh duy trì tiếp: currentTime > coreEndTime && currentTime < finalEndTime
-            // 3. Ngày tạ đàn hoàn mãn: currentTime === finalEndTime && currentTime > coreEndTime
-            const isChantingFinalDay = currentTime === finalEndTime && currentTime > coreEndTime;
-            const isChantingExtension = currentTime > coreEndTime && currentTime < finalEndTime;
-            const isCoreLastDay = currentTime === coreEndTime;
-
-            // Tính multiDayInfo
-            let multiDayInfo = undefined;
-            if (isMulti) {
-              const totalDays = Math.max(1, Math.round((coreEndTime - startTime) / 86400000) + 1);
-              const currentDayIndex = Math.max(1, Math.round((currentTime - startTime) / 86400000) + 1);
-              multiDayInfo = {
-                totalDays,
-                currentDayIndex,
-                isFirstDay: currentDayIndex === 1,
-                isLastDay: isCoreLastDay,
-                startDateStr: ce.solarDateStr,
-                endDateStr: ce.endDateStr,
-                isChantingExtension,
-                isChantingFinalDay,
-              };
-            } else if (existingMatchingMultiEv?.multiDayInfo) {
-              // Kế thừa multiDayInfo nếu sự kiện riêng này là ngày kết khóa / tạ đàn của chuỗi khóa tu đã phủ
-              multiDayInfo = {
-                ...existingMatchingMultiEv.multiDayInfo,
-                isLastDay: true,
-              };
-            }
-
-            // Tự động xử lý giờ thời khóa và lưu ý hành trì:
-            let eventTime = ce.timeSlot1Time || '08h00';
-            let eventNotes = ce.notes || '';
-            let eventSubtitle = ce.subtitle || '';
-            let eventSubTitle1 = ce.subtitle || (isCongTu ? 'Cộng tu' : 'Đại lễ sự kiện');
-
-            if (isCoreLastDay) {
-              // Ngày kết khóa chính
-              if (ce.endDayTime && ce.endDayTime.trim()) {
-                eventTime = ce.endDayTime.trim();
-              }
-              if (ce.continueChanting && ce.continueChantingUntil) {
-                const rawName = (ce.continueChantingName && ce.continueChantingName.trim()) || ce.title;
-                const chantName = rawName.toLowerCase().startsWith('kinh') ? rawName : `Kinh ${rawName}`;
-                const autoNotice = `❖ Lưu ý: Thời khóa tụng ${chantName} sẽ được tiếp tục duy trì tụng tiếp đến ngày ${ce.continueChantingUntil}.`;
-                eventNotes = eventNotes ? `${eventNotes}\n\n${autoNotice}` : autoNotice;
-              }
-            } else if (isChantingFinalDay) {
-              // Ngày Tạ Đàn tự động
-              eventSubtitle = 'Tạ đàn';
-              eventSubTitle1 = 'Tạ đàn';
-              const autoNotice = `❖ Lễ Tạ đàn hoàn mãn thời khóa tụng kinh.`;
-              eventNotes = eventNotes ? `${eventNotes}\n\n${autoNotice}` : autoNotice;
-            } else if (isChantingExtension) {
-              // Ngày tụng kinh tiếp
-              eventSubtitle = 'Tụng kinh tiếp';
-              eventSubTitle1 = 'Tụng kinh tiếp';
-            }
-
-            const customEvt: CalendarEvent = {
-              id: isChantingFinalDay || isChantingExtension ? `${ce.id}-chant-${d}` : ce.id,
-              day: d,
-              solarDateStr: `${String(d).padStart(2, '0')}.${String(currentMonth + 1).padStart(2, '0')}.${currentYear}`,
-              endDateStr: ce.endDateStr,
-              isMultiDay: isMulti,
-              multiDayInfo,
-              dayOfWeekStr: ['Chủ Nhật', 'Thứ Hai', 'Thứ Ba', 'Thứ Tư', 'Thứ Năm', 'Thứ Sáu', 'Thứ Bảy'][currentDate.getDay()],
-              lunarDate: `(${String(lunar.day).padStart(2, '0')}.${String(lunar.month).padStart(2, '0')}.ÂL)`,
-              lunarTag: isCongTu ? 'CỘNG TU' : 'SỰ KIỆN',
-              subTitle1: eventSubTitle1,
-              title: ce.title,
-              subtitle: eventSubtitle,
-              subTitle2: ce.location || 'Tùng Lâm Hòa Phúc',
-              description: ce.description || '',
-              category: ce.category || 'Đại Lễ Sự Kiện',
-              location: ce.location || 'Tùng Lâm Hòa Phúc',
-              timeSlot1Label: isCoreLastDay && ce.endDayTime ? 'Thời Khóa Kết Khóa' : (ce.timeSlot1Label || 'Thời Khóa'),
-              timeSlot1Time: eventTime,
-              timeSlot2Label: ce.timeSlot2Label,
-              timeSlot2Time: ce.timeSlot2Time,
-              color: isCongTu ? '#10B981' : '#F2C14E',
-              imgUrl: ce.imgUrl || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp',
-              imgPositionY: ce.imgPositionY !== undefined ? ce.imgPositionY : 50,
-              isImportant: true,
-              slug: ce.slug || toSlug(ce.title),
-              notes: eventNotes,
-              endDayType: ce.endDayType,
-              endDayLabel: ce.endDayLabel,
-              endDayTime: ce.endDayTime,
-              continueChanting: ce.continueChanting,
-              continueChantingUntil: ce.continueChantingUntil,
-              continueChantingName: ce.continueChantingName,
-            };
-            baseMap[d] = [...(baseMap[d] || []), customEvt];
-          }
-        }
-      });
-    }
-    return baseMap;
-  }, [currentYear, currentMonth, dbData, daysInMonth]);
+  // Sự kiện của tháng do D1 quyết định như trang www (src/lib/v3-calendar.ts): sự kiện đã xuất bản + khóa lễ thường kỳ theo quy tắc
+  // âm lịch trong chương trình. Đang chờ D1 thì để lịch trống, để một sự kiện admin đã ẩn không nhấp nháy hiện ra rồi mất.
+  // Bộ sinh cứng chỉ làm dự phòng khi D1 không có quy tắc lặp nào hoặc không đọc được (scheduleState = 'failed').
+  const monthEventsMap = useMemo((): Record<number, CalendarEvent[]> => {
+    if (scheduleState === 'loading') return {};
+    return monthEvents(scheduleState === 'ready' ? dbData : null, currentYear, currentMonth).byDay;
+  }, [currentYear, currentMonth, dbData, scheduleState]);
 
   // Danh sách tất cả sự kiện trong tháng hiện tại (sắp xếp theo ngày tăng dần)
   const allMonthEvents = useMemo(() => {
@@ -1414,17 +1194,19 @@ export const CalendarSection: FC = () => {
                       {selectedEvent.description}
                     </p>
                   )}
-                  <p
-                    style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                    className="text-xs sm:text-[13px] text-[#FFE5A3] flex items-center gap-2 font-medium"
-                  >
-                    <img loading="lazy" decoding="async"
-                      src="/images/icons/icon-cac-khu-vuc-noi-bat.webp"
-                      alt="Địa điểm"
-                      className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_0_6px_rgba(242,193,78,0.5)]"
-                    />
-                    <span>{selectedEvent.location}</span>
-                  </p>
+                  {selectedEvent.location && (
+                    <p
+                      style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                      className="text-xs sm:text-[13px] text-[#FFE5A3] flex items-center gap-2 font-medium"
+                    >
+                      <img loading="lazy" decoding="async"
+                        src="/images/icons/icon-cac-khu-vuc-noi-bat.webp"
+                        alt="Địa điểm"
+                        className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_0_6px_rgba(242,193,78,0.5)]"
+                      />
+                      <span>{selectedEvent.location}</span>
+                    </p>
+                  )}
                 </div>
 
                 {/* 3.5 LƯU Ý HÀNH TRÌ (NẾU CÓ) - DÙNG FONT UTM AVO */}

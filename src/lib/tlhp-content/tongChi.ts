@@ -131,8 +131,8 @@ export function parseTongChi(file: unknown): ParsedTongChi {
 	return { entries, issues };
 }
 
-export function tongChiSummary({ id, slug, title, name, subtitle, group, banner, excerpt }: TongChiEntry): TongChiSummary {
-	return { id, slug, title, name, subtitle, group, banner, excerpt };
+export function tongChiSummary({ id, slug, title, name, subtitle, group, groupPosition, banner, excerpt }: TongChiEntry): TongChiSummary {
+	return { id, slug, title, name, subtitle, group, ...(groupPosition === undefined ? {} : { groupPosition }), banner, excerpt };
 }
 
 /** The article with its body as safe HTML; `notes` collects what the body's conversion dropped. */

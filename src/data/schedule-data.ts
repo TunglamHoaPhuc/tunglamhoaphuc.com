@@ -369,6 +369,10 @@ export const FEATURED_PROGRAMS = [
 ];
 
 /**
+ * DỰ PHÒNG, không còn là nguồn của lịch trang chủ. Lịch lấy sự kiện từ D1 như www (src/lib/v3-calendar.ts: sự kiện đã xuất bản
+ * trong calendar_event + khóa lễ thường kỳ theo featured_program). Bộ sinh này chỉ được gọi khi D1 không cho biết quy tắc lặp nào
+ * (không có chương trình thường kỳ nào) hoặc không đọc được D1; ở đó nó vẫn sinh các khóa lễ định kỳ và đại lễ theo luật âm lịch cứng.
+ *
  * Automatically generates all Tu Học events for any given Solar Month and Year
  * with strict adherence to temple rules and exact Vietnamese Lunar calculations.
  */

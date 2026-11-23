@@ -5,7 +5,7 @@ import type { CacheLike } from "./sources/b2";
 import type { D1Like } from "./sources/d1";
 import type { FileLoaders } from "./sources/files";
 import { type TongChiEntry, tongChiArticle, tongChiSummary } from "./tongChi";
-import type { AboutTopic, Area, CategoryCount, ContentRepository, GalleryImage, Page, Post, PostQuery, PostSort, PostSummary, Schedule, Statue, StatueSummary, TongChiArticle } from "./types";
+import type { AboutTopic, Area, CategoryCount, ContentRepository, GalleryImage, Page, Post, PostQuery, PostSort, PostSummary, Quote, Schedule, Statue, StatueSummary, TongChiArticle } from "./types";
 
 export const DEFAULT_PAGE_SIZE = 12;
 const MAX_PAGE_SIZE = 60;
@@ -53,6 +53,8 @@ export type MemoryRepositoryOptions = {
 	loadAreas?: () => Promise<Area[]>;
 	/** Bảo Tượng's statues, loaded the first time a page asks for them. */
 	loadStatues?: () => Promise<StatueEntry[]>;
+	/** Lời Thầy dạy's sayings, loaded the first time a page asks for them (only D1 has any). */
+	loadQuotes?: () => Promise<Quote[]>;
 };
 
 const EMPTY_SCHEDULE: Schedule = { events: [], programs: [], themes: [], quotes: [] };
@@ -80,16 +82,21 @@ export function queryPosts(summaries: PostSummary[], { section, category, sort =
 	};
 }
 
-/** The categories of a section with their post counts, the biggest first. */
-export function countCategories(summaries: PostSummary[], section: string): CategoryCount[] {
+/**
+ * The categories of a section with their post counts. With `positions` (category slug → the editors' place, D1 only) they come in
+ * the editors' order, carry it as `position`, and those without a place come last; without it, the biggest first.
+ */
+export function countCategories(summaries: PostSummary[], section: string, positions?: ReadonlyMap<string, number>): CategoryCount[] {
 	const counts = new Map<string, CategoryCount>();
 	for (const post of summaries) {
 		if (post.section !== section || !post.category.slug) continue;
-		const entry = counts.get(post.category.slug) ?? { ...post.category, count: 0 };
+		const place = positions?.get(post.category.slug);
+		const entry = counts.get(post.category.slug) ?? { ...post.category, count: 0, ...(place === undefined ? {} : { position: place }) };
 		entry.count++;
 		counts.set(post.category.slug, entry);
 	}
-	return [...counts.values()].sort((a, b) => b.count - a.count || collator.compare(a.name, b.name));
+	const place = (entry: CategoryCount) => entry.position ?? Number.POSITIVE_INFINITY;
+	return [...counts.values()].sort((a, b) => (place(a) === place(b) ? 0 : place(a) < place(b) ? -1 : 1) || b.count - a.count || collator.compare(a.name, b.name));
 }
 
 /** `load`'s value, read on first use and kept; a failed read is tried again on the next use. */
@@ -111,7 +118,7 @@ const none = async () => [];
  */
 export function createMemoryRepository(
 	posts: Post[] | (() => Promise<Post[]>),
-	{ loadAlbums, loadSchedule, loadAbout, loadTongChi, loadAreas, loadStatues }: MemoryRepositoryOptions = {},
+	{ loadAlbums, loadSchedule, loadAbout, loadTongChi, loadAreas, loadStatues, loadQuotes }: MemoryRepositoryOptions = {},
 ): ContentRepository {
 	const postIndex = lazy(async (): Promise<PostIndex> => {
 		const list = typeof posts === "function" ? await posts() : posts;
@@ -127,6 +134,7 @@ export function createMemoryRepository(
 	const tongChiEntries = lazy<TongChiEntry[]>(loadTongChi ?? none);
 	const areas = lazy<Area[]>(loadAreas ?? none);
 	const statues = lazy<StatueEntry[]>(loadStatues ?? none);
+	const quotes = lazy<Quote[]>(loadQuotes ?? none);
 	// Bodies are turned into HTML one page at a time, once each.
 	const tongChiPages = new Map<string, TongChiArticle>();
 	const statuePages = new Map<string, Statue>();
@@ -169,6 +177,8 @@ export function createMemoryRepository(
 		},
 
 		listAreas: areas,
+
+		listQuotes: quotes,
 
 		async listStatues(): Promise<StatueSummary[]> {
 			return (await statues()).map(statueSummary);

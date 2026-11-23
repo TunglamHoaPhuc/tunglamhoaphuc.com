@@ -3,6 +3,7 @@
 // V3 pages were written for (the old admin's JSON: posts-database.json, tong-chi-data.json…).
 // Read only: nothing here writes. Edit content in www's admin (/quan-tri); it shows here within a minute.
 import scheduleBase from "@/data/schedule-database.json";
+import { toSlug } from "@/lib/schedule-detail";
 import { getContentRepository } from "@/lib/tlhp-content/repository";
 import type { AboutTopic, Area, GalleryImage, MediaImage, Post, PostSummary, Schedule, TongChiArticle, TongChiSummary } from "@/lib/tlhp-content/types";
 
@@ -271,6 +272,8 @@ export function toScheduleData(s: Schedule) {
 	const base = scheduleBase as unknown as BaseSchedule & { monthThemes: Record<string, Record<string, unknown>> };
 	const monthThemes: Record<string, Record<string, unknown>> = { ...base.monthThemes };
 	for (const t of s.themes) {
+		// A month the admin has not filled in (no title, verse, author or picture) keeps V3's bundled theme; any content makes the admin's row the theme.
+		if (!t.title && !t.lines.length && !t.author && !t.poster) continue;
 		const key = Object.keys(monthThemes).find((k) => Number((monthThemes[k] as { month?: number }).month) === t.month) ?? String(t.month);
 		monthThemes[key] = {
 			...(monthThemes[key] ?? { month: t.month, primaryColor: "#8B3A1C", secondaryColor: "#F2C14E", themeBg: "#2A170F" }),
@@ -284,6 +287,7 @@ export function toScheduleData(s: Schedule) {
 	return {
 		featuredPrograms: s.programs.map((p) => ({
 			id: p.id,
+			slug: toSlug(p.title),
 			title: p.title,
 			subtitle: p.subtitle,
 			time: p.time,

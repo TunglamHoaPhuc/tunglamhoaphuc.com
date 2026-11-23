@@ -1,6 +1,6 @@
 'use client';
 
-import React, { FC, useState, useEffect } from 'react';
+import React, { FC } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Sparkles, BookOpen, Compass, Waves } from 'lucide-react';
 import { C } from '@/config/theme';
@@ -10,7 +10,7 @@ import { PostCard } from '@/components/common/PostCard';
 import { SectionTransitionOverlay } from '@/components/common/SectionTransitionOverlay';
 import { PostItem } from '@/types/post';
 
-// ─── Dữ liệu khởi tạo hiển thị tức thì (Zero-flicker SSR fallback) ─────────────
+// ─── Bộ thẻ dự phòng: chỉ hiện khi máy chủ không đọc được bài nào từ D1 (không có số lượt xem để khỏi nói sai) ─────────────
 const INITIAL_TOP_POSTS: PostItem[] = [
   {
     id: 'tc-4',
@@ -23,7 +23,7 @@ const INITIAL_TOP_POSTS: PostItem[] = [
     subtitle: 'Nền tảng khởi đầu & động lực giác ngộ',
     description: 'Nền tảng khởi đầu và động lực tối thượng trên lộ trình tu học giác ngộ, xây dựng nếp sống tỉnh thức an lạc.',
     publishedDate: '',
-    viewsCount: '58.2K',
+    viewsCount: 0,
     targetUrl: '/tong-chi-tu-hoc/bo-de-tam-coi-nguon-thien-phap',
     thumbnailPosition: 'center 20%',
     imagePosition: 'center 20%',
@@ -39,7 +39,7 @@ const INITIAL_TOP_POSTS: PostItem[] = [
     subtitle: 'Mùa báo hiếu thiêng liêng tri ân công đức',
     description: 'Mùa báo hiếu thiêng liêng trở về nguồn cội, nuôi dưỡng tình thương và sự tri ân công đức sinh thành dưỡng dục.',
     publishedDate: '',
-    viewsCount: '52.4K',
+    viewsCount: 0,
     targetUrl: '/dong-chay-hoang-phap/dai-le-vu-lan-bao-hieu-tri-an',
     thumbnailPosition: 'center 20%',
     imagePosition: 'center 20%',
@@ -55,7 +55,7 @@ const INITIAL_TOP_POSTS: PostItem[] = [
     subtitle: 'Chỉ dẫn điều phục thân tâm & chuyển hóa khổ đau',
     description: 'Chỉ dẫn tinh tế về phương pháp điều phục thân tâm, nhận diện chướng ngại và chuyển hóa khổ đau trong đời sống thường nhật.',
     publishedDate: '',
-    viewsCount: '41.2K',
+    viewsCount: 0,
     targetUrl: '/tri-tue-phat-phap/phap-am-chu-de-tu-tap-dung-cach-cong-tu-mot-ngay-an-lac',
     thumbnailPosition: 'center 20%',
     imagePosition: 'center 20%',
@@ -71,7 +71,7 @@ const INITIAL_TOP_POSTS: PostItem[] = [
     subtitle: 'Kính dâng bậc Ân Sư Sư Tổ Ngộ Chân Tử',
     description: 'Kính dâng bậc Ân Sư Sư Tổ Ngộ Chân Tử khai sơn chốn Tổ Hoằng Pháp, kế thừa mạng mạch chánh pháp ngàn đời.',
     publishedDate: '',
-    viewsCount: '54.2K',
+    viewsCount: 0,
     targetUrl: '/tong-chi-tu-hoc/tiep-buoc-thay-toi',
     thumbnailPosition: 'center 20%',
     imagePosition: 'center 20%',
@@ -87,7 +87,7 @@ const INITIAL_TOP_POSTS: PostItem[] = [
     subtitle: 'Ngày thanh tịnh trau dồi phạm hạnh',
     description: 'Ngày thanh tịnh trau dồi phạm hạnh, nhiếp tâm niệm Phật cầu an lạc cho muôn loài đệ tử tại gia.',
     publishedDate: '',
-    viewsCount: '38.6K',
+    viewsCount: 0,
     targetUrl: '/dong-chay-hoang-phap/phap-hoi-niem-phat-hang-tuan',
     thumbnailPosition: 'center 20%',
     imagePosition: 'center 20%',
@@ -103,7 +103,7 @@ const INITIAL_TOP_POSTS: PostItem[] = [
     subtitle: 'Hành trình tu tập & chiêm nghiệm nhân sinh',
     description: 'Tập văn ký hồi ức đúc kết hành trình tu tập, chiêm nghiệm nhân sinh và lòng tri ân sâu sắc đối với Tam Bảo cùng Thầy Tổ.',
     publishedDate: '',
-    viewsCount: '35.4K',
+    viewsCount: 0,
     targetUrl: '/tri-tue-phat-phap/tac-pham-di-qua-kho-vui-cuoc-doi',
     thumbnailPosition: 'center 20%',
     imagePosition: 'center 20%',
@@ -158,6 +158,8 @@ const TABS: TabItem[] = [
 
 interface DharmaSectionProps {
   sectionRef?: SectionRef;
+  /** Các bài đọc nhiều nhất (lượt xem thật từ D1), do trang chủ đọc ở máy chủ; thiếu thì dùng bộ thẻ dự phòng. */
+  posts?: PostItem[] | null;
 }
 
 /**
@@ -169,38 +171,9 @@ interface DharmaSectionProps {
  *   + 4 Post Card xếp lưới 2x2 cân đối bên cạnh
  *   + Hover nhẹ nhàng mới hiển thị mô tả, ngày đăng và lượt xem
  */
-const DharmaSection: FC<DharmaSectionProps> = ({ sectionRef }) => {
-  const [topPosts, setTopPosts] = useState<PostItem[]>(INITIAL_TOP_POSTS.slice(0, 5));
-  const [loading, setLoading] = useState(false);
-
-  // 🚀 Tự động đồng bộ 5 bài viết có lượt theo dõi cao nhất từ API
-  useEffect(() => {
-    let isMounted = true;
-    async function fetchFeatured() {
-      try {
-        setLoading(true);
-        const res = await fetch(`/api/public/dharma-featured?t=${Date.now()}`, {
-          cache: 'no-store',
-          next: { revalidate: 0 },
-        });
-        if (res.ok) {
-          const json = await res.json();
-          if (json.success && json.data && isMounted) {
-            const list = json.data.featured?.length > 0 ? json.data.featured : INITIAL_TOP_POSTS;
-            setTopPosts(list.slice(0, 5));
-          }
-        }
-      } catch (err) {
-        console.warn('Lỗi tải dữ liệu Dấu Ấn Hoằng Pháp:', err);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    }
-    fetchFeatured();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+const DharmaSection: FC<DharmaSectionProps> = ({ sectionRef, posts }) => {
+  // Số lượt xem là của D1, đã có sẵn trong trang đầu tiên (không tải thêm từ trình duyệt).
+  const topPosts = (posts?.length ? posts : INITIAL_TOP_POSTS).slice(0, 5);
 
   const featuredPost = topPosts[0];
   const sidePosts = topPosts.slice(1, 5);

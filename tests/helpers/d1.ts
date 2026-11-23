@@ -5,8 +5,9 @@ import { DatabaseSync } from "node:sqlite";
 import type { D1Like } from "@/lib/tlhp-content/sources/d1";
 
 const SCHEMA = `
-create table media (id text primary key, r2_key text, url text);
-create table category (id text primary key, slug text, name text, kind text);
+create table media (id text primary key, r2_key text, url text, deleted_at text);
+create table category (id text primary key, slug text, name text, kind text, section text default '', position integer default 0, deleted_at text);
+create table quote (id text primary key, text text, author text default '', source text default '', source_url text default '', position integer default 0, active integer default 1, deleted_at text);
 create table page_view (entity_type text, entity_id text, count integer);
 create table album_item (album_id text, media_id text, title text default '', caption text default '', position integer default 0);
 create table post (

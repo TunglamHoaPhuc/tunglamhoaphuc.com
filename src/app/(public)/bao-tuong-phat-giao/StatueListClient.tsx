@@ -7,6 +7,7 @@ import type { StatueItem } from '@/lib/statue-types';
 import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { CustomDropdown } from '@/components/common/CustomDropdown';
 import { getImageUrl } from '@/utils/image';
+import { KIND_OPTIONS, layoutStatues, type StatueKind } from '@/lib/statue-list';
 
 function toSentenceCase(str?: string): string {
   if (!str) return '';
@@ -22,16 +23,6 @@ function formatAreaTitleCase(str?: string): string {
     .split(' ')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
-}
-
-function normalizeStr(str?: string): string {
-  if (!str) return '';
-  return str
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/đ/g, 'd')
-    .replace(/[-_\s]/g, '');
 }
 
 const HEADER_FALLBACK_IMAGE =
@@ -50,6 +41,7 @@ export default function BaoTuongPhatGiaoClient({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAssembly, setSelectedAssembly] = useState('all');
   const [selectedArea, setSelectedArea] = useState('all');
+  const [selectedKind, setSelectedKind] = useState<StatueKind>('all');
   const [isExpanded, setIsExpanded] = useState(false);
 
   // Extract unique areas with title case format
@@ -71,36 +63,12 @@ export default function BaoTuongPhatGiaoClient({
     ];
   }, [STATUE_ASSEMBLIES]);
 
-  // Filter statues
-  const filteredStatues = useMemo(() => {
-    return STATUE_LIST.filter((st) => {
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesName = st.name.toLowerCase().includes(q);
-        const matchesSub = st.subtitle?.toLowerCase().includes(q);
-        const matchesArea = st.areaName?.toLowerCase().includes(q);
-        const matchesCluster = (st.group || st.clusterName || '').toLowerCase().includes(q);
-        if (!matchesName && !matchesSub && !matchesArea && !matchesCluster) return false;
-      }
-      if (selectedAssembly !== 'all') {
-        const stAsm = normalizeStr(st.assemblyId || st.assembly || st.assemblyName);
-        const selAsm = normalizeStr(selectedAssembly);
-        if (stAsm !== selAsm && !stAsm.includes(selAsm) && !selAsm.includes(stAsm)) {
-          return false;
-        }
-      }
-      if (selectedArea !== 'all' && st.areaName !== selectedArea) return false;
-      return true;
-    });
-  }, [STATUE_LIST, searchQuery, selectedAssembly, selectedArea]);
-
-  // Active assemblies to display
-  const activeAssemblies = useMemo(() => {
-    if (selectedAssembly !== 'all') {
-      return STATUE_ASSEMBLIES.filter((asm) => normalizeStr(asm.id) === normalizeStr(selectedAssembly));
-    }
-    return STATUE_ASSEMBLIES.filter((asm) => asm.id !== 'all');
-  }, [STATUE_ASSEMBLIES, selectedAssembly]);
+  // Mọi tượng khớp bộ lọc có đúng một chỗ trên trang: khối chúng hội (tượng chính), khối Nghệ thuật Phật giáo, hoặc lưới phẳng khi tìm chữ / lọc khu vực.
+  const layout = useMemo(
+    () => layoutStatues(STATUE_LIST, assemblies, { query: searchQuery, assembly: selectedAssembly, area: selectedArea, kind: selectedKind }),
+    [STATUE_LIST, assemblies, searchQuery, selectedAssembly, selectedArea, selectedKind],
+  );
+  const totalShown = layout.total;
 
   // Lấy ảnh tôn tượng tiêu biểu cho Header (ưu tiên tôn tượng đầu tiên hoặc Thất Phật Dược Sư)
   const headerBgImage = getImageUrl(
@@ -200,11 +168,23 @@ export default function BaoTuongPhatGiaoClient({
               onChange={setSelectedArea}
               placeholder="Tất cả"
             />
+
+            {/* Vạch phân định nhẹ mờ */}
+            <div className="h-4 w-px bg-[#F2C14E]/25 hidden sm:block" />
+
+            {/* Dropdown 3: Loại (tượng chính / Nghệ thuật Phật giáo) */}
+            <CustomDropdown
+              labelPrefix="Loại"
+              value={selectedKind}
+              options={KIND_OPTIONS}
+              onChange={(v) => setSelectedKind(v as StatueKind)}
+              placeholder="Tất cả"
+            />
           </div>
 
           {/* Count Badge Tinh Gọn */}
           <div className="text-xs text-[#F2C14E] font-bold shrink-0 px-3 py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 rounded-xl border border-[#F2C14E]/35 shadow-sm" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
-            {filteredStatues.length} Bảo tượng
+            {totalShown} Bảo tượng
           </div>
         </div>
 
@@ -212,11 +192,11 @@ export default function BaoTuongPhatGiaoClient({
         <div className="relative mb-12">
           <div
             className={`relative transition-all duration-500 overflow-hidden ${
-              !isExpanded && filteredStatues.length > 8 ? 'max-h-[950px] md:max-h-[1050px]' : 'max-h-[25000px] pb-8'
+              !isExpanded && totalShown > 8 ? 'max-h-[950px] md:max-h-[1050px]' : 'pb-8'
             }`}
           >
-            {/* Nếu đang tìm kiếm cụ thể hoặc lọc theo 1 Khu vực -> Hiển thị dạng lưới trực tiếp */}
-            {searchQuery.trim() || selectedArea !== 'all' ? (
+            {/* Nếu đang tìm kiếm cụ thể hoặc lọc theo 1 Khu vực -> Hiển thị dạng lưới trực tiếp (cả tượng chính lẫn Nghệ thuật Phật giáo) */}
+            {layout.flat ? (
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h2
@@ -226,68 +206,43 @@ export default function BaoTuongPhatGiaoClient({
                     {selectedAssembly !== 'all' ? (STATUE_ASSEMBLIES.find(a => a.id === selectedAssembly)?.name || 'KẾT QUẢ TÌM KIẾM') : (selectedArea !== 'all' ? `KHU VỰC: ${formatAreaTitleCase(selectedArea)}` : 'KẾT QUẢ TÌM KIẾM')}
                   </h2>
                   <span className="text-xs text-[#FFE5A3]/70 font-bold" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
-                    {filteredStatues.length} Tôn tượng
+                    {totalShown} Tôn tượng
                   </span>
                 </div>
                 <div className="h-px w-full bg-gradient-to-r from-[#F2C14E] via-[#F2C14E]/40 to-transparent" />
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {filteredStatues.map((statue) => (
-                    <StatueItemCard key={statue.id} statue={statue} />
-                  ))}
-                </div>
+                <StatueGrid statues={layout.flat} />
               </div>
             ) : (
-              /* Hiển thị theo từng Chúng Hội */
+              /* Hiển thị theo từng Chúng Hội (tượng chính), rồi khối Nghệ thuật Phật giáo */
               <div className="space-y-16">
-                {activeAssemblies.map((asm) => {
-                  const statuesInAsm = filteredStatues.filter((s) => {
-                    const stAsm = normalizeStr(s.assemblyId || s.assembly || s.assemblyName);
-                    const curAsm = normalizeStr(asm.id || asm.name);
-                    return stAsm === curAsm || stAsm.includes(curAsm) || curAsm.includes(stAsm);
-                  });
-                  if (statuesInAsm.length === 0) return null;
-
-                  return (
-                    <div key={asm.id} className="space-y-6">
-                      {/* Assembly Header (UTM Classic Antiqua đồng bộ Bản đồ danh tăng) */}
-                      <div className="flex items-center justify-between pb-2 border-b border-[#F2C14E]/40">
-                        <h2
-                          className="text-2xl md:text-3xl font-normal uppercase tracking-widest text-[#F2C14E]"
-                          style={{ fontFamily: "'UTM ClassizismAntiqua', 'UTM Classic Antiqua', serif" }}
-                        >
-                          {asm.name}
-                        </h2>
-                        <span className="text-xs text-[#FFE5A3] font-bold px-3 py-1 rounded-full bg-[#1C130D] border border-[#F2C14E]/40 shadow-sm" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
-                          {statuesInAsm.length} Tôn tượng
-                        </span>
-                      </div>
-
-                      {/* Grid các thẻ tôn tượng */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                        {statuesInAsm.map((st) => (
-                          <StatueItemCard key={st.id} statue={st} />
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
+                {layout.groups.map((group) => (
+                  <StatueSection key={group.id} title={group.name} count={group.statues.length} statues={group.statues} />
+                ))}
+                {layout.art.length > 0 && (
+                  <StatueSection
+                    title="Nghệ thuật Phật giáo"
+                    note="Các tác phẩm nghệ thuật Phật giáo thể hiện những vị trong hệ thống bảo tượng, tôn thờ tại Tùng Lâm Hòa Phúc."
+                    count={layout.art.length}
+                    statues={layout.art}
+                  />
+                )}
               </div>
             )}
 
-            {filteredStatues.length === 0 && (
+            {totalShown === 0 && (
               <div className="text-center py-20 text-[#c9b896]/70" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 Không tìm thấy bảo tượng nào phù hợp với bộ lọc hiện tại.
               </div>
             )}
 
             {/* Gradient Mask Overlay when Collapsed */}
-            {!isExpanded && filteredStatues.length > 8 && (
+            {!isExpanded && totalShown > 8 && (
               <div className="absolute bottom-0 inset-x-0 h-48 md:h-64 bg-gradient-to-t from-[#2A1D14] via-[#2A1D14]/85 to-transparent pointer-events-none z-10" />
             )}
           </div>
 
           {/* Nút Xem Tất Cả */}
-          {!isExpanded && filteredStatues.length > 8 && (
+          {!isExpanded && totalShown > 8 && (
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 w-full flex justify-center px-4">
               <button
                 type="button"
@@ -295,7 +250,7 @@ export default function BaoTuongPhatGiaoClient({
                 className="px-8 py-3 md:px-10 md:py-3.5 bg-[#6B4B2A] hover:bg-[#8B6439] border border-[#F2C14E] text-[#F2C14E] hover:text-[#FFE5A3] font-bold text-sm md:text-base rounded-xl transition-all duration-300 shadow-[0_10px_25px_rgba(0,0,0,0.7)] flex items-center gap-2 cursor-pointer uppercase tracking-wider"
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
               >
-                <span>XEM TẤT CẢ {filteredStatues.length} BẢO TƯỢNG PHẬT GIÁO</span>
+                <span>XEM TẤT CẢ {totalShown} BẢO TƯỢNG PHẬT GIÁO</span>
                 <ChevronDown className="w-5 h-5" />
               </button>
             </div>
@@ -307,6 +262,44 @@ export default function BaoTuongPhatGiaoClient({
           <SmartSearchAIBar contextTitle="Bảo Tượng Phật Giáo Tùng Lâm Hòa Phúc" />
         </div>
       </main>
+    </div>
+  );
+}
+
+// ── Khối có tiêu đề (một chúng hội, hoặc Nghệ thuật Phật giáo) và lưới thẻ ──
+function StatueSection({ title, note, count, statues }: { title: string; note?: string; count: number; statues: StatueItem[] }) {
+  return (
+    <div className="space-y-6">
+      {/* Assembly Header (UTM Classic Antiqua đồng bộ Bản đồ danh tăng) */}
+      <div className="pb-2 border-b border-[#F2C14E]/40">
+        <div className="flex items-center justify-between">
+          <h2
+            className="text-2xl md:text-3xl font-normal uppercase tracking-widest text-[#F2C14E]"
+            style={{ fontFamily: "'UTM ClassizismAntiqua', 'UTM Classic Antiqua', serif" }}
+          >
+            {title}
+          </h2>
+          <span className="text-xs text-[#FFE5A3] font-bold px-3 py-1 rounded-full bg-[#1C130D] border border-[#F2C14E]/40 shadow-sm" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+            {count} Tôn tượng
+          </span>
+        </div>
+        {note && (
+          <p className="mt-2 text-xs sm:text-sm text-[#e3d2c1]/80" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+            {note}
+          </p>
+        )}
+      </div>
+      <StatueGrid statues={statues} />
+    </div>
+  );
+}
+
+function StatueGrid({ statues }: { statues: StatueItem[] }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      {statues.map((st) => (
+        <StatueItemCard key={st.id} statue={st} />
+      ))}
     </div>
   );
 }
