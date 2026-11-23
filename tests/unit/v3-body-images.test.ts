@@ -49,7 +49,7 @@ test("ảnh không phải /anh-goc/ giữ nguyên từng byte: /brand, /images, 
 });
 
 test("ảnh /anh-goc/ chưa có biến thể (WordPress cũ), GIF, SVG, có query: không srcset, chỉ thêm lazy/async nếu thiếu; không đổi gì nếu đã đủ", () => {
-	const old = "/anh-goc/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2018/07/a-668x445.jpg";
+	const old = "/anh-goc/s2-cnv03/ngoai/2018/07/a-668x445.jpg";
 	assert.equal(optimizeBodyImages(`<img src="${old}" alt="cũ">`), `<img src="${old}" alt="cũ" loading="lazy" decoding="async">`);
 	for (const src of [old, `/anh-goc/media-tunglamhoaphuc/${KEY.replace(".jpg", ".gif")}`, "/anh-goc/media-tunglamhoaphuc/x.svg", `${PICTURE}?v=2`]) {
 		const full = `<img src="${src}" alt="a" loading="lazy" decoding="async">`;
@@ -127,7 +127,7 @@ test("bodyImageSources và bodyZoomSrc: cùng quy tắc cho ảnh dựng bằng 
 	assert.equal(bodyImageSources(`https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/${KEY}`).src, `${PICTURE}@960`);
 	// khung hẹp hơn có sizes riêng, ảnh chưa có biến thể: một cỡ, không sizes
 	assert.equal(bodyImageSources(PICTURE, "(max-width: 704px) 100vw, 672px").sizes, "(max-width: 704px) 100vw, 672px");
-	const old = "/anh-goc/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2018/07/a-668x445.jpg";
+	const old = "/anh-goc/s2-cnv03/ngoai/2018/07/a-668x445.jpg";
 	assert.deepEqual(bodyImageSources(old), { src: old });
 	assert.equal(bodyZoomSrc(PICTURE), `${PICTURE}@1920`);
 	assert.equal(bodyZoomSrc(old), old);

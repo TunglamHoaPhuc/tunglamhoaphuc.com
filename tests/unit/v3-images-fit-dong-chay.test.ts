@@ -21,7 +21,7 @@ const KEY = "tunglamhoaphuc2/03-dong-chay-hoang-phap/dai-le-su-kien/2-2-scaled.j
 const PICTURE = `/anh-goc/media-tunglamhoaphuc/${KEY}`;
 const B2 = `https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/${KEY}`;
 /** Ảnh WordPress cũ ngoài các khóa có biến thể: đi nguyên bản, nhỏ sẵn. */
-const OLD = "/anh-goc/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2018/07/a-668x445.jpg";
+const OLD = "/anh-goc/s2-cnv03/ngoai/2018/07/a-668x445.jpg";
 const widthsOf = (srcset: string) => [...srcset.matchAll(/ (\d+)w/g)].map((match) => Number(match[1]));
 const tags = (html: string, tag = "img") => [...html.matchAll(new RegExp(`<${tag}\\b[^>]*>`, "g"))].map((match) => match[0]);
 

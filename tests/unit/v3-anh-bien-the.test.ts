@@ -16,7 +16,7 @@ test("công tắc giao ảnh mặc định là 'variants', chỉ cho khóa R2 đ
 	assert.equal(fitImage(B2, 640), `${PICTURE}@640`);
 	assert.equal(getOptimizedNextImageUrl(B2, 640), `${PICTURE}@640`);
 	// an old WordPress upload (668 px, small) goes as it is: no transformation quota is spent
-	const old = "/anh-goc/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2018/07/a-668x445.jpg";
+	const old = "/anh-goc/s2-cnv03/ngoai/2018/07/a-668x445.jpg";
 	assert.equal(fitImage(old, 640), old);
 });
 
