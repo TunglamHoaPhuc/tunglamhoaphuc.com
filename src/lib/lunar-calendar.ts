@@ -14,6 +14,8 @@ export interface LunarDate {
   canChiYear?: string;
 }
 
+import { lunarDate as wwwLunarDate } from './v3-hero-lunar';
+
 const CAN = ['Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ', 'Canh', 'Tân', 'Nhâm', 'Quý'];
 const CHI = ['Tý', 'Sửu', 'Dần', 'Mão', 'Thìn', 'Tỵ', 'Ngọ', 'Mùi', 'Thân', 'Dậu', 'Tuất', 'Hợi'];
 
@@ -126,64 +128,28 @@ export function convertSolarToLunar(
   solarDay: number,
   solarMonth: number, // 0-indexed (0 = Jan, 11 = Dec)
   solarYear: number,
-  timeZone = 7.0
+  _timeZone = 7.0 // kept for callers; the Vietnamese time zone (UTC+7) is the only one used
 ): LunarDate {
-  const mm = solarMonth + 1; // 1-indexed
-  const dayNumber = jdFromDate(solarDay, mm, solarYear);
-  const k = Math.floor((dayNumber - 2415021.076998695) / 29.530588853);
-  let monthStart = getNewMoonDay(k + 1, timeZone);
-  if (monthStart > dayNumber) {
-    monthStart = getNewMoonDay(k, timeZone);
-  }
+  // The day, month, year and leap month come from the same routine www uses (src/lib/v3-hero-lunar.ts, a byte copy of www's
+  // libs/lunar.ts, so the two sites agree). The older routine here put the leap month in the wrong place in leap years (2025, 2028).
+  const iso = `${solarYear}-${String(solarMonth + 1).padStart(2, '0')}-${String(solarDay).padStart(2, '0')}`;
+  const lunar = wwwLunarDate(iso);
+  const dayNumber = jdFromDate(solarDay, solarMonth + 1, solarYear);
 
-  let a11 = getLunarMonth11(solarYear, timeZone);
-  let b11 = a11;
-  let lunarYear = solarYear;
-
-  if (a11 >= monthStart) {
-    lunarYear = solarYear;
-    a11 = getLunarMonth11(solarYear - 1, timeZone);
-  } else {
-    lunarYear = solarYear + 1;
-    b11 = getLunarMonth11(solarYear + 1, timeZone);
-  }
-
-  const lunarDay = dayNumber - monthStart + 1;
-  const diff = Math.floor((monthStart - a11) / 29);
-  let lunarLeap = false;
-  let lunarMonth = diff + 11;
-
-  if (b11 - a11 > 365) {
-    const leapMonthDiff = getLeapMonthOffset(a11, timeZone);
-    if (diff >= leapMonthDiff) {
-      lunarMonth = diff + 10;
-      if (diff === leapMonthDiff) {
-        lunarLeap = true;
-      }
-    }
-  }
-
-  if (lunarMonth > 12) {
-    lunarMonth = lunarMonth - 12;
-  }
-  if (lunarMonth >= 11 && diff < 4) {
-    lunarYear -= 1;
-  }
-
-  // Calculate Can Chi
+  // Can Chi
   const canDay = CAN[(dayNumber + 9) % 10];
   const chiDay = CHI[(dayNumber + 1) % 12];
   const canChiDay = `${canDay} ${chiDay}`;
 
-  const canYear = CAN[(lunarYear + 6) % 10];
-  const chiYear = CHI[(lunarYear + 8) % 12];
+  const canYear = CAN[(lunar.year + 6) % 10];
+  const chiYear = CHI[(lunar.year + 8) % 12];
   const canChiYear = `${canYear} ${chiYear}`;
 
   return {
-    day: lunarDay,
-    month: lunarMonth,
-    year: lunarYear,
-    isLeap: lunarLeap,
+    day: lunar.day,
+    month: lunar.month,
+    year: lunar.year,
+    isLeap: lunar.leap,
     canChiDay,
     canChiYear,
   };

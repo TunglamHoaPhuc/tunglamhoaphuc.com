@@ -16,39 +16,26 @@
  * Và toàn bộ các mã thập phân/thập lục phân &#...; khác.
  */
 
+const NAMED: Record<string, string> = {
+  ldquo: '“', rdquo: '”', lsquo: '‘', rsquo: '’', quot: '"', apos: "'", ndash: '–', mdash: '—', hellip: '…',
+  laquo: '«', raquo: '»', amp: '&', nbsp: ' ', lt: '<', gt: '>', bull: '•', copy: '©', reg: '®', trade: '™',
+};
+
+/**
+ * One pass over the text, so a decoded "&" can never start a second entity: "&amp;lt;" is the text "&lt;", not "<".
+ * (The admin stores a verse line with & < > escaped as &amp; &lt; &gt;, and the page must show them as typed.)
+ */
 export function decodeHtmlEntities(text?: string | null): string {
   if (!text) return '';
   return text
-    // Dấu ngoặc kép & đơn thông minh (Smart quotes)
-    .replace(/&#8220;|&ldquo;/g, '“')
-    .replace(/&#8221;|&rdquo;/g, '”')
-    .replace(/&#8216;|&lsquo;/g, '‘')
-    .replace(/&#8217;|&rsquo;/g, '’')
-    .replace(/&#8243;/g, '″')
-    .replace(/&quot;|&#34;/g, '"')
-    .replace(/&apos;|&#39;/g, "'")
-    // Dấu gạch ngang & ba chấm
-    .replace(/&#8211;|&ndash;/g, '–')
-    .replace(/&#8212;|&mdash;/g, '—')
-    .replace(/&#8230;|&hellip;/g, '…')
-    .replace(/&laquo;/g, '«')
-    .replace(/&raquo;/g, '»')
-    // Dấu và & khoảng trắng
-    .replace(/&amp;|&#038;|&#38;/g, '&')
-    .replace(/&nbsp;|&#160;/g, ' ')
-    // Dấu so sánh & ký hiệu bản quyền
-    .replace(/&bull;/g, '•')
-    .replace(/&copy;/g, '©')
-    .replace(/&reg;/g, '®')
-    .replace(/&trade;/g, '™')
-    // Giải mã bất kỳ mã số thập phân hoặc hex còn sót lại
-    .replace(/&#(\d+);/g, (_m, dec) => {
-      const code = parseInt(dec, 10);
-      return code >= 32 ? String.fromCharCode(code) : '';
-    })
-    .replace(/&#x([0-9a-fA-F]+);/g, (_m, hex) => {
-      const code = parseInt(hex, 16);
-      return code >= 32 ? String.fromCharCode(code) : '';
+    .replace(/&(#x[0-9a-fA-F]+|#\d+|[a-zA-Z]+);/g, (whole, body: string) => {
+      if (body[0] === '#') {
+        const code = body[1] === 'x' || body[1] === 'X' ? parseInt(body.slice(2), 16) : parseInt(body.slice(1), 10);
+        if (code === 38) return '&';
+        if (code === 160) return ' ';
+        return code >= 32 ? String.fromCodePoint(code) : '';
+      }
+      return NAMED[body] ?? whole;
     })
     .normalize('NFC');
 }

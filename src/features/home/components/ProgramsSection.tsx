@@ -1,13 +1,38 @@
+'use client';
+
 import { FC } from "react";
+import Link from "next/link";
 import { Calendar } from "lucide-react";
 import { C } from "@/config/theme";
 import { PROGRAMS } from "@/features/home/data/home-data";
 import type { SectionRef } from "@/features/home/types";
 import { SectionHeader } from "@/components/common/SectionHeader";
+import type { HomeProgram } from "@/lib/v3-home-programs";
 
 interface ProgramsSectionProps {
-  sectionRef: SectionRef;
+  /** Optional: the ref a parent uses to scroll to the section. */
+  sectionRef?: SectionRef;
+  /**
+   * The regular ceremonies of the study calendar (Lịch tu học > Khóa lễ thường kỳ), read from D1 by lib/v3-home-programs.ts
+   * `loadHomePrograms`. Without any (the admin has none, or D1 could not be read) the cards V3 was written with are drawn.
+   */
+  programs?: HomeProgram[] | null;
 }
+
+/** The mark on each card is design, not data: they come round in turn. */
+const MARKS = ["🪷", "🔔", "🌿"];
+
+type Card = { key: string; title: string; schedule: string; imgUrl: string; imgPosition: string; href: string; emoji: string };
+
+const BUILT_IN: Card[] = PROGRAMS.map((p) => ({ key: p.title, title: p.title, schedule: p.schedule, imgUrl: p.img, imgPosition: "center 50%", href: "", emoji: p.emoji }));
+
+const fromAdmin = (list: HomeProgram[]): Card[] =>
+  list.map((p, i) => ({ key: p.id, title: p.title, schedule: p.schedule, imgUrl: p.imgUrl, imgPosition: p.imgPosition, href: p.href, emoji: MARKS[i % MARKS.length] }));
+
+const buttonStyle = { borderColor: `rgba(242,193,78,.4)`, color: C.accent };
+const buttonClass = "mt-5 inline-block font-inter text-[11px] uppercase tracking-[.15em] border rounded-lg px-5 py-2 transition-colors";
+const hoverOn = (e: React.MouseEvent) => ((e.currentTarget as HTMLElement).style.background = "rgba(242,193,78,.1)");
+const hoverOff = (e: React.MouseEvent) => ((e.currentTarget as HTMLElement).style.background = "transparent");
 
 /**
  * "Các Chương Trình Cộng Tu" — recurring program cards.
@@ -16,7 +41,8 @@ interface ProgramsSectionProps {
  * from the original page, so it's kept as its own component rather than
  * force-fit into an unrelated section.
  */
-const ProgramsSection: FC<ProgramsSectionProps> = ({ sectionRef }) => {
+const ProgramsSection: FC<ProgramsSectionProps> = ({ sectionRef, programs }) => {
+  const cards = programs && programs.length > 0 ? fromAdmin(programs) : BUILT_IN;
   return (
     <section
       ref={sectionRef}
@@ -28,9 +54,9 @@ const ProgramsSection: FC<ProgramsSectionProps> = ({ sectionRef }) => {
         <SectionHeader title="CÁC CHƯƠNG TRÌNH CỘNG TU" subtitle="Tu học định kỳ" />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {PROGRAMS.map((prog) => (
+          {cards.map((prog) => (
             <div
-              key={prog.title}
+              key={prog.key}
               className="group rounded-2xl overflow-hidden border cursor-pointer transition-all duration-300 hover:-translate-y-1"
               style={{
                 borderColor: C.border,
@@ -48,11 +74,14 @@ const ProgramsSection: FC<ProgramsSectionProps> = ({ sectionRef }) => {
             >
               {/* image + badge */}
               <div className="relative overflow-hidden" style={{ height: 240 }}>
-                <img
-                  src={prog.img}
-                  alt={prog.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
+                {prog.imgUrl && (
+                  <img
+                    src={prog.imgUrl}
+                    alt={prog.title}
+                    style={{ objectPosition: prog.imgPosition }}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                )}
                 <div
                   className="absolute inset-0"
                   style={{
@@ -80,33 +109,27 @@ const ProgramsSection: FC<ProgramsSectionProps> = ({ sectionRef }) => {
                 >
                   {prog.title}
                 </h3>
-                <div
-                  className="flex items-center justify-center gap-1.5 font-inter text-xs"
-                  style={{ color: C.muted }}
-                >
-                  <Calendar
-                    className="w-3.5 h-3.5"
-                    style={{ color: C.accent }}
-                  />
-                  <span>{prog.schedule}</span>
-                </div>
-                <button
-                  className="mt-5 font-inter text-[11px] uppercase tracking-[.15em] border rounded-lg px-5 py-2 transition-colors"
-                  style={{
-                    borderColor: `rgba(242,193,78,.4)`,
-                    color: C.accent,
-                  }}
-                  onMouseEnter={(e) =>
-                    ((e.currentTarget as HTMLElement).style.background =
-                      "rgba(242,193,78,.1)")
-                  }
-                  onMouseLeave={(e) =>
-                    ((e.currentTarget as HTMLElement).style.background =
-                      "transparent")
-                  }
-                >
-                  Đăng ký tham gia
-                </button>
+                {prog.schedule && (
+                  <div
+                    className="flex items-center justify-center gap-1.5 font-inter text-xs"
+                    style={{ color: C.muted }}
+                  >
+                    <Calendar
+                      className="w-3.5 h-3.5"
+                      style={{ color: C.accent }}
+                    />
+                    <span>{prog.schedule}</span>
+                  </div>
+                )}
+                {prog.href ? (
+                  <Link href={prog.href} className={buttonClass} style={buttonStyle} onMouseEnter={hoverOn} onMouseLeave={hoverOff}>
+                    Xem chi tiết
+                  </Link>
+                ) : (
+                  <button className={buttonClass} style={buttonStyle} onMouseEnter={hoverOn} onMouseLeave={hoverOff}>
+                    Đăng ký tham gia
+                  </button>
+                )}
               </div>
             </div>
           ))}
