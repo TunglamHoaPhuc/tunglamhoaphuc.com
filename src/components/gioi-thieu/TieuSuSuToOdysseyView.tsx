@@ -31,6 +31,7 @@ import {
   X,
 } from 'lucide-react';
 import './tieu-su-odyssey.css';
+import { fitImage } from '@/utils/image';
 
 interface Props {
   /** Chủ đề đọc từ D1 (đã là chủ đề đang hiển thị); phần còn lại của trang là thiết kế riêng. */
@@ -1391,9 +1392,10 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
             >
               <div className="odyssey-hero-feather-x relative w-full h-full md:w-auto md:max-w-full md:aspect-[15000/21941]">
                 <Image
-                  src={heroImgSrc}
+                  src={fitImage(heroImgSrc, 1920)}
                   alt={topic.title || 'Sư Tổ Ngộ Chân Tử'}
                   fill
+                  unoptimized
                   priority
                   sizes="(max-width: 768px) 100vw, 760px"
                   className="odyssey-hero-feather-y object-cover object-[center_16%] md:object-top"

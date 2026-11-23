@@ -6,6 +6,7 @@ import { Compass, Sparkles, Layers, Eye } from 'lucide-react';
 import { BaoThapMap2D } from './BaoThapMap2D';
 import { QuanAm33Grid } from './QuanAm33Grid';
 import { BAO_THAP_FLOORS } from '@/data/bao-thap-data';
+import { fitImage } from '@/utils/image';
 
 export const BaoThapGrid: FC = () => {
   const [isMapOpen, setIsMapOpen] = useState<boolean>(false);
@@ -24,9 +25,10 @@ export const BaoThapGrid: FC = () => {
             {/* Background Image */}
             <div className="absolute inset-0 opacity-45 scale-105 transition-transform duration-1000 ease-out group-hover:scale-100">
               <Image
-                src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp"
+                src={fitImage('/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp', 1920)}
                 alt="Sơ đồ 2D Bảo Tháp Vạn Phật Xá Lợi Hòa Bình"
                 fill
+                unoptimized
                 sizes="100vw"
                 className="object-cover object-center"
                 loading="lazy"

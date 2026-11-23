@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { MoveVertical } from 'lucide-react';
-import { getImageUrl, getHighResImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl, getHighResImageUrl } from '@/utils/image';
 
 interface HeroBannerProps {
   id?: string;
@@ -105,9 +105,10 @@ export function HeroBanner({
         }`}
       >
         <Image
-          src={imgSrc || DEFAULT_BANNER_IMAGE}
+          src={fitImage(imgSrc || DEFAULT_BANNER_IMAGE, 1920)}
           alt={title || 'Hero Banner Tông Chỉ Tu Học'}
           fill
+          unoptimized
           priority
           sizes="100vw"
           className="object-cover transition-all duration-300 scale-105 pointer-events-none"
