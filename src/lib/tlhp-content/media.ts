@@ -259,7 +259,9 @@ export function imageAt(src: string, width: number, delivery: ImageDelivery = IM
 	if (src.startsWith("/") && !src.startsWith("//") && !src.startsWith("/anh-goc/")) return src;
 	const source = transformSource(src);
 	if (!source) return src;
-	if (delivery === "variants" && hasVariants(source)) return variantUrl(`/${source}`, width);
+	// "variants" mode never spends the transformation quota: a picture outside the prefixes that have variants is the old WordPress kind
+	// (about 668 px, median 70 KB), small enough to go as it is.
+	if (delivery === "variants") return hasVariants(source) ? variantUrl(`/${source}`, width) : `/${source}`;
 	return `/cdn-cgi/image/width=${width},quality=75,format=auto,onerror=redirect/${source}`;
 }
 
@@ -268,7 +270,7 @@ export function imageAt(src: string, width: number, delivery: ImageDelivery = IM
  * (median 92 KB), and an album of 170 would spend the monthly quota. Variants cost no quota, so there every picture gets one.
  */
 export function albumImageAt(src: string, width: number, delivery: ImageDelivery = IMAGE_DELIVERY): string {
-	return (delivery === "variants" && srcHasVariants(src)) || isWordPressMedia(src) ? imageAt(src, width, delivery) : src;
+	return delivery === "variants" ? (srcHasVariants(src) ? imageAt(src, width, delivery) : src) : isWordPressMedia(src) ? imageAt(src, width, delivery) : src;
 }
 
 /** True when the picture behind `src` (any form `mediaUrl` understands) is one of those that have ready-made variants. */
@@ -289,7 +291,8 @@ export const IMAGE_WIDTH = { icon: 160, small: 360, card: 640, mid: 960, wide: 1
  * hears of a size that does not exist.
  */
 export function imageSrcSet(src: string, widths: readonly number[], originalWidth?: number | null, delivery: ImageDelivery = IMAGE_DELIVERY): string | undefined {
-	if (delivery !== "variants" || !srcHasVariants(src)) {
+	if (delivery === "variants" && !srcHasVariants(src)) return undefined;
+	if (delivery !== "variants") {
 		if (imageAt(src, widths[0], delivery) === src) return undefined;
 		return widths.map((width) => `${imageAt(src, width, delivery)} ${width}w`).join(", ");
 	}

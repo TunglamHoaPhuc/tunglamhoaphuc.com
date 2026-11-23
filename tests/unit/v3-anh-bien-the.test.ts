@@ -11,13 +11,13 @@ const B2 = `https://s2-cnv03.s3.us-east-005.backblazeb2.com/${KEY}`;
 const PICTURE = `/anh-goc/s2-cnv03/${KEY}`;
 const CGI = (width: number) => `/cdn-cgi/image/width=${width},quality=75,format=auto,onerror=redirect${PICTURE}`;
 
-test("công tắc giao ảnh mặc định là 'variants', chỉ cho khóa R2 đã có biến thể; ảnh còn lại vẫn qua /cdn-cgi/image", () => {
+test("công tắc giao ảnh mặc định là 'variants', chỉ cho khóa R2 đã có biến thể; ảnh còn lại (WordPress cũ, nhỏ) đi nguyên bản", () => {
 	assert.equal(IMAGE_DELIVERY, "variants");
 	assert.equal(fitImage(B2, 640), `${PICTURE}@640`);
 	assert.equal(getOptimizedNextImageUrl(B2, 640), `${PICTURE}@640`);
-	// an old WordPress upload (668 px, no variants yet) keeps the transformation
+	// an old WordPress upload (668 px, small) goes as it is: no transformation quota is spent
 	const old = "/anh-goc/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2018/07/a-668x445.jpg";
-	assert.equal(fitImage(old, 640), `/cdn-cgi/image/width=640,quality=75,format=auto,onerror=redirect${old}`);
+	assert.equal(fitImage(old, 640), old);
 });
 
 test("fitImage: chế độ 'cgi' giữ địa chỉ /cdn-cgi/image/, chế độ 'variants' dựng /anh-goc/<bucket>/<khóa>@<bậc>", () => {
