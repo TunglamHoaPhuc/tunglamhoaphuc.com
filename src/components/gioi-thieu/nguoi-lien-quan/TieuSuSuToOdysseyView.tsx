@@ -74,14 +74,14 @@ interface GalleryItem {
 }
 
 const S3_SU_TO_BASE =
-  'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/07-anh-tho-cac-vi-cao-tang/su-to-ngo-chan-tu';
+  '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/07-anh-tho-cac-vi-cao-tang/su-to-ngo-chan-tu';
 
 const FALLBACK_CHUA_IMG =
-  'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
+  '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
 const IMG_ARTWORK_BAO_TUONG =
-  'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/05-bao-tuong-phat-giao/chu_lich_dai_to_su/su_to_ngo_chan_tu.webp';
+  '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/05-bao-tuong-phat-giao/chu_lich_dai_to_su/su_to_ngo_chan_tu.webp';
 const IMG_ARCHIVE_PORTRAIT =
-  'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/07-anh-tho-cac-vi-cao-tang/anh-hoa-thuong-tong-hop/nam/nam/Hoa-Thuong-Ngo-Chan-Tu.webp';
+  '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/07-anh-tho-cac-vi-cao-tang/anh-hoa-thuong-tong-hop/nam/nam/Hoa-Thuong-Ngo-Chan-Tu.webp';
 const IMG_THUO_MOI_TU = `${S3_SU_TO_BASE}/su-to-ngo-chan-tu-thuo-moi-tu-hanh.webp`;
 const IMG_PINNED_HERO_SU_TO = `${S3_SU_TO_BASE}/hinh-su-to-final-19d1002.webp`;
 const IMG_SPOTLIGHT_HOA_PHUC = `${S3_SU_TO_BASE}/su-to-ky-niem-ngay-sinh-hoa-phuc.webp`;
@@ -102,7 +102,7 @@ const IMG_GIO_TO_35 = `${S3_SU_TO_BASE}/gio-to-chua-hoang-phap-lan-35.webp`;
 const IMG_THAP_TO_1 = `${S3_SU_TO_BASE}/bao-thap-nhi-nghiem-su-to.webp`;
 const IMG_THAP_TO_2 = `${S3_SU_TO_BASE}/cong-thap-nhi-nghiem.webp`;
 const IMG_GIO_TO_HOA_PHUC_T10 =
-  'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-11-an-duc-to-thay.webp';
+  '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-11-an-duc-to-thay.webp';
 
 // Ảnh bìa đầu sách Sư Tổ biên soạn
 const BOOK_NGHI_LUAT = `${S3_SU_TO_BASE}/sach-nghi-luat-tu-tri-thiet-yeu.webp`;

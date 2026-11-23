@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { albumImageAt, b2Source, imageAt, imageSrcSet, mediaSource, mediaUrl, topImagePriority } from "@/libs/content/media";
+import { albumImageAt, b2Source, imageAt, imageSrcSet, legacyPicturePath, mediaSource, mediaUrl, storedMediaAddress, topImagePriority } from "@/libs/content/media";
 
 // Pictures of the old site go through Cloudflare's image transformations on this zone. B2
 // files come in through /anh-goc/ so the source is on the zone too (the zone accepts only
@@ -105,5 +105,44 @@ describe("mediaSource", () => {
 		expect(mediaSource("wordpress", ["2019", "05", "1..jpg", ".."])).toBeNull();
 		expect(mediaSource("s2-cnv03", [])).toBeNull();
 		expect(mediaSource("s2-cnv03", ["a.pdf"])).toBeNull();
+	});
+});
+
+// Absolute addresses of the old hosts that /anh-goc/ reads with certainty come out as that path; the rest keep their address.
+describe("legacy picture addresses", () => {
+	it("maps the old WordPress host old. and this site's own host to /anh-goc/", () => {
+		expect(mediaUrl("https://old.tunglamhoaphuc.com/wp-content/uploads/2018/07/K49A0733-568x379.jpg")).toBe("/anh-goc/wordpress/2018/07/K49A0733-568x379.jpg");
+		expect(mediaUrl("https://www.tunglamhoaphuc.com/anh-goc/s2-cnv03/a/b.jpg")).toBe("/anh-goc/s2-cnv03/a/b.jpg");
+		expect(mediaUrl("https://quantri.tunglamhoaphuc.com/anh-goc/wordpress/2026/08/a.jpg")).toBe("/anh-goc/wordpress/2026/08/a.jpg");
+		expect(mediaUrl("https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/09/45-1.jpg")).toBe("/anh-goc/wordpress/2026/09/45-1.jpg");
+	});
+
+	it("maps Backblaze's path-style and friendly addresses of either bucket", () => {
+		expect(legacyPicturePath("https://f005.backblazeb2.com/file/media-tunglamhoaphuc/tunglamhoaphuc2/x/a.webp")).toBe("/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/x/a.webp");
+		expect(mediaUrl("https://b1.congngheviet.com.vn/file/s2-cnv03/tunglamhoaphuc2/x/a.jpg")).toBe("/anh-goc/s2-cnv03/tunglamhoaphuc2/x/a.jpg");
+		expect(mediaUrl("https://s3.us-east-005.backblazeb2.com/media-tunglamhoaphuc/tunglamhoaphuc2/x/a.jpg")).toBe("/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/x/a.jpg");
+		expect(mediaUrl("https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/x/a.jpg")).toBe("/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/x/a.jpg");
+	});
+
+	it("does not guess: another bucket, a file that is not a picture, another host and strange keys keep what they were", () => {
+		expect(legacyPicturePath("https://f005.backblazeb2.com/file/someone-else/a.jpg")).toBeNull();
+		expect(legacyPicturePath("https://f005.backblazeb2.com/file/media-tunglamhoaphuc/a.mp3")).toBeNull();
+		expect(legacyPicturePath("https://old.tunglamhoaphuc.com/wp-content/uploads/2026/08/a.mp3")).toBeNull();
+		expect(legacyPicturePath("https://example.com/anh-goc/s2-cnv03/a.jpg")).toBeNull();
+		expect(legacyPicturePath("https://s3.us-east-005.backblazeb2.com/media-tunglamhoaphuc/")).toBeNull();
+		expect(legacyPicturePath("https://user:pw@www.tunglamhoaphuc.com/anh-goc/s2-cnv03/a.jpg")).toBeNull();
+		expect(legacyPicturePath("/anh-goc/s2-cnv03/a.jpg")).toBeNull();
+		expect(legacyPicturePath("")).toBeNull();
+		expect(mediaUrl("https://example.com/a.jpg")).toBe("https://example.com/a.jpg");
+		expect(mediaUrl("https://old.tunglamhoaphuc.com/wp-content/uploads/2026/08/a.mp3")).toBe("https://old.tunglamhoaphuc.com/wp-content/uploads/2026/08/a.mp3");
+	});
+
+	it("leaves a media row's id alone: the stored address of these forms is the one the import used", () => {
+		for (const address of ["https://old.tunglamhoaphuc.com/wp-content/uploads/2018/07/a.jpg", "https://f005.backblazeb2.com/file/media-tunglamhoaphuc/x/a.webp", "https://www.tunglamhoaphuc.com/anh-goc/s2-cnv03/a.jpg"]) {
+			expect(storedMediaAddress(address), address).toBe(address);
+		}
+		// the forms that always mapped still do
+		expect(storedMediaAddress("https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/09/45-1.jpg")).toBe("https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/09/45-1.jpg");
+		expect(storedMediaAddress("https://b1.congngheviet.com.vn/file/s2-cnv03/x/a.jpg")).toBe("https://s2-cnv03.s3.us-east-005.backblazeb2.com/x/a.jpg");
 	});
 });

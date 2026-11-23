@@ -26,22 +26,44 @@ function pictureResponse(body: BodyInit | null, type: string): Response {
 	});
 }
 
+export type FallbackReason = "no-bucket" | "r2-miss" | "r2-not-image" | "r2-error";
+
+/**
+ * Every picture is meant to live in R2 only. Each time the route has to go to B2 / WordPress instead, it writes one JSON line (event
+ * "media-fallback", with the R2 key it lacked) that Workers Logs can count and list; when a week or two pass with none, the fallback
+ * (mediaSource().origin, fetchOrigin) can go. Asked before the original is fetched, so a 404 there is counted too.
+ */
+export function warnFallback(reason: FallbackReason | "cdn-image", key: string, origin: string): void {
+	let host = "";
+	try {
+		host = new URL(origin).host;
+	} catch {
+		// an origin that is no address: the line still names the key
+	}
+	console.warn(JSON.stringify({ event: "media-fallback", reason, key, host }));
+}
+
 export const fetchOrigin: OriginFetch = (url) => fetch(url, { cf: { cacheEverything: true, cacheTtl: WEEK } } as RequestInit);
 
 export async function serveMedia(bucketName: string, key: string[], bucket: MediaBucket | undefined, origin: OriginFetch = fetchOrigin): Promise<Response> {
 	const source = mediaSource(bucketName, key);
 	if (!source) return NOT_FOUND();
 
+	let reason: FallbackReason = "no-bucket";
 	if (bucket) {
+		reason = "r2-miss";
 		try {
 			const object = await bucket.get(source.r2Key);
 			const type = object?.httpMetadata?.contentType ?? "";
 			if (object && type.startsWith("image/")) return pictureResponse(object.body, type);
+			if (object) reason = "r2-not-image";
 		} catch (error) {
+			reason = "r2-error";
 			console.error(JSON.stringify({ event: "media-r2-error", key: source.r2Key, message: error instanceof Error ? error.message : String(error) }));
 		}
 	}
 
+	warnFallback(reason, source.r2Key, source.origin);
 	const upstream = await origin(source.origin);
 	const type = upstream.headers.get("content-type") ?? "";
 	if (!upstream.ok || !type.startsWith("image/")) return NOT_FOUND();

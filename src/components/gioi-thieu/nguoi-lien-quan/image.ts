@@ -1,9 +1,11 @@
 import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
 
-// Pictures of the Tiểu sử Sư Tổ page as the rest of this site draws them: B2 and WordPress
-// pictures through /anh-goc/ and Cloudflare's resizing (imageAt), at the width they show at.
+// Pictures of the Tiểu sử Sư Tổ page as the rest of this site draws them: through /anh-goc/ (R2) and
+// Cloudflare's resizing (imageAt), at the width they show at.
 
-const WP_BASE_URL = "https://admin.tunglamhoaphuc.com";
+// What the editors wrote without a host (a bare file name, a path) is a WordPress upload: its R2 key is wordpress/<path>.
+const WORDPRESS_UPLOADS = "/anh-goc/wordpress";
+const uploadPath = (path: string) => `${WORDPRESS_UPLOADS}/${path.replace(/^\/+/, "").replace(/^wp-content\/uploads\//, "")}`;
 
 /** A picture of the page at one of the site's widths (small 360, card 640, wide 1280, full 1920). */
 export function odysseyImage(url: string, size: keyof typeof IMAGE_WIDTH = "wide"): string {
@@ -20,7 +22,7 @@ export function getImageUrl(path?: string | null, fallbackUrl = ""): string {
 	let address: string;
 	if (trimmed.includes("/images/tong-chi/")) {
 		const filename = trimmed.split("/").pop() || "";
-		address = filename ? `${WP_BASE_URL}/wp-content/uploads/${filename}` : trimmed;
+		address = filename ? uploadPath(filename) : trimmed;
 	} else if (/^(https?:|data:|blob:)/.test(trimmed)) {
 		address = trimmed;
 	} else if (trimmed.startsWith("/anh-goc/") || trimmed.startsWith("/cdn-cgi/")) {
@@ -29,11 +31,11 @@ export function getImageUrl(path?: string | null, fallbackUrl = ""): string {
 	} else if (trimmed.startsWith("//")) {
 		address = `https:${trimmed}`;
 	} else if (trimmed.startsWith("/")) {
-		address = `${WP_BASE_URL}${trimmed}`;
+		address = uploadPath(trimmed);
 	} else if (!trimmed.includes("/")) {
-		address = `${WP_BASE_URL}/wp-content/uploads/${trimmed}`;
+		address = uploadPath(trimmed);
 	} else {
-		address = `${WP_BASE_URL}/${trimmed}`;
+		address = uploadPath(trimmed);
 	}
 	return address.startsWith("data:") || address.startsWith("blob:") ? address : odysseyImage(address, "wide");
 }
