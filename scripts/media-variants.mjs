@@ -523,7 +523,12 @@ async function inventory(backend, args) {
 	if (args["keys-file"]) {
 		const text = fs.readFileSync(args["keys-file"], "utf8").trim();
 		const keys = (text.startsWith("[") ? JSON.parse(text) : text.split(/\r?\n/)).map((k) => String(k).trim()).filter(Boolean);
-		await pool([...new Set(keys)], 12, async (key) => add((await backend.list(key)).filter((e) => e.key === key || e.key.startsWith(`${key}@`))));
+		// One listing per folder, not per key (thousands of keys would bring on the API's 429): the folder's objects, kept when they are one of the
+		// asked keys or one of their variants.
+		const wanted = new Set(keys);
+		const folders = [...new Set(keys.map((key) => key.slice(0, key.lastIndexOf("/") + 1)))];
+		await pool(folders, 3, async (folder) =>
+			add((await backend.list(folder)).filter((e) => wanted.has(e.key) || wanted.has(e.key.slice(0, Math.max(e.key.lastIndexOf("@"), 0)) || e.key))));
 	} else {
 		const prefixes = (args.only ?? []).flatMap((p) => p.split(",")).filter(Boolean);
 		for (const prefix of prefixes.length ? prefixes : [""]) add(await backend.list(prefix));
