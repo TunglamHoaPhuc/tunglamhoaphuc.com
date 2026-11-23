@@ -50,6 +50,9 @@ export function toPostRecord(post: PostSummary | Post) {
 		contentHtml: full?.contentHtml ?? "",
 		keywords: full ? full.keywords.map((k) => ({ ...k })) : [],
 		videoBlock: full?.videos[0] ? { videoUrl: full.videos[0].url, title: post.title, summary: "" } : undefined,
+		// What the editors fill in for a category: the book of an "Ấn phẩm & Sách" post and the sound of a "Pháp Âm" post (as www shows them).
+		sourceBook: full?.extra.book ? { bookTitle: full.extra.book.title, author: full.extra.book.author, coverImage: full.extra.book.cover ? absUrl(full.extra.book.cover) : "", description: "", linkUrl: full.extra.book.link ?? undefined } : undefined,
+		audio: full?.extra.audio ? { src: absUrl(full.extra.audio.src), duration: full.extra.audio.duration } : undefined,
 		photoGallery: full ? gallery(full.gallery) : [],
 		galleryCount: post.galleryCount,
 		previousEditions: [],

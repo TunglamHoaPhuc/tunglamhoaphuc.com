@@ -110,6 +110,16 @@ export default function TriTueDetailClient({ item, relatedFormatted }: { item: a
           </div>
         )}
 
+        {/* ── 3b. PHÁP ÂM: trình phát âm thanh ── */}
+        {item.audio?.src && (
+          <figure className="w-full rounded-2xl border border-[#F2C14E]/30 bg-[#25170E]/60 p-5 sm:p-6">
+            <figcaption className="mb-3 text-sm font-bold uppercase tracking-wider text-[#F2C14E]">
+              Nghe Pháp Âm{item.audio.duration ? ` · ${item.audio.duration}` : ''}
+            </figcaption>
+            <audio controls preload="none" src={item.audio.src} className="block w-full" />
+          </figure>
+        )}
+
         {/* ── 4. BLOCK BỘ SƯU TẬP ẢNH TƯ LIỆU (PHOTO GALLERY) ── */}
         {item.photoGallery && item.photoGallery.length > 0 && (
           <div className="w-full">
