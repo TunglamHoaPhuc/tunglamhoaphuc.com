@@ -9,7 +9,7 @@ describe("safeBookLink", () => {
 	});
 
 	it("drops anything that could run code or leave the site by a trick", () => {
-		for (const bad of ["javascript:alert(1)", "JaVaScRiPt:alert(1)", "data:text/html,<b>x</b>", "//evil.example/x", "mailto:a@b.c", "", "   ", null]) {
+		for (const bad of ["javascript:alert(1)", "JaVaScRiPt:alert(1)", "data:text/html,<b>x</b>", "//evil.example/x", "mailto:a@b.c", "/\\evil.example", "/\t/evil.example", "/ok /x", "https://a.test/x y", "", "   ", null]) {
 			expect(safeBookLink(bad), String(bad)).toBeNull();
 		}
 	});

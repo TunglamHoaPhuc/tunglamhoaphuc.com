@@ -143,7 +143,8 @@ registerRoutes(
 	{
 		method: "POST",
 		path: "backup/:name/download",
-		needs: { module: "backup", action: "view" },
+		// The file is the whole database, like the export: the same right (create), not the one that only lists them.
+		needs: { module: "backup", action: "create" },
 		handler: async (call) => {
 			const bucketOrFail = bucket(call);
 			const { password } = await call.body(z.object({ password: z.string().min(1, "Nhập mật khẩu của bạn.").max(200) }));

@@ -5,6 +5,8 @@ import type { PostExtra } from "@/libs/content/types";
 /** A link an editor typed for a book: the site's own address or a web address, nothing else (no javascript:, no data:). */
 export function safeBookLink(link: string | null): { href: string; external: boolean } | null {
 	const value = (link ?? "").trim();
+	// A backslash, a space or a control character inside is read by browsers as another address ("/\evil.example" is "//evil.example").
+	if (!value || /[\\\s\u0000-\u001f\u007f]/.test(value)) return null;
 	if (/^\/(?!\/)/.test(value)) return { href: value, external: false };
 	if (/^https?:\/\//i.test(value)) return { href: value, external: true };
 	return null;

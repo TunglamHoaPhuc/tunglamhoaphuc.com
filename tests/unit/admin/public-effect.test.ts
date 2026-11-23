@@ -7,10 +7,12 @@ describe("which admin writes drop the public pages' cache", () => {
 			["POST", "posts/abc/publish"],
 			["PATCH", "posts/abc"],
 			["DELETE", "posts/abc"],
-			["POST", "teachings"],
+			["POST", "teachings/abc/publish"],
 			["PUT", "home/hero"],
 			["PUT", "menus/main"],
 			["POST", "media/abc/replace"],
+			["DELETE", "media/abc"],
+			["PATCH", "media/abc"],
 			["POST", "trash/post/abc/restore"],
 			["PUT", "settings/site"],
 			["POST", "redirects"],
@@ -31,6 +33,16 @@ describe("which admin writes drop the public pages' cache", () => {
 			["POST", "backup/run"],
 			["GET", "audit"],
 			["POST", "dashboard"],
+			// a draft, a preview link and a copy show nothing on the site
+			["POST", "posts"],
+			["POST", "teachings"],
+			["POST", "posts/abc/preview-token"],
+			["POST", "pages/abc/duplicate"],
+			// writes that show nothing on the site
+			["POST", "media"],
+			["POST", "media/folders"],
+			["POST", "settings/smtp/test"],
+			["POST", "icons/sanitize-svg"],
 			["POST", ""],
 		]) {
 			expect(affectsPublicSite(method, path), `${method} ${path}`).toBe(false);

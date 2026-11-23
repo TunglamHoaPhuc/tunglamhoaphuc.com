@@ -140,6 +140,20 @@ describe("overLimit", () => {
 		const response = tooMany();
 		expect(response.status).toBe(429);
 		expect(response.headers.get("retry-after")).toBe("60");
-		expect(((await response.json()) as { message: string }).message).toContain("đợi một phút");
+		const body = (await response.json()) as { message: string; answer: string };
+		expect(body.message).toContain("đợi một phút");
+		expect(body.answer, "the question box shows `answer`").toBe(body.message);
+	});
+});
+
+describe("allow", () => {
+	it("throws OverLimit once a visitor is past the allowance, and counts only visitors the Cloudflare header names", async () => {
+		const { allow, OverLimit } = await import("@/libs/tibetan/server");
+		const from = (ip: string | null, extra: Record<string, string> = {}) => new Request("https://www.example.test/api/analyze", { method: "POST", headers: { ...(ip ? { "cf-connecting-ip": ip } : {}), ...extra } });
+		for (let i = 0; i < 2; i++) await allow(from("9.9.9.9"), "t-allow", 2);
+		await expect(allow(from("9.9.9.9"), "t-allow", 2)).rejects.toBeInstanceOf(OverLimit);
+		// a made-up x-forwarded-for neither shares nor escapes the count: only cf-connecting-ip names the visitor
+		for (let i = 0; i < 2; i++) await allow(from(null, { "x-forwarded-for": `8.8.8.${i}` }), "t-fwd", 2);
+		await expect(allow(from(null, { "x-forwarded-for": "7.7.7.7" }), "t-fwd", 2)).rejects.toBeInstanceOf(OverLimit);
 	});
 });

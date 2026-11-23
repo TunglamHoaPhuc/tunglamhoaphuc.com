@@ -25,8 +25,11 @@ function saveBlob(blob: Blob, filename: string) {
 export function BackupPanel() {
 	const { me, can } = useAdmin();
 	const list = useLoader(() => api<List>("GET", "backup"), "backup");
-	const [password, setPassword] = useState("");
-	const [passwordError, setPasswordError] = useState("");
+	// Two blocks ask for the password (the file made now, a file already stored): each keeps its own, so one does not fill the other.
+	const [exportPassword, setExportPassword] = useState("");
+	const [exportError, setExportError] = useState("");
+	const [storedPassword, setStoredPassword] = useState("");
+	const [storedError, setStoredError] = useState("");
 	const [busy, setBusy] = useState<"export" | "stored" | "run" | null>(null);
 	const [downloading, setDownloading] = useState<string | null>(null);
 	const [notice, setNotice] = useState<{ kind: "success" | "error"; text: string } | null>(null);
@@ -57,7 +60,10 @@ export function BackupPanel() {
 		setBusy(which === "export" ? "export" : "stored");
 		setDownloading(which);
 		setNotice(null);
-		setPasswordError("");
+		const fromExport = which === "export";
+		const password = fromExport ? exportPassword : storedPassword;
+		const showError = fromExport ? setExportError : setStoredError;
+		showError("");
 		try {
 			// The file is not JSON, so it does not go through the api helper; the CSRF token is the one /auth/me gave.
 			const response = await fetch(`/api/quan-tri/v1/${path}`, {
@@ -69,13 +75,13 @@ export function BackupPanel() {
 			});
 			if (!response.ok) {
 				const body = (await response.json().catch(() => null)) as { error?: { message?: string; fields?: Record<string, string> } } | null;
-				if (body?.error?.fields?.password) setPasswordError(body.error.fields.password);
-				throw new Error(body?.error?.message ?? "Không tạo được bản sao lưu. Hãy thử lại.");
+				if (body?.error?.fields?.password) showError(body.error.fields.password);
+				throw new Error(body?.error?.message ?? (fromExport ? "Không tạo được bản sao lưu. Hãy thử lại." : "Không tải được bản sao lưu. Hãy thử lại."));
 			}
 			const disposition = response.headers.get("content-disposition") ?? "";
 			const name = /filename="([^"]+)"/.exec(disposition)?.[1] ?? "tlhp-backup.json.gz";
 			saveBlob(await response.blob(), name);
-			setPassword("");
+			(fromExport ? setExportPassword : setStoredPassword)("");
 			setNotice({ kind: "success", text: `Đã tải về ${name}. Tệp chứa toàn bộ nội dung nhưng không có mật khẩu: hãy cất ở nơi an toàn.` });
 		} catch (caught) {
 			setNotice({ kind: "error", text: errorText(caught) });
@@ -96,8 +102,8 @@ export function BackupPanel() {
 			{can("backup", "create") ? (
 				<form className="tq-panel" onSubmit={(e) => void exportNow(e)} noValidate aria-label="Tải bản sao lưu về máy">
 					<h2 className="tq-h2">Tải bản sao lưu về máy</h2>
-					<TextField label="Nhập lại mật khẩu của bạn" type="password" autoComplete="current-password" value={password} error={passwordError} onChange={(e) => setPassword(e.target.value)} hint="Để chắc chắn đúng là bạn đang tải toàn bộ dữ liệu." />
-					<button type="submit" className="tq-btn tq-btn--primary" disabled={busy !== null || !password} aria-busy={busy === "export" || undefined}>
+					<TextField label="Nhập lại mật khẩu của bạn" type="password" autoComplete="current-password" value={exportPassword} error={exportError} onChange={(e) => setExportPassword(e.target.value)} hint="Để chắc chắn đúng là bạn đang tải toàn bộ dữ liệu." />
+					<button type="submit" className="tq-btn tq-btn--primary" disabled={busy !== null || !exportPassword} aria-busy={busy === "export" || undefined}>
 						{busy === "export" ? "Đang tạo bản sao lưu…" : "Tạo và tải về"}
 					</button>
 				</form>
@@ -119,8 +125,8 @@ export function BackupPanel() {
 							</p>
 						) : null}
 						<p className="tq-hint">Giữ 30 bản mới nhất; bản cũ hơn tự bị xóa.</p>
-						{data.backups.length > 0 ? (
-							<TextField label="Nhập lại mật khẩu của bạn để tải một bản" type="password" autoComplete="current-password" value={password} error={passwordError} onChange={(e) => setPassword(e.target.value)} hint="Mỗi lần tải đều hỏi lại mật khẩu, vì tệp chứa toàn bộ nội dung." />
+						{data.backups.length > 0 && can("backup", "create") ? (
+							<TextField label="Nhập lại mật khẩu của bạn để tải một bản" type="password" autoComplete="current-password" value={storedPassword} error={storedError} onChange={(e) => setStoredPassword(e.target.value)} hint="Mỗi lần tải đều hỏi lại mật khẩu, vì tệp chứa toàn bộ nội dung." />
 						) : null}
 						{data.backups.length === 0 ? (
 							<EmptyState>Chưa có bản sao lưu nào trong kho lưu trữ.</EmptyState>
@@ -143,7 +149,7 @@ export function BackupPanel() {
 												<td>{when(backup.createdAt)}</td>
 												<td>{formatBytes(backup.size)}</td>
 												<td>
-													<Button variant="secondary" busy={downloading === backup.name} disabled={busy !== null || !password} onClick={() => void fetchFile(backup.name, `backup/${encodeURIComponent(backup.name)}/download`)}>
+													<Button variant="secondary" busy={downloading === backup.name} disabled={busy !== null || !storedPassword} onClick={() => void fetchFile(backup.name, `backup/${encodeURIComponent(backup.name)}/download`)}>
 														Tải <span className="tq-muted">({backup.name})</span>
 													</Button>
 												</td>

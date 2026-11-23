@@ -20,7 +20,7 @@ Bảng tìm kiếm toàn văn (bảng ảo `*_fts` và các bảng phụ của n
 2. **Vào kho lưu trữ R2** (nút "Sao lưu vào kho lưu trữ ngay", hoặc `POST /api/quan-tri/v1/backup/run`). Tệp ghi vào bucket riêng `tlhp-backup` với tên `backup/YYYY-MM-DD-HHMM.json.gz` (giờ Việt Nam); chỉ giữ **30 bản mới nhất**, bản cũ hơn tự bị xóa.
 3. **Tự động hằng ngày**: xem mục dưới.
 
-Chỉ Super Admin có quyền `backup` trong các vai trò mặc định. Danh sách và tải một bản đã lưu: `GET /backup`, `POST /backup/<tên>.json.gz/download` (gửi `{password}` như lúc tải bản tạo ngay; sai mật khẩu hoặc bị khóa thì không tải được) (tên chỉ gồm chữ số và dấu gạch ngang, kết thúc `.json.gz`).
+Chỉ Super Admin có quyền `backup` trong các vai trò mặc định. Danh sách và tải một bản đã lưu: `GET /backup`, `POST /backup/<tên>.json.gz/download` (quyền `backup.create`, gửi `{password}` như lúc tải bản tạo ngay; sai mật khẩu hoặc bị khóa thì không tải được) (tên chỉ gồm chữ số và dấu gạch ngang, kết thúc `.json.gz`).
 
 ## Bật bucket sao lưu
 

@@ -32,7 +32,7 @@ const ADMIN_CSP = [
 	"script-src 'self' 'unsafe-inline'",
 	"style-src 'self' 'unsafe-inline'",
 	"img-src 'self' data: blob: https:",
-	"media-src 'self' blob:",
+	"media-src 'self' blob: https:",
 	"font-src 'self' data:",
 	"connect-src 'self'",
 	"frame-src https://www.youtube-nocookie.com https://www.youtube.com",
@@ -44,7 +44,7 @@ const ADMIN_CSP = [
 
 // The draft preview (/quan-tri/xem-truoc) shows the public site's own page, which embeds maps and videos and runs the
 // site's scripts, so it takes the site's rules (no policy of its own), but is still never framed.
-const PREVIEW_CSP = "frame-ancestors 'none'";
+const PREVIEW_CSP = "frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'";
 
 // Stricter than the above, for /quan-tri and /api/quan-tri only.
 const ADMIN_HEADERS = [
