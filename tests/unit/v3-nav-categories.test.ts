@@ -258,3 +258,24 @@ test("bảng điều hướng, trang Tông Chỉ và bộ lọc Dòng chảy kh�
 	}
 	assert.match(readFileSync("src/app/(public)/dong-chay-hoang-phap/page.tsx", "utf8"), /liveDongChayCategories/);
 });
+
+test("the tabs of Dòng chảy follow the editors' order when the reader gives positions, and the original four first when it does not", () => {
+	const fromD1 = buildDongChayCategories([
+		{ slug: "chuyen-muc-moi", name: "Chuyên mục mới", position: 1 },
+		{ slug: "dai-le-su-kien", name: "Đại lễ sự kiện", position: 2 },
+		{ slug: "cong-tu", name: "Cộng tu", position: 3 },
+	]);
+	assert.deepEqual(
+		fromD1.map((c) => c.id),
+		["chuyen-muc-moi", "dai-le-su-kien", "cong-tu"],
+	);
+	const fromFiles = buildDongChayCategories([
+		{ slug: "chuyen-muc-moi", name: "Chuyên mục mới" },
+		{ slug: "dai-le-su-kien", name: "Đại lễ sự kiện" },
+		{ slug: "cong-tu", name: "Cộng tu" },
+	]);
+	assert.deepEqual(
+		fromFiles.map((c) => c.id),
+		["cong-tu", "dai-le-su-kien", "chuyen-muc-moi"],
+	);
+});

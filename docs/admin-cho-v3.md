@@ -9,13 +9,19 @@ Cập nhật 23/11/2026. V3 (`v3.tunglamhoaphuc.com`, Worker `tlhp-v3`) không c
 - Menu đầu trang, giờ mở cửa, địa chỉ, điện thoại, mạng xã hội, bản đồ, tên chùa, thông báo (`site.announcement`, có công tắc và hạn).
 - Chuyên mục (tên, icon) và nhóm Tông Chỉ: dựng từ D1; bộ lọc Dòng Chảy và bảng điều hướng phụ cũng vậy.
 
+## Đã nối thêm (cập nhật cuối 23/11/2026)
+
+- Trang chủ: tiêu đề, dòng phụ và video của Hero theo `home.hero` và `home.welcome.videoUrl` (video nằm ở khối "Lời chào" trong admin); "Dấu ấn hoằng pháp" theo lượt xem thật.
+- Lịch tu học trên trang chủ: sự kiện riêng lẻ từ `calendar_event` (chỉ đã xuất bản, chưa xóa), khóa lễ thường kỳ từ `featured_program`, chủ đề tháng từ `month_theme`; kết quả khớp mã đọc lịch của www qua 36 tháng. Bộ sinh ngày âm lịch viết sẵn chỉ còn là dự phòng khi D1 không có chương trình thường kỳ: các đại lễ cố định (Tết, Phật Đản, Vu Lan…) không tự hiện nữa nếu admin chưa tạo thành sự kiện (www cũng không tự sinh chúng).
+- Bảo tượng: danh sách hiện đủ mọi tượng đang hiển thị (62 tượng chính theo chúng hội, 64 tượng "Nghệ thuật Phật giáo" ở khối riêng, bộ lọc "Loại"); trang tượng liệt kê hết biến thể.
+- Thứ tự chuyên mục Dòng Chảy theo vị trí admin sắp xếp. Lớp đọc đã có thêm vị trí chuyên mục, vị trí nhóm Tông Chỉ, ảnh nhiều góc, thông số và SEO của tượng, và `listQuotes()`.
+
 ## Chưa nối (cần chủ dự án quyết cách thiết kế)
 
-- Khối đầu trang chủ (video, chữ chào) và các khối `home.*`; lịch tu học trên trang chủ còn sinh sự kiện định kỳ theo quy tắc âm lịch viết sẵn nên ẩn một sự kiện định kỳ trong admin chưa làm nó biến mất khỏi lịch trang chủ.
-- Danh sách Bảo tượng chỉ hiện 62 tượng "TƯỢNG CHÍNH" (www hiện 126); các tượng còn lại mở được bằng địa chỉ.
-- Thứ tự chuyên mục Dòng Chảy và nhóm Tông Chỉ do admin sắp xếp chưa được dùng (lớp `tlhp-content` chưa đưa vị trí; sửa phải làm ở www rồi chép sang).
-- Lời Thầy (`quote`), ảnh nhiều góc, thông số và SEO của tượng, cờ `featured` của tượng.
-- Chân trang không vẽ menu chân trang; V3 không có `sitemap.xml` (V3 đang `noindex`).
+- Trang chủ V3 không có khối chào, số liệu (472 bài…, Phật lịch) và Lời Thầy để vẽ; hàm đọc đã có (`homeSettings.ts`, `listQuotes()`). Chữ phụ, nút và ảnh của từng slide Hero, cờ tự lấy sự kiện/bài mới cũng chưa dùng vì Hero V3 chỉ có một video.
+- Thứ tự nhóm Tông Chỉ do admin sắp xếp chưa dùng: thứ tự nhóm gắn với ảnh nền và số thứ tự của thiết kế 5 nhóm.
+- Trang tượng chưa vẽ ảnh nhiều góc, thông số, "Bảo tượng liên quan" (dữ liệu đã có trong lớp đọc).
+- Chân trang không vẽ menu chân trang; V3 không có `sitemap.xml` (V3 đang `noindex`); nhóm Giới thiệu chưa có vị trí.
 
 ## Độ trễ sau khi sửa trong admin
 

@@ -61,9 +61,12 @@ const upper = (text: string) => text.trim().toLocaleUpperCase('vi');
  * their old order, those the editors added after them. A category with no live post is not offered. `icons` maps a category
  * slug to the address of the icon the admin set for it (missing or empty: none).
  */
-export function buildDongChayCategories(live: readonly { slug: string; name: string }[], icons: ReadonlyMap<string, string> = new Map()): DongChayCategoryInfo[] {
+export function buildDongChayCategories(live: readonly { slug: string; name: string; position?: number }[], icons: ReadonlyMap<string, string> = new Map()): DongChayCategoryInfo[] {
   const legacyIndex = (slug: string) => LEGACY_CATEGORIES.findIndex((c) => c.id === slug);
+  // When the reader gives the editors' positions (D1), their order is the order of the tabs; without positions (files) the original four first.
+  const editorsOrder = live.some((c) => typeof c.position === 'number');
   const ordered = [...live.filter((c) => c.slug)].map((c, i) => ({ c, i })).sort((a, b) => {
+    if (editorsOrder) return a.i - b.i;
     const x = legacyIndex(a.c.slug);
     const y = legacyIndex(b.c.slug);
     if (x >= 0 && y >= 0) return x - y;

@@ -4,12 +4,15 @@ import { FC, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { Sparkles, BookOpen, Calendar, Search, Volume2 } from "lucide-react";
 import GalaxyTimelineGallery from "./GalaxyTimelineGallery";
+import type { HomeHero } from "@/lib/v3-home-content";
 
 // ⏱️ MỐC THỜI GIAN CẮT BỎ ĐOẠN DÍNH NGƯỜI (TÍNH BẰNG GIÂY)
 const CUT_START = 96;   // 1:36 (Bắt đầu đoạn dính người -> Cắt)
 const RESUME_TIME = 164; // 2:44 (Hết đoạn dính người -> Phát tiếp)
+// Mốc cắt chỉ đúng với video mặc định (hero.cutIntro); video do admin chọn được phát nguyên vẹn.
 
-export const Hero: FC = () => {
+// Tiêu đề, dòng phụ và video là của admin (home.hero, home.welcome); thiếu hoặc sai thì giữ chữ và video sẵn có (lib/v3-home-content.ts).
+export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
   const [isGalaxyOpen, setIsGalaxyOpen] = useState(false);
   const playerRef = useRef<any>(null);
 
@@ -48,7 +51,7 @@ export const Hero: FC = () => {
       if (!document.getElementById('hero-yt-player')) return;
 
       playerRef.current = new (window as any).YT.Player('hero-yt-player', {
-        videoId: 'HE2MnR8Hl5c',
+        videoId: hero.videoId,
         playerVars: {
           autoplay: 1,
           mute: 1,
@@ -70,7 +73,7 @@ export const Hero: FC = () => {
                 const currentTime = playerRef.current.getCurrentTime();
 
                 // Nếu video phát chạm tới mốc 1:36 (96s) -> Bỏ qua đến thẳng 2:44 (164s)
-                if (currentTime >= CUT_START && currentTime < RESUME_TIME) {
+                if (hero.cutIntro && currentTime >= CUT_START && currentTime < RESUME_TIME) {
                   playerRef.current.seekTo(RESUME_TIME, true);
                 }
               }
@@ -102,7 +105,11 @@ export const Hero: FC = () => {
         playerRef.current.destroy();
       }
     };
-  }, [videoOn]);
+  }, [videoOn, hero.videoId, hero.cutIntro]);
+
+  // Chữ dài thì được xuống dòng thay vì tràn khỏi màn hình; chữ ngắn giữ đúng kiểu dàn đều của V3.
+  const longTitle = hero.title.length > 18;
+  const longSubtitle = hero.subtitle.length > 28;
 
   const scrollToAiSearch = () => {
     const el = document.getElementById("smart-search-ai-bar");
@@ -137,17 +144,28 @@ export const Hero: FC = () => {
         <div className="inline-flex flex-col items-stretch max-w-full mx-auto select-none">
           {/* Tiêu đề chính phông UTM Niagara */}
           <h1
-            className="text-6xl sm:text-7xl md:text-9xl tracking-normal text-[#F2C14E] uppercase leading-none font-normal text-center whitespace-nowrap"
+            className={`${longTitle ? "text-4xl sm:text-5xl md:text-7xl text-balance" : "text-6xl sm:text-7xl md:text-9xl whitespace-nowrap"} tracking-normal text-[#F2C14E] uppercase leading-none font-normal text-center`}
             style={{
               fontFamily: "'UTM Niagara', 'Playfair Display', serif",
               fontWeight: "normal",
               textShadow: "0 0 36px rgba(242,193,78,0.8), 0 0 72px rgba(242,193,78,0.4)",
             }}
           >
-            NƠI ĐỂ TRỞ VỀ
+            {hero.title}
           </h1>
 
           {/* Phụ tiêu đề phông UTM Classizism Antiqua: Dạng không bold, chiều dài tự động căn đều khít 100% bằng tiêu đề "NƠI ĐỂ TRỞ VỀ" */}
+          {hero.subtitle && (longSubtitle ? (
+          <p
+            className="w-full text-center text-sm sm:text-base md:text-xl lg:text-2xl text-[#e3d2c1] uppercase font-normal leading-tight mt-2 sm:mt-3 tracking-[0.2em]"
+            style={{
+              fontFamily: "'UTM ClassizismAntiqua', 'Playfair Display', serif",
+              fontWeight: "normal",
+            }}
+          >
+            {hero.subtitle}
+          </p>
+          ) : (
           <p
             className="w-full flex justify-between items-center text-sm sm:text-base md:text-xl lg:text-2xl text-[#e3d2c1] uppercase font-normal leading-tight mt-2 sm:mt-3"
             style={{
@@ -155,7 +173,7 @@ export const Hero: FC = () => {
               fontWeight: "normal",
             }}
           >
-            {"CHỐN THIÊNG BÌNH YÊN".split("").map((char, i) => (
+            {hero.subtitle.split("").map((char, i) => (
               <span
                 key={i}
                 className={char === " " ? "inline-block w-2 sm:w-3.5 md:w-5" : "inline-block"}
@@ -164,6 +182,7 @@ export const Hero: FC = () => {
               </span>
             ))}
           </p>
+          ))}
         </div>
 
         {/* ── Dải 5 nút thao tác nhanh (nổi rõ rệt trên z-20, không bị lớp gradient che khuất) ── */}

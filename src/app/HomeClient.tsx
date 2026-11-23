@@ -9,6 +9,8 @@ import DharmaSection from "@/features/home/components/DharmaSection";
 import CalendarSection from "@/features/home/components/CalendarSection";
 import GallerySection from "@/features/home/components/GallerySection";
 import type { HomeGalleryArea, HomeGalleryStatue } from "@/lib/v3-home";
+import type { HomeHero } from "@/lib/v3-home-content";
+import type { PostItem } from "@/types/post";
 import { SmartSearchAIBar } from "@/components/public/SmartSearchAIBar";
 import { VerticalAnchorNav } from "@/components/common/VerticalAnchorNav";
 import { WelcomeNoticeModal } from "@/components/public/modals/WelcomeNoticeModal";
@@ -22,7 +24,15 @@ const HOME_SECTIONS = [
   { id: "gallery", label: "KHU VỰC & BẢO TƯỢNG" },
 ];
 
-const Home: FC<{ gallery: { areas: HomeGalleryArea[]; statues: HomeGalleryStatue[] } }> = ({ gallery }) => {
+type HomeProps = {
+  gallery: { areas: HomeGalleryArea[]; statues: HomeGalleryStatue[] };
+  /** Chữ và video đầu trang do admin đặt (home.hero, home.welcome). */
+  hero: HomeHero;
+  /** Dấu ấn hoằng pháp: các bài đọc nhiều nhất theo lượt xem thật; `null` thì khối giữ bộ thẻ dự phòng. */
+  dharma: PostItem[] | null;
+};
+
+const Home: FC<HomeProps> = ({ gallery, hero, dharma }) => {
   const [scrollY, setScrollY] = useState<number>(0);
 
   useEffect(() => {
@@ -49,7 +59,7 @@ const Home: FC<{ gallery: { areas: HomeGalleryArea[]; statues: HomeGalleryStatue
       <main>
         {/* Section 0: Hero Video Banner */}
         <section id="hero">
-          <Hero />
+          <Hero hero={hero} />
         </section>
 
         {/* Section 1: TRỢ LÝ PHẬT HỌC AI NGAY DƯỚI HERO VIDEO */}
@@ -64,7 +74,7 @@ const Home: FC<{ gallery: { areas: HomeGalleryArea[]; statues: HomeGalleryStatue
 
         {/* Section 3: Dharma */}
         <section id="dharma">
-          <DharmaSection />
+          <DharmaSection posts={dharma} />
         </section>
 
         {/* Section 4: Calendar */}

@@ -192,10 +192,13 @@ export async function liveStatueRecords(deps: StatueDeps = {}): Promise<StatueRe
 
 const memberOf = (s: StatueSummary) => ({ name: s.name, slug: s.slug, imgUrl: absUrl(s.image?.src) });
 
-/** The assemblies the main statues belong to, in the list's order. */
+/**
+ * The assemblies the live statues belong to (main or not: an assembly only works of art stand in is still a filter on the
+ * list), in the list's order.
+ */
 export function assembliesOf(records: StatueRecord[]): { id: string; name: string }[] {
 	const found = new Map<string, string>();
-	for (const s of records) if (s.categoryType === "TƯỢNG CHÍNH" && s.assemblyId && !found.has(s.assemblyId)) found.set(s.assemblyId, s.assemblyName);
+	for (const s of records) if (s.assemblyId && !found.has(s.assemblyId)) found.set(s.assemblyId, s.assemblyName);
 	const rank = (id: string) => {
 		const at = ASSEMBLY_ORDER.indexOf(norm(id));
 		const plain = ASSEMBLY_ORDER.findIndex((o) => norm(o) === norm(id));
@@ -204,7 +207,8 @@ export function assembliesOf(records: StatueRecord[]): { id: string; name: strin
 	return [...found].map(([id, name]) => ({ id, name })).sort((a, b) => rank(a.id) - rank(b.id));
 }
 
-export type StatueArtWork = { id: string; title: string; imgUrl: string; areaName: string; meaning: string };
+/** A variation of a statue. `href` is the page of the statue it shows, only when that statue is live (never an address that answers 404). */
+export type StatueArtWork = { id: string; title: string; imgUrl: string; areaName: string; meaning: string; href?: string };
 
 export type StatuePage = {
 	statue: StatueRecord;
@@ -230,13 +234,19 @@ export async function liveStatuePage(slug: string, deps: StatueDeps = {}): Promi
 	if (!hit || !full) return null;
 	const statue = toStatueRecord(hit, ctx, full);
 	const clusterMembers = hit.cluster ? list.filter((s) => s.main && s.id !== hit.id && norm(s.cluster) === norm(hit.cluster)).map(memberOf) : [];
-	const artWorks = full.art.map((v, i) => ({
-		id: v.id || `art-${i}`,
-		title: v.title || hit.name,
-		imgUrl: absUrl(v.image?.src) || statue.imgUrl,
-		areaName: v.location,
-		meaning: v.meaning,
-	}));
+	const liveHrefs = new Set(list.map((s) => `/bao-tuong/${s.slug}`));
+	const artWorks = full.art.map((v, i) => {
+		const work: StatueArtWork = {
+			id: v.id || `art-${i}`,
+			title: v.title || hit.name,
+			imgUrl: absUrl(v.image?.src) || statue.imgUrl,
+			areaName: v.location,
+			meaning: v.meaning,
+		};
+		// The repository links a variation to its statue whatever that statue's status; only a live one has a page to go to.
+		if (v.href && liveHrefs.has(v.href)) work.href = v.href;
+		return work;
+	});
 	const chosen = (ctx.links.related.get(hit.id) ?? []).flatMap((id) => list.filter((s) => s.id === id));
 	const sameAssembly = list.filter((s) => s.main && s.id !== hit.id && s.assembly.slug === hit.assembly.slug);
 	const fallback = sameAssembly.length >= 2 ? sameAssembly : list.filter((s) => s.main && s.id !== hit.id);

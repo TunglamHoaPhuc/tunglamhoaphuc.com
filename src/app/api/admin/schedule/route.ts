@@ -30,6 +30,7 @@ export interface QuoteGalleryItem {
 export interface ScheduleDatabaseData {
   featuredPrograms: Array<{
     id: string;
+    slug?: string;
     title: string;
     subtitle?: string;
     time?: string;

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Play, ArrowRight, Video, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, X, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
 import type { StatueItem } from "@/lib/statue-types";
 import { ThatPhatDuocSuSection } from "@/features/universe/components/ThatPhatDuocSuSection";
+import { artGallerySlots } from "@/lib/statue-list";
 import { BatBoKimCangSection } from "@/features/universe/components/BatBoKimCangSection";
 
 export interface StatueArtWork {
@@ -14,6 +15,8 @@ export interface StatueArtWork {
   imgUrl: string;
   areaName: string;
   meaning: string;
+  /** Trang của tượng mà tác phẩm thể hiện, chỉ khi tượng đó đang hiển thị. */
+  href?: string;
 }
 
 // Tượng và những gì quanh nó do máy chủ dựng từ D1 (lib/v3-statues.ts): cụm tượng, tác phẩm nghệ thuật, tượng liên quan.
@@ -141,6 +144,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
     setIsDragging(false);
   };
 
+  const artSlots = artGallerySlots(artisticWorks.length);
   const clusterCount = clusterMembers.length;
   const showBackButtonInCol1 = clusterCount <= 3;
 
@@ -565,60 +569,50 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
           </p>
         </div>
 
-        {/* Bento Grid Gallery (Giao diện hover chuẩn Vũ Trụ Phật Giáo) */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          
-          {/* Cột 1: 2 ảnh xếp chồng bên trái - focus [center 28%] */}
-          <div className="md:col-span-4 flex flex-col gap-4">
-            <BentoCard
-              item={artisticWorks[0 % artisticWorks.length]}
-              idx={0 % artisticWorks.length}
-              openLightbox={setLightboxIndex}
-              focusPosition="object-[center_28%]"
-              heightClass="h-[240px]"
-            />
-            <BentoCard
-              item={artisticWorks[1 % artisticWorks.length]}
-              idx={1 % artisticWorks.length}
-              openLightbox={setLightboxIndex}
-              focusPosition="object-[center_28%]"
-              heightClass="h-[240px]"
-            />
-          </div>
+        {/* Bento Grid Gallery (Giao diện hover chuẩn Vũ Trụ Phật Giáo): từ 5 tác phẩm trở lên, 5 tác phẩm đầu ở lưới bento */}
+        {artSlots.bento.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+            {/* Cột 1: 2 ảnh xếp chồng bên trái - focus [center 28%] */}
+            <div className="md:col-span-4 flex flex-col gap-4">
+              {[0, 1].map((i) => (
+                <BentoCard
+                  key={artisticWorks[i].id}
+                  item={artisticWorks[i]}
+                  idx={i}
+                  openLightbox={setLightboxIndex}
+                  focusPosition="object-[center_28%]"
+                  heightClass="h-[240px]"
+                />
+              ))}
+            </div>
 
-          {/* Cột 2: Khám thờ / tượng đứng giữa cao - focus [center 28%] */}
-          <div className="md:col-span-4 h-[496px]">
-            <BentoCard
-              item={artisticWorks[2 % artisticWorks.length]}
-              idx={2 % artisticWorks.length}
-              openLightbox={setLightboxIndex}
-              focusPosition="object-[center_28%]"
-              heightClass="h-full"
-            />
-          </div>
+            {/* Cột 2: Khám thờ / tượng đứng giữa cao */}
+            <div className="md:col-span-4 h-[496px]">
+              <BentoCard item={artisticWorks[2]} idx={2} openLightbox={setLightboxIndex} focusPosition="object-[center_28%]" heightClass="h-full" />
+            </div>
 
-          {/* Cột 3: Tượng đứng cao bên phải - focus [center 28%] */}
-          <div className="md:col-span-4 h-[496px]">
-            <BentoCard
-              item={artisticWorks[3 % artisticWorks.length]}
-              idx={3 % artisticWorks.length}
-              openLightbox={setLightboxIndex}
-              focusPosition="object-[center_28%]"
-              heightClass="h-full"
-            />
-          </div>
+            {/* Cột 3: Tượng đứng cao bên phải */}
+            <div className="md:col-span-4 h-[496px]">
+              <BentoCard item={artisticWorks[3]} idx={3} openLightbox={setLightboxIndex} focusPosition="object-[center_28%]" heightClass="h-full" />
+            </div>
 
-          {/* Hàng Dưới: Banner ngang lớn */}
-          <div className="col-span-1 md:col-span-12 h-[240px]">
-            <BentoCard
-              item={artisticWorks[4 % artisticWorks.length]}
-              idx={4 % artisticWorks.length}
-              openLightbox={setLightboxIndex}
-              focusPosition="object-[center_28%]"
-              heightClass="h-full"
-            />
+            {/* Hàng Dưới: Banner ngang lớn */}
+            <div className="col-span-1 md:col-span-12 h-[240px]">
+              <BentoCard item={artisticWorks[4]} idx={4} openLightbox={setLightboxIndex} focusPosition="object-[center_28%]" heightClass="h-full" />
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Các tác phẩm còn lại (hoặc tất cả, khi có ít hơn 5): mỗi tác phẩm đúng một thẻ, hàng cuối căn giữa */}
+        {artSlots.grid.length > 0 && (
+          <div className={`flex flex-wrap justify-center gap-4 ${artSlots.bento.length > 0 ? 'mt-4' : ''}`}>
+            {artSlots.grid.map((i) => (
+              <div key={artisticWorks[i].id} className="w-full sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.7rem)]">
+                <BentoCard item={artisticWorks[i]} idx={i} openLightbox={setLightboxIndex} focusPosition="object-[center_28%]" heightClass="h-[320px]" />
+              </div>
+            ))}
+          </div>
+        )}
       </section>
       )}
 
@@ -793,6 +787,18 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
             >
               {currentLightboxItem.title}
             </h3>
+
+            {/* Tác phẩm thể hiện một tượng của bộ sưu tập (đang hiển thị): dẫn tới trang của tượng đó */}
+            {currentLightboxItem.href && (
+              <Link
+                href={currentLightboxItem.href}
+                className="inline-flex items-center gap-1.5 px-5 py-1 mb-3 rounded-full bg-gradient-to-r from-[#D4A017] to-[#F2C14E] text-[#1C130D] font-bold text-xs uppercase shadow-md hover:brightness-110 transition-all"
+                style={{ fontFamily: "'UTM Avo', sans-serif" }}
+              >
+                <span>XEM TRANG TƯỢNG</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            )}
 
             {/* Subtitle (UTM Avo) */}
             {currentLightboxItem.subtitle && (
