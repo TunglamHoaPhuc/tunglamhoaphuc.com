@@ -184,7 +184,7 @@ const DROP_WITH_CONTENT = new Set([
 const RENAME: Record<string, string> = { b: "strong", i: "em", strike: "s", del: "s", h1: "h2", h5: "h4", h6: "h4" };
 
 const ALLOWED = new Set([
-	"h2", "h3", "h4", "p", "br", "strong", "em", "u", "s", "blockquote", "ul", "ol", "li", "a", "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "colgroup", "col", "figure", "img", "figcaption", "iframe", "audio", "hr", "div",
+	"h2", "h3", "h4", "p", "br", "strong", "em", "u", "s", "blockquote", "ul", "ol", "li", "a", "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "colgroup", "col", "figure", "img", "figcaption", "iframe", "audio", "hr", "div", "span", "mark", "sub", "sup",
 ]);
 
 const MEDIA_ID = /^[A-Za-z0-9_:.-]{1,120}$/;
@@ -226,6 +226,42 @@ const digits = (value: string | undefined, max: number) => {
 	return Number.isInteger(n) && n >= 1 && n <= max ? String(n) : null;
 };
 
+
+// Formatting the editor writes as inline style. Only these properties, each with a value that must match a strict
+// pattern, are kept; anything else in `style` is dropped, so no url(), expression or position can get through.
+const COLOR = /^(?:#[0-9a-f]{3,8}|rgba?\(\s*\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}\s*(?:,\s*(?:0|1|0?\.\d+)\s*)?\)|[a-z]{3,20})$/i;
+const FONT_FAMILIES: Record<string, string> = {
+	serif: "Georgia, 'Times New Roman', serif",
+	sans: "'Be Vietnam Pro', Arial, sans-serif",
+	mono: "'Courier New', monospace",
+};
+const FONT_FAMILY_VALUES = new Set(Object.values(FONT_FAMILIES));
+const STYLE_BLOCK = new Set(["p", "h2", "h3", "h4", "li", "td", "th", "blockquote"]);
+const STYLE_INLINE = new Set(["span", "mark"]);
+
+export function safeStyle(tag: string, value: string | undefined): string {
+	if (!value) return "";
+	const out: string[] = [];
+	for (const part of decoded(value).split(";")) {
+		const at = part.indexOf(":");
+		if (at < 0) continue;
+		const name = part.slice(0, at).trim().toLowerCase();
+		const v = part.slice(at + 1).trim().replace(/\s+/g, " ");
+		if (STYLE_BLOCK.has(tag)) {
+			if (name === "text-align" && ["left", "center", "right", "justify"].includes(v)) out.push(`text-align: ${v}`);
+			else if (name === "line-height" && /^(?:[1-3](?:\.\d{1,2})?)$/.test(v)) out.push(`line-height: ${v}`);
+			else if (name === "margin-left" && /^(?:[1-9]|1\d|2\d|30)(?:\.\d)?em$/.test(v)) out.push(`margin-left: ${v}`);
+		}
+		if (STYLE_INLINE.has(tag)) {
+			if ((name === "color" || (name === "background-color" && tag !== "mark")) && COLOR.test(v)) out.push(`${name}: ${v}`);
+			else if (name === "background-color" && tag === "mark" && COLOR.test(v)) out.push(`background-color: ${v}`);
+			else if (name === "font-size" && /^(?:[89]|[1-5]\d|6[0-4])(?:\.\d)?px$/.test(v)) out.push(`font-size: ${v}`);
+			else if (name === "font-family" && FONT_FAMILY_VALUES.has(v.replace(/"/g, "'"))) out.push(`font-family: ${v.replace(/"/g, "'")}`);
+		}
+	}
+	return out.join("; ");
+}
+
 /** The attributes an allowed element keeps, checked and rebuilt; `null` means the element itself goes (its text stays). */
 function attributesOf(tag: string, raw: [string, string][], options: SanitizeOptions): Record<string, string> | null {
 	const get = (name: string) => raw.find(([key]) => key === name)?.[1];
@@ -234,6 +270,8 @@ function attributesOf(tag: string, raw: [string, string][], options: SanitizeOpt
 		case "blockquote": {
 			const kind = decoded(get("class") ?? "");
 			if (kind === "kinh" || kind === "tho") out.class = kind;
+			const style = safeStyle(tag, get("style"));
+			if (style) out.style = style;
 			return out;
 		}
 		case "a": {
@@ -304,6 +342,8 @@ function attributesOf(tag: string, raw: [string, string][], options: SanitizeOpt
 			if (rowspan && rowspan !== "1") out.rowspan = rowspan;
 			const scope = decoded(get("scope") ?? "");
 			if (tag === "th" && ["row", "col", "rowgroup", "colgroup"].includes(scope)) out.scope = scope;
+			const cellStyle = safeStyle(tag, get("style"));
+			if (cellStyle) out.style = cellStyle;
 			return out;
 		}
 		case "col": {
@@ -311,8 +351,12 @@ function attributesOf(tag: string, raw: [string, string][], options: SanitizeOpt
 			if (span && span !== "1") out.span = span;
 			return out;
 		}
-		default:
+		default: {
+			const style = safeStyle(tag, get("style"));
+			if (style) out.style = style;
+			else if (tag === "span") return null;
 			return out;
+		}
 	}
 }
 

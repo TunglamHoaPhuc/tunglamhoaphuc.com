@@ -48,7 +48,7 @@ describe("B3: the server says when sanitising changed the body", () => {
 
 	it("answers bodyChanged: true when a tag, a link or a video was dropped or rewritten, and the stored HTML is what the editor must reload", async () => {
 		const { w, client, post } = await opened();
-		const html = '<p>H<sub>2</sub>O gọi <a href="tel:0900000000">0900</a></p><div data-youtube-video><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe></div>';
+		const html = '<p>H<small>2</small>O gọi <a href="tel:0900000000">0900</a></p><div data-youtube-video><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe></div>';
 		const saved = await client.call("PATCH", `posts/${post.id}`, { version: 1, contentHtml: html });
 		expect(saved.status, JSON.stringify(saved.json)).toBe(200);
 		expect(saved.data.bodyChanged).toBe(true);
@@ -61,7 +61,7 @@ describe("B3: the server says when sanitising changed the body", () => {
 	});
 
 	it("says it for a new article too", async () => {
-		const { post } = await opened("<p>x<sup>2</sup></p>");
+		const { post } = await opened("<p>x<small>2</small></p>");
 		expect(post.bodyChanged).toBe(true);
 		expect(post.contentHtml).toBe("<p>x2</p>");
 	});
