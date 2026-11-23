@@ -369,7 +369,9 @@ Quy tắc cứng nằm ngoài bảng quyền:
 - **Bí mật**: `ADMIN_JWT_SECRET`, `ADMIN_ENC_KEY` là secret của Worker, không nằm trong repo. `.env.example` chỉ ghi tên biến.
 - **Nhật ký không chứa bí mật**: các trường mật khẩu, token, khóa TOTP, mật khẩu SMTP bị loại khỏi `before` / `after`.
 - **Kiểm SMTP**: chỉ nhận cổng 465 và 587, từ chối địa chỉ IP nội bộ, và chỉ trả về kết quả dạng thành công / lỗi xác thực / không kết nối được. Đổi host SMTP bắt buộc nhập lại mật khẩu SMTP.
-- **Header**: `Content-Security-Policy` riêng cho `/quan-tri`, `X-Frame-Options: DENY`, `Referrer-Policy: same-origin`.
+- **Header** (khai trong `next.config.js`): `Content-Security-Policy` riêng cho `/quan-tri` và `/api/quan-tri` (`default-src 'self'`, `connect-src 'self'`, `object-src 'none'`, `base-uri` và `form-action` chỉ `'self'`, `frame-ancestors 'none'`, khung chỉ YouTube; script và style còn `'unsafe-inline'` vì framework và trình soạn cần, chưa dùng nonce), `X-Frame-Options: DENY`, `Referrer-Policy: same-origin`. Trang `/quan-tri/xem-truoc` (bản xem trước dựng bằng giao diện công khai) chỉ giữ `frame-ancestors 'none'`. Kiểm bằng `tests/e2e/admin/csp.spec.ts`: không màn nào của admin bị chính sách này chặn.
+- **Cache rìa sau khi ghi (B8)**: sau mỗi lần ghi thành công vào vùng dữ liệu mà trang công khai đọc (`src/admin/http/publicEffect.ts`), cổng API gọi `revalidatePath("/", "layout")` nên Workers Cache bỏ các trang ngay thay vì đợi 5 phút. Lỗi ở bước này không hoàn tác lần ghi. V3 (Worker `tlhp-v3`) có cache riêng nên vẫn theo chu kỳ của nó.
+- **Giới hạn API AI công khai**: `analyze`, `ask-ai`, `crop-analyze`, `tts` mỗi người (theo `cf-connecting-ip`) tối đa 60, 20, 40, 60 lần mỗi phút, vượt thì 429 (`src/libs/tibetan/server.ts`, đếm trong cache của trung tâm dữ liệu; chỉ là phanh chống gọi dồn, không phải bộ đếm chính xác).
 
 ## 7. Đặc tả API
 
