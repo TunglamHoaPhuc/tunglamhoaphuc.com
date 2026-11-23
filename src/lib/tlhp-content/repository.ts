@@ -240,7 +240,7 @@ function once<T>(make: () => Promise<T>): () => Promise<T> {
 }
 
 /** How often a Worker reading D1 starts a fresh repository, until saving in the admin refreshes the pages that changed (T24, tags). */
-const D1_RENEW_MS = 60_000;
+const D1_RENEW_MS = 15_000;
 
 const d1Repositories = once(async () => {
 	const [{ createD1Repository }, workers] = await Promise.all([import("./sources/d1"), (import("cloudflare:workers" as string) as Promise<{ env?: { DB?: D1Like } }>).catch(() => ({}) as { env?: { DB?: D1Like } }),
