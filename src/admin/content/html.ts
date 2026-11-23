@@ -280,10 +280,11 @@ function attributesOf(tag: string, raw: [string, string][], options: SanitizeOpt
 			out.href = href;
 			const title = get("title");
 			if (title) out.title = decoded(title).slice(0, 200);
+			const nofollow = /(?:^|\s)nofollow(?:\s|$)/i.test(decoded(get("rel") ?? ""));
 			if (isExternal(href, options.ownHosts ?? DEFAULT_HOSTS)) {
 				out.target = "_blank";
-				out.rel = "noopener noreferrer";
-			}
+				out.rel = nofollow ? "noopener noreferrer nofollow" : "noopener noreferrer";
+			} else if (nofollow) out.rel = "nofollow";
 			return out;
 		}
 		case "img": {

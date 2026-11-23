@@ -112,7 +112,7 @@ export function cleanPastedHtml(html: string): string {
 			let inner: Node[] = [...el.childNodes];
 			const wrap = (tag: string) => {
 				const w = doc.createElement(tag);
-				w.append(...inner);
+				for (const child of inner) w.appendChild(child);
 				inner = [w];
 			};
 			if (el.tagName === "SPAN" && (weight === "bold" || Number(weight) >= 600)) wrap("strong");
@@ -360,6 +360,7 @@ const formStyle = { padding: 12, borderBottom: "1px solid var(--tq-line)", backg
 function LinkForm({ editor, onDone }: { editor: Editor; onDone: () => void }) {
 	const [href, setHref] = useState<string>((editor.getAttributes("link").href as string | undefined) ?? "");
 	const [error, setError] = useState("");
+	const [nofollow, setNofollow] = useState(/nofollow/.test((editor.getAttributes("link").rel as string | undefined) ?? ""));
 	function apply() {
 		const value = href.trim();
 		if (!value) {
@@ -372,8 +373,8 @@ function LinkForm({ editor, onDone }: { editor: Editor; onDone: () => void }) {
 			return;
 		}
 		const chain = editor.chain().focus().extendMarkRange("link");
-		if (editor.state.selection.empty && !editor.isActive("link")) chain.insertContent({ type: "text", text: value, marks: [{ type: "link", attrs: { href: value } }] }).run();
-		else chain.setLink({ href: value }).run();
+		if (editor.state.selection.empty && !editor.isActive("link")) chain.insertContent({ type: "text", text: value, marks: [{ type: "link", attrs: { href: value, rel: nofollow ? "nofollow" : null } }] }).run();
+		else chain.setLink({ href: value, rel: nofollow ? "nofollow" : null } as never).run();
 		onDone();
 	}
 	return (
@@ -382,6 +383,9 @@ function LinkForm({ editor, onDone }: { editor: Editor; onDone: () => void }) {
 				<div className="tq-field">
 					<label className="tq-label" htmlFor="rich-link">
 						Địa chỉ liên kết
+					</label>
+					<label style={{ display: "block", marginBottom: 6 }}>
+						<input type="checkbox" checked={nofollow} onChange={(e) => setNofollow(e.target.checked)} /> Không theo dõi (nofollow). Liên kết ngoài luôn mở tab mới.
 					</label>
 					<input
 						id="rich-link"
@@ -616,6 +620,21 @@ function TableTools({ editor, inTable, onDone }: { editor: Editor; inTable: bool
 						</button>
 						<button type="button" className="tq-btn tq-btn--secondary tq-btn--small" onClick={() => run((c) => c.deleteColumn())}>
 							Xóa cột
+						</button>
+						<button type="button" className="tq-btn tq-btn--secondary tq-btn--small" title="Chọn nhiều ô bằng cách kéo chuột, rồi gộp" onClick={() => run((c) => c.mergeCells())}>
+							Gộp ô
+						</button>
+						<button type="button" className="tq-btn tq-btn--secondary tq-btn--small" onClick={() => run((c) => c.splitCell())}>
+							Tách ô
+						</button>
+						<button type="button" className="tq-btn tq-btn--secondary tq-btn--small" onClick={() => run((c) => c.setTextAlign("left"))}>
+							Căn trái ô
+						</button>
+						<button type="button" className="tq-btn tq-btn--secondary tq-btn--small" onClick={() => run((c) => c.setTextAlign("center"))}>
+							Căn giữa ô
+						</button>
+						<button type="button" className="tq-btn tq-btn--secondary tq-btn--small" onClick={() => run((c) => c.setTextAlign("right"))}>
+							Căn phải ô
 						</button>
 						<button type="button" className="tq-btn tq-btn--secondary tq-btn--small" onClick={() => run((c) => c.toggleHeaderRow())}>
 							Bật/tắt hàng tiêu đề

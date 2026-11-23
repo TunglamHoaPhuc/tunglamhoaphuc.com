@@ -18,3 +18,11 @@ describe("sanitiser keeps editor formatting (strict style allow-list)", () => {
 		expect(out).toContain("t");
 	});
 });
+
+describe("links", () => {
+	it("keeps nofollow, and opens outside links in a new tab", () => {
+		expect(sanitizeHtml('<a href="https://example.org/" rel="nofollow">x</a>')).toBe('<a href="https://example.org/" target="_blank" rel="noopener noreferrer nofollow">x</a>');
+		expect(sanitizeHtml('<a href="/tri-tue" rel="nofollow">x</a>')).toBe('<a href="/tri-tue" rel="nofollow">x</a>');
+		expect(sanitizeHtml('<a href="https://example.org/">x</a>')).toBe('<a href="https://example.org/" target="_blank" rel="noopener noreferrer">x</a>');
+	});
+});

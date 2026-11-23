@@ -180,7 +180,7 @@ export function editorExtensions(): Extensions {
 		Highlight.configure({ multicolor: true }),
 		Subscript,
 		Superscript,
-		TextAlign.configure({ types: ["heading", "paragraph"] }),
+		TextAlign.configure({ types: ["heading", "paragraph", "tableCell", "tableHeader"] }),
 		BlockSpacing,
 		QuoteBlock,
 		FigureImage,
