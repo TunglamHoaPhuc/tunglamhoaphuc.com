@@ -7,7 +7,7 @@
 // A fresh read is made every minute, like the content repository.
 import { MEDIA_BASE } from "@/lib/tlhp-content/media";
 import { renewingAsync } from "@/lib/renew-async";
-import { contentSource } from "@/lib/tlhp-content/repository";
+import { contentSource, lazy } from "@/lib/tlhp-content/repository";
 import type { D1Like } from "@/lib/tlhp-content/sources/d1";
 
 type Row = Record<string, unknown>;
@@ -88,7 +88,7 @@ const loaded = (async () => {
 	// A failed read is not kept for the minute (it used to be: one D1 hiccup emptied the menus and details of every page, edge-cached
 	// ones included, for 60 s). With an earlier good read in hand that is served; without one this call shows the empty state and
 	// the next call reads again.
-	const read = renewingAsync(() => load(db), 60_000);
+	const read = renewingAsync(() => load(db), 60_000, { name: "siteData" });
 	return async () => {
 		try {
 			return await read();
@@ -99,10 +99,11 @@ const loaded = (async () => {
 	};
 });
 
-let pending: Promise<() => Promise<Loaded>> | undefined;
+// What is kept is the function `loaded` made, once it exists; never the pending promise of making it (a request must not await a promise
+// another request started: it can be cancelled as "hung").
+const reader = lazy(loaded, "siteData.setup");
 async function data(): Promise<Loaded> {
-	pending ??= loaded();
-	return (await pending)();
+	return (await reader())();
 }
 
 /** True when D1 could not be read (the settings and menus are then empty, and the page shows an empty state). */

@@ -22,7 +22,7 @@ test("đọc một lần rồi giữ trong thời hạn, hết hạn thì đọc
 	assert.equal(reads, 2);
 });
 
-test("các lời gọi cùng lúc dùng chung một lần đọc", async () => {
+test("các lời gọi cùng lúc KHÔNG dùng chung lần đọc đang chạy (mỗi yêu cầu tự đọc); xong rồi thì dùng chung giá trị", async () => {
 	let reads = 0;
 	const get = renewingAsync(async () => {
 		reads++;
@@ -30,7 +30,36 @@ test("các lời gọi cùng lúc dùng chung một lần đọc", async () => {
 		return "v";
 	}, 60_000);
 	assert.deepEqual(await Promise.all(Array.from({ length: 8 }, () => get())), Array(8).fill("v"));
-	assert.equal(reads, 1);
+	assert.equal(reads, 8);
+	assert.equal(await get(), "v");
+	assert.equal(reads, 8, "giá trị đã về được dùng chung, không đọc lại");
+});
+
+test("lần đọc bắt đầu muộn nhất được giữ: lần đọc chậm bắt đầu trước không ghi đè giá trị mới", async () => {
+	const starts: ((value: string) => void)[] = [];
+	const get = renewingAsync(() => new Promise<string>((resolve) => starts.push(resolve)), 60_000);
+	const a = get();
+	const b = get();
+	assert.equal(starts.length, 2);
+	starts[1]("mới");
+	assert.equal(await b, "mới");
+	starts[0]("cũ");
+	assert.equal(await a, "cũ");
+	assert.equal(await get(), "mới");
+	assert.equal(starts.length, 2);
+});
+
+test("lần đọc hỏng được ghi log kèm tên", async () => {
+	const errors: unknown[][] = [];
+	const original = console.error;
+	console.error = (...args: unknown[]) => void errors.push(args);
+	try {
+		const get = renewingAsync(async (): Promise<number> => { throw new Error("D1 DB is overloaded"); }, 1000, { name: "statueLinks" });
+		await assert.rejects(() => get(), /overloaded/);
+	} finally {
+		console.error = original;
+	}
+	assert.ok(errors.some((args) => String(args[0]).includes("statueLinks")), JSON.stringify(errors.map(String)));
 });
 
 test("lần đọc ĐẦU hỏng: lỗi đến người gọi, KHÔNG được giữ; lời gọi kế tiếp đọc lại và thành công (renewing cũ giữ lỗi cả phút)", async () => {

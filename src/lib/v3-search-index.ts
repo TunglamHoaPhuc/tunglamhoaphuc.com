@@ -3,7 +3,8 @@
 // order, so a query ranks the same on both. Differences, on purpose: an event of the schedule links to its own page
 // (/lich-tu-hoc/<slug>, which V3 has) instead of an anchor on the month's list, and a day made from a regular ceremony is not
 // indexed (it has no page of its own; www lists it among the events).
-// Made from the repository once per Worker and kept, like the repository's data.
+// Made from the repository once per Worker and kept, like the repository's data (the finished index is kept, never one still being
+// made: a request must not await a promise another request started).
 import type { ContentRepository, PostSummary } from "@/lib/tlhp-content/types";
 import { MAP_PINS } from "@/lib/v3-areas";
 import { type SearchItem, searchItem } from "@/lib/v3-search";
@@ -14,17 +15,24 @@ export const SEARCH_POST_SECTIONS = ["dong-chay-hoang-phap", "tri-tue-phat-phap"
 /** The temple whose areas are on the map of Vũ Trụ Phật Giáo. */
 const TEMPLE = "tung-lam-hoa-phuc";
 
-const indexes = new WeakMap<ContentRepository, Promise<SearchItem[]>>();
+const indexes = new WeakMap<ContentRepository, SearchItem[]>();
 
-/** The index of this repository's content, made on the first search; made again after a failure. */
-export function searchIndex(repo: ContentRepository): Promise<SearchItem[]> {
-	let index = indexes.get(repo);
-	if (!index) {
-		index = buildSearchIndex(repo);
-		indexes.set(repo, index);
-		index.catch(() => indexes.delete(repo));
+/**
+ * The index of this repository's content, made on the first search; made again after a failure. Only a finished index is kept: while
+ * one is being made, a search that arrives makes its own rather than awaiting the first search's (another request's) promise.
+ */
+export async function searchIndex(repo: ContentRepository): Promise<SearchItem[]> {
+	const kept = indexes.get(repo);
+	if (kept) return kept;
+	let index: SearchItem[];
+	try {
+		index = await buildSearchIndex(repo);
+	} catch (error) {
+		console.error("searchIndex: đọc lỗi", error);
+		throw error;
 	}
-	return index;
+	if (!indexes.has(repo)) indexes.set(repo, index);
+	return indexes.get(repo) ?? index;
 }
 
 async function allPosts(repo: ContentRepository): Promise<PostSummary[]> {

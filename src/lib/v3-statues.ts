@@ -10,7 +10,7 @@
 // Every function takes what it reads as its last arguments so a test can hand it a fixture.
 import articleExtras from "@/data/statue-article-extras.json";
 import type { StatueRecord } from "@/lib/statue-types";
-import { getContentRepository } from "@/lib/tlhp-content/repository";
+import { getContentRepository, lazy } from "@/lib/tlhp-content/repository";
 import type { D1Like } from "@/lib/tlhp-content/sources/d1";
 import type { ContentRepository, Statue, StatueSummary } from "@/lib/tlhp-content/types";
 import { renewingAsync } from "@/lib/renew-async";
@@ -69,17 +69,18 @@ export async function readStatueLinks(db: D1Like): Promise<StatueLinks> {
 	return links;
 }
 
-let sharedLinks: Promise<() => Promise<StatueLinks>> | undefined;
+// What is kept is the function the setup made, once it exists; never the pending promise of the setup (a request must not await a
+// promise another request started: it can be cancelled as "hung").
+const sharedLinks = lazy(async (): Promise<() => Promise<StatueLinks>> => {
+	const db = await siteDb();
+	if (!db) return () => Promise.resolve(NO_LINKS);
+	// Not `renewing`: that would keep a failed read for the whole minute and fail every statue page (and the home page) meanwhile.
+	return renewingAsync(() => readStatueLinks(db), 60_000, { name: "statueLinks" });
+}, "statueLinks.setup");
 
 /** The links for this server instance (a fresh read each minute); none when V3 is not reading from D1. Started on first use, not at import. */
 export async function statueLinks(): Promise<StatueLinks> {
-	sharedLinks ??= (async () => {
-		const db = await siteDb();
-		if (!db) return () => Promise.resolve(NO_LINKS);
-		// Not `renewing`: that would keep a failed read for the whole minute and fail every statue page (and the home page) meanwhile.
-		return renewingAsync(() => readStatueLinks(db), 60_000);
-	})();
-	return (await sharedLinks)();
+	return (await sharedLinks())();
 }
 
 // ── Mapping ─────────────────────────────────────────────────────────────────────────────────────────────────────────

@@ -150,13 +150,23 @@ test("chỉ mục: đọc đủ mọi trang bài (60 bài một lần) và tìm 
 	assert.deepEqual(searchItems(index, "bao hieu").map((i) => i.title), ["Lễ Vu Lan"]);
 });
 
-test("chỉ mục được giữ cho cùng một kho (chỉ dựng một lần), kho khác dựng riêng", async () => {
+test("chỉ mục được giữ cho cùng một kho (dựng xong thì chỉ dựng một lần), kho khác dựng riêng", async () => {
+	const calls = { n: 0 };
+	const repo = fakeRepo({ calls });
+	const a = await searchIndex(repo);
+	assert.equal(await searchIndex(repo), a);
+	assert.equal(calls.n, 1);
+	await searchIndex(fakeRepo({ calls }));
+	assert.equal(calls.n, 2);
+});
+
+test("hai lượt tìm cùng lúc trên kho còn lạnh: mỗi lượt tự dựng (không đợi lời hứa của yêu cầu khác), rồi cùng dùng một chỉ mục", async () => {
 	const calls = { n: 0 };
 	const repo = fakeRepo({ calls });
 	const [a, b] = await Promise.all([searchIndex(repo), searchIndex(repo)]);
 	assert.equal(a, b);
-	assert.equal(calls.n, 1);
-	await searchIndex(fakeRepo({ calls }));
+	assert.equal(calls.n, 2);
+	assert.equal(await searchIndex(repo), a);
 	assert.equal(calls.n, 2);
 });
 
