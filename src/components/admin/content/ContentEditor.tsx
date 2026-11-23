@@ -7,7 +7,7 @@
 // (useLeaveGuard); a save that lost the race to another editor (409) offers to load the newest version.
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { JSONContent } from "@tiptap/react";
 import { api, ApiClientError } from "../api";
 import { useAdmin } from "../AdminProvider";
@@ -18,6 +18,7 @@ import { LeaveNotice, useLeaveGuard } from "../useLeaveGuard";
 import { advanceBaseline, bodyIsDirty, errorAt, normalizeYoutubeUrl, orphanErrors, publishMessage, rebase, same, SLUG_FROM_TITLE_MAX, slugify, slugOnBlur, tidyVideo, videoFormOf, videoPayload, youtubeId } from "./editorLogic";
 import { ExtraFields, MediaField, MilestonesEditor, RelatedPanel, RevisionPanel } from "./parts";
 import { RichEditor, type EditorValue } from "./RichEditor";
+import { clearDraft, draftKey, readDraft, writeDraft, type LocalDraft } from "./localDraft";
 import { isoToVietnamInput, vietnamInputToIso, vietnamToday } from "./time";
 import { KIND_UI, STATUS_LABELS, STATUS_TONES, type ContentDetail, type KindName, type MediaPreview, type Milestone, type Options } from "./types";
 
@@ -104,6 +105,8 @@ export function ContentEditor({ kind, id }: { kind: KindName; id: string | null 
 	const [conflict, setConflict] = useState(false);
 	const [schedule, setSchedule] = useState("");
 	const [confirmDelete, setConfirmDelete] = useState(false);
+	const [draftHandled, setDraftHandled] = useState(0);
+	const dKey = draftKey(kind, id);
 
 	/** The editor is rebuilt (its content, undo history and caret start again) only here: on loading, restoring, loading the newest and when the server cleaned the body. */
 	const remountEditor = useCallback((data: ContentDetail, fromStoredHtml: boolean) => {
@@ -219,6 +222,24 @@ export function ContentEditor({ kind, id }: { kind: KindName; id: string | null 
 			setSaving(false);
 		}
 	}, [body, changedKeys, detail, editable, form, kind, remountEditor, router, saving, savedBody, ui.path]);
+
+	// Local auto-save of the body (see localDraft.ts): written 3 s after typing stops, offered back when the article is opened again.
+	useEffect(() => {
+		if (!body || !editable) return;
+		const timer = window.setTimeout(() => writeDraft(dKey, { html: body.html, json: body.json, savedAt: Date.now() }), 3000);
+		return () => window.clearTimeout(timer);
+	}, [body, dKey, editable]);
+	// Read on render (the detail arrives from the server after mount, so this never runs during hydration); `draftHandled` re-reads after a choice.
+	const recoverable: LocalDraft | null = useMemo(() => {
+		void draftHandled;
+		if (!detail || !editable) return null;
+		const draft = readDraft(dKey);
+		const stored = detail.updatedAt ? Date.parse(detail.updatedAt) : 0;
+		return draft && draft.html !== (detail.contentHtml ?? "") && draft.savedAt > stored ? draft : null;
+	}, [detail, dKey, editable, draftHandled]);
+	useEffect(() => {
+		if (savedBody !== null) clearDraft(dKey);
+	}, [savedBody, dKey]);
 
 	// Ctrl+S / Cmd+S saves, wherever the focus is.
 	const saveRef = useRef(save);
@@ -470,6 +491,27 @@ export function ContentEditor({ kind, id }: { kind: KindName; id: string | null 
 						</div>
 					</fieldset>
 
+					{recoverable ? (
+						<Alert kind="warning">
+							Có bản nháp chưa lưu trên máy này (lúc {new Date(recoverable.savedAt).toLocaleString("vi-VN")}), mới hơn bản đã lưu trên máy chủ.{" "}
+							<Button
+								variant="secondary"
+								onClick={() => {
+									setEditorSeed(recoverable.json);
+									setEditorKey((n) => n + 1);
+									bodyRef.current = recoverable;
+									setBody(recoverable);
+									clearDraft(dKey);
+									setDraftHandled((n) => n + 1);
+								}}
+							>
+								Khôi phục bản nháp
+							</Button>{" "}
+							<Button variant="secondary" onClick={() => { clearDraft(dKey); setDraftHandled((n) => n + 1); }}>
+								Bỏ bản nháp
+							</Button>
+						</Alert>
+					) : null}
 					{fields.contentHtml || fields.contentJson ? <Alert kind="error">{fields.contentHtml ?? fields.contentJson}</Alert> : null}
 					<RichEditor
 						key={editorKey}

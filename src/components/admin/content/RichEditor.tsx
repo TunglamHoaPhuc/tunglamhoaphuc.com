@@ -7,7 +7,8 @@ import { EditorContent, useEditor, useEditorState, type Editor, type JSONContent
 import { useLayoutEffect, useRef, useState, type FocusEvent, type KeyboardEvent, type ReactNode } from "react";
 import { MediaPicker } from "../media/MediaPicker";
 import { Alert } from "../ui";
-import { editorExtensions, type FigureAttrs, type QuoteVariant } from "./editorExtensions";
+import { readingStats } from "./localDraft";
+import { editorExtensions, FONT_FAMILIES, FONT_SIZES, LINE_HEIGHTS, type FigureAttrs, type QuoteVariant } from "./editorExtensions";
 
 export type EditorValue = { html: string; json: JSONContent };
 
@@ -73,11 +74,55 @@ function readToolbarState(current: Editor | null) {
 		kinh: current.isActive("blockquote", { variant: "kinh" }),
 		tho: current.isActive("blockquote", { variant: "tho" }),
 		link: current.isActive("link"),
+		sub: current.isActive("subscript"),
+		sup: current.isActive("superscript"),
+		highlight: current.isActive("highlight"),
+		alignLeft: current.isActive({ textAlign: "left" }),
+		alignCenter: current.isActive({ textAlign: "center" }),
+		alignRight: current.isActive({ textAlign: "right" }),
+		alignJustify: current.isActive({ textAlign: "justify" }),
+		fontFamily: (current.getAttributes("textStyle").fontFamily as string | undefined) ?? "",
+		fontSize: String(current.getAttributes("textStyle").fontSize ?? "").replace("px", ""),
+		color: (current.getAttributes("textStyle").color as string | undefined) ?? "",
+		lineHeight: (current.getAttributes("paragraph").lineHeight as string | undefined) ?? "",
 		table: current.isActive("table"),
 		figure: current.isActive("figureImage"),
 		canUndo: current.can().undo(),
 		canRedo: current.can().redo(),
 	};
+}
+
+/**
+ * Pasted from Word or Google Docs: drop what only that program needs (classes, ids, mso styles, conditional comments, fonts,
+ * sizes in pt, empty spans) and keep structure, bold/italic/underline, alignment, headings, lists and tables.
+ */
+export function cleanPastedHtml(html: string): string {
+	const doc = new DOMParser().parseFromString(html.replace(/<!--[\s\S]*?-->/g, ""), "text/html");
+	doc.querySelectorAll("style, script, meta, link, xml, title").forEach((node) => node.remove());
+	const ALIGNABLE = new Set(["P", "H1", "H2", "H3", "H4", "H5", "H6", "TD", "TH", "LI"]);
+	for (const el of [...doc.body.querySelectorAll<HTMLElement>("*")].reverse()) {
+		const align = el.style?.textAlign;
+		const weight = el.style?.fontWeight;
+		const italic = el.style?.fontStyle === "italic";
+		const underline = (el.style?.textDecorationLine || el.style?.textDecoration || "").includes("underline");
+		for (const name of [...el.getAttributeNames()]) if (name !== "href" && name !== "src" && name !== "alt" && name !== "colspan" && name !== "rowspan") el.removeAttribute(name);
+		if (ALIGNABLE.has(el.tagName) && ["center", "right", "justify"].includes(align)) el.style.textAlign = align;
+		if (el.tagName === "SPAN" || (el.tagName === "B" && weight === "normal")) {
+			// Word and Docs mark emphasis on spans: rebuild it as real tags around the span's children, then drop the span.
+			let inner: Node[] = [...el.childNodes];
+			const wrap = (tag: string) => {
+				const w = doc.createElement(tag);
+				w.append(...inner);
+				inner = [w];
+			};
+			if (el.tagName === "SPAN" && (weight === "bold" || Number(weight) >= 600)) wrap("strong");
+			if (italic) wrap("em");
+			if (underline) wrap("u");
+			el.replaceWith(...inner);
+		}
+	}
+	doc.querySelectorAll("p:empty").forEach((node) => node.remove());
+	return doc.body.innerHTML;
 }
 
 export function RichEditor({ initial, onChange, label = "Nội dung bài", readOnly = false }: { initial: JSONContent | string; onChange: (value: EditorValue) => void; label?: string; readOnly?: boolean }) {
@@ -93,6 +138,7 @@ export function RichEditor({ initial, onChange, label = "Nội dung bài", readO
 		editable: !readOnly,
 		immediatelyRender: false,
 		editorProps: {
+			transformPastedHTML: cleanPastedHtml,
 			attributes: {
 				"aria-label": label,
 				"aria-multiline": "true",
@@ -169,6 +215,63 @@ export function RichEditor({ initial, onChange, label = "Nội dung bài", readO
 						⌫
 					</ToolButton>
 					<Divider />
+					<select aria-label="Phông chữ" className="tq-input" style={{ maxWidth: 150, width: "auto", minHeight: 0, padding: "4px 6px" }} value={state.fontFamily} onChange={(event) => (event.target.value ? chain().setFontFamily(event.target.value).run() : chain().unsetFontFamily().run())}>
+						{FONT_FAMILIES.map((font) => (
+							<option key={font.label} value={font.value}>{font.label}</option>
+						))}
+					</select>
+					<select aria-label="Cỡ chữ" className="tq-input" style={{ maxWidth: 90, width: "auto", minHeight: 0, padding: "4px 6px" }} value={state.fontSize} onChange={(event) => (event.target.value ? chain().setFontSize(`${event.target.value}px`).run() : chain().unsetFontSize().run())}>
+						<option value="">Cỡ chữ</option>
+						{FONT_SIZES.map((size) => (
+							<option key={size} value={size}>{size}</option>
+						))}
+					</select>
+					<label className="tq-btn tq-btn--secondary tq-btn--small" title="Màu chữ" style={{ minWidth: 36, cursor: "pointer" }}>
+						<span aria-hidden="true" style={{ borderBottom: `3px solid ${state.color || "currentColor"}` }}>A</span>
+						<input type="color" aria-label="Màu chữ" value={/^#[0-9a-f]{6}$/i.test(state.color) ? state.color : "#000000"} onChange={(event) => chain().setColor(event.target.value).run()} style={{ position: "absolute", opacity: 0, width: 1, height: 1 }} />
+					</label>
+					<ToolButton label="Bỏ màu chữ" onClick={() => chain().unsetColor().run()}>
+						A✕
+					</ToolButton>
+					<label className="tq-btn tq-btn--secondary tq-btn--small" title="Màu nền (tô sáng)" style={{ minWidth: 36, cursor: "pointer", background: state.highlight ? "var(--tq-accent-soft)" : undefined }}>
+						<span aria-hidden="true" style={{ background: "#fff176", padding: "0 3px" }}>ab</span>
+						<input type="color" aria-label="Màu nền chữ" defaultValue="#fff176" onChange={(event) => chain().setHighlight({ color: event.target.value }).run()} style={{ position: "absolute", opacity: 0, width: 1, height: 1 }} />
+					</label>
+					<ToolButton label="Bỏ tô sáng" onClick={() => chain().unsetHighlight().run()}>
+						ab✕
+					</ToolButton>
+					<ToolButton label="Chỉ số dưới" active={state.sub} onClick={() => chain().toggleSubscript().run()}>
+						x<sub>2</sub>
+					</ToolButton>
+					<ToolButton label="Chỉ số trên" active={state.sup} onClick={() => chain().toggleSuperscript().run()}>
+						x<sup>2</sup>
+					</ToolButton>
+					<Divider />
+					<ToolButton label="Căn trái" active={state.alignLeft} onClick={() => chain().setTextAlign("left").run()}>
+						⇤
+					</ToolButton>
+					<ToolButton label="Căn giữa" active={state.alignCenter} onClick={() => chain().setTextAlign("center").run()}>
+						≡
+					</ToolButton>
+					<ToolButton label="Căn phải" active={state.alignRight} onClick={() => chain().setTextAlign("right").run()}>
+						⇥
+					</ToolButton>
+					<ToolButton label="Căn đều hai bên" active={state.alignJustify} onClick={() => chain().setTextAlign("justify").run()}>
+						☰
+					</ToolButton>
+					<ToolButton label="Thụt lề vào (Ctrl+])" onClick={() => (editor.chain().focus() as unknown as { indentMore: () => { run: () => boolean } }).indentMore().run()}>
+						→|
+					</ToolButton>
+					<ToolButton label="Thụt lề ra (Ctrl+[)" onClick={() => (editor.chain().focus() as unknown as { outdent: () => { run: () => boolean } }).outdent().run()}>
+						|←
+					</ToolButton>
+					<select aria-label="Giãn dòng" className="tq-input" style={{ maxWidth: 90, width: "auto", minHeight: 0, padding: "4px 6px" }} value={state.lineHeight} onChange={(event) => chain().updateAttributes("paragraph", { lineHeight: event.target.value || null }).updateAttributes("heading", { lineHeight: event.target.value || null }).run()}>
+						<option value="">Giãn dòng</option>
+						{LINE_HEIGHTS.map((height) => (
+							<option key={height} value={height}>{height}</option>
+						))}
+					</select>
+					<Divider />
 					<ToolButton label="Danh sách dấu chấm" active={state.bullet} onClick={() => chain().toggleBulletList().run()}>
 						• –
 					</ToolButton>
@@ -211,6 +314,12 @@ export function RichEditor({ initial, onChange, label = "Nội dung bài", readO
 			{panel === "audio" ? <AudioForm editor={editor} onDone={() => setPanel(null)} /> : null}
 			{panel === "video" ? <VideoForm editor={editor} onDone={() => setPanel(null)} /> : null}
 			{panel === "table" ? <TableTools editor={editor} inTable={state.table} onDone={() => setPanel(null)} /> : null}
+			<p className="tq-hint" role="status" style={{ margin: 0, padding: "6px 16px", borderTop: "1px solid var(--tq-line)" }}>
+				{(() => {
+					const stats = readingStats(editor.getText());
+					return `${stats.words.toLocaleString("vi-VN")} từ · ${stats.chars.toLocaleString("vi-VN")} ký tự · đọc khoảng ${stats.minutes} phút`;
+				})()}
+			</p>
 			{state.figure && !readOnly ? <FigureForm key={JSON.stringify(editor.getAttributes("figureImage"))} editor={editor} /> : null}
 
 			<EditorContent editor={editor} />
