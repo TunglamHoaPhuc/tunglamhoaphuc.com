@@ -2,9 +2,10 @@
 # Cloudflare secrets. The www switch (T22) is a separate, deliberate change to cloudflare.config.ts.
 name: Deploy v2
 
+# Manual only since 23/11/2026: a push to main used to deploy WITHOUT TLHP_ADMIN / ADMIN_BASE_URL, which would put a Worker without the admin
+# on quantri. The deploy is done by hand with both variables (CLAUDE.md, docs/van-hanh/d1.md section 7).
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: deploy-v2

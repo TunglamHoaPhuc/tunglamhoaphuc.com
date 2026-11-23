@@ -13,7 +13,7 @@ export default defineConfig({
     entrypoint: "vinext/server/fetch-handler",
     compatibilityDate: "2026-11-02",
     compatibilityFlags: ["nodejs_compat"],
-    domains: ["v2.tunglamhoaphuc.com", "www.tunglamhoaphuc.com", "tunglamhoaphuc.com"],
+    domains: ["quantri.tunglamhoaphuc.com", "v2.tunglamhoaphuc.com", "www.tunglamhoaphuc.com", "tunglamhoaphuc.com"],
     workersDev: false,
     observability: { enabled: true },
     assets: {
