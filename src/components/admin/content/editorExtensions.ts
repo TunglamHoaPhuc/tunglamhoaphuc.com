@@ -50,7 +50,17 @@ export const QuoteBlock = Node.create({
 	},
 });
 
-export type FigureAttrs = { src: string; alt: string; mediaId: string | null; caption: string };
+/** The figure's inline style for a width (percent of the column) and an alignment; the server keeps exactly this shape (html.ts). */
+export function figureStyle(width: number | null, align: "left" | "center" | "right" | null): string {
+	const parts: string[] = [];
+	if (width && width >= 10 && width < 100) parts.push(`width: ${Math.round(width)}%`);
+	if (align === "center") parts.push("margin-left: auto", "margin-right: auto");
+	else if (align === "right") parts.push("margin-left: auto", "margin-right: 0");
+	else if (align === "left") parts.push("margin-left: 0", "margin-right: auto");
+	return parts.join("; ");
+}
+
+export type FigureAttrs = { src: string; alt: string; mediaId: string | null; caption: string; width: number | null; align: "left" | "center" | "right" | null };
 
 /** A picture (from the library: it keeps the media id) with its description and caption. */
 export const FigureImage = Node.create({
@@ -60,7 +70,7 @@ export const FigureImage = Node.create({
 	draggable: true,
 	selectable: true,
 	addAttributes() {
-		return { src: { default: null }, alt: { default: "" }, mediaId: { default: null }, caption: { default: "" } };
+		return { src: { default: null }, alt: { default: "" }, mediaId: { default: null }, caption: { default: "" }, width: { default: null }, align: { default: null } };
 	},
 	parseHTML() {
 		return [
@@ -69,7 +79,11 @@ export const FigureImage = Node.create({
 				getAttrs: (element: HTMLElement) => {
 					const img = element.querySelector("img");
 					if (!img?.getAttribute("src")) return false;
-					return { src: img.getAttribute("src"), alt: img.getAttribute("alt") ?? "", mediaId: img.getAttribute("data-media-id"), caption: element.querySelector("figcaption")?.textContent?.trim() ?? "" };
+					const w = /^(\d{2,3})%$/.exec(element.style.width);
+					const left = element.style.marginLeft;
+					const right = element.style.marginRight;
+					const align = left === "auto" && right === "auto" ? "center" : left === "auto" ? "right" : right === "auto" ? "left" : null;
+					return { src: img.getAttribute("src"), alt: img.getAttribute("alt") ?? "", mediaId: img.getAttribute("data-media-id"), caption: element.querySelector("figcaption")?.textContent?.trim() ?? "", width: w ? Number(w[1]) : null, align };
 				},
 			},
 			{
@@ -81,7 +95,9 @@ export const FigureImage = Node.create({
 	renderHTML({ node }) {
 		const attrs = node.attrs as FigureAttrs;
 		const img: [string, Record<string, string | null>] = ["img", { src: attrs.src, alt: attrs.alt ?? "", "data-media-id": attrs.mediaId, loading: "lazy" }];
-		return attrs.caption ? ["figure", {}, img, ["figcaption", {}, attrs.caption]] : ["figure", {}, img];
+		const style = figureStyle(attrs.width, attrs.align);
+		const fig: Record<string, string> = style ? { style } : {};
+		return attrs.caption ? ["figure", fig, img, ["figcaption", {}, attrs.caption]] : ["figure", fig, img];
 	},
 });
 

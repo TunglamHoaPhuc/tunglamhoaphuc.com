@@ -238,6 +238,7 @@ const FONT_FAMILIES: Record<string, string> = {
 const FONT_FAMILY_VALUES = new Set(Object.values(FONT_FAMILIES));
 const STYLE_BLOCK = new Set(["p", "h2", "h3", "h4", "li", "td", "th", "blockquote"]);
 const STYLE_INLINE = new Set(["span", "mark"]);
+const MARGIN_SIDE = /^(?:auto|0)$/;
 
 export function safeStyle(tag: string, value: string | undefined): string {
 	if (!value) return "";
@@ -251,6 +252,10 @@ export function safeStyle(tag: string, value: string | undefined): string {
 			if (name === "text-align" && ["left", "center", "right", "justify"].includes(v)) out.push(`text-align: ${v}`);
 			else if (name === "line-height" && /^(?:[1-3](?:\.\d{1,2})?)$/.test(v)) out.push(`line-height: ${v}`);
 			else if (name === "margin-left" && /^(?:[1-9]|1\d|2\d|30)(?:\.\d)?em$/.test(v)) out.push(`margin-left: ${v}`);
+		}
+		if (tag === "figure") {
+			if (name === "width" && /^(?:[1-9]\d)%$/.test(v)) out.push(`width: ${v}`);
+			else if ((name === "margin-left" || name === "margin-right") && MARGIN_SIDE.test(v)) out.push(`${name}: ${v}`);
 		}
 		if (STYLE_INLINE.has(tag)) {
 			if ((name === "color" || (name === "background-color" && tag !== "mark")) && COLOR.test(v)) out.push(`${name}: ${v}`);

@@ -26,3 +26,11 @@ describe("links", () => {
 		expect(sanitizeHtml('<a href="https://example.org/">x</a>')).toBe('<a href="https://example.org/" target="_blank" rel="noopener noreferrer">x</a>');
 	});
 });
+
+describe("figure size and alignment", () => {
+	it("keeps width in percent and auto/0 margins, drops the rest", () => {
+		const img = '<img src="/anh-goc/a.webp" alt="a">';
+		expect(sanitizeHtml(`<figure style="width: 50%; margin-left: auto; margin-right: auto; float: left; position: fixed">${img}</figure>`)).toBe(`<figure style="width: 50%; margin-left: auto; margin-right: auto">${img.replace(">", ' loading="lazy">')}</figure>`);
+		expect(sanitizeHtml(`<figure style="width: 5000px">${img}</figure>`)).not.toContain("style");
+	});
+});

@@ -467,7 +467,7 @@ function ImageForm({ editor, onDone }: { editor: Editor; onDone: () => void }) {
 							type="button"
 							className="tq-btn tq-btn--primary"
 							onClick={() => {
-								const attrs: FigureAttrs = { src: picked.src, mediaId: picked.mediaId, alt: alt.trim(), caption: caption.trim() };
+								const attrs: FigureAttrs = { src: picked.src, mediaId: picked.mediaId, alt: alt.trim(), caption: caption.trim(), width: null, align: null };
 								editor.chain().focus().insertContent({ type: "figureImage", attrs }).run();
 								onDone();
 							}}
@@ -509,6 +509,29 @@ function FigureForm({ editor }: { editor: Editor }) {
 						Chú thích
 					</label>
 					<input id="rich-figure-caption" className="tq-input" value={caption} onChange={(e) => setCaption(e.target.value)} maxLength={500} />
+				</div>
+				<div className="tq-field">
+					<label className="tq-label" htmlFor="rich-figure-width">
+						Rộng
+					</label>
+					<select id="rich-figure-width" className="tq-input" value={attrs.width ?? 100} onChange={(e) => editor.chain().focus().updateAttributes("figureImage", { width: Number(e.target.value) >= 100 ? null : Number(e.target.value) }).run()}>
+						{[25, 33, 50, 66, 75, 100].map((w) => (
+							<option key={w} value={w}>
+								{w}%
+							</option>
+						))}
+					</select>
+				</div>
+				<div className="tq-field">
+					<label className="tq-label" htmlFor="rich-figure-align">
+						Căn lề ảnh
+					</label>
+					<select id="rich-figure-align" className="tq-input" value={attrs.align ?? ""} onChange={(e) => editor.chain().focus().updateAttributes("figureImage", { align: e.target.value || null }).run()}>
+						<option value="">Mặc định</option>
+						<option value="left">Trái</option>
+						<option value="center">Giữa</option>
+						<option value="right">Phải</option>
+					</select>
 				</div>
 				<button type="button" className="tq-btn tq-btn--primary" onClick={() => editor.chain().focus().updateAttributes("figureImage", { alt: alt.trim(), caption: caption.trim() }).run()}>
 					Cập nhật
