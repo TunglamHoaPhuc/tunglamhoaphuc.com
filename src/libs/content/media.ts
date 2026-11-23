@@ -179,6 +179,56 @@ export function mediaSource(bucket: string, key: string[]): { r2Key: string; ori
 	return origin ? { r2Key: `${bucket}/${key.join("/")}`, origin } : null;
 }
 
+/**
+ * How pictures reach the browser (23/11/2026, docs/van-hanh/anh.md):
+ *  - "cgi": Cloudflare's image transformations on this zone, /cdn-cgi/image/width=…/anh-goc/… (the zone has 5,000 free ones a month);
+ *  - "variants": ready-made AVIF/WebP files kept in R2 next to the original (scripts/media-variants.mjs), asked for as
+ *    /anh-goc/<bucket>/<key>@<width> and chosen by the Accept header (serveMedia). A missing variant falls back to a larger one and in the
+ *    end to the original, so flipping this before every variant exists only costs bytes, never a broken picture.
+ * The one place to flip it: change this constant (rolling back is the same line). Every function below also takes the mode as its last
+ * argument, which is how the tests exercise both.
+ */
+export type ImageDelivery = "cgi" | "variants";
+export const IMAGE_DELIVERY: ImageDelivery = "cgi";
+
+/** Widths of the ready-made variants; scripts/media-variants.mjs has the same list (a test keeps them equal). */
+export const VARIANT_WIDTHS = [160, 360, 640, 960, 1280, 1920] as const;
+/** The biggest variant, "@max": the original's width, at most this many pixels. */
+export const VARIANT_MAX_WIDTH = 2560;
+export type VariantStep = (typeof VARIANT_WIDTHS)[number] | "max";
+export type VariantFormat = "avif" | "webp";
+
+/** The standard width a request of `width` pixels is rounded UP to ("max" past 1920), so nobody can make an unlimited number of cache keys. */
+export function variantStep(width: number): VariantStep {
+	if (!Number.isFinite(width)) return "max";
+	return VARIANT_WIDTHS.find((step) => width <= step) ?? "max";
+}
+
+/** Pictures that get variants. GIF (often animated) and SVG stay as they are; AVIF originals are already the small kind. */
+const VARIANT_SOURCE = /\.(jpe?g|jfif|png|webp)$/i;
+// "<name>@<digits or max>" optionally followed by the extension of the variant: the file part of an /anh-goc/ path.
+const VARIANT_SUFFIX = /^(.+)@(\d{1,5}|max)(?:\.(avif|webp))?$/;
+
+/**
+ * An /anh-goc/ address for the variant of `src` (a path such as "/anh-goc/s2-cnv03/a.jpg") at the standard width that fits `width`.
+ * Without an extension: the Accept header picks AVIF or WebP. A picture that has no variants (GIF, SVG, a query string) comes back as it is.
+ */
+export function variantUrl(src: string, width: number): string {
+	if (!src.startsWith(`${ANH_GOC}/`) || /[?#]/.test(src)) return src;
+	const base = src.replace(/@(?:\d{1,5}|max)(?:\.(?:avif|webp))?$/, "");
+	if (!VARIANT_SOURCE.test(base)) return src;
+	return `${base}@${variantStep(width)}`;
+}
+
+/** What a request for /anh-goc/<bucket>/<key…> means when its last part is "<name>@<width>[.avif|.webp]"; `null` for an ordinary key. */
+export function parseVariantRequest(key: string[]): { base: string[]; step: VariantStep; ext: VariantFormat | null } | null {
+	if (key.length === 0) return null;
+	const match = VARIANT_SUFFIX.exec(key[key.length - 1]);
+	if (!match) return null;
+	const step = match[2] === "max" ? "max" : variantStep(Number(match[2]));
+	return { base: [...key.slice(0, -1), match[1]], step, ext: (match[3] as VariantFormat | undefined) ?? null };
+}
+
 /** The source of a transformation on this zone: always a picture of this site's /anh-goc/ route. */
 function transformSource(src: string): string | null {
 	const address = src.startsWith("/anh-goc/") ? src : mediaUrl(src);
@@ -186,37 +236,58 @@ function transformSource(src: string): string | null {
 }
 
 /**
- * A picture of the old site at `width` pixels, through Cloudflare's image transformations on
- * this zone (AVIF or WebP as the browser takes). The old admin keeps camera originals of
- * 7–9 MB; at 640 px one is about 25 KB. The zone accepts only sources on itself, which is why
- * B2 files come through /anh-goc/. Past the free 5,000 transformations a month, onerror=redirect
- * sends the browser to the original. The site's own pictures and other hosts stay as they are.
+ * A picture of the old site at `width` pixels. In "cgi" mode (today's default) through Cloudflare's image transformations on
+ * this zone (AVIF or WebP as the browser takes): the old admin keeps camera originals of 7–9 MB; at 640 px one is about 25 KB. The
+ * zone accepts only sources on itself, which is why B2 files come through /anh-goc/. Past the free 5,000 transformations a month,
+ * onerror=redirect sends the browser to the original. In "variants" mode the ready-made file of the standard width (see IMAGE_DELIVERY).
+ * The site's own pictures and other hosts stay as they are.
  */
-export function imageAt(src: string, width: number): string {
+export function imageAt(src: string, width: number, delivery: ImageDelivery = IMAGE_DELIVERY): string {
 	if (src.startsWith("/") && !src.startsWith("//") && !src.startsWith("/anh-goc/")) return src;
 	const source = transformSource(src);
-	return source ? `/cdn-cgi/image/width=${width},quality=75,format=auto,onerror=redirect/${source}` : src;
+	if (!source) return src;
+	if (delivery === "variants") return variantUrl(`/${source}`, width);
+	return `/cdn-cgi/image/width=${width},quality=75,format=auto,onerror=redirect/${source}`;
 }
 
 /**
- * Album pictures: only WordPress uploads are transformed. The B2 album pictures were made
- * small already (median 92 KB), and an album of 170 would spend the monthly quota.
+ * Album pictures. In "cgi" mode only WordPress uploads are transformed: the B2 album pictures were made small already
+ * (median 92 KB), and an album of 170 would spend the monthly quota. Variants cost no quota, so there every picture gets one.
  */
-export function albumImageAt(src: string, width: number): string {
-	return isWordPressMedia(src) ? imageAt(src, width) : src;
+export function albumImageAt(src: string, width: number, delivery: ImageDelivery = IMAGE_DELIVERY): string {
+	return delivery === "variants" || isWordPressMedia(src) ? imageAt(src, width, delivery) : src;
 }
 
-/** Display widths of transformed pictures; few on purpose, each one counts against the quota. */
-export const IMAGE_WIDTH = { small: 360, card: 640, wide: 1280, full: 1920 } as const;
+/** Display widths of delivered pictures. In "cgi" mode few on purpose, each one counts against the quota; "icon" and "mid" are the standard variant widths between. */
+export const IMAGE_WIDTH = { icon: 160, small: 360, card: 640, mid: 960, wide: 1280, full: 1920 } as const;
 
 /**
- * `srcSet` of a transformed picture at the given widths, for pictures shown much smaller than
- * 640 px on phones (a statue card is about 185 px there: 324 device pixels at Lighthouse's 1.75, so 360, T41b). `undefined` for pictures that
- * are not transformed, which come in one size.
+ * `srcSet` of a delivered picture at the given widths, for pictures shown much smaller than 640 px on phones (a statue card is about
+ * 185 px there: 324 device pixels at Lighthouse's 1.75, so 360, T41b). `undefined` for pictures that are not delivered in sizes, which come in one size.
+ *
+ * "variants" mode: each width is rounded up to a standard one (no widths: all standard widths, and "@max" when the picture is wider than the last); with the picture's own width known
+ * (`originalWidth`, from media.width) the list stops at it, and the "@max" file stands for the original's width, so the browser never
+ * hears of a size that does not exist.
  */
-export function imageSrcSet(src: string, widths: readonly number[]): string | undefined {
-	if (imageAt(src, widths[0]) === src) return undefined;
-	return widths.map((width) => `${imageAt(src, width)} ${width}w`).join(", ");
+export function imageSrcSet(src: string, widths: readonly number[], originalWidth?: number | null, delivery: ImageDelivery = IMAGE_DELIVERY): string | undefined {
+	if (delivery !== "variants") {
+		if (imageAt(src, widths[0], delivery) === src) return undefined;
+		return widths.map((width) => `${imageAt(src, width, delivery)} ${width}w`).join(", ");
+	}
+	if (imageAt(src, VARIANT_WIDTHS[0], delivery) === src) return undefined;
+	const known = typeof originalWidth === "number" && originalWidth > 0 ? Math.round(originalWidth) : null;
+	const wanted: VariantStep[] = (widths.length ? widths : VARIANT_WIDTHS).map(variantStep);
+	// All standard widths of a picture wider than the last one: its "@max" belongs to the list too.
+	if (!widths.length && known !== null && known > VARIANT_WIDTHS[VARIANT_WIDTHS.length - 1]) wanted.push("max");
+	// From the width the picture itself has, the ladder holds no file: "@max" is it.
+	const steps = new Set<VariantStep>(wanted.map((step) => (step !== "max" && known !== null && step >= known ? "max" : step)));
+	const ordered = [...steps].sort((a, b) => (a === "max" ? Infinity : a) - (b === "max" ? Infinity : b));
+	return ordered
+		.map((step) => {
+			const descriptor = step === "max" ? Math.min(known ?? VARIANT_MAX_WIDTH, VARIANT_MAX_WIDTH) : step;
+			return `${imageAt(src, step === "max" ? VARIANT_MAX_WIDTH + 1 : step, delivery)} ${descriptor}w`;
+		})
+		.join(", ");
 }
 
 /**
