@@ -2,7 +2,7 @@
 // articles and the Giới thiệu pages. They share one set of endpoints; what differs (table, columns, the category
 // they belong to, where the body is kept) is described here, so the service is written once.
 import { z } from "zod";
-import { safeHref, safeMediaSrc } from "./html";
+import { safeHref, safePictureSrc } from "./html";
 import { youtubeIdOf } from "./extra";
 
 export type KindName = "posts" | "teachings" | "pages";
@@ -65,7 +65,9 @@ const picture = z
 	.string()
 	.trim()
 	.max(500)
-	.refine((value) => !value || safeMediaSrc(value) !== null, "Ảnh phải ở thư viện (/anh-goc/…) hoặc là địa chỉ https.");
+	.refine((value) => !value || safePictureSrc(value) !== null, "Ảnh phải lấy từ thư viện (địa chỉ bắt đầu bằng /anh-goc/); không nhận ảnh ở trang khác. Hãy tải ảnh lên thư viện rồi chọn.")
+	// Saved in the site's own form: a path under /anh-goc/ (an old WordPress or B2 address that maps with certainty becomes its /anh-goc/ path).
+	.transform((value) => (value ? (safePictureSrc(value) ?? value) : value));
 
 export const KEYWORDS = z.array(z.object({ keyword: plainItem(200), title: plainItem(300), description: plainItem(2000) })).max(50, "Tối đa 50 từ khóa.");
 export const VIDEOS = z

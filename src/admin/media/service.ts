@@ -7,7 +7,7 @@ import { num, text, type AdminStmt, type Row } from "../db";
 import { ApiError, forbidden, notFound } from "../http/errors";
 import { likeWord, type Page } from "../http/paging";
 import { newId } from "../ids";
-import { MEDIA_BASE, imageAt, IMAGE_WIDTH } from "../../libs/content/media";
+import { MEDIA_BASE, imageAt, IMAGE_WIDTH, mediaUrl } from "../../libs/content/media";
 import { can } from "../rbac/check";
 import { slugify } from "../slug";
 import { MAX_IMAGE_BYTES, RATIOS, sniffImage, type Sniffed } from "./files";
@@ -18,8 +18,8 @@ const stamp = (ctx: AuthContext) => ctx.now().toISOString();
 const audit = (ctx: AuthContext, by: Authed, entry: Pick<AuditEntry, "action" | "entityType" | "entityId" | "before" | "after">) =>
 	auditStatement(ctx.db, { ...entry, userId: by.user.id, userEmail: by.user.email, ip: ctx.ip, userAgent: ctx.userAgent }, ctx.now());
 
-/** The public address of a library picture or of one the old admin left on B2 / WordPress. */
-export const mediaPath = (r2Key: string | null, url: string | null): string => (r2Key ? `${MEDIA_BASE}/${r2Key}` : (url ?? ""));
+/** The public address of a library picture, or of one the old admin left on B2 / WordPress (those come out as /anh-goc/…, so the admin, whose CSP loads only its own pictures, can show them). */
+export const mediaPath = (r2Key: string | null, url: string | null): string => (r2Key ? `${MEDIA_BASE}/${r2Key}` : (mediaUrl(url) ?? url ?? ""));
 
 export type MediaItem = {
 	id: string;

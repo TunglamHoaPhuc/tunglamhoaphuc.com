@@ -6,10 +6,12 @@
 //
 // Kept: h2–h4 (h1 becomes h2, h5/h6 become h4), p, br, strong/b, em/i, u, s/strike/del, blockquote (class "kinh"
 // or "tho" only), ul/ol/li, a (https, mailto and relative links; external ones open in a new tab with
-// rel="noopener noreferrer"), the table family, figure/img/figcaption (pictures from /anh-goc/, /brand/ or https),
+// rel="noopener noreferrer"), the table family, figure/img/figcaption (pictures from /anh-goc/ or /brand/; reading still shows the https
+// pictures of old bodies, but a NEW save keeps only the site's own: see `strictMedia`),
 // iframe (YouTube without cookies only), audio (library media: its media id or a /anh-goc/ path; controls, preload none), hr, and the
 // <div data-youtube-video> the editor puts around a video. Everything else is unwrapped (its text stays) or, for
 // script, style, svg and the like, dropped with all it holds.
+import { mediaUrl } from "../../libs/content/media";
 import { decodeEntities } from "../../libs/content/normalize";
 
 export type HtmlNode = { type: "text"; text: string } | { type: "element"; tag: string; attrs: Record<string, string>; children: HtmlNode[] };
@@ -19,6 +21,12 @@ export type SanitizeOptions = {
 	ownHosts?: string[];
 	/** The current address of library pictures by media id: a picture or sound with `data-media-id` gets it. */
 	mediaSrc?: ReadonlyMap<string, string>;
+	/**
+	 * For a NEW save only: a picture without a library `data-media-id` stays only when its address is this site's own /anh-goc/ or /brand/
+	 * (see `safePictureSrc`); any other host is dropped like an `<img>` without a source (and reported in `changes`). Left off, the
+	 * sanitiser still reads the https pictures of old bodies, so pages keep drawing until their data is migrated.
+	 */
+	strictMedia?: boolean;
 	/**
 	 * Filled with the tag of every element the sanitiser dropped, unwrapped or rewrote (not with the attributes it tidies, nor the old
 	 * tags it renames): empty means the editor shows what the page will. The service tells the editor when it is not empty.
@@ -208,12 +216,41 @@ export function safeHref(value: string): string | null {
 	return null;
 }
 
-/** A picture or sound the site may load: from the media host (/anh-goc/), the brand folder or https. */
+/**
+ * A picture or sound the site may READ: from the media host (/anh-goc/), the brand folder or https. Only for what is already stored
+ * (old bodies, sound addresses); what an editor newly saves as a picture goes through `safePictureSrc`.
+ */
 export function safeMediaSrc(value: string): string | null {
 	const src = decoded(value);
 	if (/^https:\/\/[^\s/?#]+/i.test(src) && !/\s/.test(src)) return src;
 	if (/^\/(anh-goc|brand)\/[^\s\\]*$/.test(src) && !src.includes("..") && !src.startsWith("//")) return src;
 	return null;
+}
+
+/** The hosts a picture address may name and still be this site's own (the public host, and the admin's when an editor copies from it). */
+const OWN_PICTURE_HOSTS = ["tunglamhoaphuc.com", "www.tunglamhoaphuc.com", "quantri.tunglamhoaphuc.com"];
+const OWN_PICTURE_PATH = /^\/(anh-goc|brand)\/[^\s\\]+$/;
+
+/**
+ * A picture address a NEW save may keep: this site's own /anh-goc/ (library and mirrored files) or /brand/ path, written as a path or with
+ * the site's host in front (then written back as the path). The old WordPress and B2 addresses that /anh-goc/ maps with certainty
+ * (mediaUrl) come out in that form, so re-saving a body or book that still holds one keeps it readable. Any other host is `null`.
+ */
+export function safePictureSrc(value: string, ownHosts: readonly string[] = OWN_PICTURE_HOSTS): string | null {
+	const src = decoded(value);
+	if (!src || /\s/.test(src) || src.includes("..")) return null;
+	if (OWN_PICTURE_PATH.test(src)) return src;
+	if (!/^(https?:)?\/\//i.test(src)) return null;
+	let parsed: URL;
+	try {
+		parsed = new URL(src.startsWith("//") ? `https:${src}` : src);
+	} catch {
+		return null;
+	}
+	if (parsed.username || parsed.password) return null;
+	if (ownHosts.includes(parsed.hostname.toLowerCase())) return OWN_PICTURE_PATH.test(parsed.pathname) ? parsed.pathname : null;
+	const legacy = mediaUrl(src);
+	return legacy?.startsWith("/anh-goc/") ? legacy : null;
 }
 
 const isExternal = (href: string, hosts: string[]) => {
@@ -251,7 +288,7 @@ function attributesOf(tag: string, raw: [string, string][], options: SanitizeOpt
 		case "img": {
 			const mediaId = decoded(get("data-media-id") ?? "");
 			const known = MEDIA_ID.test(mediaId) ? options.mediaSrc?.get(mediaId) : undefined;
-			const src = known ?? safeMediaSrc(get("src") ?? "");
+			const src = known ?? (options.strictMedia ? safePictureSrc(get("src") ?? "") : safeMediaSrc(get("src") ?? ""));
 			if (!src) return {};
 			out.src = src;
 			out.alt = decoded(get("alt") ?? "").slice(0, 300);

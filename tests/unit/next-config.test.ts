@@ -73,8 +73,10 @@ describe("next.config headers", () => {
 			for (const part of ["default-src 'self'", "connect-src 'self'", "object-src 'none'", "base-uri 'self'", "form-action 'self'", "frame-ancestors 'none'"]) expect(csp, `${path}: ${part}`).toContain(part);
 			// nothing but the site itself runs scripts or styles from a file; the only frames are YouTube's
 			expect(csp, path).not.toMatch(/script-src[^;]*https?:/);
-			// the editor plays a sound from any https address the editors paste
-			expect(csp, path).toContain("media-src 'self' blob: https:");
+			// every picture and sound is the site's own (R2 through /anh-goc/): no outside host may load an image or a sound in the admin
+			expect(csp, path).toMatch(/(^|; )img-src 'self' data: blob:(;|$)/);
+			expect(csp, path).toMatch(/(^|; )media-src 'self' blob:(;|$)/);
+			expect(csp, path).not.toMatch(/(img|media)-src[^;]*https:/);
 			expect(csp, path).toMatch(/frame-src https:\/\/www\.youtube-nocookie\.com https:\/\/www\.youtube\.com(;|$)/);
 		}
 		// the draft preview shows the public site's page, so it gets no policy of the admin's, but is never framed

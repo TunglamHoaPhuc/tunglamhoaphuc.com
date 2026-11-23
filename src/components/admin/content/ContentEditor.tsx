@@ -9,6 +9,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { JSONContent } from "@tiptap/react";
+import { mediaUrl } from "@/libs/content/media";
 import { api, ApiClientError } from "../api";
 import { useAdmin } from "../AdminProvider";
 import { MediaPicker } from "../media/MediaPicker";
@@ -761,13 +762,13 @@ export function ContentEditor({ kind, id }: { kind: KindName; id: string | null 
 	);
 }
 
-/** A picture address for a book cover: typed, or taken from the library. */
+/** A picture address for a book cover: taken from the library (the address the library gives, /anh-goc/…); no outside address is accepted. */
 function CoverField({ value, onChange, error }: { value: string; onChange: (value: string) => void; error?: string }) {
 	const [picking, setPicking] = useState(false);
 	return (
 		<div>
-			<TextField label="Ảnh bìa sách (địa chỉ)" value={value} onChange={(e) => onChange(e.target.value)} placeholder="/anh-goc/…" error={error} />
-			{value ? <img src={value} alt="" style={{ width: 90, borderRadius: 4, marginBottom: 6 }} /> : null}
+			<TextField label="Ảnh bìa sách (địa chỉ)" value={value} onChange={(e) => onChange(e.target.value)} placeholder="/anh-goc/…" hint="Bấm Chọn từ thư viện bên dưới. Chỉ nhận ảnh của thư viện (địa chỉ bắt đầu bằng /anh-goc/); không dán ảnh từ trang khác." error={error} />
+			{value ? <img src={mediaUrl(value) ?? value} alt="" style={{ width: 90, borderRadius: 4, marginBottom: 6 }} /> : null}
 			<div>
 				<button type="button" className="tq-btn tq-btn--secondary tq-btn--small" onClick={() => setPicking((now) => !now)} aria-expanded={picking}>
 					Chọn từ thư viện

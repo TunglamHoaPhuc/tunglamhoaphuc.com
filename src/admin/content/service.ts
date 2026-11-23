@@ -723,11 +723,11 @@ async function prepare(db: AdminDb, kind: Kind, current: State | null, input: St
 	if (has("contentHtml") && !bodyAsOpened) {
 		const firstChanges: string[] = [];
 		const secondChanges: string[] = [];
-		const firstPass = parseSafe(String(input.contentHtml ?? ""), { changes: firstChanges });
+		const firstPass = parseSafe(String(input.contentHtml ?? ""), { changes: firstChanges, strictMedia: true });
 		const ids = mediaIdsIn(firstPass);
 		const known = ids.length ? await mediaPreviews(db, ids) : {};
 		const mediaSrc = new Map(Object.values(known).map((item) => [item.id, item.url]));
-		const tree = mediaSrc.size ? parseSafe(String(input.contentHtml ?? ""), { mediaSrc, changes: secondChanges }) : firstPass;
+		const tree = mediaSrc.size ? parseSafe(String(input.contentHtml ?? ""), { mediaSrc, changes: secondChanges, strictMedia: true }) : firstPass;
 		bodyChanged = (mediaSrc.size ? secondChanges : firstChanges).length > 0;
 		// Restoring puts back the text the version kept, as it was: sanitising the old site's HTML again would rewrite it (it adds
 		// target="_blank" to its links). A version holding library pictures still goes through the sanitiser, which points them at their
