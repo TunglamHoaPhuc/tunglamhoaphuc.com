@@ -17,115 +17,48 @@ interface NewsItem {
   imgPosition?: string;
 }
 
-const INITIAL_NEWS_DATA: NewsItem[] = [
-  {
-    id: "gioi-thieu-tieu-su-su-to",
-    category: "Tiểu Sử Sư Tổ",
-    iconUrl: "/images/icons/icon-tong-chi-tu-hoc.webp",
-    title: "TIỂU SỬ SƯ TỔ NGỘ CHÂN TỬ",
-    subtitle: "Sư tổ khai sơn Tông phong Hoằng Pháp (1901 – 1988) – Ngọn đèn Tịnh Độ và tấm lòng Bồ Tát cứu khổ nhân gian",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/07-anh-tho-cac-vi-cao-tang/su-to-ngo-chan-tu/hinh-su-to-final-19d1002.webp",
-    targetUrl: "/gioi-thieu/tieu-su-su-to",
-    imgPosition: "center 20%",
-  },
-  {
-    id: "post-1060",
-    category: "Khóa Lễ Truyền Thống",
-    iconUrl: "/images/icons/icon-khoa-le-truyen-thong.png",
-    title: "LỄ HẰNG THUẬN TẠI TÙNG LÂM HÒA PHÚC",
-    subtitle: "Tùng Lâm Hòa Phúc",
-    imgUrl: "https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/10/7.jfif",
-    targetUrl: "/dong-chay-hoang-phap/le-hang-thuan-tai-tung-lam-hoa-phuc-2",
-    imgPosition: "center 35%",
-  },
-  {
-    id: "core-bdt",
-    category: "Tông Chỉ Tu Học",
-    iconUrl: "/images/icons/icon-tong-chi-tu-hoc.webp",
-    title: "BỒ ĐỀ TÂM",
-    subtitle: "Cội nguồn thiện pháp",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/nen-tang-tu-hoc/tong-chi-tu-hoc-nen-tang-tu-hoc-bo-de-tam-herobanner-thumbnail.webp",
-    targetUrl: "/tong-chi-tu-hoc/bo-de-tam-coi-nguon-thien-phap",
-    imgPosition: "center 35%",
-  },
-  {
-    id: "core-statue",
-    category: "Bảo Tượng Phật Giáo",
-    iconUrl: "/images/icons/icon-cac-bao-tuong-noi-bat.webp",
-    title: "ĐỨC PHẬT THÍCH CA MÂU NI",
-    subtitle: "Vô Thượng Năng Nhân",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/05-bao-tuong-phat-giao/chu_phat_hai_hoi/duc_phat_thich_ca/tuong_chinh/duc_phat_thich_ca_tuongchinh.webp",
-    targetUrl: "/bao-tuong/duc_phat_thich_ca_mau_ni_vo_thuong_nang_nhan_tp0001",
-    imgPosition: "center 35%",
-  },
-  {
-    id: "hp-1",
-    category: "Đại Lễ Sự Kiện",
-    iconUrl: "/images/icons/icon-dai-le-su-kien.png",
-    title: "THÁNG BẢY – THÁNG CỦA HIẾU ÂN VÀ TÌNH THƯƠNG",
-    subtitle: "Tháng ân tình báo hiếu & gieo trồng phước điền nơi ruộng phúc Tam Bảo",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/03-dong-chay-hoang-phap/dai-le-su-kien/32-1-scaled.jpg",
-    targetUrl: "/dong-chay-hoang-phap/thang-bay-thang-cua-hieu-an-va-tinh-thuong",
-    imgPosition: "center 35%",
-  },
-  {
-    id: "tt-1",
-    category: "Trí Tuệ Phật Pháp",
-    iconUrl: "/images/icons/icon-tri-tue-phat-phap.webp",
-    title: "ĐI QUA KHỔ VUI CUỘC ĐỜI",
-    subtitle: "Hành trình tu tập của Sư Phụ Tâm Hòa",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp",
-    targetUrl: "/tri-tue-phat-phap/tac-pham-di-qua-kho-vui-cuoc-doi",
-    imgPosition: "center 35%",
-  },
-  {
-    id: "core-retreat",
-    category: "Cộng Tu Định Kỳ",
-    iconUrl: "/images/icons/icon-cong-tu.png",
-    title: "PHÁP HỘI NIỆM PHẬT & KHÓA LỄ BÁT QUAN TRAI GIỚI",
-    subtitle: "Đạo tràng niệm Phật thanh tịnh hàng tuần nuôi dưỡng Bồ Đề Tâm",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/03-dong-chay-hoang-phap/dai-le-su-kien/21-2-scaled.jpg",
-    targetUrl: "/dong-chay-hoang-phap",
-    imgPosition: "center 35%",
-  },
-  {
-    id: "tc-2",
-    category: "Tông Chỉ Tu Học",
-    iconUrl: "/images/icons/icon-tong-chi-tu-hoc.webp",
-    title: "TIẾP BƯỚC THẦY TÔI",
-    subtitle: "Hoằng Pháp – Kiến An mãi nhớ Thầy",
-    imgUrl: "https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/07/tong-chi-tu-hoc-tong-phong-truyen-thua-tiep-buoc-thay-toi-banner-thumnail-scaled.jpg",
-    targetUrl: "/tong-chi-tu-hoc/tiep-buoc-thay-toi",
-    imgPosition: "center 35%",
-  },
-];
+/**
+ * `items`: the cards the server built from what D1 holds as live (lib/v3-home-news.ts `loadHomeNews`), so the first paint already
+ * has the real news and a post the admin hid or deleted never flashes. Without it the cards are asked of /api/home/news-carousel
+ * once the page is up. There is no copy of the news written in this file: when D1 has none (or cannot be read) the block is not drawn.
+ */
+interface NewsSectionProps {
+  items?: NewsItem[] | null;
+}
 
-export const NewsSection: FC = () => {
-  const [newsList, setNewsList] = useState<NewsItem[]>(INITIAL_NEWS_DATA);
+export const NewsSection: FC<NewsSectionProps> = ({ items }) => {
+  const [fetched, setFetched] = useState<NewsItem[] | null>(null);
   const [activeIdx, setActiveIdx] = useState(0);
   const [slideDirection, setSlideDirection] = useState<'next' | 'prev'>('next');
+  const given = Array.isArray(items);
+  const newsList = Array.isArray(items) ? items : fetched;
 
-  // Dynamic fetch aggregated news from 4 admin systems
+  // The server gave no cards (not wired, or D1 could not be read there): ask the API once.
   useEffect(() => {
+    if (given) return;
+    let cancelled = false;
     async function fetchLatestNews() {
       try {
         const res = await fetch(`/api/home/news-carousel?t=${Date.now()}`, {
           cache: 'no-store',
           next: { revalidate: 0 },
         });
-        if (res.ok) {
-          const json = await res.json();
-          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
-            setNewsList(json.data);
-            setActiveIdx(0);
-          }
-        }
+        const json = res.ok ? await res.json() : null;
+        if (!cancelled) setFetched(json?.success && Array.isArray(json.data) ? json.data : []);
       } catch (err) {
-        console.log('Dynamic news fetch fallback to static dataset:', err);
+        console.log('Không tải được tin mới nhất:', err);
+        if (!cancelled) setFetched([]);
       }
     }
     fetchLatestNews();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [given]);
+
+  // Still asking: keep the block's place so the page below does not jump. Nothing live (or unreadable): no block.
+  if (newsList === null) return <section aria-hidden="true" className="w-full min-h-[760px] bg-[#1A120B]" />;
+  if (newsList.length === 0) return null;
 
   const total = newsList.length;
 

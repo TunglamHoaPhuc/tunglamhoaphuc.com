@@ -31,6 +31,7 @@ import {
   formatSolarDateStr,
   calcDaysDifference,
 } from "@/data/schedule-data";
+import { decodeHtmlEntities } from "@/lib/html-entities";
 import { monthEvents, resolveMonthTheme, type CalendarPayload } from "@/lib/v3-calendar";
 
 function toSlug(str: string): string {
@@ -75,7 +76,7 @@ function renderQuoteSegment(text: string): React.ReactNode {
           style={{ fontFamily: "'UTM Avo', sans-serif" }}
           className="text-xs sm:text-[13.5px] md:text-sm text-[#FFE5A3]/95 inline align-baseline"
         >
-          {text.substring(lastIndex, match.index)}
+          {decodeHtmlEntities(text.substring(lastIndex, match.index))}
         </span>
       );
     }
@@ -87,7 +88,7 @@ function renderQuoteSegment(text: string): React.ReactNode {
           style={{ fontFamily: "'UTM Niagara', 'UTM_Niagara', serif" }}
           className="text-2xl sm:text-[26px] md:text-[28px] font-normal text-[#FFDE59] drop-shadow-[0_0_12px_rgba(255,222,89,0.85)] tracking-normal inline align-baseline mx-1 leading-none"
         >
-          {boldContent}
+          {decodeHtmlEntities(boldContent)}
         </span>
       );
     }
@@ -101,7 +102,7 @@ function renderQuoteSegment(text: string): React.ReactNode {
         style={{ fontFamily: "'UTM Avo', sans-serif" }}
         className="text-xs sm:text-[13.5px] md:text-sm text-[#FFE5A3]/95 inline align-baseline"
       >
-        {text.substring(lastIndex)}
+        {decodeHtmlEntities(text.substring(lastIndex))}
       </span>
     );
   }
