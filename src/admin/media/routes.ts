@@ -97,6 +97,7 @@ registerRoutes(
 		method: "PATCH",
 		path: "media/:id",
 		needs: { module: "media", action: "update" },
+		own: true,
 		handler: async (call) =>
 			updateMedia(call.ctx, call.authed!, call.params.id, await call.body(z.object({ alt: z.string().max(300).optional(), title: z.string().max(200).optional(), caption: z.string().max(500).optional(), folderId: nullableId }))),
 	},
@@ -104,6 +105,7 @@ registerRoutes(
 		method: "PUT",
 		path: "media/:id/file",
 		needs: { module: "media", action: "update" },
+		own: true,
 		handler: async (call) => {
 			const { bytes, filename } = await readUpload(call);
 			return replaceMediaFile(call.ctx, call.authed!, store(call), call.params.id, { bytes, filename });
@@ -113,6 +115,7 @@ registerRoutes(
 		method: "PUT",
 		path: "media/:id/crops/:ratio",
 		needs: { module: "media", action: "update" },
+		own: true,
 		handler: async (call) => {
 			const { bytes, fields } = await readUpload(call);
 			let region: unknown;
@@ -130,6 +133,7 @@ registerRoutes(
 		method: "DELETE",
 		path: "media/:id/crops/:ratio",
 		needs: { module: "media", action: "update" },
+		own: true,
 		handler: async (call) => {
 			await deleteCrop(call.ctx, call.authed!, store(call), call.params.id, decodeURIComponent(call.params.ratio));
 		},
@@ -138,6 +142,7 @@ registerRoutes(
 		method: "DELETE",
 		path: "media/:id",
 		needs: { module: "media", action: "delete" },
+		own: true,
 		handler: async (call) => {
 			await deleteMedia(call.ctx, call.authed!, call.params.id, call.query.get("force") === "1");
 		},

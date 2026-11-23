@@ -135,7 +135,7 @@ registerRoutes(
 		needs: "session",
 		handler: async (call) => {
 			const permissions = call.authed!.permissions;
-			if (!can(permissions, "menus", "update", { userId: call.authed!.user.id, anyOwner: true }) && !can(permissions, "categories", "update", { userId: call.authed!.user.id, anyOwner: true })) throw forbidden();
+			if (!can(permissions, "menus", "update") && !can(permissions, "categories", "update")) throw forbidden();
 			const { svg } = await call.body(z.object({ svg: z.string().max(400_000, "SVG lớn hơn 50 KB.") }));
 			try {
 				return { svg: sanitizeSvg(svg) };

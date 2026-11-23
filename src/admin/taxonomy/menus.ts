@@ -346,6 +346,7 @@ registerTrashable({
 	table: "menu_item",
 	titleSql: "label",
 	module: "menus",
+	isLive: () => false, // no publish state: editing menus never took the publish right
 	hasCreatedBy: false,
 	purge: (ctx, _by, id) => [ctx.db.prepare("DELETE FROM media_usage WHERE entity_type = 'menu_item' AND entity_id = ?").bind(id)],
 });

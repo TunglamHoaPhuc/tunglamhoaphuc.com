@@ -40,6 +40,8 @@ function initVars() {
 		"ADMIN_BASE_URL=http://localhost:3001",
 		"ADMIN_SEED_EMAIL=admin@localhost.test",
 		`ADMIN_SEED_PASSWORD=${randomBytes(12).toString("base64url")}`,
+		// the e2e tests change the one-time seed password to this one at their first run (tests/e2e/admin/helpers.ts)
+		`ADMIN_E2E_PASSWORD=E2e-${randomBytes(12).toString("base64url")}`,
 	];
 	writeFileSync(DEV_VARS, `${lines.join("\n")}\n`);
 	console.log(`Wrote ${DEV_VARS} (git-ignored) with new secrets and a first sign-in; read it there.`);

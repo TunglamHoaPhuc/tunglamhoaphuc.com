@@ -45,7 +45,10 @@ export default function AccountsPage() {
 	const error = current ? loaded.error : "";
 	const result = loaded?.result ?? null;
 
+	// The role filter needs the list of roles, which is the Vai trò module's: without its "view" right the filter is simply left out.
+	const canRoles = can("roles", "view");
 	useEffect(() => {
+		if (!canRoles) return;
 		let alive = true;
 		api<{ roles: RoleOption[] }>("GET", "roles")
 			.then((data) => alive && setRoles(data.roles))
@@ -53,7 +56,7 @@ export default function AccountsPage() {
 		return () => {
 			alive = false;
 		};
-	}, []);
+	}, [canRoles]);
 
 	useEffect(() => {
 		const timer = setTimeout(() => {

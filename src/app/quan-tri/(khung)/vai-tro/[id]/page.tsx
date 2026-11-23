@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api } from "@/components/admin/api";
 import { useAdmin } from "@/components/admin/AdminProvider";
+import { mayGrant } from "@/components/admin/ownScope";
 import { PermissionMatrix, type MatrixModule } from "@/components/admin/PermissionMatrix";
 import { Alert, Badge, Button, errorText, fieldErrors, Loading, PageHeader, TextArea, TextField } from "@/components/admin/ui";
 
@@ -184,7 +185,7 @@ export default function RoleDetailPage() {
 							setPermissions(next);
 						}}
 						readOnly={!editable}
-						canGrant={(m, a) => can(m, a)}
+						canGrant={(m, a, wanted) => mayGrant(me.permissions, m, a, wanted)}
 					/>
 				</section>
 				{editable ? (

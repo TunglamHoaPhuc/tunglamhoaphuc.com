@@ -2,10 +2,7 @@
 // Left out on purpose: sessions, reset tokens, throttle counters, 2FA secrets and registrations, and from the rest every
 // password hash and secret column (an account restored from a backup gets a new password through "forgot password").
 // Restoring is a script, not an endpoint: scripts/restore-backup.ts (docs/van-hanh/sao-luu.md).
-import { verifyPassword } from "../auth/password";
-import type { AuthContext, Authed } from "../auth/service";
-import { clearFailures, LOGIN_BACKOFF, recordFailure, waitSeconds } from "../auth/throttle";
-import { sha256Hex } from "../auth/tokens";
+import { checkOwnPassword, type AuthContext, type Authed } from "../auth/service";
 import { num, text, type AdminDb, type Row } from "../db";
 import { ApiError } from "../http/errors";
 import { audit, vietnamParts } from "./common";
@@ -146,17 +143,7 @@ export const backupName = (now: Date) => {
 
 /** Checks the person's password again before a backup file leaves the server; wrong guesses slow down. */
 export async function confirmPassword(ctx: AuthContext, by: Authed, password: string): Promise<void> {
-	const now = ctx.now();
-	const key = `backup-pw:${await sha256Hex(by.user.id)}`;
-	const wait = await waitSeconds(ctx.db, [key], now);
-	if (wait > 0) throw new ApiError(429, "too_many_attempts", "Bạn thử quá nhiều lần. Hãy đợi một lát rồi thử lại.", undefined, wait);
-	const row = await ctx.db.prepare("SELECT password_hash FROM user WHERE id = ?").bind(by.user.id).first();
-	const hash = text(row?.password_hash);
-	if (!hash || !verifyPassword(password, hash)) {
-		await recordFailure(ctx.db, key, now, LOGIN_BACKOFF);
-		throw new ApiError(400, "wrong_password", "Mật khẩu chưa đúng.", { password: "Mật khẩu chưa đúng." });
-	}
-	await clearFailures(ctx.db, key);
+	if (!(await checkOwnPassword(ctx, by.user.id, password))) throw new ApiError(400, "wrong_password", "Mật khẩu chưa đúng.", { password: "Mật khẩu chưa đúng." });
 }
 
 /** Records the download in the log, then returns the backup as a file to stream to the browser. */

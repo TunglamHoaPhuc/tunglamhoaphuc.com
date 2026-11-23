@@ -74,12 +74,11 @@ registerRoutes(
 		needs: "public",
 		handler: async (call) => {
 			const input = await call.body(z.object({ email }));
-			// The mail goes out after the answer, so how long the answer takes says nothing about the address.
-			const mailer = (message: Parameters<typeof call.deps.mailer>[0]) => {
-				call.deps.defer(call.deps.mailer(message).catch((error) => console.error("reset mail failed", error)));
-				return Promise.resolve();
-			};
-			const allowed = await requestPasswordReset(call.ctx, input.email, mailer);
+			// Everything that depends on there being an account (the lookup, the token, the mail) runs after the answer, started
+			// from a timer so it does not share the answer's turn: how long the answer takes says nothing about the address.
+			const later = (work: () => Promise<unknown>) =>
+				call.deps.defer(new Promise<void>((resolve) => setTimeout(resolve, 0)).then(work).catch((error) => console.error("password reset failed", error)));
+			const allowed = await requestPasswordReset(call.ctx, input.email, call.deps.mailer, later);
 			if (!allowed) throw new ApiError(429, "too_many_attempts", "Bạn gửi yêu cầu quá nhiều lần. Hãy thử lại sau.", undefined, 3600);
 			return { message: "Nếu email này có tài khoản, một thư hướng dẫn đặt lại mật khẩu sẽ được gửi tới." };
 		},
@@ -121,13 +120,13 @@ registerRoutes(
 	{
 		method: "GET",
 		path: "me/sessions",
-		needs: "session-any",
+		needs: "session",
 		handler: async (call) => ({ sessions: await listSessions(call.ctx, call.authed!.user.id, call.authed!.session.id) }),
 	},
 	{
 		method: "DELETE",
 		path: "me/sessions/:id",
-		needs: "session-any",
+		needs: "session",
 		handler: async (call) => {
 			const ended = await revokeSessions(call.ctx, call.authed!.user.id, { sessionId: call.params.id });
 			if (!ended) throw new ApiError(404, "not_found", "Phiên này không còn.");
@@ -136,14 +135,14 @@ registerRoutes(
 	{
 		method: "DELETE",
 		path: "me/sessions",
-		needs: "session-any",
+		needs: "session",
 		handler: async (call) => ({ ended: await revokeSessions(call.ctx, call.authed!.user.id, { exceptId: call.authed!.session.id }) }),
 	},
-	{ method: "POST", path: "me/2fa/setup", needs: "session-any", handler: async (call) => setupTotp(call.ctx, call.authed!) },
+	{ method: "POST", path: "me/2fa/setup", needs: "session", handler: async (call) => setupTotp(call.ctx, call.authed!) },
 	{
 		method: "POST",
 		path: "me/2fa/enable",
-		needs: "session-any",
+		needs: "session",
 		handler: async (call) => {
 			const input = await call.body(z.object({ code: z.string().trim().min(6).max(10) }));
 			return { recoveryCodes: await enableTotp(call.ctx, call.authed!, input.code) };
@@ -152,7 +151,7 @@ registerRoutes(
 	{
 		method: "POST",
 		path: "me/2fa/disable",
-		needs: "session-any",
+		needs: "session",
 		handler: async (call) => {
 			const input = await call.body(z.object({ password }));
 			await disableTotp(call.ctx, call.authed!, input.password);

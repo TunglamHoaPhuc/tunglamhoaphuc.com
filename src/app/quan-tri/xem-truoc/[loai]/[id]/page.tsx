@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
+import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import type { AdminDb } from "@/admin/db";
 import { kindByPath } from "@/admin/content/kinds";
+import { isAdminHost } from "@/admin/http/origin";
 import { loadPreview, type PreviewData } from "@/admin/content/service";
 import SiteShell from "@/components/layout/SiteShell";
 import { PagePreview, PostPreview, TeachingPreview } from "@/components/admin/content/PreviewArticles";
@@ -52,12 +55,14 @@ function Refused({ message }: { message: string }) {
 }
 
 export default async function PreviewPage({ params, searchParams }: Props) {
+	// The admin exists on one address only (as in the API dispatcher): on any other host this page is not there.
+	const env = await workerEnv();
+	if (!isAdminHost((await headers()).get("host"), typeof env?.ADMIN_BASE_URL === "string" ? env.ADMIN_BASE_URL : undefined)) notFound();
 	const { loai, id } = await params;
 	const raw = (await searchParams).token;
 	const token = Array.isArray(raw) ? raw[0] : raw;
 	const kind = kindByPath(loai);
 	if (!kind || !token) return <Refused message="Liên kết xem trước không đầy đủ. Hãy mở lại từ nút “Xem trước” trong trang soạn bài." />;
-	const env = await workerEnv();
 	if (!env?.DB || typeof env.ADMIN_JWT_SECRET !== "string") return <Refused message="Máy chủ chưa được cấu hình cho trang quản trị." />;
 	let data: PreviewData | null = null;
 	try {

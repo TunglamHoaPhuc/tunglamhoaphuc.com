@@ -1,6 +1,6 @@
 import { analyze, tibetanText, wordsInRect } from "@/libs/tibetan/api";
 import { PROMPT_VERSION } from "@/libs/tibetan/prompts";
-import { cachedJson, json, pageWords, readBody, workerEnv } from "@/libs/tibetan/server";
+import { allow, cachedJson, json, OverLimit, pageWords, readBody, tooMany, workerEnv } from "@/libs/tibetan/server";
 
 // The Tibetan course (T17b): the learner draws a rectangle on a page of the book. The words in
 // it come from the book's word positions (sara_words_coords.json, one file a page), not from
@@ -18,11 +18,20 @@ export async function POST(request: Request) {
 			status: "error",
 			message: "Không thấy chữ Tạng trong vùng đã chọn.",
 		});
-	const analysis = await cachedJson(`analyze-v${PROMPT_VERSION}`, text, () => analyze(text, AI));
-	return json({
-		...analysis,
-		status: "success",
-		detected_text: text,
-		cropped_image: null,
-	});
+	try {
+		const analysis = await cachedJson(`analyze-v${PROMPT_VERSION}`, text, async () => {
+			// Counted only where the model is asked, not for an answer already kept.
+			await allow(request, "crop-analyze", 40);
+			return analyze(text, AI);
+		});
+		return json({
+			...analysis,
+			status: "success",
+			detected_text: text,
+			cropped_image: null,
+		});
+	} catch (error) {
+		if (error instanceof OverLimit) return tooMany();
+		throw error;
+	}
 }

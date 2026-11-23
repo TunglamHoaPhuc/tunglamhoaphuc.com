@@ -1,7 +1,6 @@
 import { notFoundMetadata } from "@/components/sections/error/NotFoundMain";
-import { notFound, permanentRedirect, redirect } from "next/navigation";
-import { countHit, findRedirect } from "@/libs/redirects";
-import { afterResponse, siteDb } from "@/libs/siteDb";
+import { notFound } from "next/navigation";
+import { redirectIfMoved } from "@/libs/siteRedirect";
 
 // vinext takes the 404 page's title from here rather than from not-found.js.
 export const metadata = notFoundMetadata;
@@ -22,14 +21,6 @@ const decode = (segment) => {
 // admin moved answers with its redirect instead of a 404.
 export default async function Missing({ params }) {
 	const segments = (await params)?.missing ?? [];
-	const db = await siteDb();
-	if (db && segments.length) {
-		const found = await findRedirect(db, `/${segments.map(decode).join("/")}`).catch(() => null);
-		if (found) {
-			await afterResponse(countHit(db, found.fromPath));
-			if (found.code === 301) permanentRedirect(found.to);
-			redirect(found.to);
-		}
-	}
+	if (segments.length) await redirectIfMoved(`/${segments.map(decode).join("/")}`);
 	notFound();
 }

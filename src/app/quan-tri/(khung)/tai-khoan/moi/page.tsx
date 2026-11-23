@@ -6,7 +6,7 @@ import { api } from "@/components/admin/api";
 import { useAdmin } from "@/components/admin/AdminProvider";
 import { Alert, Button, errorText, fieldErrors, Loading, PageHeader, SelectField, TextField } from "@/components/admin/ui";
 
-type RoleOption = { id: string; name: string };
+type RoleOption = { id: string; name: string; assignable?: boolean };
 type Created = { user: { id: string; email: string; name: string }; temporaryPassword: string };
 
 export default function NewAccountPage() {
@@ -21,7 +21,10 @@ export default function NewAccountPage() {
 	const [fields, setFields] = useState<Record<string, string>>({});
 	const [created, setCreated] = useState<Created | null>(null);
 
+	// Choosing a role needs the list of roles (the Vai trò module's "view" right).
+	const canRoles = can("roles", "view");
 	useEffect(() => {
+		if (!canRoles) return;
 		let alive = true;
 		api<{ roles: RoleOption[] }>("GET", "roles")
 			.then((data) => alive && setRoles(data.roles))
@@ -29,7 +32,7 @@ export default function NewAccountPage() {
 		return () => {
 			alive = false;
 		};
-	}, []);
+	}, [canRoles]);
 
 	// the temporary password must not outlive this page
 	useEffect(() => () => setCreated(null), []);
@@ -100,9 +103,10 @@ export default function NewAccountPage() {
 		<>
 			<PageHeader title="Thêm tài khoản" back={back} />
 			<section className="tq-panel">
+				{!canRoles ? <Alert kind="warning">Bạn không có quyền xem danh sách vai trò nên chưa chọn được vai trò cho tài khoản mới. Hãy nhờ quản trị viên cấp quyền xem mục Vai trò và quyền.</Alert> : null}
 				{rolesError ? <Alert kind="error">{`Không tải được danh sách vai trò: ${rolesError}`}</Alert> : null}
 				{error ? <Alert kind="error">{error}</Alert> : null}
-				{!roles && !rolesError ? (
+				{!canRoles ? null : !roles && !rolesError ? (
 					<Loading />
 				) : (
 					<form onSubmit={submit} noValidate>
@@ -110,7 +114,7 @@ export default function NewAccountPage() {
 						<TextField label="Email" type="email" name="email" autoComplete="off" value={email} onChange={(e) => setEmail(e.target.value)} error={fields.email} required />
 						<SelectField label="Vai trò" name="roleId" value={roleId} onChange={(e) => setRoleId(e.target.value)} error={fields.roleId} required>
 							<option value="">Chọn vai trò</option>
-							{(roles ?? []).map((role) => (
+							{(roles ?? []).filter((role) => role.assignable !== false).map((role) => (
 								<option key={role.id} value={role.id}>
 									{role.name}
 								</option>

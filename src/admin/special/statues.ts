@@ -9,7 +9,7 @@ import { newId } from "../ids";
 import { mediaPath, replaceUsageStatements } from "../media/service";
 import { revisionStatement } from "../revision";
 import { registerTrashable, trashStatement } from "../trash";
-import { asBool, audit, checkMedia, checkMediaAll, checkStatusChange, conflictOf, diffOf, invalid, json, mayChange, slugFor, stamp, staleVersion, taken } from "./common";
+import { asBool, audit, checkMedia, checkMediaAll, checkStatusChange, conflictOf, diffOf, invalid, json, mayChange, mayChangeLive, slugFor, stamp, staleVersion, taken } from "./common";
 import { cleanBodyHtml } from "./html";
 
 export type StatueCore = {
@@ -318,6 +318,7 @@ type Change = { core?: Partial<StatueCore>; images?: StatueImageEntry[]; related
 async function persist(ctx: AuthContext, by: Authed, id: string, version: number, change: Change): Promise<StatueDetail> {
 	const row = await findRow(ctx, id);
 	mayChange(by, "statues", "update", text(row.created_by) || null);
+	mayChangeLive(by, "statues", text(row.status) === "published");
 	staleVersion(row, version);
 	const before = await loadState(ctx, row);
 	const after: State = {
@@ -374,6 +375,7 @@ export const setStatueVariations = (ctx: AuthContext, by: Authed, id: string, ve
 export async function deleteStatue(ctx: AuthContext, by: Authed, id: string): Promise<void> {
 	const row = await findRow(ctx, id);
 	mayChange(by, "statues", "delete", text(row.created_by) || null);
+	mayChangeLive(by, "statues", text(row.status) === "published");
 	await ctx.db.batch([trashStatement(ctx, by, "statue", id), audit(ctx, by, { action: "statue.trash", entityType: "statue", entityId: id, before: { name: row.name, code: row.code } })]);
 }
 
@@ -383,6 +385,7 @@ registerTrashable({
 	table: "statue",
 	titleSql: "name",
 	module: "statues",
+	isLive: (row) => text(row.status) === "published",
 	hasCreatedBy: true,
 	purge: (ctx, _by, id) => [
 		ctx.db.prepare("DELETE FROM revision WHERE entity_type = 'statue' AND entity_id = ?").bind(id),

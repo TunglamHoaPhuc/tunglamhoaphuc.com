@@ -24,7 +24,8 @@ export default function AreasPage() {
 		setOrder([...list.data.areas].filter((area) => area.featured).sort((a, b) => a.featuredPosition - b.featuredPosition).map((area) => area.id));
 	}
 	const byId = new Map(areas.map((area) => [area.id, area]));
-	const canEdit = can("areas", "update");
+	// The featured list is on the home page the moment it is saved: it takes the home page's publish right (the server refuses otherwise).
+	const canEdit = can("areas", "update") && can("home", "publish");
 
 	async function saveFeatured() {
 		setBusy(true);
@@ -59,6 +60,7 @@ export default function AreasPage() {
 						<h2 className="tq-h2" id="kv-featured">
 							Khu vực nổi bật trên trang chủ
 						</h2>
+						{can("areas", "update") && !canEdit ? <Alert kind="info">Danh sách này hiện ngay trên trang chủ, nên chỉ người có quyền xuất bản trang chủ mới đổi được.</Alert> : null}
 						<Feedback error={error} notice={notice} />
 						{order.length === 0 ? <EmptyState>Chưa chọn khu vực nổi bật nào.</EmptyState> : null}
 						<ol style={{ listStyle: "none", padding: 0, display: "grid", gap: 8 }}>

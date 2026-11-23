@@ -29,10 +29,10 @@ const countdown = (event: { start: string }) => {
 };
 
 // T13b: what Lời chào counts and who Chư Tôn Đức shows, from posts.json and gioi-thieu.json.
-// A slug two posts share opens only the first, so it counts once.
+// Every published post counts: of two posts that share a slug the later one is given a -2 address (migration 0004), so none is lost.
 type RawPost = { slug: string; status: string; mainCategory: string };
 const POSTS = (JSON.parse(readFileSync("data/snapshot/posts.json", "utf8")) as { posts: RawPost[] }).posts.filter((post) => post.status === "published");
-const postsIn = (section: string) => new Set(POSTS.filter((post) => post.mainCategory.trim() === section).map((post) => post.slug.trim())).size;
+const postsIn = (section: string) => POSTS.filter((post) => post.mainCategory.trim() === section).length;
 type RawTopic = { slug: string; status: string; groupCategory: string; orderIndex: number };
 const TEACHERS = (JSON.parse(readFileSync("data/snapshot/gioi-thieu.json", "utf8")) as { topics: RawTopic[] }).topics
 	.filter((topic) => topic.status === "published" && topic.groupCategory === "nguoi-lien-quan")

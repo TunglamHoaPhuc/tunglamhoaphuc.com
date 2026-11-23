@@ -123,6 +123,7 @@ registerRoutes(
 		method: "PATCH",
 		path: "events/:id",
 		needs: { module: "events", action: "update" },
+		own: true,
 		handler: async (call) => {
 			const { version, ...patch } = await call.body(updateSchema);
 			return updateEvent(call.ctx, call.authed!, call.params.id, version, patch as Partial<EventModel>);
@@ -133,6 +134,7 @@ registerRoutes(
 		method: "DELETE",
 		path: "events/:id",
 		needs: { module: "events", action: "delete" },
+		own: true,
 		handler: async (call) => {
 			await deleteEvent(call.ctx, call.authed!, call.params.id);
 		},

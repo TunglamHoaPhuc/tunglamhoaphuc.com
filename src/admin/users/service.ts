@@ -1,6 +1,6 @@
 // Accounts and roles, as the people who manage them see them (docs/admin-architecture.md 6.4, 7.2).
 // The rules that sit outside the permission table are here, so no route can forget them:
-// - nobody changes, locks, deletes or gives a role to anyone holding rights beyond their own;
+// - nobody changes, locks, deletes or gives a role to anyone holding rights beyond their own, nor EQUAL to their own (see `above`);
 // - only a Super Admin gives or takes the Super Admin role, and one always remains;
 // - nobody locks, deletes or changes the role of their own account.
 import { auditStatement, type AuditEntry } from "../audit/log";
@@ -8,15 +8,16 @@ import { hashPassword } from "../auth/password";
 import type { AuthContext, Authed } from "../auth/service";
 import { randomToken } from "../auth/tokens";
 import { num, text, type AdminStmt, type Row } from "../db";
+import { listSessions } from "../auth/service";
 import { ApiError, forbidden, notFound } from "../http/errors";
 import { likeWord, type Page } from "../http/paging";
 import { newId } from "../ids";
-import { isKnownPermission, SUPER_ADMIN_ROLE_ID, type Permissions, type Scope } from "../rbac/catalog";
+import { isKnownPermission, isOwnable, SUPER_ADMIN_ROLE_ID, type Permissions, type Scope } from "../rbac/catalog";
 import { can, covers, loadPermissions } from "../rbac/check";
 
 const stamp = (ctx: AuthContext) => ctx.now().toISOString();
-const audit = (ctx: AuthContext, by: Authed, entry: Pick<AuditEntry, "action" | "entityType" | "entityId" | "before" | "after">) =>
-	auditStatement(ctx.db, { ...entry, userId: by.user.id, userEmail: by.user.email, ip: ctx.ip, userAgent: ctx.userAgent }, ctx.now());
+const audit = (ctx: AuthContext, by: Authed, entry: Pick<AuditEntry, "action" | "entityType" | "entityId" | "before" | "after">, when?: { sql: string; args: unknown[] }) =>
+	auditStatement(ctx.db, { ...entry, userId: by.user.id, userEmail: by.user.email, ip: ctx.ip, userAgent: ctx.userAgent }, ctx.now(), when);
 
 export type UserRow = {
 	id: string;
@@ -81,20 +82,78 @@ async function superAdminsLeft(ctx: AuthContext, except: string): Promise<number
 	return num(row?.n);
 }
 
-/** Throws unless `by` may act on `target`: not oneself, and nothing beyond their own rights. */
-async function mayManage(ctx: AuthContext, by: Authed, target: UserRow, opts: { self?: "allow" | "refuse" } = {}): Promise<void> {
+const LAST_SUPER_ADMIN = "Phải còn ít nhất một Super Admin đang hoạt động.";
+const lastSuperAdmin = () => new ApiError(409, "last_super_admin", LAST_SUPER_ADMIN);
+
+/**
+ * "One Super Admin always remains", enforced by the write itself: the counting above runs before the batch, so two requests
+ * arriving together (A locks B while B locks A) would each see "one left". Put this in the UPDATE's WHERE: it holds for the row being
+ * changed only if it is not a Super Admin, or another active Super Admin exists at the moment the UPDATE runs (D1 runs a batch alone).
+ * `args` goes after the other bound values of the statement.
+ */
+const KEEP_ONE_SUPER_ADMIN = "(role_id <> ? OR EXISTS (SELECT 1 FROM user o WHERE o.role_id = ? AND o.id <> ? AND o.locked_at IS NULL AND o.deleted_at IS NULL))";
+const keepOneArgs = (id: string) => [SUPER_ADMIN_ROLE_ID, SUPER_ADMIN_ROLE_ID, id];
+
+/** True in the batch only when the guarded UPDATE of `id` took effect: it stamped `updated_at` with this request's time. Guards the audit row and what hangs off the change. */
+const landed = (id: string, now: string) => ({ sql: "EXISTS (SELECT 1 FROM user WHERE id = ? AND updated_at = ?)", args: [id, now] });
+
+/** After the batch: a refused guarded UPDATE changed nothing and wrote no audit row; tell the caller. */
+async function mustHaveLanded(ctx: AuthContext, id: string, now: string): Promise<void> {
+	if (!(await ctx.db.prepare("SELECT 1 AS yes FROM user WHERE id = ? AND updated_at = ?").bind(id, now).first())) throw lastSuperAdmin();
+}
+
+/**
+ * Policy (second security audit, owner-visible): acting on someone else's account, or handing out a role, takes rights STRICTLY greater
+ * than the other side's, unless the actor is a Super Admin. With "covers" alone two Admins could change each other's email, run
+ * "forgot password" and sign in as the peer with the audit trail pointing at the victim. Seeded roles: Admin still manages Editor and
+ * Author (they hold less); Super Admin manages everyone, subject to the last-Super-Admin rule. Editing yourself is a separate path.
+ */
+function above(by: Authed, theirs: Permissions): boolean {
+	if (by.user.roleId === SUPER_ADMIN_ROLE_ID) return true;
+	return covers(by.permissions, theirs) && !covers(theirs, by.permissions);
+}
+
+/** Throws unless `by` may act on `target`: not oneself, and rights strictly greater than the target's (a Super Admin: anyone). Exported for the trash, which acts on accounts too. */
+export async function mayManage(ctx: AuthContext, by: Authed, target: Pick<UserRow, "id" | "roleId">, opts: { self?: "allow" | "refuse" } = {}): Promise<void> {
 	if (target.id === by.user.id) {
 		if (opts.self === "allow") return;
 		throw new ApiError(403, "forbidden_self", "Bạn không thể làm điều này với chính tài khoản của mình.");
 	}
-	if (!covers(by.permissions, await loadPermissions(ctx.db, target.roleId))) throw new ApiError(403, "forbidden_higher", "Tài khoản này có quyền cao hơn quyền của bạn.");
+	if (!above(by, await loadPermissions(ctx.db, target.roleId))) throw new ApiError(403, "forbidden_higher", "Tài khoản này có quyền cao hơn hoặc ngang quyền của bạn, nên bạn không thao tác lên nó được.");
 }
 
 async function mayAssign(ctx: AuthContext, by: Authed, roleId: string): Promise<void> {
 	const role = await ctx.db.prepare("SELECT id FROM role WHERE id = ? AND deleted_at IS NULL").bind(roleId).first();
 	if (!role) throw new ApiError(400, "invalid_input", "Vai trò không tồn tại.", { roleId: "Vai trò không tồn tại." });
 	if (roleId === SUPER_ADMIN_ROLE_ID && by.user.roleId !== SUPER_ADMIN_ROLE_ID) throw new ApiError(403, "forbidden_super", "Chỉ Super Admin mới cấp vai trò Super Admin.");
-	if (!covers(by.permissions, await loadPermissions(ctx.db, roleId))) throw new ApiError(403, "forbidden_higher", "Bạn không thể cấp vai trò có quyền vượt quá quyền của bạn.");
+	if (!above(by, await loadPermissions(ctx.db, roleId))) throw new ApiError(403, "forbidden_higher", "Bạn chỉ cấp được vai trò có quyền thấp hơn quyền của bạn.");
+}
+
+/** Whether `by` may give `roleId` (the server's own answer, for the account screens to grey out what it would refuse). */
+async function maySetRole(ctx: AuthContext, by: Authed, roleId: string): Promise<boolean> {
+	try {
+		await mayAssign(ctx, by, roleId);
+		return true;
+	} catch (error) {
+		if (error instanceof ApiError) return false;
+		throw error;
+	}
+}
+
+/** Each role with `assignable`: whether the caller may give it to an account. */
+export async function withAssignable(ctx: AuthContext, by: Authed, roles: RoleRow[]): Promise<(RoleRow & { assignable: boolean })[]> {
+	return Promise.all(roles.map(async (role) => ({ ...role, assignable: await maySetRole(ctx, by, role.id) })));
+}
+
+/** An account with `manageable`: whether the caller may change, lock, delete or re-role it (not oneself, nothing above their own rights). */
+export async function withManageable(ctx: AuthContext, by: Authed, user: UserRow): Promise<UserRow & { manageable: boolean }> {
+	try {
+		await mayManage(ctx, by, user);
+		return { ...user, manageable: true };
+	} catch (error) {
+		if (error instanceof ApiError) return { ...user, manageable: false };
+		throw error;
+	}
 }
 
 export async function createUser(ctx: AuthContext, by: Authed, input: { email: string; name: string; roleId: string }): Promise<{ user: UserRow; temporaryPassword: string }> {
@@ -129,6 +188,9 @@ export async function updateUser(ctx: AuthContext, by: Authed, id: string, input
 	const before: Record<string, unknown> = {};
 	const after: Record<string, unknown> = {};
 	let oldEmail: string | null = null;
+	const now = stamp(ctx);
+	let guarded = false;
+	let sessionsToEnd = false;
 
 	if (input.name !== undefined && input.name.trim() !== target.name) {
 		set.push("name = ?");
@@ -145,14 +207,15 @@ export async function updateUser(ctx: AuthContext, by: Authed, id: string, input
 			before.email = target.email;
 			after.email = email;
 			oldEmail = target.email;
-			statements.push(ctx.db.prepare("UPDATE session SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL").bind(stamp(ctx), id));
+			sessionsToEnd = true;
 		}
 	}
 	if (input.roleId !== undefined && input.roleId !== target.roleId) {
 		await mayAssign(ctx, by, input.roleId);
 		if (target.roleId === SUPER_ADMIN_ROLE_ID) {
 			if (by.user.roleId !== SUPER_ADMIN_ROLE_ID) throw new ApiError(403, "forbidden_super", "Chỉ Super Admin mới đổi vai trò của Super Admin.");
-			if ((await superAdminsLeft(ctx, id)) < 1) throw new ApiError(409, "last_super_admin", "Phải còn ít nhất một Super Admin đang hoạt động.");
+			if ((await superAdminsLeft(ctx, id)) < 1) throw lastSuperAdmin();
+			guarded = true;
 		}
 		set.push("role_id = ?");
 		args.push(input.roleId);
@@ -162,23 +225,35 @@ export async function updateUser(ctx: AuthContext, by: Authed, id: string, input
 	if (!set.length) return { user: target, oldEmail: null };
 
 	set.push("updated_at = ?");
-	args.push(stamp(ctx), id);
-	await ctx.db.batch([ctx.db.prepare(`UPDATE user SET ${set.join(", ")} WHERE id = ?`).bind(...args), ...statements, audit(ctx, by, { action: "user.update", entityType: "user", entityId: id, before, after })]);
+	args.push(now, id);
+	const when = guarded ? landed(id, now) : undefined;
+	if (sessionsToEnd) statements.push(ctx.db.prepare(`UPDATE session SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL${when ? ` AND ${when.sql}` : ""}`).bind(now, id, ...(when?.args ?? [])));
+	await ctx.db.batch([
+		ctx.db.prepare(`UPDATE user SET ${set.join(", ")} WHERE id = ?${guarded ? ` AND ${KEEP_ONE_SUPER_ADMIN}` : ""}`).bind(...args, ...(guarded ? keepOneArgs(id) : [])),
+		...statements,
+		audit(ctx, by, { action: "user.update", entityType: "user", entityId: id, before, after }, when),
+	]);
+	if (guarded) await mustHaveLanded(ctx, id, now);
 	return { user: await findUser(ctx, id), oldEmail };
 }
 
 export async function setLocked(ctx: AuthContext, by: Authed, id: string, locked: boolean, reason = ""): Promise<UserRow> {
 	const target = await findUser(ctx, id);
 	await mayManage(ctx, by, target);
-	if (locked && target.roleId === SUPER_ADMIN_ROLE_ID && (await superAdminsLeft(ctx, id)) < 1) throw new ApiError(409, "last_super_admin", "Phải còn ít nhất một Super Admin đang hoạt động.");
+	if (locked && target.roleId === SUPER_ADMIN_ROLE_ID && (await superAdminsLeft(ctx, id)) < 1) throw lastSuperAdmin();
 	const now = stamp(ctx);
+	const entry = { action: locked ? "user.lock" : "user.unlock", entityType: "user", entityId: id, after: { reason } };
+	if (!locked) {
+		await ctx.db.batch([ctx.db.prepare("UPDATE user SET locked_at = NULL, locked_reason = NULL, failed_logins = 0, updated_at = ? WHERE id = ?").bind(now, id), audit(ctx, by, entry)]);
+		return findUser(ctx, id);
+	}
+	const when = landed(id, now);
 	await ctx.db.batch([
-		locked
-			? ctx.db.prepare("UPDATE user SET locked_at = ?, locked_reason = ?, updated_at = ? WHERE id = ?").bind(now, reason, now, id)
-			: ctx.db.prepare("UPDATE user SET locked_at = NULL, locked_reason = NULL, failed_logins = 0, updated_at = ? WHERE id = ?").bind(now, id),
-		...(locked ? [ctx.db.prepare("UPDATE session SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL").bind(now, id)] : []),
-		audit(ctx, by, { action: locked ? "user.lock" : "user.unlock", entityType: "user", entityId: id, after: { reason } }),
+		ctx.db.prepare(`UPDATE user SET locked_at = ?, locked_reason = ?, updated_at = ? WHERE id = ? AND ${KEEP_ONE_SUPER_ADMIN}`).bind(now, reason, now, id, ...keepOneArgs(id)),
+		ctx.db.prepare(`UPDATE session SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL AND ${when.sql}`).bind(now, id, ...when.args),
+		audit(ctx, by, entry, when),
 	]);
+	await mustHaveLanded(ctx, id, now);
 	return findUser(ctx, id);
 }
 
@@ -194,6 +269,8 @@ export async function forcePasswordChange(ctx: AuthContext, by: Authed, id: stri
 
 export async function resetTwoFactor(ctx: AuthContext, by: Authed, id: string): Promise<void> {
 	if (by.user.roleId !== SUPER_ADMIN_ROLE_ID) throw new ApiError(403, "forbidden_super", "Chỉ Super Admin mới gỡ xác thực hai bước của người khác.");
+	// Switching one's own 2FA off takes the password (docs 6.3): that is `me/2fa/disable`, not this.
+	if (id === by.user.id) throw new ApiError(403, "forbidden_self", "Muốn tắt xác thực hai bước của chính mình, hãy dùng mục Bảo mật và nhập mật khẩu.");
 	const target = await findUser(ctx, id);
 	await ctx.db.batch([ctx.db.prepare("DELETE FROM user_totp WHERE user_id = ?").bind(id), audit(ctx, by, { action: "user.reset_2fa", entityType: "user", entityId: target.id })]);
 }
@@ -202,13 +279,22 @@ export async function resetTwoFactor(ctx: AuthContext, by: Authed, id: string): 
 export async function deleteUser(ctx: AuthContext, by: Authed, id: string): Promise<void> {
 	const target = await findUser(ctx, id);
 	await mayManage(ctx, by, target);
-	if (target.roleId === SUPER_ADMIN_ROLE_ID && (await superAdminsLeft(ctx, id)) < 1) throw new ApiError(409, "last_super_admin", "Phải còn ít nhất một Super Admin đang hoạt động.");
+	if (target.roleId === SUPER_ADMIN_ROLE_ID && (await superAdminsLeft(ctx, id)) < 1) throw lastSuperAdmin();
 	const now = stamp(ctx);
+	const when = landed(id, now);
 	await ctx.db.batch([
-		ctx.db.prepare("UPDATE user SET deleted_at = ?, deleted_by = ?, updated_at = ? WHERE id = ?").bind(now, by.user.id, now, id),
-		ctx.db.prepare("UPDATE session SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL").bind(now, id),
-		audit(ctx, by, { action: "user.delete", entityType: "user", entityId: id, before: { email: target.email, name: target.name } }),
+		ctx.db.prepare(`UPDATE user SET deleted_at = ?, deleted_by = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL AND ${KEEP_ONE_SUPER_ADMIN}`).bind(now, by.user.id, now, id, ...keepOneArgs(id)),
+		ctx.db.prepare(`UPDATE session SET revoked_at = ? WHERE user_id = ? AND revoked_at IS NULL AND ${when.sql}`).bind(now, id, ...when.args),
+		audit(ctx, by, { action: "user.delete", entityType: "user", entityId: id, before: { email: target.email, name: target.name } }, when),
 	]);
+	await mustHaveLanded(ctx, id, now);
+}
+
+/** The live sessions (and their addresses) of an account: the same "not above your rights" rule as changing it; one's own are always visible. */
+export async function sessionsOf(ctx: AuthContext, by: Authed, id: string) {
+	const target = await findUser(ctx, id);
+	await mayManage(ctx, by, target, { self: "allow" });
+	return listSessions(ctx, id, by.user.id === id ? by.session.id : undefined);
 }
 
 export async function revokeUserSessions(ctx: AuthContext, by: Authed, id: string): Promise<number> {
@@ -247,7 +333,7 @@ function parsePermissions(list: string[]): Map<string, Scope> {
 		const key = own ? entry.slice(0, -4) : entry;
 		const [module, action] = key.split(".");
 		if (!module || !action || !isKnownPermission(module, action)) throw new ApiError(400, "invalid_input", `Quyền "${entry}" không có trong danh mục.`, { permissions: `Quyền "${entry}" không có trong danh mục.` });
-		if (own && action !== "update" && action !== "delete" && action !== "view") throw new ApiError(400, "invalid_input", `Quyền "${entry}" không có phạm vi "của mình".`, { permissions: "Phạm vi “của mình” chỉ dùng cho xem, sửa, xóa." });
+		if (own && !isOwnable(module, action)) throw new ApiError(400, "invalid_input", `Quyền "${entry}" không có phạm vi "của mình".`, { permissions: `Quyền “${entry}” không có phạm vi “của mình”: mục này không xét người tạo.` });
 		out.set(key, own ? "own" : "all");
 	}
 	return out;
@@ -308,6 +394,9 @@ export async function deleteRole(ctx: AuthContext, by: Authed, id: string): Prom
 	const role = await getRole(ctx, id);
 	if (role.isSystem) throw new ApiError(403, "system_role", "Không xóa được vai trò mẫu.");
 	if (role.users > 0) throw new ApiError(409, "role_in_use", `Còn ${role.users} tài khoản đang dùng vai trò này. Hãy chuyển họ sang vai trò khác trước.`);
+	// An account in the trash still points at its role and would get it back on restore.
+	const trashed = num((await ctx.db.prepare("SELECT COUNT(*) AS n FROM user WHERE role_id = ? AND deleted_at IS NOT NULL").bind(id).first())?.n);
+	if (trashed > 0) throw new ApiError(409, "role_in_use", `Còn ${trashed} tài khoản trong thùng rác đang giữ vai trò này. Hãy xóa vĩnh viễn hoặc chuyển họ sang vai trò khác trước.`);
 	if (!covers(by.permissions, await loadPermissions(ctx.db, id))) throw new ApiError(403, "forbidden_higher", "Vai trò này có quyền cao hơn quyền của bạn.");
 	await ctx.db.batch([
 		ctx.db.prepare("UPDATE role SET deleted_at = ? WHERE id = ?").bind(stamp(ctx), id),

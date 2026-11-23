@@ -91,6 +91,9 @@ const teaching = (id: string, patch: Partial<TongChiEntry> = {}): TongChiEntry =
 	gallery: [],
 	book: null,
 	keywords: [],
+	seoTitle: "",
+	seoDescription: "",
+	ogImage: null,
 	body: "Nội dung",
 	...patch,
 });

@@ -42,22 +42,24 @@ registerRoutes(
 	{ method: "GET", path: "audit/:id", needs: { module: "audit", action: "view" }, handler: async (call) => getAudit(call.ctx, call.params.id) },
 
 	// ---------------------------------------------------------------- trash
-	{ method: "GET", path: "trash/types", needs: { module: "trash", action: "view" }, handler: async () => ({ types: trashTypes() }) },
+	{ method: "GET", path: "trash/types", needs: { module: "trash", action: "view" }, own: true, handler: async (call) => ({ types: trashTypes(call.authed!) }) },
 	{
 		method: "GET",
 		path: "trash",
 		needs: { module: "trash", action: "view" },
+		own: true,
 		handler: async (call) => {
 			const page = pageOf(call.query, 25, 100);
 			const { rows, total } = await listTrash(call.ctx, call.authed!, { type: call.query.get("type") || undefined }, page);
 			return listResponse(rows, page, total);
 		},
 	},
-	{ method: "POST", path: "trash/:type/:id/restore", needs: { module: "trash", action: "update" }, handler: async (call) => restoreTrashed(call.ctx, call.authed!, call.params.type, call.params.id) },
+	{ method: "POST", path: "trash/:type/:id/restore", needs: { module: "trash", action: "update" }, own: true, handler: async (call) => restoreTrashed(call.ctx, call.authed!, call.params.type, call.params.id) },
 	{
 		method: "DELETE",
 		path: "trash/:type/:id",
 		needs: { module: "trash", action: "delete" },
+		own: true,
 		handler: async (call) => {
 			await purgeTrashed(call.ctx, call.authed!, call.params.type, call.params.id, call.deps.media);
 		},
@@ -137,5 +139,17 @@ registerRoutes(
 		needs: { module: "backup", action: "view" },
 		handler: async (call) => (call.deps.backup ? { configured: true, backups: await listBackups(call.deps.backup) } : { configured: false, backups: [] }),
 	},
-	{ method: "GET", path: "backup/:name/download", needs: { module: "backup", action: "view" }, handler: async (call) => downloadStored(call.ctx, call.authed!, bucket(call), call.params.name) },
+	// A stored file holds all the content too, so it asks for the password again like the export (a POST: a plain link cannot carry it).
+	{
+		method: "POST",
+		path: "backup/:name/download",
+		// The file is the whole database, like the export: the same right (create), not the one that only lists them.
+		needs: { module: "backup", action: "create" },
+		handler: async (call) => {
+			const bucketOrFail = bucket(call);
+			const { password } = await call.body(z.object({ password: z.string().min(1, "Nhập mật khẩu của bạn.").max(200) }));
+			await confirmPassword(call.ctx, call.authed!, password);
+			return downloadStored(call.ctx, call.authed!, bucketOrFail, call.params.name);
+		},
+	},
 );

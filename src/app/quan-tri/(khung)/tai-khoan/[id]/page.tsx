@@ -9,6 +9,8 @@ import { Alert, Badge, Button, errorText, fieldErrors, Loading, PageHeader, Sele
 
 type UserRow = {
 	id: string;
+	/** The server's answer to "may I change, lock, delete or re-role this account?" (not oneself, nothing above my own rights). */
+	manageable?: boolean;
 	email: string;
 	name: string;
 	roleId: string | null;
@@ -21,7 +23,7 @@ type UserRow = {
 	createdAt: string | null;
 };
 type SessionRow = { id: string; createdAt: string | null; lastUsedAt: string | null; ip: string | null; userAgent: string | null; current: boolean };
-type RoleOption = { id: string; name: string };
+type RoleOption = { id: string; name: string; assignable?: boolean };
 
 const shorten = (text: string | null, max = 60) => (!text ? "—" : text.length > max ? `${text.slice(0, max)}…` : text);
 
@@ -46,8 +48,7 @@ export default function AccountDetailPage() {
 	const [confirmDelete, setConfirmDelete] = useState(false);
 
 	const isSelf = id === me.user.id;
-	const canUpdate = can("users", "update");
-	const canDelete = can("users", "delete");
+	const canRoles = can("roles", "view");
 	const isSuper = me.user.role === "Super Admin";
 
 	useEffect(() => {
@@ -57,9 +58,17 @@ export default function AccountDetailPage() {
 		};
 	}, []);
 
+	// What the buttons offer follows what the server accepts for THIS account: `manageable` is false for oneself and for an account above my own
+	// rights. Oneself may still change their own name and end their own sessions.
+	const manageable = user?.manageable !== false && !isSelf;
+	const canManage = can("users", "update") && manageable;
+	const canUpdate = can("users", "update") && (manageable || isSelf);
+	const canDelete = can("users", "delete") && manageable;
+
 	const load = useCallback(async () => {
+		let row: UserRow;
 		try {
-			const row = await api<UserRow>("GET", `users/${encodeURIComponent(id)}`);
+			row = await api<UserRow>("GET", `users/${encodeURIComponent(id)}`);
 			if (!mounted.current) return;
 			setUser(row);
 			setName(row.name);
@@ -70,7 +79,7 @@ export default function AccountDetailPage() {
 			if (mounted.current) setLoadError(errorText(caught));
 			return;
 		}
-		if (canUpdate) {
+		if (can("users", "update") && (row.manageable !== false || id === me.user.id)) {
 			try {
 				const data = await api<{ sessions: SessionRow[] }>("GET", `users/${encodeURIComponent(id)}/sessions`);
 				if (mounted.current) setSessions(data.sessions);
@@ -78,24 +87,25 @@ export default function AccountDetailPage() {
 				if (mounted.current) setSessions([]);
 			}
 		}
-	}, [id, canUpdate]);
+	}, [id, can, me.user.id]);
 
 	useEffect(() => {
 		queueMicrotask(() => void load());
 	}, [load]);
 
+	// Without the "view" right of the Vai trò module the list is not asked for (it would be a 403): the role is then shown read-only.
 	useEffect(() => {
+		if (!canRoles) return;
 		let alive = true;
 		api<{ roles: RoleOption[] }>("GET", "roles")
 			.then((data) => alive && setRoles(data.roles))
 			.catch((caught) => {
-				// 403 means no right to list roles: the role is then shown read-only
 				if (alive && !(caught instanceof ApiClientError && caught.status === 403)) setRoles(null);
 			});
 		return () => {
 			alive = false;
 		};
-	}, []);
+	}, [canRoles]);
 
 	async function run(key: string, action: () => Promise<string | void>) {
 		setBusy(key);
@@ -122,8 +132,8 @@ export default function AccountDetailPage() {
 		if (!user) return;
 		const body: { name?: string; email?: string; roleId?: string } = {};
 		if (name !== user.name) body.name = name;
-		if (!isSelf && email !== user.email) body.email = email;
-		if (!isSelf && roles && roleId && roleId !== (user.roleId ?? "")) body.roleId = roleId;
+		if (canManage && email !== user.email) body.email = email;
+		if (canManage && roles && roleId && roleId !== (user.roleId ?? "")) body.roleId = roleId;
 		if (Object.keys(body).length === 0) {
 			setNotice("");
 			setError("Chưa có thay đổi nào để lưu.");
@@ -195,15 +205,16 @@ export default function AccountDetailPage() {
 					{canUpdate ? (
 						<form onSubmit={save} noValidate>
 							<TextField label="Họ tên" name="name" value={name} onChange={(e) => setName(e.target.value)} error={fields.name} required />
-							{isSelf ? (
-								<p className="tq-muted">Bạn không thể tự đổi email hoặc vai trò của chính mình.</p>
+							{!canManage ? (
+								<p className="tq-muted">{isSelf ? "Bạn không thể tự đổi email hoặc vai trò của chính mình." : "Bạn chỉ đổi được họ tên của tài khoản này."}</p>
 							) : (
 								<>
 									<TextField label="Email" type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} error={fields.email} required />
 									{roles ? (
 										<SelectField label="Vai trò" name="roleId" value={roleId} onChange={(e) => setRoleId(e.target.value)} error={fields.roleId}>
 											{user.roleId ? null : <option value="">Chưa có vai trò</option>}
-											{roles.map((role) => (
+											{/* Only the roles the server would accept; the account's own role stays so the field shows it. */}
+											{roles.filter((role) => role.assignable !== false || role.id === user.roleId).map((role) => (
 												<option key={role.id} value={role.id}>
 													{role.name}
 												</option>
@@ -226,7 +237,7 @@ export default function AccountDetailPage() {
 						<h2 className="tq-h2" id="tk-actions">
 							Hành động
 						</h2>
-						{!isSelf ? (
+						{canManage ? (
 							user.locked ? (
 								<p>
 									<Button
@@ -264,20 +275,22 @@ export default function AccountDetailPage() {
 							)
 						) : null}
 						<div className="tq-actions">
-							<Button
-								variant="secondary"
-								busy={busy === "force"}
-								disabled={!!busy}
-								onClick={() =>
-									void run("force", async () => {
-										await api("POST", `${path}/force-password-change`, {});
-										return "Người dùng sẽ phải đổi mật khẩu ở lần đăng nhập tới.";
-									})
-								}
-							>
-								Yêu cầu đổi mật khẩu
-							</Button>
-							{isSuper && user.mfaEnabled ? (
+							{canManage ? (
+								<Button
+									variant="secondary"
+									busy={busy === "force"}
+									disabled={!!busy}
+									onClick={() =>
+										void run("force", async () => {
+											await api("POST", `${path}/force-password-change`, {});
+											return "Người dùng sẽ phải đổi mật khẩu ở lần đăng nhập tới.";
+										})
+									}
+								>
+									Yêu cầu đổi mật khẩu
+								</Button>
+							) : null}
+							{canManage && isSuper && user.mfaEnabled ? (
 								<Button
 									variant="secondary"
 									busy={busy === "reset2fa"}

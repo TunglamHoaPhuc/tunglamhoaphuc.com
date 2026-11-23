@@ -4,7 +4,7 @@ import { world } from "../helpers/adminWorld";
 import { count, insertAudit, insertMedia, SEEDS } from "../helpers/ops";
 
 // A kind with a partial unique index (page slugs among live pages), to see a restore refused.
-registerTrashable({ type: "test_page", label: "Trang thử", table: "page", titleSql: "title", module: "pages", hasCreatedBy: true, purge: (ctx, _by, id) => [ctx.db.prepare("DELETE FROM revision WHERE entity_type = 'page' AND entity_id = ?").bind(id)] });
+registerTrashable({ type: "test_page", label: "Trang thử", table: "page", titleSql: "title", module: "pages", isLive: () => false, hasCreatedBy: true, purge: (ctx, _by, id) => [ctx.db.prepare("DELETE FROM revision WHERE entity_type = 'page' AND entity_id = ?").bind(id)] });
 
 describe("activity log", () => {
 	it("lists newest first, 50 to a page, with the total", async () => {
@@ -81,7 +81,8 @@ describe("activity log", () => {
 describe("trash: listing", () => {
 	it("knows the kinds nobody else owns", async () => {
 		const w = await world(SEEDS);
-		const editor = await w.as("editor@example.test");
+		// accounts and roles are listed only to people who may view them (an Editor may not: see permissions.test.ts)
+		const editor = await w.as("root@example.test");
 		const types = (await editor.call("GET", "trash/types")).data.types as { type: string; label: string }[];
 		for (const type of ["media", "user", "role"]) expect(types.map((t) => t.type)).toContain(type);
 		expect(types.find((t) => t.type === "media")?.label).toBe("Ảnh trong thư viện");
@@ -93,7 +94,8 @@ describe("trash: listing", () => {
 		insertMedia(w.raw, { id: "m-new", deletedAt: "2026-04-03T00:00:00.000Z", deletedBy: "admin" });
 		insertMedia(w.raw, { id: "m-live" });
 		w.raw.prepare("UPDATE role SET deleted_at = '2026-04-02T00:00:00.000Z' WHERE id = 'role-editor'").run();
-		const editor = await w.as("editor@example.test");
+		// a role shows only to someone who may view roles (roles.view): a Super Admin here, not the Editor
+		const editor = await w.as("root@example.test");
 		const all = await editor.call("GET", "trash");
 		expect(all.status).toBe(200);
 		expect(all.data.map((row: { id: string }) => row.id)).toEqual(["m-new", "role-editor", "m-old"]);
@@ -137,7 +139,8 @@ describe("trash: restore", () => {
 	it("restores a role, which has no deleted_by column", async () => {
 		const w = await world(SEEDS);
 		w.raw.prepare("UPDATE role SET deleted_at = '2026-04-02T00:00:00.000Z' WHERE id = 'role-author'").run();
-		const editor = await w.as("editor@example.test");
+		// roles.update is needed on top of trash.update, so a Super Admin does it (an Editor is refused: see permissions.test.ts)
+		const editor = await w.as("root@example.test");
 		expect((await editor.call("POST", "trash/role/role-author/restore", {})).status).toBe(200);
 		expect(w.raw.prepare("SELECT deleted_at FROM role WHERE id = 'role-author'").get()).toEqual({ deleted_at: null });
 	});
@@ -226,7 +229,8 @@ describe("trash: removing for good", () => {
 
 	it("keeps an account that the log still names, with its sessions, all in one piece", async () => {
 		const w = await world(SEEDS);
-		const admin = await w.as("admin@example.test");
+		// removing an account for good needs users.delete, which only a Super Admin has
+		const admin = await w.as("root@example.test");
 		w.raw.prepare("UPDATE user SET deleted_at = '2026-04-01T00:00:00.000Z', deleted_by = 'admin' WHERE id = 'author2'").run();
 		insertAudit(w.raw, { userId: "author2", email: "author2@example.test", at: "2026-03-01T00:00:00.000Z" });
 		w.raw.prepare("INSERT INTO session (id, user_id, created_at, last_used_at, expires_at) VALUES ('s1', 'author2', 'a', 'a', '2099')").run();
@@ -240,7 +244,8 @@ describe("trash: removing for good", () => {
 		const w = await world(SEEDS);
 		w.raw.prepare("INSERT INTO role (id, name, is_system, deleted_at) VALUES ('r-x', 'Tạm', 0, '2026-04-01')").run();
 		w.raw.prepare("INSERT INTO role_permission (role_id, module, action, scope) VALUES ('r-x', 'posts', 'view', 'all')").run();
-		const admin = await w.as("admin@example.test");
+		// roles.delete is a Super Admin's alone
+		const admin = await w.as("root@example.test");
 		expect((await admin.call("DELETE", "trash/role/r-x")).status).toBe(204);
 		expect(count(w.raw, "role", "id = 'r-x'")).toBe(0);
 		expect(count(w.raw, "role_permission", "role_id = 'r-x'")).toBe(0);

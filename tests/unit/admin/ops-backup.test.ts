@@ -44,7 +44,9 @@ describe("backup export", () => {
 			expect((await client.call("POST", "backup/export", { password: PASSWORD })).status, who).toBe(403);
 			expect((await client.call("POST", "backup/run", {})).status, who).toBe(403);
 			expect((await client.call("GET", "backup")).status, who).toBe(403);
-			expect((await client.call("GET", "backup/2026-01-01-0000.json.gz/download")).status, who).toBe(403);
+			expect((await client.call("POST", "backup/2026-01-01-0000.json.gz/download", { password: PASSWORD })).status, who).toBe(403);
+			// the old plain link is gone: nobody downloads a stored file by address alone
+			expect((await client.call("GET", "backup/2026-01-01-0000.json.gz/download")).status, who).toBeGreaterThanOrEqual(403);
 		}
 	});
 
@@ -135,7 +137,7 @@ describe("backups kept in R2", () => {
 		const run = await root.call("POST", "backup/run", {});
 		expect(run.status).toBe(503);
 		expect(run.error.code).toBe("no_backup_bucket");
-		expect((await root.call("GET", "backup/2026-01-01-0000.json.gz/download")).status).toBe(503);
+		expect((await root.call("POST", "backup/2026-01-01-0000.json.gz/download", { password: PASSWORD })).status).toBe(503);
 	});
 
 	it("writes backup/<date>-<time>.json.gz and keeps the newest 30", async () => {
@@ -178,7 +180,17 @@ describe("backups kept in R2", () => {
 		expect(list.data.backups[1]).toMatchObject({ size: payload.length, createdAt: "2026-02-01T03:00:00.000Z" });
 		const { dispatch } = await import("../../../src/admin/http/api");
 		const jar = [...root.jar].map(([name, value]) => `${name}=${value}`).join("; ");
-		const response = await dispatch(new Request("https://www.example.test/api/quan-tri/v1/backup/2026-02-01-0300.json.gz/download", { headers: { cookie: jar } }), "backup/2026-02-01-0300.json.gz/download", w.deps);
+		const me = await root.call("GET", "auth/me");
+		const ask = (password: string) =>
+			dispatch(
+				new Request("https://www.example.test/api/quan-tri/v1/backup/2026-02-01-0300.json.gz/download", { method: "POST", headers: { origin: "https://www.example.test", cookie: jar, "content-type": "application/json", "x-tlhp-csrf": me.data.csrfToken }, body: JSON.stringify({ password }) }),
+				"backup/2026-02-01-0300.json.gz/download",
+				w.deps,
+			);
+		const wrong = await ask("sai-mat-khau-roi");
+		expect(wrong.status).toBe(400);
+		expect(count(w.raw, "audit_log", "action = 'backup.download'"), "a wrong password downloads and logs nothing").toBe(0);
+		const response = await ask(PASSWORD);
 		expect(response.status).toBe(200);
 		expect(response.headers.get("content-disposition")).toContain("tlhp-backup-2026-02-01-0300.json.gz");
 		expect(Buffer.from(await response.arrayBuffer()).equals(payload)).toBe(true);
@@ -192,9 +204,9 @@ describe("backups kept in R2", () => {
 		objects.set("backup/secret.txt", { bytes: new Uint8Array([1]), uploaded: new Date() });
 		const root = await w.as("root@example.test");
 		for (const name of ["..%2Fsecret.txt", "secret.txt", "2026-02-01.json", "a.json.gz", "2026-02-01-0300.json.gz.txt", "%2E%2E%2Fbackup%2Fsecret.txt"]) {
-			expect((await root.call("GET", `backup/${name}/download`)).status, name).toBe(404);
+			expect((await root.call("POST", `backup/${name}/download`, { password: PASSWORD })).status, name).toBe(404);
 		}
-		expect((await root.call("GET", "backup/2026-02-01-0300.json.gz/download")).status).toBe(404);
+		expect((await root.call("POST", "backup/2026-02-01-0300.json.gz/download", { password: PASSWORD })).status).toBe(404);
 	});
 });
 

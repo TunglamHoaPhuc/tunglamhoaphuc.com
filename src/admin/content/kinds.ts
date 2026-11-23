@@ -84,7 +84,9 @@ const TEACHING_VIDEO = z
 		description: plainItem(2000),
 	})
 	.transform((video, ctx) => {
-		const id = youtubeIdOf(video.id || video.url);
+		// Both empty: the editor took the video off. The address is the newer word: the id of the form is only read when there is none.
+		if (!video.url && !video.id) return null;
+		const id = youtubeIdOf(video.url || video.id);
 		if (!id) {
 			ctx.addIssue({ code: "custom", message: "Nhập mã hoặc địa chỉ video YouTube hợp lệ.", path: ["url"] });
 			return z.NEVER;
@@ -239,6 +241,12 @@ export const PAGES: Kind = {
 };
 
 export const KINDS: Record<KindName, Kind> = { posts: POSTS, teachings: TEACHINGS, pages: PAGES };
+
+/** The address the public site serves an article at: /<section>/<slug>, /tong-chi-tu-hoc/<slug> or /gioi-thieu/<slug>. */
+export function publicPathOf(kind: Kind, section: string | null, slug: string): string {
+	if (kind.table === "post") return `/${section ?? ""}/${slug}`;
+	return `${kind.table === "teaching_article" ? "/tong-chi-tu-hoc" : "/gioi-thieu"}/${slug}`;
+}
 export const kindByPath = (path: string): Kind | undefined => Object.values(KINDS).find((kind) => kind.path === path);
 
 /** The parts of the site posts belong to (the first part of their address). */

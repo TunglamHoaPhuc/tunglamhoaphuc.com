@@ -7,7 +7,7 @@
 // Kept: h2–h4 (h1 becomes h2, h5/h6 become h4), p, br, strong/b, em/i, u, s/strike/del, blockquote (class "kinh"
 // or "tho" only), ul/ol/li, a (https, mailto and relative links; external ones open in a new tab with
 // rel="noopener noreferrer"), the table family, figure/img/figcaption (pictures from /anh-goc/, /brand/ or https),
-// iframe (YouTube without cookies only), audio (from /anh-goc/ or https; controls, preload none), hr, and the
+// iframe (YouTube without cookies only), audio (library media: its media id or a /anh-goc/ path; controls, preload none), hr, and the
 // <div data-youtube-video> the editor puts around a video. Everything else is unwrapped (its text stays) or, for
 // script, style, svg and the like, dropped with all it holds.
 import { decodeEntities } from "../../libs/content/normalize";
@@ -19,6 +19,11 @@ export type SanitizeOptions = {
 	ownHosts?: string[];
 	/** The current address of library pictures by media id: a picture or sound with `data-media-id` gets it. */
 	mediaSrc?: ReadonlyMap<string, string>;
+	/**
+	 * Filled with the tag of every element the sanitiser dropped, unwrapped or rewrote (not with the attributes it tidies, nor the old
+	 * tags it renames): empty means the editor shows what the page will. The service tells the editor when it is not empty.
+	 */
+	changes?: string[];
 };
 
 const DEFAULT_HOSTS = ["tunglamhoaphuc.com", "www.tunglamhoaphuc.com"];
@@ -183,8 +188,9 @@ const ALLOWED = new Set([
 ]);
 
 const MEDIA_ID = /^[A-Za-z0-9_:.-]{1,120}$/;
-// The video's id; of the address's options only the start time is kept.
-const YOUTUBE = /^https:\/\/www\.youtube-nocookie\.com\/embed\/([A-Za-z0-9_-]{6,20})(?:\?(?:[^#]*&)?start=(\d{1,6})(?:&[^#]*)?|\?[^#]*)?$/;
+// The video's id; of the address's options only the start time is kept. Both embed addresses of YouTube are read (the editor and
+// pasted code give either) and written as the no-cookie one.
+const YOUTUBE = /^https:\/\/(?:www\.)?youtube(?:-nocookie)?\.com\/embed\/([A-Za-z0-9_-]{6,20})(?:\?(?:[^#]*&)?start=(\d{1,6})(?:&[^#]*)?|\?[^#]*)?$/;
 
 /** The value an attribute really carries once entities are read, without the control characters browsers ignore. */
 // Control characters become spaces, so "java\tscript:" can never read as a scheme (browsers drop tabs and newlines).
@@ -261,7 +267,9 @@ function attributesOf(tag: string, raw: [string, string][], options: SanitizeOpt
 		case "audio": {
 			const mediaId = decoded(get("data-media-id") ?? "");
 			const known = MEDIA_ID.test(mediaId) ? options.mediaSrc?.get(mediaId) : undefined;
-			const src = known ?? safeMediaSrc(get("src") ?? "");
+			// Sound comes from the library only: its address by media id, or the site's own /anh-goc/ path (docs 6.5), never an outside host.
+			const own = decoded(get("src") ?? "");
+			const src = known ?? (own.startsWith("/anh-goc/") ? safeMediaSrc(own) : null);
 			if (!src) return {};
 			out.src = src;
 			out.controls = "";
@@ -270,9 +278,12 @@ function attributesOf(tag: string, raw: [string, string][], options: SanitizeOpt
 			return out;
 		}
 		case "iframe": {
-			const match = decoded(get("src") ?? "").match(YOUTUBE);
+			const asked = decoded(get("src") ?? "");
+			const match = asked.match(YOUTUBE);
 			if (!match) return {};
 			out.src = `https://www.youtube-nocookie.com/embed/${match[1]}${match[2] ? `?start=${match[2]}` : ""}`;
+			// Written another way than it came (the other host, or options dropped): the editor still holds the first.
+			if (asked !== out.src) options.changes?.push("iframe");
 			out.title = decoded(get("title") ?? "").slice(0, 200) || "Video YouTube";
 			out.width = digits(get("width"), 4000) ?? "640";
 			out.height = digits(get("height"), 4000) ?? "360";
@@ -334,17 +345,25 @@ export function parseSafe(html: string, options: SanitizeOptions = {}): HtmlNode
 		}
 		if (token.kind === "start") {
 			if (DROP_WITH_CONTENT.has(token.tag)) {
+				options.changes?.push(token.tag);
 				if (!VOID.has(token.tag) && !token.selfClosing && !RAW_TEXT.has(token.tag)) skip = { tag: token.tag, depth: 1 };
 				continue;
 			}
 			const tag = RENAME[token.tag] ?? token.tag;
-			if (!ALLOWED.has(tag)) continue;
+			if (!ALLOWED.has(tag)) {
+				options.changes?.push(tag);
+				continue;
+			}
 			const attrs = attributesOf(tag, token.attrs, options);
 			if (attrs === null) {
 				// Unwrapped: remember it so its end tag closes nothing.
+				options.changes?.push(tag);
 				continue;
 			}
-			if (NEEDS_SOURCE.has(tag) && !attrs.src) continue;
+			if (NEEDS_SOURCE.has(tag) && !attrs.src) {
+				options.changes?.push(tag);
+				continue;
+			}
 			const node: HtmlNode & { type: "element" } = { type: "element", tag, attrs, children: [] };
 			stack[stack.length - 1].children.push(node);
 			if (!VOID.has(tag) && tag !== "audio" && tag !== "iframe") stack.push(node);
@@ -431,8 +450,8 @@ export function textOf(nodes: HtmlNode[]): string {
 /** Plain text from a field that must not hold markup (titles, summaries): tags removed, spaces tidied. */
 export function plainText(value: string): string {
 	return value
-		.replace(/<[^>]*>?/g, "")
-		.replace(/[<>]/g, "")
+		// Only well-formed tags go (a name after "<", attributes that may hold a quoted ">"): "Tuổi < 18" is text.
+		.replace(/<\/?[a-z](?:"[^"]*"|'[^']*'|[^>"'])*>/gi, "")
 		// eslint-disable-next-line no-control-regex
 		.replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/g, "")
 		.trim();
@@ -509,7 +528,8 @@ export function markdownOf(nodes: HtmlNode[]): string {
 					const items = node.children.filter((child): child is HtmlNode & { type: "element" } => child.type === "element" && child.tag === "li");
 					const out = items
 						.map((item, index) => {
-							const text = lines(markdownOf(item.children).replace(/^[-*>#]+\s*/gm, "")).join(" ");
+							// Only one marker of a list, quote or heading inside the item goes ("- ", "> ", "## "): a "**" that opens bold is not one.
+							const text = lines(markdownOf(item.children).replace(/^(?:[-*>]|#{1,6}) +/gm, "")).join(" ");
 							return text ? `${node.tag === "ol" ? `${index + 1}.` : "-"} ${text}` : "";
 						})
 						.filter(Boolean);

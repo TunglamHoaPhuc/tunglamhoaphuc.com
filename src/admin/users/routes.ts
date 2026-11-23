@@ -1,12 +1,11 @@
 // /users, /roles, /permissions and PATCH /me (docs/admin-architecture.md 7.2).
 import { z } from "zod";
-import { listSessions } from "../auth/service";
 import { registerRoutes } from "../http/api";
 import { listResponse, pageOf } from "../http/paging";
 import { ACTIONS, MODULES } from "../rbac/catalog";
 import {
 	createRole, createUser, deleteRole, deleteUser, forcePasswordChange, getRole, getUser, listRoles, listUsers, resetTwoFactor, revokeUserSessions,
-	setLocked, updateRole, updateUser,
+	sessionsOf, setLocked, updateRole, updateUser, withAssignable, withManageable,
 } from "./service";
 
 const email = z.string().trim().min(3, "Nhập email.").max(200).includes("@", { message: "Email chưa đúng." });
@@ -24,7 +23,7 @@ registerRoutes(
 			return listResponse(rows, page, total);
 		},
 	},
-	{ method: "GET", path: "users/:id", needs: { module: "users", action: "view" }, handler: async (call) => getUser(call.ctx, call.params.id) },
+	{ method: "GET", path: "users/:id", needs: { module: "users", action: "view" }, handler: async (call) => withManageable(call.ctx, call.authed!, await getUser(call.ctx, call.params.id)) },
 	{
 		method: "POST",
 		path: "users",
@@ -69,10 +68,7 @@ registerRoutes(
 		method: "GET",
 		path: "users/:id/sessions",
 		needs: { module: "users", action: "update" },
-		handler: async (call) => {
-			await getUser(call.ctx, call.params.id);
-			return { sessions: await listSessions(call.ctx, call.params.id) };
-		},
+		handler: async (call) => ({ sessions: await sessionsOf(call.ctx, call.authed!, call.params.id) }),
 	},
 	{
 		method: "DELETE",
@@ -89,7 +85,7 @@ registerRoutes(
 		},
 	},
 
-	{ method: "GET", path: "roles", needs: { module: "roles", action: "view" }, handler: async (call) => ({ roles: await listRoles(call.ctx) }) },
+	{ method: "GET", path: "roles", needs: { module: "roles", action: "view" }, handler: async (call) => ({ roles: await withAssignable(call.ctx, call.authed!, await listRoles(call.ctx)) }) },
 	{ method: "GET", path: "roles/:id", needs: { module: "roles", action: "view" }, handler: async (call) => getRole(call.ctx, call.params.id) },
 	{
 		method: "GET",
@@ -121,7 +117,7 @@ registerRoutes(
 	{
 		method: "PATCH",
 		path: "me",
-		needs: "session-any",
+		needs: "session",
 		handler: async (call) => {
 			const input = await call.body(z.object({ name }));
 			await call.ctx.db.prepare("UPDATE user SET name = ?, updated_at = ? WHERE id = ?").bind(input.name, call.ctx.now().toISOString(), call.authed!.user.id).run();

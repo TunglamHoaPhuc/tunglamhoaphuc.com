@@ -346,7 +346,7 @@ TOTP 6 số, bước 30 giây, chấp nhận lệch 1 bước. Khi bật: hiện
 Quy tắc cứng nằm ngoài bảng quyền:
 
 - Chỉ Super Admin gán hoặc gỡ vai trò Super Admin, và luôn phải còn ít nhất một Super Admin đang hoạt động.
-- Không ai được sửa, khóa, thu hồi phiên của một tài khoản, hay gán một vai trò, có quyền vượt ra ngoài tập quyền của chính mình. Nhờ đó Admin không thể đổi email của Super Admin rồi dùng "quên mật khẩu" để chiếm tài khoản.
+- Không ai được sửa, khóa, xóa, thu hồi phiên của một tài khoản, hay gán một vai trò, có quyền vượt ra ngoài hoặc chỉ ngang bằng tập quyền của chính mình (cần quyền lớn hơn hẳn; riêng Super Admin thao tác được trên mọi tài khoản, trừ quy tắc còn ít nhất một Super Admin). Nhờ đó Admin không thể đổi email của Super Admin hay của một Admin khác rồi dùng "quên mật khẩu" để chiếm tài khoản.
 - Đổi email của một tài khoản gửi thư báo tới địa chỉ cũ và thu hồi mọi phiên của tài khoản đó.
 - Nhóm cấu hình `mail.smtp` và `security.policy` chỉ Super Admin sửa được. Chính sách bảo mật có mức sàn ghi trong mã (ví dụ mật khẩu không ngắn hơn 10 ký tự) mà giao diện không hạ xuống được.
 - Không ai tự khóa, tự xóa hay tự đổi vai trò của chính mình.
@@ -369,7 +369,9 @@ Quy tắc cứng nằm ngoài bảng quyền:
 - **Bí mật**: `ADMIN_JWT_SECRET`, `ADMIN_ENC_KEY` là secret của Worker, không nằm trong repo. `.env.example` chỉ ghi tên biến.
 - **Nhật ký không chứa bí mật**: các trường mật khẩu, token, khóa TOTP, mật khẩu SMTP bị loại khỏi `before` / `after`.
 - **Kiểm SMTP**: chỉ nhận cổng 465 và 587, từ chối địa chỉ IP nội bộ, và chỉ trả về kết quả dạng thành công / lỗi xác thực / không kết nối được. Đổi host SMTP bắt buộc nhập lại mật khẩu SMTP.
-- **Header**: `Content-Security-Policy` riêng cho `/quan-tri`, `X-Frame-Options: DENY`, `Referrer-Policy: same-origin`.
+- **Header** (khai trong `next.config.js`): `Content-Security-Policy` riêng cho `/quan-tri` và `/api/quan-tri` (`default-src 'self'`, `connect-src 'self'`, `object-src 'none'`, `base-uri` và `form-action` chỉ `'self'`, `frame-ancestors 'none'`, khung chỉ YouTube; script và style còn `'unsafe-inline'` vì framework và trình soạn cần, chưa dùng nonce), `X-Frame-Options: DENY`, `Referrer-Policy: same-origin`. `media-src` nhận mọi địa chỉ https (trình soạn phát thử âm thanh từ B2 hay WordPress), `img-src` cũng nhận https. Trang `/quan-tri/xem-truoc` (bản xem trước dựng bằng giao diện công khai) chỉ giữ `frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'`. Kiểm bằng `tests/e2e/admin/csp.spec.ts` (`CSP_STRICT=1` trên bản build sản xuất): không màn nào của admin bị chính sách này chặn. **Giới hạn đã biết:** admin cùng origin (`www`) với trang công khai, mà trang công khai không có CSP, nên một lỗ XSS ở trang công khai vẫn gọi được API admin bằng cookie của người đang đăng nhập; `unsafe-inline` và `img-src https:` còn cho phép rò rỉ qua ảnh hoặc CSS. Cách sửa triệt để là tách admin sang origin riêng (ví dụ `quantri.`) và dùng nonce; chưa làm.
+- **Cache rìa sau khi ghi (B8)**: sau mỗi lần ghi thành công vào vùng dữ liệu mà trang công khai đọc (`src/admin/http/publicEffect.ts`), cổng API gọi `revalidatePath("/", "layout")` nên Workers Cache bỏ các trang ngay thay vì đợi 5 phút. Lần tạo nháp, tạo bản sao, link xem trước, ảnh mới và thư thử không làm xóa cache. Lỗi ở bước này không hoàn tác lần ghi. Các isolate khác giữ bản đọc D1 tối đa 15 giây (`D1_RENEW_MS`), nên một trang dựng lại trong khoảng đó vẫn có thể là bản cũ và được giữ tới 5 phút; độ trễ thường là vài giây, tệ nhất vài phút. V3 (Worker `tlhp-v3`) có cache riêng nên vẫn theo chu kỳ của nó.
+- **Giới hạn API AI công khai**: `analyze`, `ask-ai`, `crop-analyze`, `tts` mỗi người (theo `cf-connecting-ip`, IPv6 gộp theo /64) tối đa 60, 20, 40 lần mỗi phút (chỉ tính lần phải hỏi AI thật, câu đã có trong cache không tính) và 240 lần mỗi phút cho `tts` (khóa học tải trước tới 20 từ sau mỗi lần phân tích); vượt thì 429 kèm thông báo, khóa học hiện thông báo đó (`src/libs/tibetan/server.ts`). Bộ đếm nằm trong cache của trung tâm dữ liệu, đọc rồi ghi, nên chỉ là phanh chống gọi dồn: yêu cầu song song vẫn lọt, mỗi trung tâm đếm riêng, và không có trần chung. Muốn chặn thật cần quy tắc Rate Limiting của Cloudflare cho 4 đường dẫn này hoặc bộ đếm nguyên tử, cộng cảnh báo ngân sách Workers AI (việc của chủ tài khoản).
 
 ## 7. Đặc tả API
 
@@ -513,7 +515,8 @@ Các bản cắt cũ của ảnh bị xóa khi thay tệp; giao diện nhắc c�
 | `GET /settings/:group`, `PUT /settings/:group` | thông tin chùa, mạng xã hội, SMTP, chính sách bảo mật | `settings.view` / `update` |
 | `POST /settings/smtp/test` | gửi thư thử | `settings.update` |
 | `POST /backup/export` | tạo bản sao lưu, trả tệp tải về | `backup.create` |
-| `GET /backup`, `GET /backup/:id/download` | danh sách bản sao lưu trong R2 | `backup.view` |
+| `GET /backup` | danh sách bản sao lưu trong R2 | `backup.view` |
+| `POST /backup/:id/download` | tải một bản đã lưu, nhập lại mật khẩu | `backup.create` |
 | `POST /cache/revalidate` | làm mới cache trang công khai | `settings.update` |
 
 Meta Title, Meta Description và ảnh OG của từng bài, trang, chuyên mục nằm ngay trong form của bản ghi đó (các cột `seo_*`, `og_media_id`).
@@ -579,6 +582,15 @@ Biến môi trường mới (sẽ có trong `.env.example`): `ADMIN_JWT_SECRET`,
 | Menu | Chuyển vào `setting` | Bảng `menu`, `menu_item` có cây và icon |
 
 Giữ nguyên từ kế hoạch cũ: cùng ứng dụng trên Workers, D1, R2, Bootstrap + SCSS, TipTap, nén ảnh ở trình duyệt, chặn xóa ảnh đang dùng, mọi thao tác ghi đều có nhật ký, sao lưu D1 hằng ngày giữ 30 ngày.
+
+### 9.1 Quyết định đã chốt (23/11/2026)
+
+Chủ dự án giao các quyết định này cho người làm; ghi lại để không phải hỏi lại.
+
+- **Khôi phục tông chỉ nhập từ web cũ không trả lại từng byte của hai cột `body` và `content_html`.** Sau lần sửa thân đầu tiên, `body` là Markdown đã làm sạch và `content_html` là HTML hiện trang. Trang công khai vẫn y hệt trước khi sửa (có test so từng trang). Bản brief gốc còn nằm ở `data/snapshot`. Không thêm cột lưu bản thô: tốn schema mà người dùng không thấy khác biệt. Làm lại nếu có người cần bản thô trong admin.
+- **Sửa thân bài chạy qua bộ lọc HTML, nên link ra ngoài trang của bài nhập được thêm `target="_blank" rel="noopener noreferrer"`.** Giữ như vậy: người đọc không rời trang chùa, `noopener` chặn trang kia điều khiển trang này. Link nội bộ không bị đổi. Lưu bản cũ (khôi phục) không thêm thuộc tính này.
+- **`PUT /seo/defaults` với `{}` ghi dòng mặc định.** Đúng thiết kế (lưu "không có giá trị riêng"); test quét quyền đã loại trừ.
+- **Slug nhận tới 200 ký tự.** Bài nhập có slug dài nhất 162 ký tự vẫn mở được và giữ nguyên slug khi lưu (test B1/B15c).
 
 ## 10. Chiến lược kiểm thử
 

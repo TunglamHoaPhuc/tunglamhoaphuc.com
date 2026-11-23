@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { api, apiList } from "../api";
+import { useAdmin } from "../AdminProvider";
 import { Alert, Badge, EmptyState, errorText, Loading, Pager } from "../ui";
 import { flattenFolders, useDebounced, useLoader, usePage, type FolderList, type MediaItem } from "./imageTools";
 import { UploadZone } from "./UploadZone";
@@ -54,7 +55,25 @@ export function MediaGrid({ items, selectedId, onOpen, busy }: { items: MediaIte
  * Picks a picture from the library: search, a folder filter and an upload zone. It is a block in the page flow
  * (not a pop-up); `onPick` gets the chosen picture, `onCancel` (when given) shows a "Hủy" button.
  */
-export function MediaPicker({ onPick, folderId, onCancel }: { onPick: (item: MediaItem) => void; folderId?: string; onCancel?: () => void }) {
+export function MediaPicker(props: { onPick: (item: MediaItem) => void; folderId?: string; onCancel?: () => void }) {
+	const { can } = useAdmin();
+	// The library belongs to the Media module: without its "view" right nothing is asked (it would be a 403) and the person is told why.
+	if (!can("media", "view")) {
+		return (
+			<section className="tq-panel" aria-label="Chọn ảnh từ thư viện">
+				<Alert kind="warning">Bạn không có quyền xem thư viện media nên chưa chọn được ảnh ở đây. Hãy nhờ quản trị viên cấp quyền xem mục Thư viện Media.</Alert>
+				{props.onCancel ? (
+					<button type="button" className="tq-btn tq-btn--secondary" onClick={props.onCancel}>
+						Đóng
+					</button>
+				) : null}
+			</section>
+		);
+	}
+	return <PickerBody {...props} />;
+}
+
+function PickerBody({ onPick, folderId, onCancel }: { onPick: (item: MediaItem) => void; folderId?: string; onCancel?: () => void }) {
 	const [q, setQ] = useState("");
 	const [folder, setFolder] = useState(folderId ?? "");
 	const [message, setMessage] = useState("");

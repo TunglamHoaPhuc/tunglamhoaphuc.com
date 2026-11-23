@@ -97,11 +97,10 @@ test.describe("with reduced motion", () => {
 		expect(darkColours[0]).not.toBe(darkColours[1]);
 
 		await primary.focus();
-		const ring = await primary.evaluate((el) => ({ focusVisible: el.matches(":focus-visible"), shadow: getComputedStyle(el).boxShadow }));
-		expect(ring.focusVisible).toBe(true);
-		// Two rings: page background (đen mun) inside, hoại sắc outside.
-		expect(ring.shadow).toContain("rgb(26, 18, 11)");
-		expect(ring.shadow).toContain("rgb(227, 190, 147)");
+		expect(await primary.evaluate((el) => el.matches(":focus-visible"))).toBe(true);
+		// Two rings: page background (đen mun) inside, hoại sắc outside. The box-shadow fades in, so read it once it has settled.
+		await expect.poll(() => primary.evaluate((el) => getComputedStyle(el).boxShadow)).toContain("rgb(26, 18, 11)");
+		await expect.poll(() => primary.evaluate((el) => getComputedStyle(el).boxShadow)).toContain("rgb(227, 190, 147)");
 	});
 
 	// The whole site runs on <html data-theme="dark"> (the look of the old site, 13/11/2026);

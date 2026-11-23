@@ -120,3 +120,40 @@ describe("speak", () => {
 		expect(await speak(TASHI, errored)).toBeNull();
 	});
 });
+
+describe("overLimit", () => {
+	const request = (ip: string) => new Request("https://www.example.test/api/analyze", { method: "POST", headers: { "cf-connecting-ip": ip } });
+
+	it("lets a visitor ask `limit` times a minute, then says no, and starts again the next minute", async () => {
+		const { overLimit } = await import("@/libs/tibetan/server");
+		const at = Date.UTC(2026, 10, 23, 8, 0, 10);
+		for (let i = 0; i < 3; i++) expect(await overLimit(request("1.1.1.1"), "t1", 3, at), `call ${i + 1}`).toBe(false);
+		expect(await overLimit(request("1.1.1.1"), "t1", 3, at)).toBe(true);
+		// another visitor, another route and the next minute each have their own allowance
+		expect(await overLimit(request("2.2.2.2"), "t1", 3, at)).toBe(false);
+		expect(await overLimit(request("1.1.1.1"), "t2", 3, at)).toBe(false);
+		expect(await overLimit(request("1.1.1.1"), "t1", 3, at + 60_000)).toBe(false);
+	});
+
+	it("answers 429 with a Vietnamese message and Retry-After", async () => {
+		const { tooMany } = await import("@/libs/tibetan/server");
+		const response = tooMany();
+		expect(response.status).toBe(429);
+		expect(response.headers.get("retry-after")).toBe("60");
+		const body = (await response.json()) as { message: string; answer: string };
+		expect(body.message).toContain("đợi một phút");
+		expect(body.answer, "the question box shows `answer`").toBe(body.message);
+	});
+});
+
+describe("allow", () => {
+	it("throws OverLimit once a visitor is past the allowance, and counts only visitors the Cloudflare header names", async () => {
+		const { allow, OverLimit } = await import("@/libs/tibetan/server");
+		const from = (ip: string | null, extra: Record<string, string> = {}) => new Request("https://www.example.test/api/analyze", { method: "POST", headers: { ...(ip ? { "cf-connecting-ip": ip } : {}), ...extra } });
+		for (let i = 0; i < 2; i++) await allow(from("9.9.9.9"), "t-allow", 2);
+		await expect(allow(from("9.9.9.9"), "t-allow", 2)).rejects.toBeInstanceOf(OverLimit);
+		// a made-up x-forwarded-for neither shares nor escapes the count: only cf-connecting-ip names the visitor
+		for (let i = 0; i < 2; i++) await allow(from(null, { "x-forwarded-for": `8.8.8.${i}` }), "t-fwd", 2);
+		await expect(allow(from(null, { "x-forwarded-for": "7.7.7.7" }), "t-fwd", 2)).rejects.toBeInstanceOf(OverLimit);
+	});
+});

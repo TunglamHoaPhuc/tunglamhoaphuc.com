@@ -356,7 +356,7 @@ describe("Tông Chỉ articles", () => {
 	it("keeps what Markdown cannot hold (a table, a sound, a caption) by saving the HTML too, and the page shows that HTML", async () => {
 		const w = await contentWorld();
 		const editor = await w.as("editor@example.test");
-		const html = '<h2>Bảng</h2><table><tbody><tr><td>Một</td><td>Hai</td></tr></tbody></table><figure><img src="/anh-goc/s2-cnv03/cms/media-a/v2/sen.webp" alt="Sen"><figcaption>Hoa sen</figcaption></figure><audio controls src="https://example.test/phap-am.mp3"></audio>';
+		const html = '<h2>Bảng</h2><table><tbody><tr><td>Một</td><td>Hai</td></tr></tbody></table><figure><img src="/anh-goc/s2-cnv03/cms/media-a/v2/sen.webp" alt="Sen"><figcaption>Hoa sen</figcaption></figure><audio controls src="/anh-goc/s2-cnv03/cms/phap-am.mp3"></audio>';
 		const saved = await editor.call("PATCH", "teachings/tc-1", { version: 1, contentHtml: html });
 		expect(saved.status, JSON.stringify(saved.json)).toBe(200);
 		const stored = row(w, "SELECT body, content_html FROM teaching_article WHERE id = 'tc-1'") as { body: string; content_html: string };

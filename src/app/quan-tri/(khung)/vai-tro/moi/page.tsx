@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { api } from "@/components/admin/api";
 import { useAdmin } from "@/components/admin/AdminProvider";
+import { mayGrant } from "@/components/admin/ownScope";
 import { PermissionMatrix, type MatrixModule } from "@/components/admin/PermissionMatrix";
 import { Alert, Button, errorText, fieldErrors, Loading, PageHeader, TextArea, TextField } from "@/components/admin/ui";
 
@@ -13,7 +14,7 @@ type RoleRow = { id: string };
 
 export default function NewRolePage() {
 	const router = useRouter();
-	const { can } = useAdmin();
+	const { can, me } = useAdmin();
 	const mayCreate = can("roles", "create");
 	const [catalog, setCatalog] = useState<Catalog | null>(null);
 	const [loadError, setLoadError] = useState("");
@@ -104,7 +105,7 @@ export default function NewRolePage() {
 						<h2 id="matrix-title" className="tq-h2">Quyền</h2>
 						<p className="tq-hint">“Của mình” nghĩa là chỉ áp dụng cho nội dung do chính người đó tạo. Bạn chỉ cấp được những quyền bạn đang có.</p>
 						{fields.permissions ? <Alert kind="error">{fields.permissions}</Alert> : null}
-						<PermissionMatrix modules={catalog.modules} actions={catalog.actions} value={permissions} onChange={setPermissions} canGrant={(m, a) => can(m, a)} />
+						<PermissionMatrix modules={catalog.modules} actions={catalog.actions} value={permissions} onChange={setPermissions} canGrant={(m, a, wanted) => mayGrant(me.permissions, m, a, wanted)} />
 					</section>
 					<div className="tq-actions">
 						<Button type="submit" busy={busy}>Tạo vai trò</Button>

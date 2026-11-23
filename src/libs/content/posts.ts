@@ -129,6 +129,13 @@ function toPost(raw: RawPost, publishedDate: string, categoryName: string, issue
 		intro: ownSummary && !repeatsOpening(summary, raw.content) ? summary : "",
 		// An album kept apart (post-albums.json) still counts, so lists can say it has photos.
 		galleryCount: gallery.length || (raw.galleryCount ?? 0),
+		// What only the new admin saves: the old admin's file has none of it.
+		pinned: false,
+		seoTitle: "",
+		seoDescription: "",
+		ogImage: null,
+		extra: { audio: null, youtubeId: null, book: null },
+		related: [],
 		contentHtml,
 		videos: videosOf(raw.content),
 		keywords: raw.keywords

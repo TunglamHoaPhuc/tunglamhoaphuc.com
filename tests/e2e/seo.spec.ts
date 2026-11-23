@@ -140,7 +140,8 @@ test.describe("structured data and share cards", () => {
 
 	test("the contact page names the temple as a place", async ({ request }) => {
 		const place = jsonLd(await (await request.get("/lien-he")).text()).find((item) => item["@type"] === "Place");
-		expect(place?.hasMap).toMatch(/^https:\/\/www\.google\.com\/maps/);
+		// the temple's own link is a short Google Maps address
+		expect(place?.hasMap).toMatch(/^https:\/\/(www\.google\.com\/maps|maps\.app\.goo\.gl\/)/);
 	});
 
 	test("every page names the card a shared link shows, with icons and a manifest", async ({ request }) => {

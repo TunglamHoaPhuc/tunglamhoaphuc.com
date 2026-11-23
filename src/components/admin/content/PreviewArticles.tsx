@@ -2,7 +2,7 @@
 // own PostArticle; Tông Chỉ articles and Giới thiệu pages through frames that use the same components and classes as
 // their public pages (those pages keep their markup inside the route files, so it cannot be imported as is).
 import type { PreviewData } from "@/admin/content/service";
-import { markdownOf, parseSafe } from "@/admin/content/html";
+import { sanitizeHtml } from "@/admin/content/html";
 import AboutMilestones from "@/components/sections/about/AboutMilestones";
 import Cta from "@/components/sections/cta/Cta";
 import HeroInner from "@/components/sections/hero/HeroInner";
@@ -13,8 +13,6 @@ import HeaderSpace from "@/components/shared/others/HeaderSpace";
 import { DONG_CHAY, TRI_TUE, type PostSection } from "@/config/sections";
 import { tongChi } from "@/config/tongChi";
 import { IMAGE_WIDTH, imageAt } from "@/libs/content/media";
-import { renderContent } from "@/libs/content/normalize";
-import { tongChiMarkdown } from "@/libs/content/tongChiBody";
 import type { Keyword, MediaImage, Milestone, Post } from "@/libs/content/types";
 import { formatNumber, titleCase } from "@/libs/format";
 
@@ -54,6 +52,12 @@ export function PostPreview({ data }: { data: PreviewData }) {
 		keywords: (Array.isArray(state.keywords) ? state.keywords : []) as Keyword[],
 		gallery: [],
 		videos: (Array.isArray(state.videos) ? state.videos : []) as Post["videos"],
+		pinned: state.pinned === true,
+		seoTitle: str(state.seoTitle),
+		seoDescription: str(state.seoDescription),
+		ogImage: imageOf(data, "ogMediaId", ""),
+		extra: { audio: null, youtubeId: null, book: null },
+		related: [],
 	};
 	return <PostArticle section={section} post={post} />;
 }
@@ -62,9 +66,8 @@ export function TeachingPreview({ data }: { data: PreviewData }) {
 	const state = data.state;
 	const name = str(state.name) || str(state.title);
 	const banner = imageOf(data, "bannerMediaId", "bannerPosition");
-	// What the public page will show: the Markdown the body is saved as, read back the way the page reads it.
-	const markdown = markdownOf(parseSafe(str(state.contentHtml)));
-	const contentHtml = renderContent(tongChiMarkdown(markdown, { title: str(state.title), slug: str(state.slug), targets: [] }).markdown);
+	// What the public page will show: the HTML the editor saved, cleaned the way the page cleans it (tongChiArticle), not the Markdown copy.
+	const contentHtml = sanitizeHtml(str(state.contentHtml));
 	const video = state.video as { id: string; url: string; title: string; description: string } | null;
 	return (
 		<main>

@@ -52,6 +52,42 @@ describe("next.config headers", () => {
 		expect(headers["Content-Security-Policy"]).toBeUndefined();
 	});
 
+	it("never lets the admin be framed, keeps its referrer to itself and gives it a Content-Security-Policy that shuts other origins", async () => {
+		const rules = ((await nextConfig.headers?.()) ?? []) as Rule[];
+		// What a request gets: the matching rules in order, the last value of a header wins (as Next.js and vinext do).
+		const headersFor = (path: string) => {
+			const out: Record<string, string> = {};
+			for (const rule of rules.filter((item) => !item.missing)) {
+				const pattern = new RegExp(`^${rule.source.replace(/\/:path\*$/, "(/.*)?")}$`);
+				if (pattern.test(path)) for (const { key, value } of rule.headers) out[key] = value;
+			}
+			return out;
+		};
+		for (const path of ["/quan-tri", "/quan-tri/dang-nhap", "/quan-tri/bai-viet/abc", "/api/quan-tri/v1/auth/me"]) {
+			const headers = headersFor(path);
+			expect(headers["X-Frame-Options"], path).toBe("DENY");
+			expect(headers["Referrer-Policy"], path).toBe("same-origin");
+			expect(headers["Strict-Transport-Security"], path).toBe("max-age=31536000");
+			const csp = headers["Content-Security-Policy"];
+			expect(csp, path).toBeDefined();
+			for (const part of ["default-src 'self'", "connect-src 'self'", "object-src 'none'", "base-uri 'self'", "form-action 'self'", "frame-ancestors 'none'"]) expect(csp, `${path}: ${part}`).toContain(part);
+			// nothing but the site itself runs scripts or styles from a file; the only frames are YouTube's
+			expect(csp, path).not.toMatch(/script-src[^;]*https?:/);
+			// the editor plays a sound from any https address the editors paste
+			expect(csp, path).toContain("media-src 'self' blob: https:");
+			expect(csp, path).toMatch(/frame-src https:\/\/www\.youtube-nocookie\.com https:\/\/www\.youtube\.com(;|$)/);
+		}
+		// the draft preview shows the public site's page, so it gets no policy of the admin's, but is never framed
+		const preview = headersFor("/quan-tri/xem-truoc/bai-viet/abc");
+		expect(preview["Content-Security-Policy"]).toBe("frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self'");
+		expect(preview["X-Frame-Options"]).toBe("DENY");
+		for (const path of ["/", "/gioi-thieu", "/api/other", "/quan-tri-gia"]) {
+			expect(headersFor(path)["X-Frame-Options"], path).toBe("SAMEORIGIN");
+			expect(headersFor(path)["Referrer-Policy"], path).toBe("strict-origin-when-cross-origin");
+			expect(headersFor(path)["Content-Security-Policy"], path).toBeUndefined();
+		}
+	});
+
 	it("names the same public hosts as the code that hides internal pages", () => {
 		for (const host of ["www.tunglamhoaphuc.com", "tunglamhoaphuc.com"]) expect(isPublicHost(host)).toBe(true);
 	});
