@@ -66,7 +66,10 @@ test("chuyển hướng admin: /quan-tri, /api/quan-tri, /admin, /login, /van-ha
 			const rule = rules.find((item) => item.source === source);
 			assert.ok(rule, `thiếu luật ${source}`);
 			assert.equal(rule.permanent, false, `${source}: 307 tạm thời cho tới khi chốt`);
-			assert.equal(rule.destination, source.endsWith(":rest*") ? `https://quantri.tunglamhoaphuc.com${path}/:rest*` : `https://quantri.tunglamhoaphuc.com${path}`);
+			// The old site's admin addresses lead to the new admin's front door (the same path on quantri. would loop back to www).
+			const old = ["/admin", "/login", "/van-hanh"].includes(path);
+			const expected = old ? "https://quantri.tunglamhoaphuc.com/quan-tri" : source.endsWith(":rest*") ? `https://quantri.tunglamhoaphuc.com${path}/:rest*` : `https://quantri.tunglamhoaphuc.com${path}`;
+			assert.equal(rule.destination, expected);
 			assert.equal(rule.has?.length, 1);
 			for (const host of PUBLIC) assert.equal(hostRe(rule.has?.[0].value).test(host), true, `${source} chạy ở ${host}`);
 			for (const host of OTHER) assert.equal(hostRe(rule.has?.[0].value).test(host), false, `${source} không chạy ở ${host}`);

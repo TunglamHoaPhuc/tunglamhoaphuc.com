@@ -20,11 +20,20 @@ const SECURITY_HEADERS = [
 
 // Địa chỉ admin: /quan-tri và /api/quan-tri (đường dẫn của admin mới), /admin, /login, /van-hanh (admin cũ của www). Mỗi cái
 // sang cùng đường dẫn trên quantri.; chỉ khi host là host công khai.
-const ADMIN_PATHS = ['/quan-tri', '/api/quan-tri', '/admin', '/login', '/van-hanh'];
-const ADMIN_REDIRECTS = ADMIN_PATHS.flatMap((path) => [
-  { source: path, has: [{ type: 'host' as const, value: PUBLIC_HOST }], destination: `${ADMIN_ORIGIN}${path}`, permanent: false },
-  { source: `${path}/:rest*`, has: [{ type: 'host' as const, value: PUBLIC_HOST }], destination: `${ADMIN_ORIGIN}${path}/:rest*`, permanent: false },
-]);
+const ADMIN_PATHS = ['/quan-tri', '/api/quan-tri'];
+// The old site's admin addresses (before 23/11/2026 Cloudflare Access guarded them) lead to the new admin's front door, NOT to the same
+// path on quantri.: that host answers a path it does not serve with a 308 back to www, which would loop.
+const OLD_ADMIN_PATHS = ['/admin', '/login', '/van-hanh'];
+const ADMIN_REDIRECTS = [
+  ...ADMIN_PATHS.flatMap((path) => [
+    { source: path, has: [{ type: 'host' as const, value: PUBLIC_HOST }], destination: `${ADMIN_ORIGIN}${path}`, permanent: false },
+    { source: `${path}/:rest*`, has: [{ type: 'host' as const, value: PUBLIC_HOST }], destination: `${ADMIN_ORIGIN}${path}/:rest*`, permanent: false },
+  ]),
+  ...OLD_ADMIN_PATHS.flatMap((path) => [
+    { source: path, has: [{ type: 'host' as const, value: PUBLIC_HOST }], destination: `${ADMIN_ORIGIN}/quan-tri`, permanent: false },
+    { source: `${path}/:rest*`, has: [{ type: 'host' as const, value: PUBLIC_HOST }], destination: `${ADMIN_ORIGIN}/quan-tri`, permanent: false },
+  ]),
+];
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
