@@ -5,7 +5,10 @@ import { expect, test, type Page } from "@playwright/test";
 // (data/snapshot/, `npm run snapshot:fetch -- --albums`).
 const PATH = "/dong-chay-hoang-phap";
 // 30 photos in the list file; 170 photos only in post-albums.json; one YouTube link.
+// Two posts of the old site shared this slug (post-1045 of 13/07/2026 and post-29713 of 03/09/2026); the earlier keeps it and the later
+// is at /phap-hoi-huyet-bon-trai-2 (migration 0004, src/libs/content/slugs.ts), so this address is the July post, in Khóa Lễ Truyền Thống.
 const ARTICLE = `${PATH}/phap-hoi-huyet-bon-trai`;
+const ARTICLE_CATEGORY = { name: "Khóa Lễ Truyền Thống", slug: "khoa-le-truyen-thong", date: "13/07/2026" };
 const BIG_ALBUM = `${PATH}/dem-van-nghe-hoa-phuc-got-talent-khoa-tu-tuoi-tre-chu-de-di-qua-kho-vui-cuoc-doi-2025`;
 const WITH_VIDEO = `${PATH}/le-tuong-niem-lan-thu-33-ngay-to-su-khai-son-chua-hoang-phap-vien-tich-chua-hoa-phuc`;
 // Stored percent-encoded (an emoji); the old site cannot open it.
@@ -41,9 +44,9 @@ test.describe("article page", () => {
 		await expect(page.getByRole("heading", { level: 1 })).toHaveText("Pháp hội Huyết Bồn Trai");
 		const crumbs = page.getByRole("navigation", { name: "Đường dẫn" });
 		await expect(crumbs.getByRole("link", { name: "Dòng Chảy Hoằng Pháp" })).toHaveAttribute("href", PATH);
-		await expect(crumbs.getByRole("link", { name: "Đại Lễ Sự Kiện" })).toHaveAttribute("href", `${PATH}?danh-muc=dai-le-su-kien`);
+		await expect(crumbs.getByRole("link", { name: ARTICLE_CATEGORY.name })).toHaveAttribute("href", `${PATH}?danh-muc=${ARTICLE_CATEGORY.slug}`);
 		await expect(page.getByRole("link", { name: "Quay lại Dòng Chảy Hoằng Pháp" })).toHaveAttribute("href", PATH);
-		await expect(page.locator(".tlhp-article-meta")).toContainText("03/09/2026");
+		await expect(page.locator(".tlhp-article-meta")).toContainText(ARTICLE_CATEGORY.date);
 	});
 
 	test("shows tabs only for the parts the post has", async ({ page }) => {
@@ -63,7 +66,7 @@ test.describe("article page", () => {
 		await open(page);
 		const related = page.locator("#tim-hieu-them .tlhp-post-card");
 		await expect(related).toHaveCount(3);
-		await expect(related.locator(".tlhp-chip")).toHaveText(["Đại Lễ Sự Kiện", "Đại Lễ Sự Kiện", "Đại Lễ Sự Kiện"]);
+		await expect(related.locator(".tlhp-chip")).toHaveText([ARTICLE_CATEGORY.name, ARTICLE_CATEGORY.name, ARTICLE_CATEGORY.name]);
 		await expect(related.locator(`a[href="${ARTICLE}"]`)).toHaveCount(0);
 	});
 

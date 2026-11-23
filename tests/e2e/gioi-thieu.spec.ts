@@ -7,6 +7,9 @@ import { expect, test, type Page } from "@playwright/test";
 const PATH = "/gioi-thieu";
 type RawTopic = { slug: string; title: string; subtitle: string; groupCategory: string; groupCategoryName: string; milestones: unknown };
 const TOPICS = (JSON.parse(readFileSync("data/snapshot/gioi-thieu.json", "utf8")) as { topics: RawTopic[] }).topics;
+// Since 22/11/2026 the group "Người Liên Quan" keeps the old site's own pages (Sư Tổ's Odyssey view, a detail layout for the others);
+// the other groups use the site's article layout with the reading frame (src/components/gioi-thieu/nguoi-lien-quan/content.ts).
+const OLD_SITE_GROUP = "nguoi-lien-quan";
 const milestonesOf = (topic: RawTopic) => (typeof topic.milestones === "string" ? JSON.parse(topic.milestones) : topic.milestones) as unknown[];
 
 async function open(page: Page, path: string, width = 1440) {
@@ -45,12 +48,14 @@ test.describe("Giới thiệu", () => {
 			expect(seen.has(title) || seen.has(description), topic.slug).toBe(false);
 			seen.add(title);
 			seen.add(description);
-			expect(html).toContain('class="tlhp-reading"');
+			if (topic.groupCategory === OLD_SITE_GROUP) expect(html, `${topic.slug} has its own heading`).toMatch(/<h1[\s>]/);
+			else expect(html).toContain('class="tlhp-reading"');
 		}
 	});
 
 	test("the timeline is an ordered list a screen reader reads in order", async ({ page }) => {
-		const topic = TOPICS.find((item) => item.slug === "tieu-su-su-to") ?? TOPICS.find((item) => milestonesOf(item).length)!;
+		// A topic of the article layout: its timeline is the page's own list (the old site's pages draw theirs as cards).
+		const topic = TOPICS.find((item) => item.groupCategory !== OLD_SITE_GROUP && milestonesOf(item).length)!;
 		await open(page, `${PATH}/${topic.slug}`);
 		await expect(page.getByRole("heading", { level: 1 })).toHaveText(topic.title);
 		const list = page.locator("#moc-nien-bieu ol.tlhp-milestones");
@@ -65,12 +70,12 @@ test.describe("Giới thiệu", () => {
 		await expect(list.getByRole("listitem").first().getByRole("heading", { level: 3 })).toHaveText(first.title);
 	});
 
-	test("shows the teaching, the book and the reading frame for the abbot", async ({ page }) => {
-		await open(page, `${PATH}/su-phu-tru-tri`);
-		await expect(page.locator(".tlhp-about-quote blockquote p").first()).toContainText("Hạnh phúc thật sự");
-		await expect(page.getByRole("complementary", { name: "Tác phẩm" })).toContainText("Đi Qua Khổ Vui Cuộc Đời");
-		await expect(page.getByRole("button", { name: "A+ phóng to chữ" })).toBeVisible();
-		await expect(page.locator("#cung-nhom .tlhp-about-card")).toHaveCount(3);
+	test("shows the abbot's own heading and the teaching he is known by, in the old site's detail layout", async ({ page }) => {
+		const abbot = TOPICS.find((item) => item.slug === "su-phu-tru-tri")!;
+		await open(page, `${PATH}/${abbot.slug}`);
+		await expect(page.getByRole("heading", { level: 1 })).toHaveText(abbot.title);
+		await expect(page.getByText("Hạnh phúc thật sự").first()).toBeVisible();
+		await expect(page.getByRole("heading", { level: 2 }).first()).toBeVisible();
 	});
 
 	test("the menu's three ways in all land somewhere real", async ({ page, request }) => {
