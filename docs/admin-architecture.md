@@ -582,6 +582,15 @@ Biến môi trường mới (sẽ có trong `.env.example`): `ADMIN_JWT_SECRET`,
 
 Giữ nguyên từ kế hoạch cũ: cùng ứng dụng trên Workers, D1, R2, Bootstrap + SCSS, TipTap, nén ảnh ở trình duyệt, chặn xóa ảnh đang dùng, mọi thao tác ghi đều có nhật ký, sao lưu D1 hằng ngày giữ 30 ngày.
 
+### 9.1 Quyết định đã chốt (23/11/2026)
+
+Chủ dự án giao các quyết định này cho người làm; ghi lại để không phải hỏi lại.
+
+- **Khôi phục tông chỉ nhập từ web cũ không trả lại từng byte của hai cột `body` và `content_html`.** Sau lần sửa thân đầu tiên, `body` là Markdown đã làm sạch và `content_html` là HTML hiện trang. Trang công khai vẫn y hệt trước khi sửa (có test so từng trang). Bản brief gốc còn nằm ở `data/snapshot`. Không thêm cột lưu bản thô: tốn schema mà người dùng không thấy khác biệt. Làm lại nếu có người cần bản thô trong admin.
+- **Sửa thân bài chạy qua bộ lọc HTML, nên link ra ngoài trang của bài nhập được thêm `target="_blank" rel="noopener noreferrer"`.** Giữ như vậy: người đọc không rời trang chùa, `noopener` chặn trang kia điều khiển trang này. Link nội bộ không bị đổi. Lưu bản cũ (khôi phục) không thêm thuộc tính này.
+- **`PUT /seo/defaults` với `{}` ghi dòng mặc định.** Đúng thiết kế (lưu "không có giá trị riêng"); test quét quyền đã loại trừ.
+- **Slug nhận tới 200 ký tự.** Bài nhập có slug dài nhất 162 ký tự vẫn mở được và giữ nguyên slug khi lưu (test B1/B15c).
+
 ## 10. Chiến lược kiểm thử
 
 | Tầng | Công cụ | Phạm vi |
