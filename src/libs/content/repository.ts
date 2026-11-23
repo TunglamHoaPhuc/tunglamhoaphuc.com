@@ -99,14 +99,28 @@ export function countCategories(summaries: PostSummary[], section: string, posit
 	return [...counts.values()].sort((a, b) => (place(a) === place(b) ? 0 : place(a) < place(b) ? -1 : 1) || b.count - a.count || collator.compare(a.name, b.name));
 }
 
-/** `load`'s value, read on first use and kept; a failed read is tried again on the next use. */
-export function lazy<T>(load: () => Promise<T>): () => Promise<T> {
-	let value: Promise<T> | undefined;
-	return () =>
-		(value ??= load().catch((error: unknown) => {
-			value = undefined;
+/**
+ * `load`'s value, read on first use and kept once it has ARRIVED. What is kept is the value, never the pending read: the repository
+ * that owns these is shared by every request of a Worker instance (see `renewing`), and on Cloudflare a request that awaits a
+ * promise started by another request (a D1 read in flight) can be cancelled as "hung" ("the Worker's code had hung and would never
+ * generate a response"). So while a read is pending every caller makes its own read (a few duplicate reads at a cold start) and the
+ * first value to arrive is kept for all. A failed read is not kept (the next use reads again) and is logged with `name`, so the
+ * logs say which read it was.
+ */
+export function lazy<T>(load: () => Promise<T>, name = "lazy"): () => Promise<T> {
+	let kept: { value: T } | undefined;
+	return async () => {
+		if (kept) return kept.value;
+		let value: T;
+		try {
+			value = await load();
+		} catch (error) {
+			console.error(`content: đọc "${name}" lỗi`, error);
 			throw error;
-		}));
+		}
+		kept ??= { value };
+		return kept.value;
+	};
 }
 
 const none = async () => [];
@@ -127,14 +141,14 @@ export function createMemoryRepository(
 			bySectionSlug: new Map(list.map((post) => [sectionSlugKey(post.section, post.slug), post])),
 			summaries: list.map(toSummary),
 		};
-	});
-	const albums = lazy(loadAlbums ?? (async () => new Map<string, GalleryImage[]>()));
-	const schedule = lazy(loadSchedule ?? (async () => EMPTY_SCHEDULE));
-	const about = lazy<AboutTopic[]>(loadAbout ?? none);
-	const tongChiEntries = lazy<TongChiEntry[]>(loadTongChi ?? none);
-	const areas = lazy<Area[]>(loadAreas ?? none);
-	const statues = lazy<StatueEntry[]>(loadStatues ?? none);
-	const quotes = lazy<Quote[]>(loadQuotes ?? none);
+	}, "posts");
+	const albums = lazy(loadAlbums ?? (async () => new Map<string, GalleryImage[]>()), "albums");
+	const schedule = lazy(loadSchedule ?? (async () => EMPTY_SCHEDULE), "schedule");
+	const about = lazy<AboutTopic[]>(loadAbout ?? none, "about");
+	const tongChiEntries = lazy<TongChiEntry[]>(loadTongChi ?? none, "tongChi");
+	const areas = lazy<Area[]>(loadAreas ?? none, "areas");
+	const statues = lazy<StatueEntry[]>(loadStatues ?? none, "statues");
+	const quotes = lazy<Quote[]>(loadQuotes ?? none, "quotes");
 	// Bodies are turned into HTML one page at a time, once each.
 	const tongChiPages = new Map<string, TongChiArticle>();
 	const statuePages = new Map<string, Statue>();
@@ -215,7 +229,11 @@ let contentEpoch = 0;
 export const bumpContentEpoch = (): number => ++contentEpoch;
 export const currentContentEpoch = (): number => contentEpoch;
 
-/** A value made again once `ttl` ms have passed since it was made, or an admin write has happened since (`epoch`). */
+/**
+ * A value made again once `ttl` ms have passed since it was made, or an admin write has happened since (`epoch`). `make` must answer at
+ * once with a plain value (a repository object, which reads lazily): never with a promise of a read, which would be kept and awaited
+ * by every request (see `lazy`). For a read use `renewingAsync` (renew-async.ts).
+ */
 export function renewing<T>(make: () => T, ttl: number, now: () => number = Date.now, epoch: () => number = currentContentEpoch): () => T {
 	let current: { value: T; until: number; epoch: number } | undefined;
 	return () => {
@@ -239,38 +257,28 @@ export function repositoryFromFiles(loaders: FileLoaders): ContentRepository {
 	});
 }
 
-/** `make()`, kept; a failed one is made again on the next call rather than kept forever. */
-function once<T>(make: () => Promise<T>): () => Promise<T> {
-	let value: Promise<T> | undefined;
-	return () =>
-		(value ??= make().catch((error: unknown) => {
-			value = undefined;
-			throw error;
-		}));
-}
-
 /** How often a Worker reading D1 starts a fresh repository, until saving in the admin refreshes the pages that changed (T24, tags). */
 const D1_RENEW_MS = 15_000;
 
-const d1Repositories = once(async () => {
+const d1Repositories = lazy(async () => {
 	const [{ createD1Repository }, workers] = await Promise.all([import("./sources/d1"), (import("cloudflare:workers" as string) as Promise<{ env?: { DB?: D1Like } }>).catch(() => ({}) as { env?: { DB?: D1Like } }),
 	]);
 	const db = workers.env?.DB;
 	if (!db) throw new Error('Nguồn "d1" thiếu binding DB (cloudflare.config.ts)');
 	return renewing(() => createD1Repository(db), D1_RENEW_MS);
-});
+}, "d1.repository");
 
-const snapshotRepository = once(async () => {
+const snapshotRepository = lazy(async () => {
 	const [{ readSnapshot }, { createFileLoaders }] = await Promise.all([import("./sources/snapshot"), import("./sources/files")]);
 	return repositoryFromFiles(createFileLoaders(readSnapshot));
-});
+}, "snapshot.repository");
 
-const b2Repositories = once(async () => {
+const b2Repositories = lazy(async () => {
 	const [{ b2Config, createB2Reader }, { createFileLoaders }] = await Promise.all([import("./sources/b2"), import("./sources/files")]);
 	const cache = (globalThis as { caches?: { default?: CacheLike } }).caches?.default;
 	const loaders = createFileLoaders(createB2Reader(b2Config(process.env), { cache }));
 	return renewing(() => repositoryFromFiles(loaders), B2_RENEW_MS);
-});
+}, "b2.repository");
 
 /**
  * The repository for this server instance. The snapshot never changes, so it is built once.
