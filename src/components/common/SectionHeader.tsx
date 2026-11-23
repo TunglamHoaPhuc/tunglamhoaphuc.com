@@ -33,7 +33,7 @@ export const SectionHeader: FC<SectionHeaderProps> = ({
       {/* Tầng 1: Icon - Chiều cao chuẩn tương xứng tiêu đề (Có không gian thở để hào quang tỏa đều 360 độ) */}
       <div className="mb-3 md:mb-4 flex items-center justify-center overflow-visible pt-1">
         {iconUrl ? (
-          <img loading="lazy" decoding="async"
+          <img width={128} height={128} loading="lazy" decoding="async"
             src={iconUrl}
             alt={title || "Section Icon"}
             className={

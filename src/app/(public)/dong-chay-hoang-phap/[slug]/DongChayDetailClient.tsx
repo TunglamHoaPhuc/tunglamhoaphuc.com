@@ -86,7 +86,7 @@ export default function DongChayDetailClient({ article, relatedArticlesFormatted
         onScrollToSection={scrollToSection}
         pageTitle={shortAnchorTitle}
         navItems={NAV_ITEMS}
-        logoUrl="/images/icons/icon-dong-chay-hoang-phap.webp"
+        logoUrl="/images/icons/icon-dong-chay-hoang-phap-128.webp"
       />
 
       <SidebarNav
@@ -95,7 +95,7 @@ export default function DongChayDetailClient({ article, relatedArticlesFormatted
         onScrollToSection={scrollToSection}
         pageTitle={shortAnchorTitle}
         navItems={NAV_ITEMS}
-        logoUrl="/images/icons/icon-dong-chay-hoang-phap.webp"
+        logoUrl="/images/icons/icon-dong-chay-hoang-phap-128.webp"
       />
 
       {/* ── 2. HERO BANNER HOẶC THÔNG BÁO BÀI VIẾT ĐÃ GỠ BỎ ── */}

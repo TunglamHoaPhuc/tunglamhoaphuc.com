@@ -162,7 +162,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
           <div
             className="absolute inset-0 bg-cover bg-[center_28%] pointer-events-none transition-transform duration-75"
             style={{
-              backgroundImage: `url('${statue.imgUrl || '/images/toan-canh-chua.jpg'}')`,
+              backgroundImage: `url('${statue.imgUrl || '/images/hero/toan-canh-chua-1280.webp'}')`,
               opacity: bgOpacity,
               transform: `${statue.imgRotation ? `rotate(${statue.imgRotation}deg) ` : ''}scale(${bgScale}) translateY(${heroProgress * 30}px)`,
             }}
@@ -264,7 +264,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                     >
                       {/* Avatar tròn viền vàng phát sáng - object-[center_28%] */}
                       <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full border-2 border-[#F2C14E] p-0.5 overflow-hidden bg-[#1C130D] shadow-[0_0_20px_rgba(242,193,78,0.5)] group-hover:scale-105 group-hover:shadow-[0_0_25px_rgba(242,193,78,0.9)] transition-all duration-300">
-                        <img
+                        <img loading="lazy" decoding="async" width={640} height={480}
                           src={member.imgUrl}
                           alt={member.name}
                           className="w-full h-full rounded-full object-cover object-[center_28%]"
@@ -299,7 +299,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
               >
                 {/* Logo Bảo tượng nổi lên trên */}
                 <div className="w-9 h-9 flex items-center justify-center filter drop-shadow-[0_0_8px_rgba(242,193,78,0.7)] group-hover:scale-110 transition-transform">
-                  <img
+                  <img loading="lazy" decoding="async" width={128} height={128}
                     src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
                     alt="Logo Bảo tượng"
                     className="w-full h-full object-contain"
@@ -327,7 +327,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
               {/* Logo Avatar Nổi Đè Lên Viền Mép Trên Cùng (Focus [center 28%] rõ mặt tượng) */}
               <div className="absolute -top-12 left-1/2 -translate-x-1/2 z-30 group cursor-pointer">
                 <div className="relative w-24 h-24 rounded-full border-2 border-[#F2C14E] p-0.5 bg-[#2C1C11] shadow-[0_0_30px_rgba(242,193,78,0.95)] overflow-hidden flex items-center justify-center">
-                  <img
+                  <img loading="lazy" decoding="async" width={640} height={480}
                     src={statue.avatarUrl || statue.imgUrl}
                     alt={statue.name}
                     className="w-full h-full rounded-full object-cover object-[center_28%] group-hover:scale-105 transition-transform duration-500"
@@ -365,7 +365,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
               <div
                 className="absolute inset-0 bg-cover bg-center opacity-15 pointer-events-none scale-105"
                 style={{
-                  backgroundImage: `url('${statue.areaImgUrl || '/images/toan-canh-chua.jpg'}')`,
+                  backgroundImage: `url('${statue.areaImgUrl || '/images/hero/toan-canh-chua-1280.webp'}')`,
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-b from-[#2A1D14]/70 via-[#2A1D14]/90 to-[#1C130D] pointer-events-none" />
@@ -416,7 +416,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
             >
               {/* Khoang Logo To bên trái */}
               <div className="w-16 h-16 sm:w-18 sm:h-18 rounded-xl border border-[#F2C14E]/60 bg-[#1C130D] p-2 flex items-center justify-center shrink-0 group-hover:scale-105 group-hover:border-[#F2C14E] transition-transform shadow-inner">
-                <img
+                <img loading="lazy" decoding="async" width={128} height={128}
                   src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
                   alt="Biểu tượng Chúng hội"
                   className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.8)]"
@@ -440,7 +440,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
             {/* Card 2: Khối Phối Cảnh & Vị Trí Tôn Thờ (flex-1 để kéo đều đáy với Cột 1 và Cột 2) */}
             <div className="flex-1 rounded-2xl border border-[#F2C14E]/50 bg-[#1C130D] overflow-hidden flex flex-col justify-between relative shadow-2xl">
               {/* Background Photo - focus [center 28%] */}
-              <img
+              <img loading="lazy" decoding="async" width={640} height={480}
                 src={statue.areaImgUrl || statue.avatarUrl || statue.imgUrl}
                 alt={statue.areaName || "Khu vực"}
                 className="absolute inset-0 w-full h-full object-cover object-[center_28%] opacity-60"
@@ -450,7 +450,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
               {/* Central Altar Photo Frame - Focus [center 28%] rõ hào quang và khuôn mặt */}
               <div className="relative z-10 p-4 flex items-center justify-center flex-1 min-h-[220px]">
                 <div className="w-40 h-52 sm:w-44 sm:h-56 rounded-xl border border-[#F2C14E] overflow-hidden shadow-[0_0_25px_rgba(0,0,0,0.9)] bg-black/50 p-1">
-                  <img
+                  <img loading="lazy" decoding="async" width={640} height={480}
                     src={statue.imgUrl}
                     alt={statue.name}
                     className="w-full h-full object-cover object-[center_28%] rounded-lg transition-transform duration-300"
@@ -481,7 +481,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
 
                 {/* Khoang Logo Khu vực to có hiệu ứng hover nhẹ */}
                 <div className="w-12 h-12 rounded-xl border border-[#F2C14E]/60 bg-[#1C130D] p-1.5 flex items-center justify-center text-[#F2C14E] shrink-0 group-hover/area:scale-108 group-hover/area:border-[#F2C14E] transition-all duration-300 shadow-md">
-                  <img
+                  <img loading="lazy" decoding="async" width={128} height={128}
                     src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
                     alt="Logo Khu vực"
                     className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.8)]"
@@ -500,7 +500,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                 className="rounded-2xl border border-[#F2C14E]/50 bg-gradient-to-b from-[#3A2718]/95 to-[#1C130D]/95 p-3.5 text-center flex flex-col items-center justify-center gap-1.5 hover:border-[#F2C14E] hover:brightness-110 transition-all duration-300 shadow-2xl cursor-pointer group shrink-0"
               >
                 <div className="w-9 h-9 flex items-center justify-center filter drop-shadow-[0_0_8px_rgba(242,193,78,0.7)] group-hover:scale-110 transition-transform">
-                  <img
+                  <img loading="lazy" decoding="async" width={128} height={128}
                     src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
                     alt="Logo Bảo tượng"
                     className="w-full h-full object-contain"
@@ -531,7 +531,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
         {/* Header Section căn giữa đồng bộ với nghệ thuật Phật giáo các khu vực */}
         <div className="flex flex-col items-center text-center my-10">
           <div className="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center" aria-hidden="true">
-            <img
+            <img loading="lazy" decoding="async" width={128} height={128}
               src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
               alt=""
               className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
@@ -674,7 +674,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                   }}
                   className="max-h-full max-w-full object-contain rounded-lg filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)] select-none"
                   onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                    (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
                   }}
                 />
               </div>
@@ -885,7 +885,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
                   className="relative w-full h-full cursor-pointer"
                   onClick={() => setIsPlayingVideo(true)}
                 >
-                  <img
+                  <img loading="lazy" decoding="async" width={640} height={480}
                     src={videoThumbnail}
                     alt={videoTitle}
                     className="w-full h-full object-cover object-[center_28%] group-hover:scale-105 transition-transform duration-500 opacity-80"
@@ -924,7 +924,7 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
       ══════════════════════════════════════════════════════════════ */}
       <section className="relative w-full border-y border-[#F2C14E]/40 overflow-hidden bg-[#160B04] min-h-[380px] sm:min-h-[440px] flex items-center justify-center text-center p-6 sm:p-12 group my-6">
         <div className="absolute inset-0 opacity-40 scale-105 transition-transform duration-1000 group-hover:scale-100">
-          <img
+          <img loading="lazy" decoding="async" width={640} height={480}
             src={statue.article?.bannerUrl || "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/08-tu-an-book/di-qua-kho-vui-cuoc-doi-bia-1.webp"}
             alt="Bài viết"
             className="w-full h-full object-cover object-center"
@@ -1002,12 +1002,12 @@ export const StatueDetailCoreLayout: FC<StatueDetailCoreLayoutProps> = ({ statue
               >
                 {/* Thumbnail Image - lấy [center 28%] rõ mặt tượng */}
                 <div className="relative w-full h-[280px] overflow-hidden bg-[#1A120B]">
-                  <img
+                  <img loading="lazy" decoding="async" width={640} height={480}
                     src={rel.imgUrl}
                     alt={rel.name}
                     className="w-full h-full object-cover object-[center_28%] group-hover:scale-105 transition-transform duration-500"
                     onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                      (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#25170E] via-transparent to-transparent" />
@@ -1095,13 +1095,13 @@ const BentoCard: FC<BentoCardProps> = ({
       className={`group relative overflow-hidden cursor-pointer rounded-2xl border border-[#f2c14e]/35 hover:border-[#ffde59] transition-all duration-500 shadow-xl bg-[#1c120b] w-full ${heightClass}`}
     >
       {/* Image with vertical statue face focus [center 28%] */}
-      <img
+      <img decoding="async" width={640} height={480}
         src={item.imgUrl}
         alt={item.title}
         className={`w-full h-full object-cover ${focusPosition} transition-transform duration-700 group-hover:scale-105`}
         loading="lazy"
         onError={(e) => {
-          (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+          (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
         }}
       />
 

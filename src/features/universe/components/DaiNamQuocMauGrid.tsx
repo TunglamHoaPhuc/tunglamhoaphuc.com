@@ -48,7 +48,7 @@ export const DaiNamQuocMauGrid: FC = () => {
             >
               {/* 1. FULL-BLEED IMAGE FRAME (No inner padding, zero exposed image border, 57% Height Ratio) */}
               <div className="relative w-full h-[195px] bg-[#1A120B] overflow-hidden shrink-0">
-                <img
+                <img loading="lazy" decoding="async" width={640} height={480}
                   src={seal.imgUrl}
                   alt={seal.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
@@ -77,7 +77,7 @@ export const DaiNamQuocMauGrid: FC = () => {
 
                   {/* FLOATING CIRCULAR GOLD LOGO (Positioned at top-0 -translate-y-1/2, z-30 so NOT clipped) */}
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#1A120B] border-2 border-[#F2C14E] p-1 flex items-center justify-center shadow-[0_0_18px_rgba(242,193,78,0.75)] overflow-hidden">
-                    <img
+                    <img loading="lazy" decoding="async" width={128} height={128}
                       src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-bao-vat-phat-giao.webp"
                       alt="Bảo Vật Triều Nguyễn"
                       className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.95)] scale-145 sm:scale-150 transform-gpu"

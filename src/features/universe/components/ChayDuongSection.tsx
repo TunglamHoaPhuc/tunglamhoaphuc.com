@@ -97,7 +97,7 @@ export const ChayDuongSection: FC = () => {
             <div>
               {/* Thumbnail Image */}
               <div className="relative w-full h-[220px] rounded-xl overflow-hidden mb-4 bg-[#140B05] border border-[#F2C14E]/20">
-                <img
+                <img loading="lazy" decoding="async" width={640} height={480}
                   src={art.imageUrl}
                   alt={art.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"

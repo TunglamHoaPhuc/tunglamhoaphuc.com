@@ -34,7 +34,7 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
           <div
             className="absolute inset-0 bg-cover bg-center opacity-25 blur-[2px] pointer-events-none scale-105"
             style={{
-              backgroundImage: `url('${topic.heroBanner || '/images/toan-canh-chua.jpg'}')`,
+              backgroundImage: `url('${topic.heroBanner || '/images/hero/toan-canh-chua-1280.webp'}')`,
               backgroundPosition: topic.heroBannerPosition || 'center 50%',
             }}
           />
@@ -89,7 +89,7 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
                       alt={topic.title}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                        (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1A120B]/80 via-transparent to-transparent pointer-events-none" />
@@ -211,7 +211,7 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
                         loading="lazy"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                          (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
                         }}
                       />
                     </div>

@@ -272,13 +272,13 @@ function CirclePortalCard({
       <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 rounded-full p-1 bg-gradient-to-b from-[#C8AA6E] via-[#8B4513] to-[#452D1D] shadow-[0_0_20px_rgba(200,170,110,0.25)] group-hover:shadow-[0_0_35px_rgba(255,222,89,0.55)] group-hover:from-[#FFDE59] group-hover:to-[#F2C14E] transition-all duration-500 ease-out">
         {/* Vòng đệm bên trong */}
         <div className="w-full h-full rounded-full overflow-hidden bg-[#160D07] relative border-2 border-black/80">
-          <img
+          <img width={640} height={480}
             src={getImageUrl(item.image)}
             alt={item.name}
             className="w-full h-full object-cover group-hover:scale-115 transition-transform duration-700 ease-out"
             loading="lazy"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+              (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
             }}
           />
 

@@ -116,6 +116,6 @@ test("thiếu ảnh thì dùng ảnh mặc định của chuyên trang; ngày �
 
 test("bài có chữ 'Pháp âm' dùng biểu tượng Pháp âm", () => {
 	const data = buildDharmaFeatured([post("a", "tri-tue-phat-phap", 1, { categoryName: "Pháp Âm" }), post("b", "tri-tue-phat-phap", 2)], []);
-	assert.equal(data.triTue.find((p) => p.id === "a")?.category1IconUrl, "/images/icons/icon-phap-am.webp");
-	assert.equal(data.triTue.find((p) => p.id === "b")?.category1IconUrl, "/images/icons/icon-tri-tue-phat-phap.webp");
+	assert.equal(data.triTue.find((p) => p.id === "a")?.category1IconUrl, "/images/icons/icon-phap-am-128.webp");
+	assert.equal(data.triTue.find((p) => p.id === "b")?.category1IconUrl, "/images/icons/icon-tri-tue-phat-phap-128.webp");
 });

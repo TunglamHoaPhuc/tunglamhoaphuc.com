@@ -18,7 +18,7 @@ interface PropsBaiVietNoiBat {
 }
 
 export function FeaturedPosts({ heroBanner, featuredArticle }: PropsBaiVietNoiBat) {
-  const bgImageSrc = getImageUrl(featuredArticle?.bgImage || heroBanner) || '/images/toan-canh-chua.jpg';
+  const bgImageSrc = getImageUrl(featuredArticle?.bgImage || heroBanner) || '/images/hero/toan-canh-chua-1280.webp';
 
   return (
     <section id="bai-viet-noibat" className="scroll-mt-24 py-12 relative w-full">
@@ -26,14 +26,14 @@ export function FeaturedPosts({ heroBanner, featuredArticle }: PropsBaiVietNoiBa
 
         {/* TỐI ƯU HÓA: Dùng thẻ img với fallback onError mượt mà, không bị crash nếu ảnh WordPress lỗi */}
         <div className="absolute inset-0 opacity-40 scale-105 transition-transform duration-1000 ease-out group-hover:scale-100">
-          <img
+          <img width={640} height={480}
             src={bgImageSrc}
             alt={featuredArticle?.title || 'Bài viết nổi bật'}
             className="w-full h-full object-cover transition-all duration-700"
             style={{ objectPosition: featuredArticle?.bgPosition || 'center' }}
             loading="lazy"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+              (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
             }}
           />
         </div>

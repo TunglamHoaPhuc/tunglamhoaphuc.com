@@ -51,7 +51,7 @@ export function SubNavbar({
 
   const logoSrc = logoUrl || (
     isHoangPhap
-      ? '/images/icons/icon-dong-chay-hoang-phap.webp'
+      ? '/images/icons/icon-dong-chay-hoang-phap-128.webp'
       : isUniverse
       ? '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-moc-an.webp'
       : '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/bieu-tuong-tong-chi-tu-hoc-tung-lam-hoa-phuc.webp'
@@ -84,10 +84,9 @@ export function SubNavbar({
           <div className="h-8 w-[1px] bg-gradient-to-b from-transparent via-[#c8aa6e]/60 to-transparent flex-shrink-0 my-auto" />
 
           <Link href={homeHref} title={homeTitle} className="flex items-center">
-            <img
+            <img width={128} height={128}
               src={logoSrc}
               alt={homeTitle}
-              loading="lazy"
               decoding="async"
               className="h-10 md:h-12 w-auto object-contain flex-shrink-0 my-auto drop-shadow-[0_0_8px_rgba(242,193,78,0.4)] hover:scale-105 transition-transform"
               onError={(e) => {

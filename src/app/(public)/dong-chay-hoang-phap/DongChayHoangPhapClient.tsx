@@ -94,7 +94,7 @@ export default function DongChayHoangPhapClient({ initial, categories }: { initi
   const headerBgImage = getImageUrl(
     featuredArticle?.bannerUrl ||
     featuredArticle?.thumbnailUrl ||
-    '/images/toan-canh-chua.jpg'
+    '/images/hero/toan-canh-chua-1280.webp'
   );
 
   return (
@@ -179,8 +179,8 @@ export default function DongChayHoangPhapClient({ initial, categories }: { initi
             <p className="text-center py-16 text-[#e3d2c1]/80">Danh mục này chưa có bài viết.</p>
           ) : (
             <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 transition-opacity duration-300 ${loading ? 'opacity-50' : ''}`}>
-              {data.items.map((art) => (
-                <PostCard key={art.id} post={mapArticleToPostItem(art, categories)} variant="golden" />
+              {data.items.map((art, index) => (
+                <PostCard key={art.id} post={mapArticleToPostItem(art, categories)} variant="golden" priority={index === 0} />
               ))}
             </div>
           )}
@@ -280,7 +280,7 @@ function mapArticleToPostItem(art: HoangPhapArticle, categories: DongChayCategor
 
   return {
     id: art.id,
-    imageUrl: art.thumbnailUrl || '/images/toan-canh-chua.jpg',
+    imageUrl: art.thumbnailUrl || '/images/hero/toan-canh-chua-1280.webp',
     category1: categoryName,
     category1IconUrl: categoryIconUrl,
     title: decodeHtmlEntities(art.title),

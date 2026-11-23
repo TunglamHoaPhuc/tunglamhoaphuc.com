@@ -124,7 +124,7 @@ export function BookCitationSection({ sourceBook }: BookCitationProps) {
               onClick={() => setSelectedBookForFlip(displayedList[0])}
               className="relative w-32 h-44 sm:w-36 sm:h-48 md:w-44 md:h-60 rounded-2xl overflow-hidden border-2 border-[#F2C14E]/50 shadow-2xl shrink-0 bg-black/40 group cursor-pointer"
             >
-              <img
+              <img width={300} height={400}
                 src={getImageUrl(displayedList[0].coverImage) || '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp'}
                 alt={displayedList[0].bookTitle}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -206,7 +206,7 @@ export function BookCitationSection({ sourceBook }: BookCitationProps) {
                     onClick={() => setSelectedBookForFlip(item)}
                     className="relative w-16 h-20 sm:w-20 sm:h-24 rounded-xl overflow-hidden border border-[#F2C14E]/35 shadow-md flex-shrink-0 bg-black/40 cursor-pointer"
                   >
-                    <img
+                    <img width={300} height={400}
                       src={getImageUrl(item.coverImage) || '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp'}
                       alt={item.bookTitle}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

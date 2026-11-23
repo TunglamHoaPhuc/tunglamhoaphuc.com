@@ -102,7 +102,7 @@ const ArticleDetailTemplate: FC<ArticleDetailTemplateProps> = ({
         className="relative overflow-hidden"
         style={{ height: 'clamp(300px, 55vh, 580px)' }}
       >
-        <img
+        <img width={640} height={480}
           src={getImageUrl(heroBannerUrl) || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp'}
           alt={title}
           className="absolute inset-0 w-full h-full object-cover"
@@ -307,7 +307,7 @@ const ArticleDetailTemplate: FC<ArticleDetailTemplateProps> = ({
                 >
                   {art.imgUrl && (
                     <div className="overflow-hidden" style={{ height: 140 }}>
-                      <img
+                      <img width={640} height={480}
                         src={getImageUrl(art.imgUrl)}
                         alt={art.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

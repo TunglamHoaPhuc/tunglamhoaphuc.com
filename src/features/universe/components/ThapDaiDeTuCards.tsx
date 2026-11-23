@@ -158,7 +158,7 @@ export const ThapDaiDeTuCards: FC = () => {
           >
             {/* Postcard Image with golden border */}
             <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-[#100702] border border-[#F2C14E]/20 mb-3">
-              <img
+              <img width={640} height={480}
                 src={item.imageUrl}
                 alt={item.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"

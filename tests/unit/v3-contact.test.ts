@@ -122,7 +122,6 @@ test("V3 tự có favicon, logo, biểu tượng và ảnh chia sẻ (không cò
 		"public/brand/favicon/apple-touch-icon.png",
 		"public/brand/favicon/icon-192x192.png",
 		"public/brand/favicon/icon-512x512.png",
-		"public/images/toan-canh-chua.jpg",
 		"public/images/hero/toan-canh-chua-1920.webp",
 		"public/images/hero/toan-canh-chua-1280.webp",
 		"public/images/hero/toan-canh-chua-doc-760.webp",
@@ -143,7 +142,13 @@ test("đầu trang và chân trang dùng logo của chính V3 (/brand), không d
 	for (const file of ["src/components/public/layout/Header.tsx", "src/components/public/layout/Footer.tsx"]) {
 		const code = readFileSync(file, "utf8");
 		assert.doesNotMatch(code, /backblazeb2/, file);
-		for (const [, src] of code.matchAll(/["'](\/brand\/[^"']+)["']/g)) assert.ok(existsSync(path.join("public", src)), `${file} dùng ${src}`);
+		// Một chuỗi có thể là srcSet ("/brand/a-200.webp 200w, /brand/a.webp 400w"): xét từng địa chỉ trong đó.
+		for (const [, list] of code.matchAll(/["'](\/brand\/[^"']+)["']/g)) {
+			for (const candidate of list.split(",")) {
+				const src = candidate.trim().split(/\s+/)[0];
+				assert.ok(existsSync(path.join("public", src)), `${file} dùng ${src}`);
+			}
+		}
 	}
 });
 

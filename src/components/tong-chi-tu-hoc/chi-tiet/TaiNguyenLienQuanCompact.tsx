@@ -69,7 +69,7 @@ export function TaiNguyenLienQuanCompact({
   const videoUrl = videoBlock?.videoUrl || '';
   const videoEmbed = formatYoutubeEmbed(videoUrl);
   const videoTitle = videoBlock?.title || '';
-  const videoThumb = getImageUrl(heroBanner) || '/images/toan-canh-chua.jpg';
+  const videoThumb = getImageUrl(heroBanner) || '/images/hero/toan-canh-chua-1280.webp';
 
   const previewPhotos = photoGallery.slice(0, 4);
 
@@ -102,7 +102,7 @@ export function TaiNguyenLienQuanCompact({
         <div className="rounded-2xl bg-gradient-to-b from-[#2A180E] to-[#1A0E07] border border-[#F2C14E]/35 hover:border-[#F2C14E] transition-all p-4 flex flex-col justify-between group shadow-lg hover:shadow-[0_8px_30px_rgba(242,193,78,0.18)]">
           <div>
             <div className="relative aspect-video rounded-xl overflow-hidden mb-3.5 border border-[#F2C14E]/30 bg-black/60 group-hover:border-[#F2C14E]/60 transition-colors">
-              <img
+              <img width={640} height={480}
                 src={videoThumb}
                 alt={videoTitle}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-85 group-hover:opacity-100"
@@ -168,7 +168,7 @@ export function TaiNguyenLienQuanCompact({
           <div>
             <div className="relative aspect-video rounded-xl overflow-hidden mb-3.5 border border-[#F2C14E]/30 bg-black/40 p-2 flex items-center justify-center group-hover:border-[#F2C14E]/60 transition-colors">
               <div className="h-full flex items-center justify-center gap-3">
-                <img
+                <img width={300} height={400}
                   src={getImageUrl(mainBook.coverImage) || '/images/sach-mau.jpg'}
                   alt={mainBook.bookTitle || mainBook.title || 'Sách tham khảo'}
                   className="h-full w-auto object-contain rounded-md shadow-md border border-[#F2C14E]/40 group-hover:scale-105 transition-transform"
@@ -232,8 +232,8 @@ export function TaiNguyenLienQuanCompact({
               {previewPhotos.length > 0 ? (
                 previewPhotos.map((p, idx) => (
                   <div key={idx} className="relative h-full overflow-hidden rounded">
-                    <img
-                      src={getImageUrl(p.imageUrl || p.url) || '/images/toan-canh-chua.jpg'}
+                    <img width={640} height={480}
+                      src={getImageUrl(p.imageUrl || p.url) || '/images/hero/toan-canh-chua-1280.webp'}
                       alt={p.title || `Ảnh tư liệu ${idx + 1}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"
@@ -242,7 +242,7 @@ export function TaiNguyenLienQuanCompact({
                 ))
               ) : (
                 <div className="col-span-2 flex items-center justify-center h-full">
-                  <img
+                  <img width={640} height={480}
                     src={videoThumb}
                     alt="Bộ sưu tập ảnh"
                     className="w-full h-full object-cover rounded"

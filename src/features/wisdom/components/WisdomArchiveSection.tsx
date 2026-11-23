@@ -243,7 +243,6 @@ export const WisdomArchiveSection: FC<{ items: WisdomItem[] }> = ({ items }) => 
       <div className="mt-16 w-full">
         <div className="relative overflow-hidden rounded-2xl border border-[#F2C14E]/40 bg-gradient-to-br from-[#2C1C11] via-[#1C130D] to-[#0F0A06] p-8 shadow-2xl">
           {/* Background decoration */}
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url("/images/tibetan-pattern.png")', backgroundSize: '200px' }} />
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#F2C14E]/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
 
           <div className="relative flex flex-col md:flex-row items-center gap-6">

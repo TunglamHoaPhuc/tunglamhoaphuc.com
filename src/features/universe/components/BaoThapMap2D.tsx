@@ -782,7 +782,7 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
                     alt={activeTab === 'mandala' ? selectedFloor.mandalaName : selectedFloor.statueName}
                     className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
                     onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                      (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
                     }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-3">

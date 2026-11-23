@@ -29,7 +29,7 @@ export interface DongChayPage {
 	sort: DongChaySort;
 }
 
-const FALLBACK_IMAGE = "/images/toan-canh-chua.jpg";
+const FALLBACK_IMAGE = "/images/hero/toan-canh-chua-1280.webp";
 
 function shortSummary(text: string): string {
 	return text.length > 200 ? `${text.slice(0, 200).trimEnd()}…` : text;

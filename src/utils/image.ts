@@ -1,4 +1,4 @@
-import { imageAt, mediaUrl } from '@/lib/tlhp-content/media';
+import { IMAGE_DELIVERY, imageAt, mediaUrl, type ImageDelivery } from '@/lib/tlhp-content/media';
 
 // Mọi ảnh của site nằm trên Cloudflare: tệp tĩnh trong public/ (/images, /brand) và ảnh trong R2 qua /anh-goc/<bucket>/<khóa>.
 // Không còn địa chỉ B2 hay WordPress nào ở đây (kiểm kê ảnh 23/11/2026).
@@ -84,11 +84,13 @@ export function getOptimizedNextImageUrl(
 const WWW_ANH_GOC = 'https://www.tunglamhoaphuc.com/anh-goc/';
 
 /**
- * Ảnh thu nhỏ theo bề rộng hiển thị, qua image transformations của Cloudflare trên zone này
- * (AVIF/WebP, chất lượng 75). Ảnh gốc trên B2 / WordPress / kho R2 của www đi qua /anh-goc/ của v3.
- * Ảnh khác (đường dẫn tĩnh /images, host lạ) giữ nguyên.
+ * Ảnh thu nhỏ theo bề rộng hiển thị. Cách giao theo công tắc IMAGE_DELIVERY của media.ts:
+ *  - 'cgi' (mặc định): image transformations của Cloudflare trên zone này (AVIF/WebP, chất lượng 75), /cdn-cgi/image/width=…/anh-goc/…;
+ *  - 'variants': biến thể dựng sẵn trong R2, /anh-goc/<bucket>/<khóa>@<bậc chiều rộng> (route chọn AVIF/WebP theo Accept).
+ * Ảnh gốc trên B2 / WordPress / kho R2 của www đi qua /anh-goc/ của v3. Ảnh khác (đường dẫn tĩnh /images, host lạ) giữ nguyên.
+ * `delivery` chỉ để kiểm thử hai chế độ; nơi gọi không truyền.
  */
-export function fitImage(url: string | null | undefined, width: number): string {
+export function fitImage(url: string | null | undefined, width: number, delivery: ImageDelivery = IMAGE_DELIVERY): string {
   if (!url) return '';
   let src = url.trim();
   if (src.startsWith(WWW_ANH_GOC)) src = src.slice('https://www.tunglamhoaphuc.com'.length);
@@ -98,5 +100,5 @@ export function fitImage(url: string | null | undefined, width: number): string 
     if (!local || !local.startsWith('/anh-goc/')) return src;
     src = local;
   }
-  return imageAt(src, width);
+  return imageAt(src, width, delivery);
 }

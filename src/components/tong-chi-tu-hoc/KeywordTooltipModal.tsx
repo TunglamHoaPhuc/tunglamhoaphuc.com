@@ -64,12 +64,12 @@ export const KeywordTooltipModal: FC<KeywordTooltipModalProps> = ({ popup, onClo
         {/* ── Ảnh minh họa ── */}
         {popup.imageUrl && (
           <div className="relative overflow-hidden w-full" style={{ height: 210 }}>
-            <img
+            <img width={640} height={480}
               src={getImageUrl(popup.imageUrl)}
               alt={popup.title}
               className="w-full h-full object-cover"
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
               }}
             />
             {/* Overlay gradient */}

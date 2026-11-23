@@ -19,7 +19,7 @@ const BookCard = React.memo(({ book, onSelect }: BookCardProps) => {
     >
       {/* 1. BOOK COVER IMAGE FRAME */}
       <div className="relative w-full h-[260px] overflow-hidden bg-[#1A120B] shrink-0 flex items-center justify-center p-3">
-        <img
+        <img width={300} height={400}
           src={book.coverUrl}
           alt={book.title}
           loading="lazy"

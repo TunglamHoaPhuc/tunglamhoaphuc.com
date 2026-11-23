@@ -43,8 +43,6 @@ const PENDING_DECISION: { file: string; urlStart: string; reason: string }[] = [
  * hoặc R2 rồi dùng /anh-goc/. */
 const KNOWN_MISSING_STATIC_IMAGES = new Set([
 	"/images/sach-mau.jpg",
-	"/images/lotus-pattern.png",
-	"/images/tibetan-pattern.png",
 	"/images/vu-tru-phat-giao/to-duong/to-duong-banner.jpg",
 	"/images/bao_tuong_phat_giao/linh_vat_phat_giao/cac_an_rong_trieu_dai_nha_nguyen_viet_nam.jpg",
 	"/images/bao_tuong_phat_giao/thanh_tinh_dai_hai_chung/BO_TAT_NHAT_NGUYET_QUANG/nhat_nguyet_quang_bo_tat.JPG",

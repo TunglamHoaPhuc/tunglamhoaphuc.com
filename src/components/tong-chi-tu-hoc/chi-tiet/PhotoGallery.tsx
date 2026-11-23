@@ -201,7 +201,7 @@ export function PhotoGallery({
       {/* ── LƯỚI ADAPTIVE BENTO BOX ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 w-full auto-rows-[minmax(180px,auto)]">
         {visibleItems.map((item, idx) => {
-          const rawSrc = getImageUrl(item.imageUrl || item.url) || '/images/toan-canh-chua.jpg';
+          const rawSrc = getImageUrl(item.imageUrl || item.url) || '/images/hero/toan-canh-chua-1280.webp';
           const directHighRes = getHighResImageUrl(item.imageUrl || item.url) || rawSrc;
           // Lưới Bento dùng ảnh WebP tối ưu qua GPU/SIMD Sharp (1080px, nén chỉ ~70-120KB)
           const previewSrc = getOptimizedNextImageUrl(item.imageUrl || item.url, 1080, 75) || directHighRes;
@@ -218,7 +218,7 @@ export function PhotoGallery({
               className={`group relative ${spanClass} rounded-2xl overflow-hidden border border-[#f2c14e]/35 hover:border-[#ffde59] shadow-xl hover:shadow-[0_0_20px_rgba(255,222,89,0.25)] cursor-pointer bg-[#1C120A] transition-all duration-500`}
             >
               {/* Hình ảnh tối ưu hóa WebP siêu nét và nhẹ */}
-              <img
+              <img width={640} height={480}
                 src={previewSrc}
                 alt={titleText || captionText || `Ảnh tư liệu ${idx + 1}`}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
@@ -231,7 +231,7 @@ export function PhotoGallery({
                   } else if (target.src !== rawSrc && rawSrc) {
                     target.src = rawSrc;
                   } else {
-                    target.src = '/images/toan-canh-chua.jpg';
+                    target.src = '/images/hero/toan-canh-chua-1280.webp';
                   }
                 }}
               />

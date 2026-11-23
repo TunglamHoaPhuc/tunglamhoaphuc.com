@@ -46,7 +46,7 @@
       "primaryColor": "#8B3A1C",
       "secondaryColor": "#F2C14E",
       "themeBg": "#2A170F",
-      "quoteImg": "/images/lich-tu-hoc/quotes/thang-01-quy-y-tam-bao.png"
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-01-quy-y-tam-bao.webp"
     },
     "1": {
       "month": 2,
@@ -67,7 +67,7 @@
       "primaryColor": "#1E4B3E",
       "secondaryColor": "#FFDE59",
       "themeBg": "#122620",
-      "quoteImg": "/images/lich-tu-hoc/quotes/thang-02-tu-hoc-phat-phap.jpg"
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-02-tu-hoc-phat-phap.webp"
     },
     "2": {
       "month": 3,
@@ -81,7 +81,7 @@
       "primaryColor": "#6B2D5C",
       "secondaryColor": "#FFE5A3",
       "themeBg": "#261121",
-      "quoteImg": "/images/lich-tu-hoc/quotes/thang-03-dung-bo-cuoc.jpg"
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-03-dung-bo-cuoc.webp"
     },
     "3": {
       "month": 4,
@@ -103,7 +103,7 @@
       "primaryColor": "#B45309",
       "secondaryColor": "#F2C14E",
       "themeBg": "#2E1A08",
-      "quoteImg": "/images/lich-tu-hoc/quotes/thang-04-tich-cuc-nang-cao.jpg"
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-04-tich-cuc-nang-cao.webp"
     },
     "4": {
       "month": 5,
@@ -124,7 +124,7 @@
       "primaryColor": "#854D0E",
       "secondaryColor": "#FFDE59",
       "themeBg": "#261504",
-      "quoteImg": "/images/lich-tu-hoc/quotes/thang-05-tu-tap-khiem-ha.jpg"
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-05-tu-tap-khiem-ha.webp"
     },
     "5": {
       "month": 6,
@@ -141,7 +141,7 @@
       "primaryColor": "#0F5132",
       "secondaryColor": "#FFE5A3",
       "themeBg": "#082115",
-      "quoteImg": "/images/lich-tu-hoc/quotes/thang-06-tinh-thuong-phung-su.jpg"
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-06-tinh-thuong-phung-su.webp"
     },
     "6": {
       "month": 7,
@@ -155,7 +155,7 @@
       "primaryColor": "#991B1B",
       "secondaryColor": "#FFDE59",
       "themeBg": "#2A0A0A",
-      "quoteImg": "/images/lich-tu-hoc/quotes/thang-07-biet-minh-biet-ta.jpg"
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-07-biet-minh-biet-ta.webp"
     },
     "7": {
       "month": 8,
@@ -168,7 +168,7 @@
       "primaryColor": "#7C2D12",
       "secondaryColor": "#F2C14E",
       "themeBg": "#240E06",
-      "quoteImg": "/images/lich-tu-hoc/quotes/thang-08-ve-ben-thay.jpg"
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-08-ve-ben-thay.webp"
     },
     "8": {
       "month": 9,
@@ -181,7 +181,7 @@
       "primaryColor": "#1E3A8A",
       "secondaryColor": "#FFDE59",
       "themeBg": "#0B1533",
-      "quoteImg": "/images/lich-tu-hoc/quotes/thang-09-nhan-moi-la-suc-manh.jpg"
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-09-nhan-moi-la-suc-manh.webp"
     },
     "9": {
       "month": 10,
@@ -194,7 +194,7 @@
       "primaryColor": "#8B3A1C",
       "secondaryColor": "#F2C14E",
       "themeBg": "#2A170F",
-      "quoteImg": "/images/lich-tu-hoc/quotes/thang-10-tim-ve-yen-lang.jpg"
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-10-tim-ve-yen-lang.webp"
     },
     "10": {
       "month": 11,
@@ -214,7 +214,7 @@
       "primaryColor": "#9A3412",
       "secondaryColor": "#F2C14E",
       "themeBg": "#2B0F05",
-      "quoteImg": "/images/lich-tu-hoc/quotes/thang-11-ve-ben-thay.jpg"
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-11-ve-ben-thay.webp"
     },
     "11": {
       "month": 12,
@@ -227,7 +227,7 @@
       "primaryColor": "#78350F",
       "secondaryColor": "#FFDE59",
       "themeBg": "#210E04",
-      "quoteImg": "/images/lich-tu-hoc/quotes/thang-12-kho-dau-la-chat-lieu.jpg"
+      "quoteImg": "/images/lich-tu-hoc/quotes/thang-12-kho-dau-la-chat-lieu.webp"
     }
   },
   "customEvents": [
@@ -464,62 +464,62 @@
   "quoteGallery": [
     {
       "id": "quote-1",
-      "url": "/images/lich-tu-hoc/quotes/thang-01-quy-y-tam-bao.png",
+      "url": "/images/lich-tu-hoc/quotes/thang-01-quy-y-tam-bao.webp",
       "title": "Quy y Tam Bảo - Nguồn cội tâm linh"
     },
     {
       "id": "quote-2",
-      "url": "/images/lich-tu-hoc/quotes/thang-02-tu-hoc-phat-phap.jpg",
+      "url": "/images/lich-tu-hoc/quotes/thang-02-tu-hoc-phat-phap.webp",
       "title": "Tu học Phật Pháp - Lòng biết ơn"
     },
     {
       "id": "quote-3",
-      "url": "/images/lich-tu-hoc/quotes/thang-03-dung-bo-cuoc.jpg",
+      "url": "/images/lich-tu-hoc/quotes/thang-03-dung-bo-cuoc.webp",
       "title": "Đừng bỏ cuộc - Thử thách tạo sức mạnh"
     },
     {
       "id": "quote-4",
-      "url": "/images/lich-tu-hoc/quotes/thang-04-tich-cuc-nang-cao.jpg",
+      "url": "/images/lich-tu-hoc/quotes/thang-04-tich-cuc-nang-cao.webp",
       "title": "Tích cực nâng cao - Trở về cội nguồn"
     },
     {
       "id": "quote-5",
-      "url": "/images/lich-tu-hoc/quotes/thang-05-tu-tap-khiem-ha.jpg",
+      "url": "/images/lich-tu-hoc/quotes/thang-05-tu-tap-khiem-ha.webp",
       "title": "Tu tập khiêm hạ - Phật về nắng đẹp"
     },
     {
       "id": "quote-6",
-      "url": "/images/lich-tu-hoc/quotes/thang-06-tinh-thuong-phung-su.jpg",
+      "url": "/images/lich-tu-hoc/quotes/thang-06-tinh-thuong-phung-su.webp",
       "title": "Tình thương phụng sự - Ươm mầm sen Việt"
     },
     {
       "id": "quote-7",
-      "url": "/images/lich-tu-hoc/quotes/thang-07-biet-minh-biet-ta.jpg",
+      "url": "/images/lich-tu-hoc/quotes/thang-07-biet-minh-biet-ta.webp",
       "title": "Biết mình biết ta - Đền ơn đáp nghĩa"
     },
     {
       "id": "quote-8",
-      "url": "/images/lich-tu-hoc/quotes/thang-08-ve-ben-thay.jpg",
+      "url": "/images/lich-tu-hoc/quotes/thang-08-ve-ben-thay.webp",
       "title": "Về bên Thầy tìm thấy bình an"
     },
     {
       "id": "quote-9",
-      "url": "/images/lich-tu-hoc/quotes/thang-09-nhan-moi-la-suc-manh.jpg",
+      "url": "/images/lich-tu-hoc/quotes/thang-09-nhan-moi-la-suc-manh.webp",
       "title": "Nhẫn mới là sức mạnh"
     },
     {
       "id": "quote-10",
-      "url": "/images/lich-tu-hoc/quotes/thang-10-tim-ve-yen-lang.jpg",
+      "url": "/images/lich-tu-hoc/quotes/thang-10-tim-ve-yen-lang.webp",
       "title": "Tìm về yên lặng - Học hạnh buông xả"
     },
     {
       "id": "quote-11",
-      "url": "/images/lich-tu-hoc/quotes/thang-11-ve-ben-thay.jpg",
+      "url": "/images/lich-tu-hoc/quotes/thang-11-ve-ben-thay.webp",
       "title": "Ân đức Tổ Thầy - Hoằng Pháp Kiến An"
     },
     {
       "id": "quote-12",
-      "url": "/images/lich-tu-hoc/quotes/thang-12-kho-dau-la-chat-lieu.jpg",
+      "url": "/images/lich-tu-hoc/quotes/thang-12-kho-dau-la-chat-lieu.webp",
       "title": "Khổ đau là chất liệu"
     }
   ]

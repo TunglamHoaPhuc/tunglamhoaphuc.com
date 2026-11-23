@@ -125,7 +125,7 @@ export const ArtisticStatueSection: FC<ArtisticStatueSectionProps> = ({
             alt="Toàn cảnh chùa"
             className="w-full h-full object-cover opacity-12 sm:opacity-15 filter blur-[2px] scale-105"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+              (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
             }}
           />
           <div className="absolute inset-0 bg-[#2C1C11]/35" />

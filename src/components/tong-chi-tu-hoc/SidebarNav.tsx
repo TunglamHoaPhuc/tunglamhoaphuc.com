@@ -52,7 +52,7 @@ export function SidebarNav({
 
   const logoSrc = logoUrl || (
     isHoangPhap
-      ? '/images/icons/icon-dong-chay-hoang-phap.webp'
+      ? '/images/icons/icon-dong-chay-hoang-phap-128.webp'
       : isUniverse
       ? '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-moc-an.webp'
       : '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/bieu-tuong-tong-chi-tu-hoc-tung-lam-hoa-phuc.webp'
@@ -85,10 +85,9 @@ export function SidebarNav({
           title={homeTitle}
           className="group flex flex-col items-center hover:scale-110 transition-transform cursor-pointer"
         >
-          <img
+          <img width={128} height={128}
             src={logoSrc}
             alt={homeTitle}
-            loading="lazy"
             decoding="async"
             className="h-8 w-auto object-contain mb-2 flex-shrink-0 drop-shadow-[0_0_6px_rgba(255,222,89,0.4)] group-hover:drop-shadow-[0_0_12px_rgba(255,222,89,0.9)] transition-all"
             onError={(e) => {

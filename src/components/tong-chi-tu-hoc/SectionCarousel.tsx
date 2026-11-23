@@ -128,7 +128,7 @@ export function SectionCarousel({ section, dynamicBgImage }: SectionCarouselProp
               className="group relative flex-none w-[280px] md:w-[310px] h-[380px] rounded-xl overflow-hidden cursor-pointer border border-[#593b26] hover:border-[#f2cc8f] transition-all duration-300 ease-out hover:shadow-[0_0_30px_rgba(242,204,143,0.4)] hover:-translate-y-1.5 snap-start block transform-gpu"
             >
               <Image
-                src={getImageUrl(card.imageUrl) || '/images/toan-canh-chua.jpg'}
+                src={getImageUrl(card.imageUrl) || '/images/hero/toan-canh-chua-1280.webp'}
                 alt={card.title}
                 fill
                 loading="lazy"

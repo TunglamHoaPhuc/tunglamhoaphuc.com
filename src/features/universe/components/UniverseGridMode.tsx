@@ -63,7 +63,7 @@ const UniverseAreaCard = React.memo(({ area }: UniverseAreaCardProps) => {
     >
       {/* 1. THUMBNAIL IMAGE FRAME (aspect-[1.618/1] Golden Ratio) */}
       <div className="relative w-full aspect-[1.618/1] overflow-hidden bg-[#1A120B] shrink-0">
-        <img
+        <img width={640} height={480}
           src={area.imgUrl}
           alt={area.name}
           loading="lazy"

@@ -83,11 +83,11 @@ export function calcDaysDifference(startStr: string, endStr: string): number {
 }
 
 export function getEventCategoryIcon(category?: string): string {
-  if (category === 'Cộng Tu') return '/images/icons/icon-cong-tu.png';
-  if (category === 'Khóa Lễ Truyền Thống') return '/images/icons/icon-khoa-le-truyen-thong.png';
-  if (category === 'Đại Lễ Sự Kiện') return '/images/icons/icon-dai-le-su-kien.png';
-  if (category === 'Tịnh Độ Nhân Gian') return '/images/icons/icon-tinh-do-nhan-gian.png';
-  return '/images/icons/icon-dai-le-su-kien.png';
+  if (category === 'Cộng Tu') return '/images/icons/icon-cong-tu-128.webp';
+  if (category === 'Khóa Lễ Truyền Thống') return '/images/icons/icon-khoa-le-truyen-thong-128.webp';
+  if (category === 'Đại Lễ Sự Kiện') return '/images/icons/icon-dai-le-su-kien-128.webp';
+  if (category === 'Tịnh Độ Nhân Gian') return '/images/icons/icon-tinh-do-nhan-gian-128.webp';
+  return '/images/icons/icon-dai-le-su-kien-128.webp';
 }
 
 export function splitEventTitle(rawTitle: string): { title: string; subtitle: string } {
@@ -132,7 +132,7 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#8B3A1C",
     "secondaryColor": "#F2C14E",
     "themeBg": "#2A170F",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-01-quy-y-tam-bao.png"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-01-quy-y-tam-bao.webp"
   },
   1: {
     "month": 2,
@@ -152,7 +152,7 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#1E4B3E",
     "secondaryColor": "#FFDE59",
     "themeBg": "#122620",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-02-tu-hoc-phat-phap.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-02-tu-hoc-phat-phap.webp"
   },
   2: {
     "month": 3,
@@ -169,7 +169,7 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#6B2D5C",
     "secondaryColor": "#FFE5A3",
     "themeBg": "#261121",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-03-dung-bo-cuoc.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-03-dung-bo-cuoc.webp"
   },
   3: {
     "month": 4,
@@ -191,7 +191,7 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#B45309",
     "secondaryColor": "#F2C14E",
     "themeBg": "#2E1A08",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-04-tich-cuc-nang-cao.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-04-tich-cuc-nang-cao.webp"
   },
   4: {
     "month": 5,
@@ -212,7 +212,7 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#854D0E",
     "secondaryColor": "#FFDE59",
     "themeBg": "#261504",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-05-tu-tap-khiem-ha.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-05-tu-tap-khiem-ha.webp"
   },
   5: {
     "month": 6,
@@ -229,7 +229,7 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#0F5132",
     "secondaryColor": "#FFE5A3",
     "themeBg": "#082115",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-06-tinh-thuong-phung-su.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-06-tinh-thuong-phung-su.webp"
   },
   6: {
     "month": 7,
@@ -243,7 +243,7 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#991B1B",
     "secondaryColor": "#FFDE59",
     "themeBg": "#2A0A0A",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-07-biet-minh-biet-ta.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-07-biet-minh-biet-ta.webp"
   },
   7: {
     "month": 8,
@@ -259,7 +259,7 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#7C2D12",
     "secondaryColor": "#F2C14E",
     "themeBg": "#240E06",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-08-ve-ben-thay.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-08-ve-ben-thay.webp"
   },
   8: {
     "month": 9,
@@ -276,7 +276,7 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#1E3A8A",
     "secondaryColor": "#FFDE59",
     "themeBg": "#0B1533",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-09-nhan-moi-la-suc-manh.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-09-nhan-moi-la-suc-manh.webp"
   },
   9: {
     "month": 10,
@@ -292,7 +292,7 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#8B3A1C",
     "secondaryColor": "#F2C14E",
     "themeBg": "#2A170F",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-10-tim-ve-yen-lang.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-10-tim-ve-yen-lang.webp"
   },
   10: {
     "month": 11,
@@ -312,7 +312,7 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#9A3412",
     "secondaryColor": "#F2C14E",
     "themeBg": "#2B0F05",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-11-ve-ben-thay.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-11-ve-ben-thay.webp"
   },
   11: {
     "month": 12,
@@ -327,7 +327,7 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#78350F",
     "secondaryColor": "#FFDE59",
     "themeBg": "#210E04",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-12-kho-dau-la-chat-lieu.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-12-kho-dau-la-chat-lieu.webp"
   }
 };
 

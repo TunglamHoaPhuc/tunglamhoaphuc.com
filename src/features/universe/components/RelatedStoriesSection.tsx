@@ -61,7 +61,7 @@ const StoryCard = React.memo(({ story, isPlaying, onPlay }: StoryCardProps) => {
               className="relative w-full h-full cursor-pointer"
               onClick={() => onPlay(story.id)}
             >
-              <img
+              <img width={640} height={480}
                 src={story.thumbnailUrl}
                 alt={story.title}
                 loading="lazy"

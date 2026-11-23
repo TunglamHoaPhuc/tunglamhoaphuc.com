@@ -108,12 +108,12 @@ export const SpaceGallerySection: FC<SpaceGallerySectionProps> = ({
       >
         {/* ── NỀN SECTION: DÙNG ẢNH TRIỂN LÃM SƯ TỔ NGỘ CHÂN TỬ VỚI LỚP PHỦ NÂU VÀNG THIỀN MÔN ── */}
         <div className="absolute top-10 sm:top-14 inset-x-0 h-[460px] sm:h-[540px] z-0 pointer-events-none overflow-hidden">
-          <img
+          <img width={640} height={480}
             src={isBaoTang ? BAO_TANG_BACKGROUND_IMAGE : '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp'}
             alt="Không gian bảo tàng"
             className="w-full h-full object-cover opacity-15 sm:opacity-20 filter blur-[2px] scale-105"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+              (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
             }}
           />
           <div className="absolute inset-0 bg-[#2C1C11]/45" />
@@ -134,7 +134,7 @@ export const SpaceGallerySection: FC<SpaceGallerySectionProps> = ({
               className="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center"
               aria-hidden="true"
             >
-              <img
+              <img width={128} height={128}
                 src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
                 alt=""
                 className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
@@ -286,7 +286,7 @@ const SpaceBentoCard: FC<SpaceBentoCardProps> = ({ item, idx, openLightbox }) =>
       className="group relative overflow-hidden cursor-pointer rounded-2xl border border-[#f2c14e]/35 hover:border-[#ffde59] transition-all duration-500 shadow-xl bg-[#1c120b] w-full h-full"
     >
       {/* 1. Base Image */}
-      <img
+      <img width={640} height={480}
         src={item.imgUrl}
         alt={itemTitle}
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
@@ -514,7 +514,7 @@ const SpaceGalleryModal: FC<SpaceGalleryModalProps> = ({
               }}
               className="max-h-full max-w-full object-contain rounded-lg filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                (e.target as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
               }}
             />
           </div>

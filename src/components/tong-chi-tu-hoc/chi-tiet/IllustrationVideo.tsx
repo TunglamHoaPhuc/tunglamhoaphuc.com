@@ -43,7 +43,7 @@ function formatYoutubeEmbed(url?: string): string {
 
 export function IllustrationVideo({ heroBanner, videoBlock }: PropsKhoiVideo) {
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
-  const thumbnailSrc = getImageUrl(heroBanner) || '/images/toan-canh-chua.jpg';
+  const thumbnailSrc = getImageUrl(heroBanner) || '/images/hero/toan-canh-chua-1280.webp';
 
   return (
     <section id="video-minh-hoa" className="scroll-mt-24 pt-8 pb-4 w-full relative">
@@ -89,13 +89,13 @@ export function IllustrationVideo({ heroBanner, videoBlock }: PropsKhoiVideo) {
               />
             ) : (
               <div className="relative w-full h-full cursor-pointer">
-                <img
+                <img width={640} height={480}
                   src={thumbnailSrc}
                   alt="Video Thumbnail"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
                   onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                    (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
                   }}
                 />
 

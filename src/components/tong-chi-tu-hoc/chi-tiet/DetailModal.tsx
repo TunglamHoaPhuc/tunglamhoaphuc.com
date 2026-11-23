@@ -67,13 +67,13 @@ export function DetailModal({
             <div className="flex items-center gap-4 sm:gap-5 pr-6 pt-1">
               {activeKeywordPopup.imageUrl && (
                 <div className="relative w-24 sm:w-28 h-24 sm:h-28 flex-shrink-0 rounded-2xl overflow-hidden border border-[#F2C14E]/60 shadow-[0_0_20px_rgba(242,193,78,0.2)] bg-black">
-                  <img
+                  <img width={640} height={480}
                     src={getImageUrl(activeKeywordPopup.imageUrl)}
                     alt={activeKeywordPopup.title}
                     style={{ objectPosition: activeKeywordPopup.imagePosition || 'center 50%' }}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                      (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
                     }}
                   />
                 </div>

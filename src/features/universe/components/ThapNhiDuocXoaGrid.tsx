@@ -15,7 +15,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
         {/* SECTION HEADER: ICON & TIÊU ĐỀ */}
         <div className="flex flex-col items-center text-center mb-10">
           <div className="w-16 h-16 sm:w-20 sm:h-20 mb-3 flex items-center justify-center" aria-hidden="true">
-            <img
+            <img loading="lazy" decoding="async" width={128} height={128}
               src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
               alt="Thập Nhị Dược Xoa"
               className="w-full h-full object-contain filter drop-shadow-[0_0_18px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
@@ -60,7 +60,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
             >
               {/* FULL BLEED STATUE IMAGE (NO INITIAL TEXT) */}
               <div className="relative w-full h-full bg-[#1A120B] overflow-hidden">
-                <img
+                <img loading="lazy" decoding="async" width={640} height={480}
                   src={item.imgUrl}
                   alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"

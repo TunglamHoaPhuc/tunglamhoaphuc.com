@@ -132,14 +132,14 @@ export function DiscoverMore({ relatedArticles }: PropsTimHieuThem) {
               >
                 {/* Ảnh bìa */}
                 <div className="w-full h-full relative">
-                  <img
-                    src={getImageUrl(item.url) || '/images/toan-canh-chua.jpg'}
+                  <img width={640} height={480}
+                    src={getImageUrl(item.url) || '/images/hero/toan-canh-chua-1280.webp'}
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                     style={{ objectPosition: (item as any).thumbnailPosition || (item as any).imagePosition || 'center 20%' }}
                     loading="lazy"
                     onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                      (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
                     }}
                   />
                 </div>

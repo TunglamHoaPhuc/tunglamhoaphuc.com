@@ -76,12 +76,20 @@ const Header: FC<HeaderProps> = ({ scrolled }) => {
           className="relative z-50 shrink-0 -mb-10 md:-mb-16 overflow-visible cursor-pointer group"
           title="Tùng Lâm Hòa Phúc"
         >
+          {/* Ảnh trên nếp gấp nên không lazy. Hai bản 200/400 px: khung cao 96/128/144 px (rộng 129/172/194 px), màn thường lấy 200, màn DPR 2 lấy 400. */}
           <img
             src="/brand/logo-moc-an.webp"
+            srcSet="/brand/logo-moc-an-200.webp 200w, /brand/logo-moc-an.webp 400w"
+            sizes="(min-width: 1024px) 194px, (min-width: 768px) 172px, 129px"
+            width={400}
+            height={297}
+            decoding="async"
             alt="Logo Mộc Ấn Tùng Lâm Hòa Phúc"
             className="h-24 md:h-32 lg:h-36 w-auto object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.7)] transition-transform duration-300 group-hover:scale-105"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/brand/logo-tung-lam-hoa-phuc-tron.webp';
+              const img = e.currentTarget as HTMLImageElement;
+              img.removeAttribute('srcset');
+              img.src = '/brand/logo-tung-lam-hoa-phuc-tron-192.webp';
             }}
           />
         </Link>

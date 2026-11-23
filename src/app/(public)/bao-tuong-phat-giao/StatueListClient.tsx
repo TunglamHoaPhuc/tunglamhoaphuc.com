@@ -291,15 +291,15 @@ function StatueSection({ title, note, count, statues }: { title: string; note?: 
 function StatueGrid({ statues }: { statues: StatueItem[] }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {statues.map((st) => (
-        <StatueItemCard key={st.id} statue={st} />
+      {statues.map((st, index) => (
+        <StatueItemCard key={st.id} statue={st} priority={index === 0} />
       ))}
     </div>
   );
 }
 
 // ── Item Card Component Đồng Bộ Tam Bảo Chuẩn Tỷ Lệ & Hover ──
-function StatueItemCard({ statue }: { statue: StatueItem }) {
+function StatueItemCard({ statue, priority = false }: { statue: StatueItem; priority?: boolean }) {
   const displayArea = statue.areaName ? formatAreaTitleCase(statue.areaName) : 'Tùng Lâm Hòa Phúc';
 
   return (
@@ -309,10 +309,11 @@ function StatueItemCard({ statue }: { statue: StatueItem }) {
     >
       {/* 1. KHUNG ẢNH THUMBNAIL (Focus [center 28%] rõ mặt tượng) */}
       <div className="relative w-full h-[330px] overflow-hidden bg-[#1A120B] shrink-0">
-        <img
+        <img width={640} height={480}
           src={statue.imgUrl}
           alt={statue.name}
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : undefined}
           decoding="async"
           className="w-full h-full object-cover object-[center_28%] group-hover:scale-105 transition-transform duration-700 transform-gpu"
           style={{
@@ -322,7 +323,7 @@ function StatueItemCard({ statue }: { statue: StatueItem }) {
             transformOrigin: 'center center',
           }}
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+            (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
           }}
         />
         <div
@@ -342,7 +343,7 @@ function StatueItemCard({ statue }: { statue: StatueItem }) {
         <div className="relative w-full bg-gradient-to-b from-[#25170E] to-[#1C130D] px-3 pt-5 pb-3.5 text-center flex flex-col items-center justify-start">
           {/* LOGO BADGE CĂN GIỮA */}
           <div className="absolute top-[-24px] left-1/2 -translate-x-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#F2C14E] bg-[#25170E] flex items-center justify-center p-1 shadow-[0_0_18px_rgba(242,193,78,0.75)] overflow-hidden">
-            <img
+            <img width={128} height={128}
               src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
               alt="Logo Bảo tượng"
               loading="lazy"

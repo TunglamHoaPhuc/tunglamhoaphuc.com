@@ -31,7 +31,7 @@ const StatueCard = React.memo(({ statue }: StatueCardProps) => {
     >
       {/* 1. KHUNG ẢNH THUMBNAIL (H-[330PX] LAZY & ASYNC DECODING) */}
       <div className="relative w-full h-[330px] overflow-hidden bg-[#1A120B] shrink-0">
-        <img
+        <img width={640} height={480}
           src={statue.imgUrl}
           alt={statue.name}
           loading="lazy"
@@ -45,7 +45,7 @@ const StatueCard = React.memo(({ statue }: StatueCardProps) => {
             transformOrigin: 'center center',
           }}
           onError={(e) => {
-            (e.target as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+            (e.target as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
           }}
         />
 
@@ -66,7 +66,7 @@ const StatueCard = React.memo(({ statue }: StatueCardProps) => {
         <div className="relative w-full bg-gradient-to-b from-[#25170E] to-[#1C130D] px-3 pt-5 pb-3.5 text-center flex flex-col items-center justify-start">
           {/* LOGO BADGE CĂN GIỮA */}
           <div className="absolute top-[-24px] left-1/2 -translate-x-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#F2C14E] bg-[#25170E] flex items-center justify-center p-1 shadow-[0_0_18px_rgba(242,193,78,0.75)] overflow-hidden">
-            <img
+            <img width={128} height={128}
               src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
               alt="Logo Bảo tượng"
               loading="lazy"
@@ -142,13 +142,13 @@ export const StatueCollectionGrid: FC<StatueCollectionGridProps> = ({
     <div className="w-full py-16 my-8 relative overflow-hidden bg-[#2C1C11]">
       {/* ── 1. BACKGROUND HÒA TRỘN TỰ NHIÊN ── */}
       <div className="absolute top-0 inset-x-0 h-[850px] pointer-events-none select-none z-0 overflow-hidden bg-[#2C1C11]">
-        <img
+        <img width={640} height={480}
           src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp"
           alt="Background Tam Bảo"
           loading="lazy"
           decoding="async"
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+            (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
           }}
           className="w-full h-full object-cover opacity-48 mix-blend-overlay filter brightness-95"
           style={{
@@ -166,7 +166,7 @@ export const StatueCollectionGrid: FC<StatueCollectionGridProps> = ({
         {/* ── 2. SECTION HEADER: ICON & 2 ĐƯỜNG KẺ HAI BÊN ── */}
         <div className="flex flex-col items-center text-center mb-12">
           <div className="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center" aria-hidden="true">
-            <img
+            <img width={128} height={128}
               src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
               alt="Biểu Tượng Tượng Pháp"
               className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(242,193,78,0.95)] scale-135 transform-gpu"

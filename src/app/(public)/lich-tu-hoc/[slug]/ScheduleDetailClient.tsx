@@ -296,7 +296,7 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
                   <div className="space-y-2.5">
                     {/* Ảnh Thumbnail */}
                     <div className="relative w-full h-36 rounded-xl overflow-hidden bg-black/40 border border-[#F2C14E]/20">
-                      <img
+                      <img loading="lazy" decoding="async" width={640} height={480}
                         src={art.thumbnailUrl || art.bannerUrl}
                         alt={art.title}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

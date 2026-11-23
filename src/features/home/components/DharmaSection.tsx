@@ -18,7 +18,7 @@ const INITIAL_TOP_POSTS: PostItem[] = [
     category1: 'Tông Chỉ Tu Học',
     category2: 'NỀN TẢNG TU HỌC',
     category1Url: '/tong-chi-tu-hoc',
-    category1IconUrl: '/images/icons/icon-tong-chi-tu-hoc.webp',
+    category1IconUrl: '/images/icons/icon-tong-chi-tu-hoc-256.webp',
     title: 'BỒ ĐỀ TÂM — CỘI NGUỒN MỌI THIỆN PHÁP',
     subtitle: 'Nền tảng khởi đầu & động lực giác ngộ',
     description: 'Nền tảng khởi đầu và động lực tối thượng trên lộ trình tu học giác ngộ, xây dựng nếp sống tỉnh thức an lạc.',
@@ -34,7 +34,7 @@ const INITIAL_TOP_POSTS: PostItem[] = [
     category1: 'Dòng Chảy Hoằng Pháp',
     category2: 'HOẰNG PHÁP ĐỘ SINH',
     category1Url: '/dong-chay-hoang-phap',
-    category1IconUrl: '/images/icons/icon-dong-chay-hoang-phap.webp',
+    category1IconUrl: '/images/icons/icon-dong-chay-hoang-phap-128.webp',
     title: 'ĐẠI LỄ VU LAN BÁO HIẾU — THẮP SÁNG NGỌN ĐÈN TRI ÂN CHA MẸ',
     subtitle: 'Mùa báo hiếu thiêng liêng tri ân công đức',
     description: 'Mùa báo hiếu thiêng liêng trở về nguồn cội, nuôi dưỡng tình thương và sự tri ân công đức sinh thành dưỡng dục.',
@@ -50,7 +50,7 @@ const INITIAL_TOP_POSTS: PostItem[] = [
     category1: 'Trí Tuệ Phật Pháp',
     category2: 'PHÁP ÂM & KHAI THỊ',
     category1Url: '/tri-tue-phat-phap',
-    category1IconUrl: '/images/icons/icon-phap-am.webp',
+    category1IconUrl: '/images/icons/icon-phap-am-128.webp',
     title: 'PHÁP ÂM CHỦ ĐỀ: “TU TẬP ĐÚNG CÁCH” — SA-MÔN VÔ TRÍ',
     subtitle: 'Chỉ dẫn điều phục thân tâm & chuyển hóa khổ đau',
     description: 'Chỉ dẫn tinh tế về phương pháp điều phục thân tâm, nhận diện chướng ngại và chuyển hóa khổ đau trong đời sống thường nhật.',
@@ -66,7 +66,7 @@ const INITIAL_TOP_POSTS: PostItem[] = [
     category1: 'Tông Chỉ Tu Học',
     category2: 'TÔNG PHONG TRUYỀN THỪA',
     category1Url: '/tong-chi-tu-hoc',
-    category1IconUrl: '/images/icons/icon-tong-chi-tu-hoc.webp',
+    category1IconUrl: '/images/icons/icon-tong-chi-tu-hoc-256.webp',
     title: 'TIẾP BƯỚC THẦY TÔI — NỐI NGUỒN TỔ ĐẠO',
     subtitle: 'Kính dâng bậc Ân Sư Sư Tổ Ngộ Chân Tử',
     description: 'Kính dâng bậc Ân Sư Sư Tổ Ngộ Chân Tử khai sơn chốn Tổ Hoằng Pháp, kế thừa mạng mạch chánh pháp ngàn đời.',
@@ -82,7 +82,7 @@ const INITIAL_TOP_POSTS: PostItem[] = [
     category1: 'Dòng Chảy Hoằng Pháp',
     category2: 'CỘNG TU ĐỊNH KỲ',
     category1Url: '/dong-chay-hoang-phap',
-    category1IconUrl: '/images/icons/icon-dong-chay-hoang-phap.webp',
+    category1IconUrl: '/images/icons/icon-dong-chay-hoang-phap-128.webp',
     title: 'PHÁP HỘI NIỆM PHẬT & KHÓA LỄ BÁT QUAN TRAI GIỚI',
     subtitle: 'Ngày thanh tịnh trau dồi phạm hạnh',
     description: 'Ngày thanh tịnh trau dồi phạm hạnh, nhiếp tâm niệm Phật cầu an lạc cho muôn loài đệ tử tại gia.',
@@ -98,7 +98,7 @@ const INITIAL_TOP_POSTS: PostItem[] = [
     category1: 'Trí Tuệ Phật Pháp',
     category2: 'TỦ SÁCH TỨ ÂN',
     category1Url: '/tri-tue-phat-phap',
-    category1IconUrl: '/images/icons/icon-tri-tue-phat-phap.webp',
+    category1IconUrl: '/images/icons/icon-tri-tue-phat-phap-128.webp',
     title: "TÁC PHẨM 'ĐI QUA KHỔ VUI CUỘC ĐỜI' — THÍCH TÂM HÒA",
     subtitle: 'Hành trình tu tập & chiêm nghiệm nhân sinh',
     description: 'Tập văn ký hồi ức đúc kết hành trình tu tập, chiêm nghiệm nhân sinh và lòng tri ân sâu sắc đối với Tam Bảo cùng Thầy Tổ.',
@@ -187,18 +187,12 @@ const DharmaSection: FC<DharmaSectionProps> = ({ sectionRef, posts }) => {
       {/* ── Seamless Gradient Blur Overlay ── */}
       <SectionTransitionOverlay position="both" />
 
-      {/* Nền hoa văn nhẹ trang nghiêm */}
-      <div
-        className="absolute inset-0 opacity-[0.03] pointer-events-none bg-repeat"
-        style={{ backgroundImage: "url('/images/lotus-pattern.png')" }}
-      />
-
       <div className="max-w-[1280px] mx-auto relative z-10">
         {/* ── Section Header (Tiêu đề font UTM Niagara) ── */}
         <SectionHeader
           title="DẤU ẤN HOẰNG PHÁP"
           subtitle="Những bài viết được quan tâm & theo dõi nhiều nhất"
-          iconUrl="/images/icons/icon-dau-an-hoang-phap.webp"
+          iconUrl="/images/icons/icon-dau-an-hoang-phap-160.webp"
         />
 
         {/* ── Bố cục 5 bài viết: 4 Thẻ 2x2 Bên Trái + 1 Post Card To Bên Phải (Tất cả chuẩn tỷ lệ 3:4) ── */}

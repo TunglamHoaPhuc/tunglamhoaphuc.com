@@ -11,6 +11,8 @@ export interface PostCardProps {
   large?: boolean;
   className?: string;
   variant?: 'portrait' | 'golden';
+  /** Thẻ đầu danh sách (trên nếp gấp): tải ngay, không lazy. */
+  priority?: boolean;
 }
 
 const DEFAULT_TEMPLE_LOGO = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/bieu-tuong-tong-chi-tu-hoc-tung-lam-hoa-phuc.webp';
@@ -27,14 +29,14 @@ const getCategoryIcon = (category?: string, subCategory?: string, title?: string
   // 1. Trí Tuệ Phật Pháp / Pháp Âm
   if (cat.includes('trí tuệ') || cat.includes('tri tue') || sub.includes('pháp âm') || sub.includes('phap am') || t.includes('pháp âm') || t.includes('phap am') || cat.includes('phap-am') || sub.includes('phap-am')) {
     if (sub.includes('pháp âm') || sub.includes('phap am') || t.includes('pháp âm') || t.includes('phap am') || sub.includes('phap-am')) {
-      return '/images/icons/icon-phap-am.webp';
+      return '/images/icons/icon-phap-am-128.webp';
     }
-    return '/images/icons/icon-tri-tue-phat-phap.webp';
+    return '/images/icons/icon-tri-tue-phat-phap-128.webp';
   }
 
   // 2. Tông Chỉ Tu Học
   if (cat.includes('tông chỉ') || cat.includes('tong chi') || cat.includes('tong-chi') || cat.includes('tông phong') || cat.includes('bồ đề tâm')) {
-    return '/images/icons/icon-tong-chi-tu-hoc.webp';
+    return '/images/icons/icon-tong-chi-tu-hoc-256.webp';
   }
 
   // 3. Dòng Chảy Hoằng Pháp (4 Chuyên Mục Con Đặc Trưng)
@@ -53,7 +55,7 @@ const getCategoryIcon = (category?: string, subCategory?: string, title?: string
     t.includes('sám hối') ||
     t.includes('sam hoi')
   ) {
-    return '/images/icons/icon-khoa-le-truyen-thong.png';
+    return '/images/icons/icon-khoa-le-truyen-thong-128.webp';
   }
 
   // 3.2. Đại Lễ Sự Kiện
@@ -70,7 +72,7 @@ const getCategoryIcon = (category?: string, subCategory?: string, title?: string
     t.includes('phật đản') ||
     t.includes('phat dan')
   ) {
-    return '/images/icons/icon-dai-le-su-kien.png';
+    return '/images/icons/icon-dai-le-su-kien-128.webp';
   }
 
   // 3.3. Cộng Tu Định Kỳ
@@ -84,7 +86,7 @@ const getCategoryIcon = (category?: string, subCategory?: string, title?: string
     t.includes('niem phat') ||
     t.includes('bát quan trai')
   ) {
-    return '/images/icons/icon-cong-tu.png';
+    return '/images/icons/icon-cong-tu-128.webp';
   }
 
   // 3.4. Tịnh Độ Nhân Gian
@@ -98,12 +100,12 @@ const getCategoryIcon = (category?: string, subCategory?: string, title?: string
     t.includes('tịnh độ') ||
     t.includes('tinh do')
   ) {
-    return '/images/icons/icon-tinh-do-nhan-gian.png';
+    return '/images/icons/icon-tinh-do-nhan-gian-128.webp';
   }
 
   // 3.5. Dòng Chảy Hoằng Pháp chung
   if (cat.includes('dòng chảy') || cat.includes('dong chay') || cat.includes('hoằng pháp') || cat.includes('hoang phap') || sub.includes('hoằng pháp')) {
-    return '/images/icons/icon-dong-chay-hoang-phap.webp';
+    return '/images/icons/icon-dong-chay-hoang-phap-128.webp';
   }
 
   return DEFAULT_TEMPLE_LOGO;
@@ -124,6 +126,7 @@ export const PostCard: FC<PostCardProps> = ({
   large = false,
   className = '',
   variant = 'portrait',
+  priority = false,
 }) => {
   const CardWrapper = post.targetUrl ? Link : 'div';
   const wrapperProps = post.targetUrl ? { href: post.targetUrl } : {};
@@ -148,12 +151,14 @@ export const PostCard: FC<PostCardProps> = ({
       >
         {/* 1. Khung ảnh Thumbnail: flex-1 min-h-0 co lại mượt mà vào trong khi hover */}
         <div className="relative w-full flex-1 min-h-0 overflow-hidden bg-[#1A120B] transition-all duration-500 ease-out">
-          <img
+          <img width={640} height={520}
             src={fitImage(post.imageUrl || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp', 640)}
             alt={post.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             style={{ objectPosition: post.thumbnailPosition || post.imagePosition || 'center 20%' }}
-            loading="lazy"
+            loading={priority ? 'eager' : 'lazy'}
+            fetchPriority={priority ? 'high' : undefined}
+            decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
         </div>
@@ -162,7 +167,7 @@ export const PostCard: FC<PostCardProps> = ({
         <div className="relative w-full h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/70 to-transparent z-10 shrink-0 transition-all duration-500 ease-out">
           {/* Huy hiệu Logo Chuyên mục con nổi chính giữa tim đường kẻ */}
           <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[44px] h-[44px] md:w-[50px] md:h-[50px] rounded-full border-2 border-[#F2C14E] bg-[#24160E] flex items-center justify-center p-2 shadow-[0_0_16px_rgba(242,193,78,0.6)] group-hover:scale-110 group-hover:shadow-[0_0_24px_rgba(242,193,78,0.85)] transition-all duration-300">
-            <img loading="lazy" decoding="async"
+            <img width={128} height={128} loading="lazy" decoding="async"
               src={`${logoUrl}?v=4`}
               alt={post.title}
               className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.5)]"
@@ -234,12 +239,14 @@ export const PostCard: FC<PostCardProps> = ({
     >
       {/* 1. Khung ảnh Thumbnail tỷ lệ 3:4 linh hoạt */}
       <div className="relative w-full flex-1 min-h-0 overflow-hidden bg-[#1A120B]">
-        <img
+        <img width={480} height={640}
           src={fitImage(post.imageUrl || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp', 640)}
           alt={post.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           style={{ objectPosition: post.thumbnailPosition || post.imagePosition || 'center 20%' }}
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : undefined}
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
       </div>
@@ -248,7 +255,7 @@ export const PostCard: FC<PostCardProps> = ({
       <div className="relative w-full h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/70 to-transparent z-10 shrink-0">
         {/* Huy hiệu Logo Danh mục nổi chính giữa tim đường kẻ (Phóng to trang nghiêm, tròn trịa cân đối) */}
         <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[46px] h-[46px] md:w-[54px] md:h-[54px] rounded-full border-2 border-[#F2C14E] bg-[#24160E] flex items-center justify-center p-2 md:p-2.5 shadow-[0_0_16px_rgba(242,193,78,0.6)] group-hover:scale-110 group-hover:shadow-[0_0_24px_rgba(242,193,78,0.85)] transition-all duration-300">
-          <img loading="lazy" decoding="async"
+          <img width={128} height={128} loading="lazy" decoding="async"
             src={`${logoUrl}?v=4`}
             alt={categoryTag}
             className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.5)]"

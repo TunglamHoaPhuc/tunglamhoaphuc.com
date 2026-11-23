@@ -59,8 +59,8 @@ test("thẻ theo đúng bảy chỗ của V3: Sư Tổ, bài mới nhất, Tông
 	assert.equal(items[0].imgPosition, "center 10%");
 	assert.match(items[1].imgUrl, /posts\/a\.webp$/);
 	assert.equal(items[1].category, "Khóa Lễ Truyền Thống");
-	assert.equal(items[1].iconUrl, "/images/icons/icon-khoa-le-truyen-thong.png");
-	assert.equal(items[5].iconUrl, "/images/icons/icon-phap-am.webp");
+	assert.equal(items[1].iconUrl, "/images/icons/icon-khoa-le-truyen-thong-128.webp");
+	assert.equal(items[5].iconUrl, "/images/icons/icon-phap-am-128.webp");
 	assert.equal(items[3].subtitle, "Vô Thượng Năng Nhân");
 	assert.equal(new Set(items.map((i) => i.id)).size, items.length, "không thẻ nào lặp");
 });

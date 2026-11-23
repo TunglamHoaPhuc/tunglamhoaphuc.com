@@ -174,6 +174,8 @@ export function HeroBanner({
               <div className="relative group/emblem flex items-center justify-center">
                 <div className="absolute -inset-2 rounded-full bg-[#F2C14E]/25 blur-md pointer-events-none" />
                 <img
+                  width={256}
+                  height={256}
                   src={resolvedEmblem}
                   alt={emblemAlt || title || 'Biểu tượng linh thiêng Tùng Lâm Hòa Phúc'}
                   className="h-[48px] sm:h-[72px] md:h-[96px] lg:h-[116px] xl:h-[128px] w-auto object-contain drop-shadow-[0_0_20px_rgba(242,193,78,0.7)] transition-transform duration-300 group-hover/emblem:scale-105 select-none"

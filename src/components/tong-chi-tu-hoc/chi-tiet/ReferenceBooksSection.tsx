@@ -62,7 +62,7 @@ export function ReferenceBooksSection({ books = [] }: ReferenceBooksSectionProps
               >
                 {/* Book Cover */}
                 <div className="relative w-16 h-20 sm:w-20 sm:h-24 rounded-xl overflow-hidden border border-[#F2C14E]/35 shadow-md flex-shrink-0 bg-black/40">
-                  <img
+                  <img width={300} height={400}
                     src={getImageUrl(book.coverImage) || '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp'}
                     alt={book.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

@@ -52,7 +52,7 @@ const OtherAreaCard = React.memo(({ area }: OtherAreaCardProps) => {
       className="group relative overflow-hidden rounded-2xl border border-[#e5a93b]/40 bg-[#25170e] hover:border-[#ffde59] transition-all duration-300 shadow-2xl flex flex-col cursor-pointer"
     >
       <div className="relative w-full h-[220px] sm:h-[260px] md:h-[280px] overflow-hidden bg-[#1a120b] shrink-0">
-        <img
+        <img width={640} height={480}
           src={area.imgUrl}
           alt={shortTitle}
           loading="lazy"
@@ -112,7 +112,7 @@ export const OtherAreasSection: FC<OtherAreasSectionProps> = ({
     <section id="khu-vuc-khac" className="w-full scroll-mt-24 py-10">
       <div className="flex flex-col items-center text-center mb-10">
         <div className="w-14 h-14 sm:w-16 sm:h-16 mb-2 flex items-center justify-center" aria-hidden="true">
-          <img
+          <img width={128} height={128}
             src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
             alt=""
             loading="lazy"

@@ -13,7 +13,7 @@ const PhapThoaiCard = React.memo(({ talk }: { talk: PhapThoaiTalk }) => {
     >
       {/* 1. THUMBNAIL CONTAINER */}
       <div className="relative w-full aspect-[16/9] overflow-hidden bg-[#1A120B] shrink-0">
-        <img
+        <img width={640} height={480}
           src={talk.thumbnailUrl}
           alt={talk.title}
           loading="lazy"
@@ -41,7 +41,7 @@ const PhapThoaiCard = React.memo(({ talk }: { talk: PhapThoaiTalk }) => {
       <div className="relative w-full bg-gradient-to-b from-[#25170E] to-[#1C130D] px-5 pt-6 pb-4 flex flex-col justify-between flex-1">
         {/* Center Circular Badge at Top Edge */}
         <div className="absolute top-[-24px] left-1/2 -translate-x-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#F2C14E] bg-[#25170E] flex items-center justify-center p-1 shadow-[0_0_18px_rgba(242,193,78,0.65)] overflow-hidden">
-          <img
+          <img width={128} height={128}
             src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
             alt="Biểu tượng Bảo tượng"
             loading="lazy"

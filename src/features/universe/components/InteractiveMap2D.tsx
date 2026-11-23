@@ -334,7 +334,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
               <img
                 src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp"
                 onError={(e) => {
-                  e.currentTarget.src = "/images/toan-canh-chua.jpg";
+                  e.currentTarget.src = "/images/hero/toan-canh-chua-1280.webp";
                 }}
                 alt="Toàn cảnh Tùng Lâm Hòa Phúc"
                 className="w-full h-full object-cover scale-105"
@@ -578,7 +578,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
           <img
             src={MAP_IMAGE_URL}
             onError={(e) => {
-              e.currentTarget.src = "/images/toan-canh-chua.jpg";
+              e.currentTarget.src = "/images/hero/toan-canh-chua-1280.webp";
             }}
             alt="Sơ đồ 2D Tùng Lâm Hòa Phúc - canh-1.png"
             className="min-w-full min-h-full w-full h-full object-cover select-none pointer-events-auto block"

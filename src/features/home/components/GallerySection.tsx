@@ -69,7 +69,7 @@ export const GallerySection: FC<GallerySectionProps> = ({ areas: FEATURED_AREAS,
         <SectionHeader
           title="CÁC KHU VỰC NỔI BẬT"
           subtitle="Sơ đồ kiến trúc & Không gian tâm linh Tùng Lâm Hòa Phúc"
-          iconUrl="/images/icons/icon-cac-khu-vuc-noi-bat.webp"
+          iconUrl="/images/icons/icon-cac-khu-vuc-noi-bat-160.webp"
         />
 
         {/* ── 2. Container Slider ── */}
@@ -81,7 +81,7 @@ export const GallerySection: FC<GallerySectionProps> = ({ areas: FEATURED_AREAS,
             className="hidden xl:block absolute -left-10 md:-left-8 top-1/2 -translate-y-1/2 w-16 md:w-20 h-[80%] rounded-r-2xl overflow-hidden opacity-30 grayscale brightness-50 hover:opacity-65 transition-all duration-300 cursor-pointer z-0 border-y border-r border-[#F2C14E]/30 shadow-2xl"
             title={`Xem khu vực: ${prevArea.name}`}
           >
-            <img loading="lazy" decoding="async"
+            <img width={640} height={480} loading="lazy" decoding="async"
               src={fitImage(prevArea.imgUrl, 640)}
               alt={prevArea.name}
               className="w-full h-full object-cover object-left"
@@ -91,7 +91,7 @@ export const GallerySection: FC<GallerySectionProps> = ({ areas: FEATURED_AREAS,
 
           {/* ✦ SLIDE CHÍNH Ó GIỮA (TO HƠN, TỈ LỆ VÀNG 1.618 : 1) ✦ */}
           <div className="w-full sm:w-[88%] md:w-[84%] max-w-5xl aspect-[1.618/1] relative z-10 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0 border border-[#F2C14E]/60 group mx-auto">
-            <img loading="lazy" decoding="async"
+            <img width={640} height={480} loading="lazy" decoding="async"
               src={fitImage(currentArea.imgUrl, 640)}
               alt={currentArea.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
@@ -177,7 +177,7 @@ export const GallerySection: FC<GallerySectionProps> = ({ areas: FEATURED_AREAS,
             className="hidden xl:block absolute -right-10 md:-right-8 top-1/2 -translate-y-1/2 w-16 md:w-20 h-[80%] rounded-l-2xl overflow-hidden opacity-30 grayscale brightness-50 hover:opacity-65 transition-all duration-500 cursor-pointer z-0 border-y border-l border-[#F2C14E]/30 shadow-2xl"
             title={`Xem khu vực: ${nextArea.name}`}
           >
-            <img loading="lazy" decoding="async"
+            <img width={640} height={480} loading="lazy" decoding="async"
               src={fitImage(nextArea.imgUrl, 640)}
               alt={nextArea.name}
               className="w-full h-full object-cover object-right"
@@ -207,7 +207,7 @@ export const GallerySection: FC<GallerySectionProps> = ({ areas: FEATURED_AREAS,
       <section className="relative overflow-visible w-full pt-2">
         <SectionHeader
           title="CÁC BẢO TƯỢNG NỔI BẬT"
-          iconUrl="/images/icons/icon-cac-bao-tuong-noi-bat.webp?v=2"
+          iconUrl="/images/icons/icon-cac-bao-tuong-noi-bat-224.webp?v=2"
           iconClassName="h-16 sm:h-20 md:h-24 lg:h-28 w-auto max-w-[160px] object-contain drop-shadow-[0_0_20px_rgba(242,193,78,0.75)] transition-all duration-300 hover:scale-110"
         />
 
@@ -219,7 +219,7 @@ export const GallerySection: FC<GallerySectionProps> = ({ areas: FEATURED_AREAS,
             className="hidden xl:block absolute -left-10 md:-left-8 top-1/2 -translate-y-1/2 w-16 md:w-20 h-[80%] rounded-r-2xl overflow-hidden opacity-30 grayscale brightness-50 hover:opacity-65 transition-all duration-300 cursor-pointer z-0 border-y border-r border-[#F2C14E]/30 shadow-2xl"
             title={`Xem tượng: ${prevStatue.name}`}
           >
-            <img loading="lazy" decoding="async"
+            <img width={640} height={480} loading="lazy" decoding="async"
               src={fitImage(prevStatue.imgUrl, 360)}
               alt={prevStatue.name}
               className="w-full h-full object-cover object-left"
@@ -229,7 +229,7 @@ export const GallerySection: FC<GallerySectionProps> = ({ areas: FEATURED_AREAS,
 
           {/* ✦ SLIDE CHÍNH Ó GIỮA (TỈ LỆ VÀNG 1.618 : 1) ✦ */}
           <div className="w-full sm:w-[88%] md:w-[84%] max-w-5xl aspect-[1.618/1] relative z-10 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0 border border-[#F2C14E]/60 group mx-auto">
-            <img loading="lazy" decoding="async" src={fitImage(currentStatue.imgUrl, 640)} alt={currentStatue.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" style={{ objectPosition: currentStatue.imgPosition || 'center center' }} />
+            <img width={640} height={480} loading="lazy" decoding="async" src={fitImage(currentStatue.imgUrl, 640)} alt={currentStatue.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" style={{ objectPosition: currentStatue.imgPosition || 'center center' }} />
             <div className="absolute inset-0 bg-gradient-to-t from-[#1A1008]/95 via-black/20 to-transparent" />
 
             <button
@@ -322,7 +322,7 @@ export const GallerySection: FC<GallerySectionProps> = ({ areas: FEATURED_AREAS,
             className="hidden xl:block absolute -right-10 md:-right-8 top-1/2 -translate-y-1/2 w-16 md:w-20 h-[80%] rounded-l-2xl overflow-hidden opacity-30 grayscale brightness-50 hover:opacity-65 transition-all duration-500 cursor-pointer z-0 border-y border-l border-[#F2C14E]/30 shadow-2xl"
             title={`Xem tượng: ${nextStatue.name}`}
           >
-            <img loading="lazy" decoding="async"
+            <img width={640} height={480} loading="lazy" decoding="async"
               src={fitImage(nextStatue.imgUrl, 360)}
               alt={nextStatue.name}
               className="w-full h-full object-cover object-right"

@@ -75,7 +75,7 @@ const QuanAmCard = React.memo(({ item, onSelect }: CardProps) => {
     >
       {/* 1. TOP ARTWORK IMAGE FRAME */}
       <div className="relative w-full h-[270px] sm:h-[295px] bg-[#120A06] overflow-hidden shrink-0">
-        <img
+        <img width={640} height={480}
           src={item.imgUrl}
           alt={item.name}
           loading="lazy"
@@ -112,7 +112,7 @@ const QuanAmCard = React.memo(({ item, onSelect }: CardProps) => {
             
             {/* Center Circle with Logo (Nổi trên bề mặt, tiếp giáp sát đường kẻ) */}
             <div className="w-8 h-8 rounded-full border border-[#F2C14E] bg-[#1C120B] flex items-center justify-center mx-1.5 shadow-[0_0_12px_rgba(242,193,78,0.6)] z-30 shrink-0">
-              <img
+              <img width={128} height={128}
                 src="/images/icon-minh-hoa/GIEO THẺ QUAN ÂM LOGO.svg"
                 alt=""
                 className="w-4 h-4 object-contain filter drop-shadow-[0_0_4px_rgba(242,193,78,0.9)]"
@@ -265,7 +265,7 @@ export const QuanAm33Grid: FC = () => {
         <div className="flex flex-col items-center text-center">
           {/* Standalone Logo above section title */}
           <div className="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center transform hover:scale-105 transition-transform duration-300">
-            <img
+            <img width={128} height={128}
               src="/images/icon-minh-hoa/GIEO THẺ QUAN ÂM LOGO.svg"
               alt="Gieo Quẻ Quan Âm"
               className="w-full h-full object-contain filter drop-shadow-[0_0_16px_rgba(242,193,78,0.95)]"
@@ -318,7 +318,7 @@ export const QuanAm33Grid: FC = () => {
 
               {/* Logo icon màu nâu trầm đồng bộ */}
               <span className="w-5 h-5 flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
-                <img
+                <img width={128} height={128}
                   src="/images/icon-minh-hoa/GIEO THẺ QUAN ÂM LOGO.svg"
                   alt=""
                   className="w-full h-full object-contain filter brightness-0 sepia hue-rotate-[320deg] saturate-[600%]"

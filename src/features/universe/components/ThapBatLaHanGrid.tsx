@@ -13,13 +13,13 @@ export const ThapBatLaHanGrid: FC = () => {
     <div className="relative w-full py-10 md:py-14 overflow-hidden bg-transparent transform-gpu">
       {/* ── TOP HEADER BACKGROUND IMAGE ONLY WITH LEFT & RIGHT GRADIENT MASKS ── */}
       <div className="absolute top-8 inset-x-0 h-[360px] z-0 pointer-events-none overflow-hidden">
-        <img
+        <img width={640} height={480}
           src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp"
           alt="Toàn cảnh chùa"
           className="w-full h-full object-cover opacity-12 filter blur-[2px] scale-105"
           loading="lazy"
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+            (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
           }}
         />
         <div className="absolute inset-0 bg-[#2C1C11]/35" />
@@ -33,7 +33,7 @@ export const ThapBatLaHanGrid: FC = () => {
         {/* SECTION HEADER */}
         <div className="flex flex-col items-center text-center mb-8 sm:mb-10">
           <div className="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center" aria-hidden="true">
-            <img
+            <img width={128} height={128}
               src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
               alt="Thập Bát La Hán"
               className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
@@ -84,7 +84,7 @@ export const ThapBatLaHanGrid: FC = () => {
                   className="group relative rounded-2xl border border-[#F2C14E]/35 hover:border-[#ffde59] transition-all duration-300 shadow-xl cursor-pointer overflow-hidden bg-[#1C130D] h-[260px] sm:h-[290px] w-full"
                 >
                   {/* FULL BLEED IMAGE */}
-                  <img
+                  <img width={640} height={480}
                     src={item.imgUrl}
                     alt={item.name}
                     className="w-full h-full object-cover object-[center_20%] transition-transform duration-500 group-hover:scale-105"

@@ -129,14 +129,14 @@ test("chuyên mục: icon admin đặt thắng, rồi icon của bốn chuyên m
 	assert.equal(categories[2].iconSrc, DONG_CHAY_DEFAULT_ICON);
 	assert.equal(categories[2].label, "khac", "D1 không có tên: dùng slug, không để trống");
 	const noIcons = buildDongChayCategories(live);
-	assert.equal(noIcons[0].iconSrc, "/images/icons/icon-cong-tu.png", "không có icon admin: icon đang dùng");
+	assert.equal(noIcons[0].iconSrc, "/images/icons/icon-cong-tu-128.webp", "không có icon admin: icon đang dùng");
 });
 
 test("huy hiệu thẻ bài: tên và icon của chuyên mục, chuyên mục lạ không bị gọi nhầm là chuyên mục cũ", () => {
 	const categories = buildDongChayCategories([{ slug: "cong-tu", name: "Cộng tu định kỳ" }, { slug: "chuyen-muc-moi", name: "Chuyên mục mới" }], new Map([["chuyen-muc-moi", "/icon-moi.svg"]]));
 	assert.deepEqual(dongChayBadge("chuyen-muc-moi", categories), { name: "CHUYÊN MỤC MỚI", iconSrc: "/icon-moi.svg" });
-	assert.deepEqual(dongChayBadge("cong-tu", categories), { name: "CỘNG TU ĐỊNH KỲ", iconSrc: "/images/icons/icon-cong-tu.png" });
-	assert.deepEqual(dongChayBadge("khoa-le-truyen-thong", []), { name: "KHÓA LỄ TRUYỀN THỐNG", iconSrc: "/images/icons/icon-khoa-le-truyen-thong.png" });
+	assert.deepEqual(dongChayBadge("cong-tu", categories), { name: "CỘNG TU ĐỊNH KỲ", iconSrc: "/images/icons/icon-cong-tu-128.webp" });
+	assert.deepEqual(dongChayBadge("khoa-le-truyen-thong", []), { name: "KHÓA LỄ TRUYỀN THỐNG", iconSrc: "/images/icons/icon-khoa-le-truyen-thong-128.webp" });
 	assert.deepEqual(dongChayBadge("dai-le-su-kien", []).name, "ĐẠI LỄ SỰ KIỆN");
 	assert.deepEqual(dongChayBadge("khong-biet", categories), { name: DONG_CHAY_DEFAULT_NAME, iconSrc: DONG_CHAY_DEFAULT_ICON });
 	assert.deepEqual(dongChayBadge(undefined, categories), { name: DONG_CHAY_DEFAULT_NAME, iconSrc: DONG_CHAY_DEFAULT_ICON });

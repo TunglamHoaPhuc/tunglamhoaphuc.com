@@ -29,7 +29,7 @@ export default async function GioiThieuOverviewPage() {
     subtitle: t.subtitle || t.overviewSummary,
     href: `/gioi-thieu/${t.slug}`,
     icon: GROUP_ICON[t.groupCategory] ?? Scroll,
-    image: t.heroBanner || t.portraitImage || '/images/toan-canh-chua.jpg',
+    image: t.heroBanner || t.portraitImage || '/images/hero/toan-canh-chua-1280.webp',
     tag: t.tag || t.groupCategoryName,
   }));
   return (
@@ -41,7 +41,7 @@ export default async function GioiThieuOverviewPage() {
           <div
             className="absolute inset-0 bg-cover bg-center opacity-30 blur-[2px] pointer-events-none"
             style={{
-              backgroundImage: "url('/images/toan-canh-chua.jpg')",
+              backgroundImage: "url('/images/hero/toan-canh-chua-1280.webp')",
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-[#2A1D14]/40 via-[#2A1D14]/80 to-[#2A1D14] pointer-events-none" />

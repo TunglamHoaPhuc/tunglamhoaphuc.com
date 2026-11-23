@@ -443,7 +443,7 @@ export const CalendarSection: FC = () => {
       {/* ── 1. Top Section Header ── */}
       <SectionHeader
         title={`LỊCH TU HỌC PHẬT LỊCH ${buddhistEra}`}
-        iconUrl="/images/icons/icon-lich-tu-hoc.webp"
+        iconUrl="/images/icons/icon-lich-tu-hoc-160.webp"
       />
 
       {/* ── 2. Unified Side-by-Side Calendar Container ── */}
@@ -506,7 +506,7 @@ export const CalendarSection: FC = () => {
                   {/* Huy hiệu Logo Quote Chủ Đề nổi chính giữa tim đường kẻ */}
                   <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#F2C14E] bg-[#24160E] flex items-center justify-center p-2 shadow-[0_0_16px_rgba(242,193,78,0.6)]">
                     <img loading="lazy" decoding="async"
-                      src="/images/icons/icon-quote-chu-de.png"
+                      src="/images/icons/icon-quote-chu-de-128.webp"
                       alt="Quote Chủ Đề"
                       className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
                     />
@@ -949,7 +949,7 @@ export const CalendarSection: FC = () => {
                 {/* Logo 1: Cộng Tu (Bỏ khung, để trên nền, chữ nghiêng) */}
                 <div className="flex items-center gap-1.5">
                   <img loading="lazy" decoding="async"
-                    src="/images/icons/icon-cong-tu.png"
+                    src="/images/icons/icon-cong-tu-128.webp"
                     alt="Cộng Tu"
                     className="w-4 h-4 object-contain"
                   />
@@ -959,7 +959,7 @@ export const CalendarSection: FC = () => {
                 {/* Logo 2: Khóa Lễ Truyền Thống (Bỏ khung, để trên nền, chữ nghiêng) */}
                 <div className="flex items-center gap-1.5">
                   <img loading="lazy" decoding="async"
-                    src="/images/icons/icon-khoa-le-truyen-thong.png"
+                    src="/images/icons/icon-khoa-le-truyen-thong-128.webp"
                     alt="Khóa Lễ Truyền Thống"
                     className="w-4 h-4 object-contain"
                   />
@@ -969,7 +969,7 @@ export const CalendarSection: FC = () => {
                 {/* Logo 3: Đại Lễ Sự Kiện (Bỏ khung, để trên nền, chữ nghiêng) */}
                 <div className="flex items-center gap-1.5">
                   <img loading="lazy" decoding="async"
-                    src="/images/icons/icon-dai-le-su-kien.png"
+                    src="/images/icons/icon-dai-le-su-kien-128.webp"
                     alt="Đại Lễ Sự Kiện"
                     className="w-4 h-4 object-contain"
                   />
@@ -1201,7 +1201,7 @@ export const CalendarSection: FC = () => {
                       className="text-xs sm:text-[13px] text-[#FFE5A3] flex items-center gap-2 font-medium"
                     >
                       <img loading="lazy" decoding="async"
-                        src="/images/icons/icon-cac-khu-vuc-noi-bat.webp"
+                        src="/images/icons/icon-cac-khu-vuc-noi-bat-160.webp"
                         alt="Địa điểm"
                         className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_0_6px_rgba(242,193,78,0.5)]"
                       />

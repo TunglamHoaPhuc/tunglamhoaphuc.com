@@ -229,7 +229,7 @@ export function TongChiArticleSwitcherModal({
                     <div className="flex items-start gap-3">
                       {/* Thumbnail */}
                       <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-black/50 border border-[#F2C14E]/40 shrink-0 shadow-md">
-                        <img
+                        <img width={640} height={480}
                           src={getImageUrl(item.bannerImage) || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-banner.webp'}
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"

@@ -92,7 +92,7 @@ export default function TongChiTuHocClient({
       <div className="px-4 sm:px-8 md:pl-20 md:pr-10">
         {/* Banner chính */}
         <HeroBanner
-          emblemUrl="/images/icons/icon-tong-chi-tu-hoc.webp"
+          emblemUrl="/images/icons/icon-tong-chi-tu-hoc-256.webp"
           emblemAlt="Biểu tượng Tông Chỉ Tu Học"
         />
 

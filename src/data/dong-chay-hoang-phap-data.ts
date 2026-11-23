@@ -45,13 +45,13 @@ export interface DongChayCategoryInfo {
 }
 
 export const DONG_CHAY_DEFAULT_NAME = 'DÒNG CHẢY HOẰNG PHÁP';
-export const DONG_CHAY_DEFAULT_ICON = '/images/icons/icon-dong-chay-hoang-phap.webp';
+export const DONG_CHAY_DEFAULT_ICON = '/images/icons/icon-dong-chay-hoang-phap-128.webp';
 
 const LEGACY_CATEGORIES = [
-  { id: 'cong-tu', label: 'Cộng tu', name: 'CỘNG TU ĐỊNH KỲ', icon: '/images/icons/icon-cong-tu.png' },
-  { id: 'khoa-le-truyen-thong', label: 'Khóa lễ truyền thống', name: 'KHÓA LỄ TRUYỀN THỐNG', icon: '/images/icons/icon-khoa-le-truyen-thong.png' },
-  { id: 'dai-le-su-kien', label: 'Đại lễ sự kiện', name: 'ĐẠI LỄ SỰ KIỆN', icon: '/images/icons/icon-dai-le-su-kien.png' },
-  { id: 'tinh-do-nhan-gian', label: 'Tịnh độ nhân gian', name: 'TỊNH ĐỘ NHÂN GIAN', icon: '/images/icons/icon-tinh-do-nhan-gian.png' },
+  { id: 'cong-tu', label: 'Cộng tu', name: 'CỘNG TU ĐỊNH KỲ', icon: '/images/icons/icon-cong-tu-128.webp' },
+  { id: 'khoa-le-truyen-thong', label: 'Khóa lễ truyền thống', name: 'KHÓA LỄ TRUYỀN THỐNG', icon: '/images/icons/icon-khoa-le-truyen-thong-128.webp' },
+  { id: 'dai-le-su-kien', label: 'Đại lễ sự kiện', name: 'ĐẠI LỄ SỰ KIỆN', icon: '/images/icons/icon-dai-le-su-kien-128.webp' },
+  { id: 'tinh-do-nhan-gian', label: 'Tịnh độ nhân gian', name: 'TỊNH ĐỘ NHÂN GIAN', icon: '/images/icons/icon-tinh-do-nhan-gian-128.webp' },
 ] as const;
 
 const upper = (text: string) => text.trim().toLocaleUpperCase('vi');

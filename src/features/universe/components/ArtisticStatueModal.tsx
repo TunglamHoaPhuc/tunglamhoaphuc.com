@@ -162,7 +162,7 @@ export const ArtisticStatueModal: FC<ArtisticStatueModalProps> = ({
               }}
               className="max-h-full max-w-full object-contain rounded-lg filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                (e.target as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
               }}
             />
           </div>
