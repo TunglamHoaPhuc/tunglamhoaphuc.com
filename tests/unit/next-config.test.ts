@@ -52,7 +52,7 @@ describe("next.config headers", () => {
 		expect(headers["Content-Security-Policy"]).toBeUndefined();
 	});
 
-	it("never lets the admin be framed and keeps its referrer to itself, and still sends no Content-Security-Policy", async () => {
+	it("never lets the admin be framed, keeps its referrer to itself and gives it a Content-Security-Policy that shuts other origins", async () => {
 		const rules = ((await nextConfig.headers?.()) ?? []) as Rule[];
 		// What a request gets: the matching rules in order, the last value of a header wins (as Next.js and vinext do).
 		const headersFor = (path: string) => {
@@ -68,11 +68,21 @@ describe("next.config headers", () => {
 			expect(headers["X-Frame-Options"], path).toBe("DENY");
 			expect(headers["Referrer-Policy"], path).toBe("same-origin");
 			expect(headers["Strict-Transport-Security"], path).toBe("max-age=31536000");
-			expect(headers["Content-Security-Policy"], path).toBeUndefined();
+			const csp = headers["Content-Security-Policy"];
+			expect(csp, path).toBeDefined();
+			for (const part of ["default-src 'self'", "connect-src 'self'", "object-src 'none'", "base-uri 'self'", "form-action 'self'", "frame-ancestors 'none'"]) expect(csp, `${path}: ${part}`).toContain(part);
+			// nothing but the site itself runs scripts or styles from a file; the only frames are YouTube's
+			expect(csp, path).not.toMatch(/script-src[^;]*https?:/);
+			expect(csp, path).toMatch(/frame-src https:\/\/www\.youtube-nocookie\.com https:\/\/www\.youtube\.com(;|$)/);
 		}
+		// the draft preview shows the public site's page, so it gets no policy of the admin's, but is never framed
+		const preview = headersFor("/quan-tri/xem-truoc/bai-viet/abc");
+		expect(preview["Content-Security-Policy"]).toBe("frame-ancestors 'none'");
+		expect(preview["X-Frame-Options"]).toBe("DENY");
 		for (const path of ["/", "/gioi-thieu", "/api/other", "/quan-tri-gia"]) {
 			expect(headersFor(path)["X-Frame-Options"], path).toBe("SAMEORIGIN");
 			expect(headersFor(path)["Referrer-Policy"], path).toBe("strict-origin-when-cross-origin");
+			expect(headersFor(path)["Content-Security-Policy"], path).toBeUndefined();
 		}
 	});
 
