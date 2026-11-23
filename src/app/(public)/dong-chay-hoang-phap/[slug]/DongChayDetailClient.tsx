@@ -136,6 +136,15 @@ export default function DongChayDetailClient({ article, relatedArticlesFormatted
         {/* ── 3. NỘI DUNG BÀI VIẾT & CÁC KHỐI CHUẨN 100% TỪ TÔNG CHỈ TU HỌC ── */}
         <main className="max-w-5xl mx-auto pt-4 pb-16 space-y-16 w-full">
           <div id="article-body" className="max-w-4xl mx-auto">
+            {/* Lời dẫn do người biên tập viết (như www hiện dưới tiêu đề); để trống thì không có khối này. */}
+            {article.intro ? (
+              <p
+                style={{ fontFamily: "'UTM Avo', sans-serif" }}
+                className="max-w-3xl mx-auto mb-8 border-l-2 border-[#F2C14E]/60 pl-4 sm:pl-5 text-base sm:text-lg italic leading-relaxed text-[#FFE5A3]"
+              >
+                {article.intro}
+              </p>
+            ) : null}
             <InfographicArticleRenderer
               rawContent={article.content || article.contentHtml || article.summary || ''}
               title={article.title}

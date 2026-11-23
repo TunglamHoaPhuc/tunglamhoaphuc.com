@@ -1,11 +1,13 @@
 import DongChayHoangPhapClient from './DongChayHoangPhapClient';
 import { dongChayPage } from '@/lib/dong-chay';
+import { liveDongChayCategories } from '@/lib/dong-chay-categories';
 
-// Cache ở edge 5 phút. Trang chỉ dựng 12 bài mới nhất; các trang sau, danh mục và cách sắp xếp
-// lấy qua /api/public/dong-chay (không đọc searchParams ở đây, vì đọc là mất cache).
-export const revalidate = 300;
+// Cache ở edge 60 giây (trước là 5 phút: V3 không có chỗ nào để admin xóa cache, bài mới đăng phải hiện sớm). Trang chỉ dựng
+// 12 bài mới nhất; các trang sau, danh mục và cách sắp xếp lấy qua /api/public/dong-chay (không đọc searchParams ở đây, vì
+// đọc là mất cache). Danh sách đọc nhiều dòng hơn một bài lẻ nên giữ 60 giây, gấp bốn lần D1_RENEW_MS (15 giây).
+export const revalidate = 60;
 
 export default async function DongChayHoangPhapPage() {
-  const first = await dongChayPage({ page: 1 });
-  return <DongChayHoangPhapClient initial={first} />;
+  const [first, categories] = await Promise.all([dongChayPage({ page: 1 }), liveDongChayCategories()]);
+  return <DongChayHoangPhapClient initial={first} categories={categories} />;
 }

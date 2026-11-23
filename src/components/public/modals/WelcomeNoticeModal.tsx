@@ -1,17 +1,35 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, X, Check, MessageSquareHeart, HeartHandshake, Compass } from 'lucide-react';
+import { X, Check, HeartHandshake, ExternalLink } from 'lucide-react';
+import { useSiteChrome } from '@/components/public/SiteChrome';
+import { noticeIsCurrent } from '@/lib/v3-menu';
 
+// Khóa của chữ có sẵn (khi admin chưa lưu thông báo nào). Thông báo do admin lưu có khóa riêng theo mã của nó,
+// nên đổi nội dung thì người đã đóng bản cũ sẽ thấy bản mới.
 const STORAGE_KEY = 'tlhp_welcome_notice_v1_0';
 
 export function WelcomeNoticeModal() {
+  const { notice } = useSiteChrome();
   const [isOpen, setIsOpen] = useState(false);
   const [dontShowAgain, setDontShowAgain] = useState(true);
+  // Chưa lưu: giữ chữ có sẵn. Admin tắt, để trống hay đã hết hạn: không hiện. Đang bật: chữ của admin.
+  const custom = notice.state === 'on' ? notice : null;
+  const enabled = notice.state !== 'off';
+  const storageKey = custom ? `tlhp_notice_${custom.id}` : STORAGE_KEY;
+  const endsAt = custom ? custom.endsAt : null;
 
   useEffect(() => {
+    if (!enabled) return;
+    // Trang có thể được dựng từ lâu: hết ngày cuối thì không hiện nữa.
+    if (!noticeIsCurrent(endsAt, Date.now())) return;
     // Check if user has already dismissed the notice
-    const hasSeen = localStorage.getItem(STORAGE_KEY);
+    let hasSeen: string | null = null;
+    try {
+      hasSeen = localStorage.getItem(storageKey);
+    } catch {
+      // trình duyệt chặn lưu trữ: coi như chưa xem
+    }
     if (!hasSeen) {
       // Delay slightly for smooth page entrance
       const timer = setTimeout(() => {
@@ -19,20 +37,27 @@ export function WelcomeNoticeModal() {
       }, 1000);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [enabled, endsAt, storageKey]);
 
   const handleClose = () => {
     if (dontShowAgain) {
-      localStorage.setItem(STORAGE_KEY, 'seen');
+      try {
+        localStorage.setItem(storageKey, 'seen');
+      } catch {
+        // không lưu được thì lần sau hộp hiện lại
+      }
     }
     setIsOpen(false);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !enabled) return null;
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 sm:p-6 bg-black/80 backdrop-blur-md transition-opacity duration-300 animate-in fade-in">
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tlhp-welcome-notice-title"
         className="relative w-full max-w-2xl rounded-2xl overflow-hidden border border-[#F2C14E]/60 bg-gradient-to-b from-[#2A1D14] via-[#20140D] to-[#160D08] text-[#e3d2c1] shadow-[0_0_50px_rgba(242,193,78,0.25)] flex flex-col transform transition-all duration-300 scale-100"
         style={{ fontFamily: "'UTM Avo', sans-serif" }}
       >
@@ -57,19 +82,40 @@ export function WelcomeNoticeModal() {
             <span className="text-3xl">☸</span>
           </div>
 
-          <div className="inline-block px-3 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[#F2C14E] text-[11px] font-bold tracking-widest uppercase mb-2">
-            ẤN BẢN SỐ HÓA V1.0.0 (XUẤT BẢN LẦN THỨ NHẤT)
-          </div>
+          {!custom && (
+            <div className="inline-block px-3 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[#F2C14E] text-[11px] font-bold tracking-widest uppercase mb-2">
+              ẤN BẢN SỐ HÓA V1.0.0 (XUẤT BẢN LẦN THỨ NHẤT)
+            </div>
+          )}
 
           <h2
+            id="tlhp-welcome-notice-title"
             style={{ fontFamily: "'UTM Niagara', serif" }}
             className="text-4xl sm:text-5xl text-[#ffde59] uppercase tracking-wider font-normal drop-shadow-[0_0_12px_rgba(242,193,78,0.6)] leading-tight"
           >
-            KÍNH MỪNG QUÝ PHẬT TỬ &amp; ĐẠI CHÚNG
+            {custom ? 'THÔNG BÁO CỦA NHÀ CHÙA' : <>KÍNH MỪNG QUÝ PHẬT TỬ &amp; ĐẠI CHÚNG</>}
           </h2>
         </div>
 
         {/* Body content */}
+        {custom ? (
+          <div className="p-6 sm:p-8 space-y-4 text-sm sm:text-base leading-relaxed overflow-y-auto max-h-[60vh]">
+            <div className="p-4 rounded-xl bg-[#321F14]/70 border border-[#F2C14E]/30 space-y-3">
+              <p className="whitespace-pre-line">{custom.text}</p>
+              {custom.link && (
+                <a
+                  href={custom.link.href}
+                  {...(custom.link.newTab ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  className="inline-flex items-center gap-1.5 font-bold text-[#F2C14E] hover:underline"
+                >
+                  <span>{custom.link.label}</span>
+                  {custom.link.newTab && <ExternalLink className="w-4 h-4 shrink-0" aria-hidden="true" />}
+                  {custom.link.newTab && <span className="sr-only">(mở trong tab mới)</span>}
+                </a>
+              )}
+            </div>
+          </div>
+        ) : (
         <div className="p-6 sm:p-8 space-y-4 text-xs sm:text-sm leading-relaxed overflow-y-auto max-h-[60vh]">
           <p className="font-semibold text-[#F2C14E] text-sm sm:text-base">
             Nam Mô Bổn Sư Thích Ca Mâu Ni Phật!
@@ -95,6 +141,7 @@ export function WelcomeNoticeModal() {
             </span>
           </div>
         </div>
+        )}
 
         {/* Footer actions */}
         <div className="p-6 pt-4 border-t border-[#F2C14E]/20 bg-[#1C130D] flex flex-col sm:flex-row items-center justify-between gap-4">

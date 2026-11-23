@@ -140,6 +140,8 @@ export async function GET() {
         !SPECIAL_GIOI_THIEU_WP_IDS.has(String(p.id).replace('post-', '')) &&
         !SPECIAL_TONG_CHI_WP_IDS.has(String(p.wpPostId)) &&
         (p.status === 'published' || !p.status) &&
+        // Bài cũ của mục Vũ Trụ Phật Giáo (ví dụ "Sân Di Đà") không có trang bài: nằm ở /vu-tru-phat-giao/<khu vực>, không phải Dòng Chảy.
+        p.mainCategory !== 'vu-tru-phat-giao' &&
         p.title &&
         p.slug
     );

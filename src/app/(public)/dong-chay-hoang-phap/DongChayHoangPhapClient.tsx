@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { HOANG_PHAP_CATEGORIES, HoangPhapArticle } from '@/data/dong-chay-hoang-phap-data';
+import { dongChayBadge, type DongChayCategoryInfo, HoangPhapArticle } from '@/data/dong-chay-hoang-phap-data';
 import type { DongChayPage } from '@/lib/dong-chay';
 import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { CategoryFilter } from '@/components/common/CategoryFilter';
@@ -45,12 +45,14 @@ function viewToQuery(v: View): string {
 
 const sameView = (a: View, b: View) => a.page === b.page && a.category === b.category && a.sort === b.sort;
 
-export default function DongChayHoangPhapClient({ initial }: { initial: DongChayPage }) {
+// `categories`: các chuyên mục đang có bài ở D1 (tên và icon do admin đặt), máy chủ dựng ở page.tsx.
+export default function DongChayHoangPhapClient({ initial, categories }: { initial: DongChayPage; categories: DongChayCategoryInfo[] }) {
   const [data, setData] = useState<DongChayPage>(initial);
   const [view, setView] = useState<View>({ page: initial.page, category: initial.category, sort: initial.sort });
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
   const gridTopRef = useRef<HTMLDivElement>(null);
+  const filterCategories = useMemo(() => [{ id: 'all', label: 'Tất cả' }, ...categories.map(({ id, label }) => ({ id, label }))], [categories]);
   const requestRef = useRef(0);
 
   const load = useCallback(async (next: View) => {
@@ -149,7 +151,7 @@ export default function DongChayHoangPhapClient({ initial }: { initial: DongChay
           </div>
 
           <CategoryFilter
-            categories={HOANG_PHAP_CATEGORIES}
+            categories={filterCategories}
             activeCategory={view.category}
             onSelectCategory={(category) => go({ ...view, category, page: 1 })}
             sortOptions={SORT_OPTIONS}
@@ -179,7 +181,7 @@ export default function DongChayHoangPhapClient({ initial }: { initial: DongChay
           ) : (
             <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 transition-opacity duration-300 ${loading ? 'opacity-50' : ''}`}>
               {data.items.map((art) => (
-                <PostCard key={art.id} post={mapArticleToPostItem(art)} variant="golden" />
+                <PostCard key={art.id} post={mapArticleToPostItem(art, categories)} variant="golden" />
               ))}
             </div>
           )}
@@ -278,24 +280,9 @@ function decodeHtmlEntities(text: string): string {
     .normalize('NFC');
 }
 
-function mapArticleToPostItem(art: HoangPhapArticle): PostItem {
-  let categoryName = 'DÒNG CHẢY HOẰNG PHÁP';
-  let categoryIconUrl = '/images/icons/icon-dong-chay-hoang-phap.webp';
-
-  const cat = (art.category || '').toLowerCase();
-  if (cat.includes('cong-tu') || cat.includes('cộng tu')) {
-    categoryName = 'CỘNG TU ĐỊNH KỲ';
-    categoryIconUrl = '/images/icons/icon-cong-tu.png';
-  } else if (cat.includes('khoa-le-truyen-thong') || cat.includes('khóa lễ') || cat.includes('khoa le')) {
-    categoryName = 'KHÓA LỄ TRUYỀN THỐNG';
-    categoryIconUrl = '/images/icons/icon-khoa-le-truyen-thong.png';
-  } else if (cat.includes('dai-le-su-kien') || cat.includes('đại lễ') || cat.includes('dai le') || cat.includes('sự kiện')) {
-    categoryName = 'ĐẠI LỄ SỰ KIỆN';
-    categoryIconUrl = '/images/icons/icon-dai-le-su-kien.png';
-  } else if (cat.includes('tinh-do-nhan-gian') || cat.includes('tịnh độ') || cat.includes('tinh do')) {
-    categoryName = 'TỊNH ĐỘ NHÂN GIAN';
-    categoryIconUrl = '/images/icons/icon-tinh-do-nhan-gian.png';
-  }
+function mapArticleToPostItem(art: HoangPhapArticle, categories: DongChayCategoryInfo[]): PostItem {
+  // Tên và icon của chuyên mục: của admin khi có, không thì thiết kế của bốn chuyên mục cũ (data/dong-chay-hoang-phap-data.ts).
+  const { name: categoryName, iconSrc: categoryIconUrl } = dongChayBadge(art.category, categories);
 
   return {
     id: art.id,
