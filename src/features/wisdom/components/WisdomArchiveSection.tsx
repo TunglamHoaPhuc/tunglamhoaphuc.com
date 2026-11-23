@@ -7,6 +7,12 @@ import { MEDIA_TYPE_OPTIONS } from "@/data/wisdom-archive-data";
 import { WisdomItem } from "@/types/wisdom-tags";
 import { MediaPlayModal } from "@/components/public/modals/MediaPlayModal";
 import { CustomDropdown } from "@/components/common/CustomDropdown";
+import { fitImage } from "@/utils/image";
+import { imageSrcSet } from "@/lib/tlhp-content/media";
+
+// Thẻ hiển thị 282–380 px (lưới 1/2/3/4 cột): chỉ xin bản vừa khung theo màn hình, không xin ảnh gốc.
+const CARD_WIDTHS = [360, 640, 960] as const;
+const CARD_SIZES = "(min-width: 1280px) 282px, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw";
 
 interface WisdomCardProps {
   item: WisdomItem;
@@ -22,14 +28,18 @@ const WisdomCard = React.memo(({ item, onClick }: WisdomCardProps) => {
       {/* 1. Thumbnail Image */}
       <div className="relative w-full aspect-[16/10] overflow-hidden bg-[#1A120B] shrink-0">
         <img
-          src={item.thumbnailUrl}
+          src={fitImage(item.thumbnailUrl, 640)}
+          srcSet={imageSrcSet(item.thumbnailUrl, CARD_WIDTHS)}
+          sizes={CARD_SIZES}
           alt={item.title}
           loading="lazy"
           decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
           style={{ objectPosition: (item as any).thumbnailPosition || 'center center' }}
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
+            const el = e.currentTarget as HTMLImageElement;
+            el.removeAttribute('srcset');
+            el.src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#2C1C11] via-transparent to-black/40" />

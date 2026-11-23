@@ -1,5 +1,6 @@
 'use client';
 import { fitImage } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 import { FC, useState, useEffect } from "react";
 import { SectionTransitionOverlay } from "@/components/common/SectionTransitionOverlay";
@@ -146,7 +147,7 @@ export const NewsSection: FC<NewsSectionProps> = ({ items }) => {
               {prevNews.iconUrl && (
                 <div className="w-7 h-7 rounded-full border border-[#F2C14E]/60 bg-[#1C120B] shadow-[0_0_10px_rgba(242,193,78,0.3)] flex items-center justify-center p-1 mb-1">
                   <img width={128} height={128} loading="lazy" decoding="async"
-                    src={prevNews.iconUrl}
+                    src={fitImage(prevNews.iconUrl, 160)}
                     alt="Biểu tượng"
                     className="w-full h-full object-contain opacity-85"
                   />
@@ -181,7 +182,9 @@ export const NewsSection: FC<NewsSectionProps> = ({ items }) => {
             >
               <img width={640} height={480} loading="lazy" decoding="async"
                 key={`center-img-${currentNews.id}`}
-                src={fitImage(currentNews.imgUrl, 640)}
+                src={fitImage(currentNews.imgUrl, 960)}
+                srcSet={imageSrcSet(currentNews.imgUrl, [640, 960, 1280, 1920])}
+                sizes="(min-width: 1536px) 1000px, (min-width: 1024px) 66vw, 100vw"
                 alt={currentNews.title}
                 style={{ objectPosition: currentNews.imgPosition || 'center 20%' }}
                 className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out ${animClass}`}
@@ -224,7 +227,7 @@ export const NewsSection: FC<NewsSectionProps> = ({ items }) => {
                 {currentNews.iconUrl && (
                   <div className="absolute -top-7 sm:-top-8 md:-top-9 left-1/2 -translate-x-1/2 w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 rounded-full border-2 border-[#F2C14E] bg-[#1C120B] shadow-[0_0_20px_rgba(242,193,78,0.5),0_6px_20px_rgba(0,0,0,0.9)] flex items-center justify-center p-2.5 sm:p-3 transition-transform group-hover:scale-110 duration-300 z-50">
                     <img width={128} height={128}
-                      src={currentNews.iconUrl}
+                      src={fitImage(currentNews.iconUrl, 160)}
                       alt={currentNews.category || 'Biểu tượng'}
                       className="w-full h-full object-contain drop-shadow-[0_2px_8px_rgba(242,193,78,0.6)]"
                       loading="lazy"
@@ -288,7 +291,7 @@ export const NewsSection: FC<NewsSectionProps> = ({ items }) => {
               {nextNews.iconUrl && (
                 <div className="w-7 h-7 rounded-full border border-[#F2C14E]/60 bg-[#1C120B] shadow-[0_0_10px_rgba(242,193,78,0.3)] flex items-center justify-center p-1 mb-1">
                   <img width={128} height={128} loading="lazy" decoding="async"
-                    src={nextNews.iconUrl}
+                    src={fitImage(nextNews.iconUrl, 160)}
                     alt="Biểu tượng"
                     className="w-full h-full object-contain opacity-85"
                   />

@@ -3,6 +3,7 @@
 import React, { FC } from 'react';
 import Link from 'next/link';
 import type { V3Area } from '@/lib/v3-data';
+import { LOGO_ROUND_SRC, swapOnError, fitProps, CARD_WIDTHS, STATUE_ICON_LARGE_SRC } from '@/features/universe/image-props';
 
 interface OtherAreasSectionProps {
   currentSlug?: string;
@@ -53,7 +54,7 @@ const OtherAreaCard = React.memo(({ area }: OtherAreaCardProps) => {
     >
       <div className="relative w-full h-[220px] sm:h-[260px] md:h-[280px] overflow-hidden bg-[#1a120b] shrink-0">
         <img width={640} height={480}
-          src={area.imgUrl}
+          {...fitProps(area.imgUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 400px, (min-width: 640px) 46vw, calc(100vw - 48px)' })}
           alt={shortTitle}
           loading="lazy"
           decoding="async"
@@ -113,14 +114,12 @@ export const OtherAreasSection: FC<OtherAreasSectionProps> = ({
       <div className="flex flex-col items-center text-center mb-10">
         <div className="w-14 h-14 sm:w-16 sm:h-16 mb-2 flex items-center justify-center" aria-hidden="true">
           <img width={128} height={128}
-            src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+            src={STATUE_ICON_LARGE_SRC}
             alt=""
             loading="lazy"
             decoding="async"
             className="w-full h-full object-contain filter drop-shadow-[0_0_16px_rgba(242,193,78,0.95)] scale-125 transform-gpu"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-            }}
+            onError={swapOnError(LOGO_ROUND_SRC)}
           />
         </div>
 

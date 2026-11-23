@@ -15,6 +15,8 @@ import {
   KNOWN_MONK_LOCATIONS, VIETNAM_PROVINCE_COORDINATES, getMonkLocation,
 } from '@/data/danh-tang-data';
 import { CustomDropdown } from '@/components/common/CustomDropdown';
+import { STATUE_ICON_SRC, LOGO_ROUND_SRC, swapOnError, fitProps, CARD_WIDTHS } from '@/features/universe/image-props';
+import { fitImage } from '@/utils/image';
 
 interface DanhTangMapProps {
   onExitMapMode?: () => void;
@@ -131,12 +133,12 @@ const MonkGridCard = React.memo(({ monk, onSelect }: MonkGridCardProps) => {
     >
       <div className="relative w-full h-[310px] overflow-hidden bg-[#1A120B] shrink-0">
         <img
-          src={monk.avatarUrl}
+          {...fitProps(monk.avatarUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 285px, (min-width: 768px) 30vw, (min-width: 640px) 46vw, calc(100vw - 32px)' })}
           alt={monk.name}
           loading="lazy"
           decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          onError={(e) => { (e.target as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp'; }}
+          onError={swapOnError(LOGO_ROUND_SRC)}
         />
         <div
           className="absolute inset-0 pointer-events-none"
@@ -152,14 +154,12 @@ const MonkGridCard = React.memo(({ monk, onSelect }: MonkGridCardProps) => {
         <div className="relative w-full bg-gradient-to-b from-[#25170E] to-[#1C130D] px-3 pt-5 pb-4 text-center flex flex-col items-center justify-start">
           <div className="absolute top-[-24px] left-1/2 -translate-x-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#F2C14E] bg-[#25170E] flex items-center justify-center p-1 shadow-[0_0_18px_rgba(242,193,78,0.65)] overflow-hidden">
             <img
-              src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+              src={STATUE_ICON_SRC}
               alt="Biểu tượng Bảo tượng"
               loading="lazy"
               decoding="async"
               className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-              }}
+              onError={swapOnError(LOGO_ROUND_SRC)}
             />
           </div>
 
@@ -570,7 +570,8 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
             >
               <div className="absolute inset-0 z-0 bg-[#2c1c11]">
                 <img
-                  src={DANH_TANG_MAP_IMAGE}
+                  // Nền mờ (blur) phủ cả màn hình: bậc 1280.
+                  src={fitImage(DANH_TANG_MAP_IMAGE, 1280)}
                   alt="Bản đồ Danh Tăng"
                   className="w-full h-full object-cover scale-105 blur-sm"
                   loading="lazy"
@@ -867,7 +868,8 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
           >
             {/* FULL SCREEN BACKGROUND MAP IMAGE */}
             <img
-              src={DANH_TANG_MAP_IMAGE}
+              // Bản đồ phủ cả màn hình, kéo và phóng to được: bậc lớn nhất 1920.
+              src={fitImage(DANH_TANG_MAP_IMAGE, 1920)}
               alt="Bản đồ Danh Tăng Việt Nam"
               className="w-full h-full object-cover select-none pointer-events-auto block filter brightness-95 contrast-105"
               loading="lazy"
@@ -961,11 +963,11 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                             {/* Larger Avatar Frame (Golden Ratio Proportions) */}
                             <div className="relative w-16 h-20 rounded-xl overflow-hidden border-2 border-[#F2C14E]/50 shrink-0 bg-[#1A120B] shadow-md group-hover:border-[#F2C14E]">
                               <img
-                                src={monk.avatarUrl}
+                                {...fitProps(monk.avatarUrl, { width: 160 })}
                                 alt={monk.name}
                                 className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                                 loading="lazy"
-                                onError={(e) => { (e.target as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp'; }}
+                                onError={swapOnError(LOGO_ROUND_SRC)}
                               />
                             </div>
 
@@ -1055,11 +1057,11 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                       {/* Portrait */}
                       <div className="relative w-44 h-56 rounded-2xl overflow-hidden border-2 border-[#F2C14E] shadow-2xl mb-4">
                         <img
-                          src={selectedMapMonk.avatarUrl}
+                          {...fitProps(selectedMapMonk.avatarUrl, { width: 640, widths: [360, 640], sizes: '176px' })}
                           alt={selectedMapMonk.name}
                           className="w-full h-full object-cover object-top"
                           loading="lazy"
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp'; }}
+                          onError={swapOnError(LOGO_ROUND_SRC)}
                         />
                       </div>
 
@@ -1399,11 +1401,11 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                   style={{ borderColor: 'rgba(242,193,78,0.5)', aspectRatio: '3/4' }}
                 >
                   <img
-                    src={selectedMonk.avatarUrl}
+                    {...fitProps(selectedMonk.avatarUrl, { width: 960, widths: [640, 960], sizes: '(min-width: 768px) 360px, 90vw' })}
                     alt={selectedMonk.name}
                     loading="lazy"
                     className="w-full h-full object-cover object-top"
-                    onError={(e) => { (e.target as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp'; }}
+                    onError={swapOnError(LOGO_ROUND_SRC)}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1C130D]/60 via-transparent to-transparent" />
                 </div>

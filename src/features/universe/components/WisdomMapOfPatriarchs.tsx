@@ -4,6 +4,7 @@ import { FC, useState } from "react";
 import { Search, Filter, ZoomIn, X, Sparkles, BookOpen, Clock } from "lucide-react";
 import { PATRIARCH_NODES, WISDOM_CLUSTERS, PatriarchNode } from "@/data/wisdom-map-data";
 import { CustomDropdown } from "@/components/common/CustomDropdown";
+import { fitProps } from '@/features/universe/image-props';
 
 export const WisdomMapOfPatriarchs: FC = () => {
   // 5 Filter Bar States
@@ -75,7 +76,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
           }}
         >
           <img
-            src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp"
+            {...fitProps('/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp', { width: 1280, widths: [640, 960, 1280], sizes: '100vw' })}
             alt="Bản đồ Ngân hà Tuệ Giác Danh Tăng"
             className="w-full h-full object-cover opacity-35"
             style={{ minHeight: "580px" }}
@@ -134,7 +135,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
                       : "0 0 12px rgba(242,193,78,0.3)",
                   }}
                 >
-                  <img src={node.portraitUrl} alt={node.name} className="w-full h-full object-cover" />
+                  <img {...fitProps(node.portraitUrl, { width: 360, widths: [160, 360], sizes: '120px' })} loading="lazy" decoding="async" alt={node.name} className="w-full h-full object-cover" />
                 </div>
 
                 {/* Node Name Tag underneath */}
@@ -315,7 +316,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
                   className="w-40 h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden border-2 shadow-2xl mb-3"
                   style={{ borderColor: "#F2C14E" }}
                 >
-                  <img src={selectedNode.portraitUrl} alt={selectedNode.name} className="w-full h-full object-cover" />
+                  <img {...fitProps(selectedNode.portraitUrl, { width: 640, widths: [360, 640], sizes: '(min-width: 768px) 240px, 90vw' })} alt={selectedNode.name} className="w-full h-full object-cover" />
                 </div>
                 <span className="text-[10px] uppercase font-bold text-[#F2C14E] tracking-widest" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
                   {selectedNode.clusterName}

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 
 interface PortalItem {
   id: string;
@@ -273,7 +273,8 @@ function CirclePortalCard({
         {/* Vòng đệm bên trong */}
         <div className="w-full h-full rounded-full overflow-hidden bg-[#160D07] relative border-2 border-black/80">
           <img width={640} height={480}
-            src={getImageUrl(item.image)}
+            // Khung tròn 128–176 px, object-cover: ảnh ngang phải cao bằng khung nên bản 640.
+            src={fitImage(getImageUrl(item.image), 640)}
             alt={item.name}
             className="w-full h-full object-cover group-hover:scale-115 transition-transform duration-700 ease-out"
             loading="lazy"

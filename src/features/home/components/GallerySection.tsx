@@ -1,5 +1,6 @@
 'use client';
 import { fitImage } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 import { FC, useState } from "react";
 import Link from "next/link";
@@ -82,7 +83,7 @@ export const GallerySection: FC<GallerySectionProps> = ({ areas: FEATURED_AREAS,
             title={`Xem khu vực: ${prevArea.name}`}
           >
             <img width={640} height={480} loading="lazy" decoding="async"
-              src={fitImage(prevArea.imgUrl, 640)}
+              src={fitImage(prevArea.imgUrl, 360)}
               alt={prevArea.name}
               className="w-full h-full object-cover object-left"
             />
@@ -92,7 +93,9 @@ export const GallerySection: FC<GallerySectionProps> = ({ areas: FEATURED_AREAS,
           {/* ✦ SLIDE CHÍNH Ó GIỮA (TO HƠN, TỈ LỆ VÀNG 1.618 : 1) ✦ */}
           <div className="w-full sm:w-[88%] md:w-[84%] max-w-5xl aspect-[1.618/1] relative z-10 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0 border border-[#F2C14E]/60 group mx-auto">
             <img width={640} height={480} loading="lazy" decoding="async"
-              src={fitImage(currentArea.imgUrl, 640)}
+              src={fitImage(currentArea.imgUrl, 960)}
+              srcSet={imageSrcSet(currentArea.imgUrl, [640, 960, 1280, 1920])}
+              sizes="(min-width: 1280px) 1024px, (min-width: 768px) 84vw, (min-width: 640px) 88vw, 100vw"
               alt={currentArea.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
             />
@@ -178,7 +181,7 @@ export const GallerySection: FC<GallerySectionProps> = ({ areas: FEATURED_AREAS,
             title={`Xem khu vực: ${nextArea.name}`}
           >
             <img width={640} height={480} loading="lazy" decoding="async"
-              src={fitImage(nextArea.imgUrl, 640)}
+              src={fitImage(nextArea.imgUrl, 360)}
               alt={nextArea.name}
               className="w-full h-full object-cover object-right"
             />
@@ -229,7 +232,7 @@ export const GallerySection: FC<GallerySectionProps> = ({ areas: FEATURED_AREAS,
 
           {/* ✦ SLIDE CHÍNH Ó GIỮA (TỈ LỆ VÀNG 1.618 : 1) ✦ */}
           <div className="w-full sm:w-[88%] md:w-[84%] max-w-5xl aspect-[1.618/1] relative z-10 rounded-2xl overflow-hidden shadow-2xl flex-shrink-0 border border-[#F2C14E]/60 group mx-auto">
-            <img width={640} height={480} loading="lazy" decoding="async" src={fitImage(currentStatue.imgUrl, 640)} alt={currentStatue.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" style={{ objectPosition: currentStatue.imgPosition || 'center center' }} />
+            <img width={640} height={480} loading="lazy" decoding="async" src={fitImage(currentStatue.imgUrl, 960)} srcSet={imageSrcSet(currentStatue.imgUrl, [640, 960, 1280, 1920])} sizes="(min-width: 1280px) 1024px, (min-width: 768px) 84vw, (min-width: 640px) 88vw, 100vw" alt={currentStatue.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" style={{ objectPosition: currentStatue.imgPosition || 'center center' }} />
             <div className="absolute inset-0 bg-gradient-to-t from-[#1A1008]/95 via-black/20 to-transparent" />
 
             <button

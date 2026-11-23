@@ -3,6 +3,7 @@
 import React, { FC, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, UserCheck, Flame, ArrowRight } from 'lucide-react';
+import { fitProps, CARD_WIDTHS } from '@/features/universe/image-props';
 
 export interface DeTuItem {
   id: string;
@@ -159,7 +160,7 @@ export const ThapDaiDeTuCards: FC = () => {
             {/* Postcard Image with golden border */}
             <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-[#100702] border border-[#F2C14E]/20 mb-3">
               <img width={640} height={480}
-                src={item.imageUrl}
+                {...fitProps(item.imageUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 230px, (min-width: 768px) 23vw, (min-width: 640px) 30vw, 46vw' })}
                 alt={item.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
               />

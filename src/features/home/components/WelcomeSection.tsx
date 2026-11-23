@@ -5,6 +5,8 @@ import Link from "next/link";
 import { ArrowRight, Play } from "lucide-react";
 import { C } from "@/config/theme";
 import type { HomeWelcome } from "@/lib/v3-home-welcome";
+import { fitImage } from "@/utils/image";
+import { imageSrcSet } from "@/lib/tlhp-content/media";
 
 // "Lời chào": lời chào của chùa, video giới thiệu và các số liệu. Mọi chữ, đường dẫn, video và số do máy chủ đưa vào
 // (lib/v3-home-welcome.ts đọc các khối home.welcome, home.stats, home.buddhist_year của admin); component này chỉ vẽ.
@@ -73,6 +75,8 @@ export const CountUp: FC<{ value: number; year?: boolean }> = ({ value, year = f
 const WelcomeVideo: FC<{ video: HomeWelcome["video"]; image: HomeWelcome["image"] }> = ({ video, image }) => {
   const [playing, setPlaying] = useState(false);
   const frame = useRef<HTMLIFrameElement>(null);
+  // Ảnh bìa của D1 (hoặc ảnh YouTube, giữ nguyên) trong khung 16:9 rộng khoảng 477 px (di động ~380 px).
+  const cover = image?.src ?? `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`;
 
   useEffect(() => {
     if (playing) frame.current?.focus();
@@ -101,7 +105,9 @@ const WelcomeVideo: FC<{ video: HomeWelcome["video"]; image: HomeWelcome["image"
           className="group absolute inset-0 block h-full w-full cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-[#F2C14E]"
         >
           <img
-            src={image?.src ?? `https://i.ytimg.com/vi/${video.id}/hqdefault.jpg`}
+            src={fitImage(cover, 960)}
+            srcSet={imageSrcSet(cover, [640, 960, 1280])}
+            sizes="(min-width: 1024px) 477px, calc(100vw - 32px)"
             alt=""
             loading="lazy"
             decoding="async"

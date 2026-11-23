@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
 import { NAV_ITEMS } from '@/data/tong-chi-tu-hoc-data';
 import { NavDropdownPanel } from './NavDropdownPanel';
+import { fitImage } from '@/utils/image';
 
 interface NavItem {
   id: string;
@@ -86,7 +87,7 @@ export function SidebarNav({
           className="group flex flex-col items-center hover:scale-110 transition-transform cursor-pointer"
         >
           <img width={128} height={128}
-            src={logoSrc}
+            src={fitImage(logoSrc, 160)}
             alt={homeTitle}
             decoding="async"
             className="h-8 w-auto object-contain mb-2 flex-shrink-0 drop-shadow-[0_0_6px_rgba(255,222,89,0.4)] group-hover:drop-shadow-[0_0_12px_rgba(255,222,89,0.9)] transition-all"

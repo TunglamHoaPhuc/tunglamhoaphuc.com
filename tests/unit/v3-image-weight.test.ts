@@ -112,7 +112,6 @@ test("logo đầu trang/chân trang dùng bản vừa cỡ: logo tròn 192 px, m
 
 /** Tệp được phép đặt `priority`/`preload` cho <Image> (vinext sinh <link rel="preload" as="image">): ảnh nhìn thấy ngay ở đầu trang. */
 const PRIORITY_ALLOWED: Record<string, string> = {
-	"src/components/tong-chi-tu-hoc/HeroBanner.tsx": "Biểu ngữ đầu trang Tông Chỉ/Vũ Trụ: phần tử LCP, phủ toàn khung nhìn.",
 	"src/components/gioi-thieu/TieuSuSuToOdysseyView.tsx": "Ảnh chân dung đầu trang tiểu sử Sư Tổ: phần tử LCP.",
 };
 
@@ -227,7 +226,8 @@ test("ảnh trên nếp gấp không lazy: logo đầu trang, biểu tượng th
 	assert.equal([...card.matchAll(/loading=\{priority \? 'eager' : 'lazy'\}/g)].length, 2, "hai biến thể thẻ đều theo priority");
 	assert.match(read("src/app/(public)/dong-chay-hoang-phap/DongChayHoangPhapClient.tsx"), /priority=\{index === 0\}/);
 	const statues = read("src/app/(public)/bao-tuong-phat-giao/StatueListClient.tsx");
-	assert.match(statues, /priority=\{index === 0\}/);
+	// 23/11/2026 (vùng 3): hai thẻ đầu của khối đầu tiên tải ngay, không chỉ thẻ đầu (xem v3-images-fit-area3.test.ts).
+	assert.match(statues, /priority=\{index < eager\}/);
 	assert.match(statues, /loading=\{priority \? 'eager' : 'lazy'\}/);
 });
 

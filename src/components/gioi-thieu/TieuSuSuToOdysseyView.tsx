@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import './tieu-su-odyssey.css';
 import { fitImage } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 interface Props {
   /** Chủ đề đọc từ D1 (đã là chủ đề đang hiển thị); phần còn lại của trang là thiết kế riêng. */
@@ -1500,7 +1501,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
           {/* Full-Bleed Atmospheric Backdrop */}
           <div className="absolute inset-0 pointer-events-none">
             <img
-              src={IMG_ARTWORK_BAO_TUONG}
+              src={fitImage(IMG_ARTWORK_BAO_TUONG, 1280)}
               alt="Họa phẩm Tổ sư Ngộ Chân Tử"
               loading="lazy"
               className="w-full h-full object-cover object-[center_25%] opacity-25 scale-[1.02]"
@@ -1667,7 +1668,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                     <>
                       {/* Soft ambient blurred fill so vertical portraits fit 16:9 gracefully without cropping faces */}
                       <img
-                        src={spotlightImage}
+                        src={fitImage(spotlightImage, 360)}
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
@@ -1677,7 +1678,9 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                       <AnimatePresence mode="wait">
                         <motion.img
                           key={spotlightMode}
-                          src={spotlightImage}
+                          src={fitImage(spotlightImage, 1280)}
+                          srcSet={imageSrcSet(spotlightImage, [640, 960, 1280, 1920])}
+                          sizes="(min-width: 960px) 884px, calc(100vw - 32px)"
                           alt={
                             spotlightMode === 'artwork'
                               ? 'Di ảnh thờ Sư Tổ Ngộ Chân Tử tại Tùng Lâm Hòa Phúc'
@@ -1689,6 +1692,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                           transition={{ duration: 0.35 }}
                           className="relative z-0 w-full h-full object-contain object-center"
                           onError={(e) => {
+                            e.currentTarget.removeAttribute('srcset');
                             (e.currentTarget as HTMLImageElement).src = FALLBACK_CHUA_IMG;
                           }}
                         />
@@ -1912,7 +1916,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                     >
                       <div className="w-full h-full rounded-full overflow-hidden bg-[#1D120B] relative">
                         <img
-                          src={chapter.medallionImage}
+                          src={fitImage(chapter.medallionImage, 160)}
                           alt={chapter.year}
                           loading="lazy"
                           className={`w-full h-full object-cover object-top transition-all duration-300 ${
@@ -1988,13 +1992,16 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                         className="absolute inset-0"
                       >
                         <img
-                          src={activeStagePhoto.url}
+                          src={fitImage(activeStagePhoto.url, 960)}
+                          srcSet={imageSrcSet(activeStagePhoto.url, [640, 960, 1280])}
+                          sizes="(min-width: 1024px) 620px, 100vw"
                           alt={activeStagePhoto.caption || activeChapter.headline}
                           loading="lazy"
                           decoding="async"
                           style={{ objectPosition: activeStagePhoto.objectPosition || 'center 25%' }}
                           className="w-full h-full object-cover"
                           onError={(e) => {
+                            e.currentTarget.removeAttribute('srcset');
                             (e.currentTarget as HTMLImageElement).src = FALLBACK_CHUA_IMG;
                           }}
                         />
@@ -2071,7 +2078,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                                   } ${isThumbLed ? 'odyssey-led-active-ring' : ''}`}
                                 >
                                   <img
-                                    src={thumb.url}
+                                    src={fitImage(thumb.url, 160)}
                                     alt={thumb.caption}
                                     loading="lazy"
                                     decoding="async"
@@ -2259,7 +2266,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                         className="relative shrink-0 w-16 h-24 sm:w-20 sm:h-28 bg-[#120A05] border border-[#F2C14E]/45 hover:border-[#FFDE59] overflow-hidden cursor-zoom-in group"
                       >
                         <img
-                          src={pillar.coverImage}
+                          src={fitImage(pillar.coverImage, 160)}
                           alt={pillar.title}
                           loading="lazy"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
@@ -2340,7 +2347,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                               className="relative shrink-0 w-14 h-20 bg-[#0D0704] border border-[#F2C14E]/40 hover:border-[#FFDE59] overflow-hidden cursor-zoom-in group"
                             >
                               <img
-                                src={book.coverImage}
+                                src={fitImage(book.coverImage, 160)}
                                 alt={`Bìa ${book.title}`}
                                 loading="lazy"
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform"
@@ -2532,7 +2539,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                         <span className="rounded-full absolute inset-0 bg-gradient-to-tr from-[#B67E1E] via-[#F2C14E] to-[#FFE5A3] shadow-[0_0_24px_rgba(242,193,78,0.28)] group-hover:scale-105 group-hover:shadow-[0_0_32px_rgba(255,222,89,0.5)] transition-all duration-300" />
                         <span className="rounded-full absolute inset-[3px] bg-[#140C07] overflow-hidden ring-1 ring-[#FFE5A3]/40">
                           <img
-                            src={item.url}
+                            src={fitImage(item.url, 360)}
                             alt={item.caption}
                             loading="lazy"
                             className="w-full h-full object-cover object-[center_25%] group-hover:scale-110 transition-transform duration-500"
@@ -2686,7 +2693,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
 
             <div className="relative mt-4 aspect-[16/10] max-h-[65vh] w-full bg-[#0E0704] overflow-hidden flex items-center justify-center">
               <img
-                src={lightboxState.items[lightboxState.idx].url}
+                src={fitImage(lightboxState.items[lightboxState.idx].url, 1920)}
                 alt={lightboxState.items[lightboxState.idx].caption}
                 className="max-h-full max-w-full object-contain"
                 onError={(e) => {
@@ -2768,7 +2775,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
               <div className="mt-5 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
                 <div className="md:col-span-6 relative aspect-[4/5] max-h-[60vh] w-full bg-[#0E0704] border border-[#F2C14E]/30 overflow-hidden flex items-center justify-center p-3">
                   <img
-                    src={standalonePreview.url}
+                    src={fitImage(standalonePreview.url, 1920)}
                     alt={standalonePreview.caption}
                     className="max-h-full max-w-full object-contain drop-shadow-[0_12px_30px_rgba(0,0,0,0.9)]"
                     onError={(e) => {
@@ -2789,7 +2796,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
             ) : (
               <div className="relative mt-4 aspect-[16/11] max-h-[70vh] w-full bg-[#0E0704] overflow-hidden flex items-center justify-center">
                 <img
-                  src={standalonePreview.url}
+                  src={fitImage(standalonePreview.url, 1920)}
                   alt={standalonePreview.caption}
                   className="max-h-full max-w-full object-contain"
                   onError={(e) => {

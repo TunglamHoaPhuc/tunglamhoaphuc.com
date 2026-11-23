@@ -8,6 +8,8 @@ import { PROGRAMS } from "@/features/home/data/home-data";
 import type { SectionRef } from "@/features/home/types";
 import { SectionHeader } from "@/components/common/SectionHeader";
 import type { HomeProgram } from "@/lib/v3-home-programs";
+import { fitImage } from "@/utils/image";
+import { imageSrcSet } from "@/lib/tlhp-content/media";
 
 interface ProgramsSectionProps {
   /** Optional: the ref a parent uses to scroll to the section. */
@@ -76,7 +78,11 @@ const ProgramsSection: FC<ProgramsSectionProps> = ({ sectionRef, programs }) => 
               <div className="relative overflow-hidden" style={{ height: 240 }}>
                 {prog.imgUrl && (
                   <img
-                    src={prog.imgUrl}
+                    src={fitImage(prog.imgUrl, 960)}
+                    srcSet={imageSrcSet(prog.imgUrl, [360, 640, 960, 1280])}
+                    sizes="(min-width: 1280px) 384px, (min-width: 768px) 30vw, calc(100vw - 80px)"
+                    loading="lazy"
+                    decoding="async"
                     alt={prog.title}
                     style={{ objectPosition: prog.imgPosition }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

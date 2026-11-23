@@ -3,7 +3,8 @@
 import { FC, useState } from 'react';
 import Link from 'next/link';
 import { KeywordTooltipModal } from '@/components/tong-chi-tu-hoc/KeywordTooltipModal';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 interface KeywordPopup {
@@ -103,7 +104,11 @@ const ArticleDetailTemplate: FC<ArticleDetailTemplateProps> = ({
         style={{ height: 'clamp(300px, 55vh, 580px)' }}
       >
         <img width={640} height={480}
-          src={getImageUrl(heroBannerUrl) || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp'}
+          src={fitImage(getImageUrl(heroBannerUrl) || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp', 1280)}
+          srcSet={imageSrcSet(getImageUrl(heroBannerUrl) || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp', [640, 960, 1280, 1920])}
+          sizes="100vw"
+          loading="eager"
+          fetchPriority="high"
           alt={title}
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -308,7 +313,11 @@ const ArticleDetailTemplate: FC<ArticleDetailTemplateProps> = ({
                   {art.imgUrl && (
                     <div className="overflow-hidden" style={{ height: 140 }}>
                       <img width={640} height={480}
-                        src={getImageUrl(art.imgUrl)}
+                        src={fitImage(getImageUrl(art.imgUrl), 640)}
+                        srcSet={imageSrcSet(getImageUrl(art.imgUrl), [360, 640, 960])}
+                        sizes="(min-width: 1024px) 300px, (min-width: 640px) 31vw, 92vw"
+                        loading="lazy"
+                        decoding="async"
                         alt={art.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />

@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ChevronDown, RefreshCw, X, BookOpen, User, FileText, Calendar, ArrowRight, Building, Sparkles } from 'lucide-react';
 import { THU_VIEN_BOOKS, BOOK_CATEGORIES, BookItem } from '@/data/thu-vien-data';
 import { CustomDropdown } from '@/components/common/CustomDropdown';
+import { swapOnError, fitProps } from '@/features/universe/image-props';
+import { fitImage } from '@/utils/image';
 
 interface BookCardProps {
   book: BookItem;
@@ -20,14 +22,12 @@ const BookCard = React.memo(({ book, onSelect }: BookCardProps) => {
       {/* 1. BOOK COVER IMAGE FRAME */}
       <div className="relative w-full h-[260px] overflow-hidden bg-[#1A120B] shrink-0 flex items-center justify-center p-3">
         <img width={300} height={400}
-          src={book.coverUrl}
+          {...fitProps(book.coverUrl, { width: 640, widths: [360, 640], sizes: '230px' })}
           alt={book.title}
           loading="lazy"
           decoding="async"
           className="w-auto h-full max-h-[230px] object-contain shadow-2xl rounded-lg group-hover:scale-105 transition-transform duration-700 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp';
-          }}
+          onError={swapOnError(fitImage('/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp', 960))}
         />
         <div
           className="absolute inset-0 pointer-events-none"
@@ -375,7 +375,7 @@ export const ThuVienGrid: FC = () => {
                 {/* Left: Book Cover */}
                 <div className="relative w-40 mx-auto sm:mx-0 shrink-0 rounded-xl overflow-hidden border-2 border-[#F2C14E]/50 shadow-2xl self-start bg-[#1A120B] p-2">
                   <img
-                    src={selectedBook.coverUrl}
+                    {...fitProps(selectedBook.coverUrl, { width: 640, widths: [360, 640], sizes: '160px' })}
                     alt={selectedBook.title}
                     className="w-full h-auto object-contain rounded-lg shadow-lg"
                   />

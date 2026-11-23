@@ -12,7 +12,25 @@ import {
   MapPin, 
   ChevronDown
 } from 'lucide-react';
-import { getImageUrl, getHighResImageUrl, getOptimizedNextImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
+import { fallbackOnError, imageSources } from '@/lib/image-sources';
+
+/** Ảnh thay thế khi cả ảnh thu nhỏ lẫn ảnh gốc đều hỏng. */
+const GALLERY_FALLBACK_IMAGE = '/images/hero/toan-canh-chua-1280.webp';
+/** Ô lưới: ảnh thu nhỏ (360/640/960/1280), mặc định 640 px. Ảnh phủ ô (object-cover) nên ô cao (1 cột x 2 hàng, 2x2) cần ảnh rộng cỡ chiều cao nhân tỉ lệ. */
+const TILE_IMAGE_WIDTHS = [360, 640, 960, 1280] as const;
+const TILE_SIZES = {
+  tall: '(max-width: 639px) 130vw, 600px',
+  wide: '(max-width: 639px) 100vw, 490px',
+  small: '(max-width: 639px) 100vw, 340px',
+} as const;
+/** Bố cục bento lặp 8 ô một vòng (xem getBentoSpan): ô 0 (2x2) và 2 (1x2) cao, ô 4 và 7 ngang 2 cột, còn lại ô vừa. */
+const tileSizes = (index: number) => {
+  const slot = index % 8;
+  return slot === 0 || slot === 2 ? TILE_SIZES.tall : slot === 4 || slot === 7 ? TILE_SIZES.wide : TILE_SIZES.small;
+};
+/** Hộp phóng to: bậc 1920 (hộp rộng tối đa 896 px, kéo phóng đến 4 lần), một tệp cho mọi màn hình. */
+const LIGHTBOX_IMAGE_WIDTH = 1920;
 
 export interface AnhTuLieu {
   imageUrl?: string;
@@ -201,10 +219,9 @@ export function PhotoGallery({
       {/* ── LƯỚI ADAPTIVE BENTO BOX ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 w-full auto-rows-[minmax(180px,auto)]">
         {visibleItems.map((item, idx) => {
-          const rawSrc = getImageUrl(item.imageUrl || item.url) || '/images/hero/toan-canh-chua-1280.webp';
-          const directHighRes = getHighResImageUrl(item.imageUrl || item.url) || rawSrc;
-          // Lưới Bento dùng ảnh WebP tối ưu qua GPU/SIMD Sharp (1080px, nén chỉ ~70-120KB)
-          const previewSrc = getOptimizedNextImageUrl(item.imageUrl || item.url, 1080, 75) || directHighRes;
+          const original = getImageUrl(item.imageUrl || item.url) || GALLERY_FALLBACK_IMAGE;
+          // Lưới Bento dùng biến thể dựng sẵn (AVIF/WebP, 360 đến 1280 px theo ô và màn hình), không bao giờ tải ảnh gốc hàng MB cho ô cỡ 240-480 px
+          const tile = imageSources(original, 640, TILE_IMAGE_WIDTHS, tileSizes(idx));
           const spanClass = getBentoSpan(idx);
           const captionText = item.noiDung || item.caption || '';
           const titleText = item.title && item.title !== 'Ảnh tư liệu' ? item.title : '';
@@ -217,23 +234,15 @@ export function PhotoGallery({
               }}
               className={`group relative ${spanClass} rounded-2xl overflow-hidden border border-[#f2c14e]/35 hover:border-[#ffde59] shadow-xl hover:shadow-[0_0_20px_rgba(255,222,89,0.25)] cursor-pointer bg-[#1C120A] transition-all duration-500`}
             >
-              {/* Hình ảnh tối ưu hóa WebP siêu nét và nhẹ */}
+              {/* Hình ảnh tối ưu hóa AVIF/WebP vừa cỡ ô */}
               <img width={640} height={480}
-                src={previewSrc}
+                {...tile}
                 alt={titleText || captionText || `Ảnh tư liệu ${idx + 1}`}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                 style={{ objectPosition: item.imagePosition || 'center 50%' }}
                 loading="lazy"
-                onError={(e) => {
-                  const target = e.currentTarget as HTMLImageElement;
-                  if (target.src !== directHighRes && directHighRes) {
-                    target.src = directHighRes;
-                  } else if (target.src !== rawSrc && rawSrc) {
-                    target.src = rawSrc;
-                  } else {
-                    target.src = '/images/hero/toan-canh-chua-1280.webp';
-                  }
-                }}
+                decoding="async"
+                onError={fallbackOnError(original !== tile.src ? original : null, GALLERY_FALLBACK_IMAGE)}
               />
 
               {/* Lớp phủ Gradient dịu mắt ở chân ảnh */}
@@ -356,24 +365,13 @@ export function PhotoGallery({
                 }}
               >
                 <img
-                  src={
-                    getOptimizedNextImageUrl(currentItem.imageUrl || currentItem.url, 1920, 75) ||
-                    getHighResImageUrl(currentItem.imageUrl || currentItem.url) ||
-                    getImageUrl(currentItem.imageUrl || currentItem.url)
-                  }
+                  key={lightboxIndex}
+                  src={fitImage(getImageUrl(currentItem.imageUrl || currentItem.url), LIGHTBOX_IMAGE_WIDTH)}
                   alt={currentItem.title || 'Ảnh tư liệu'}
                   className="max-h-full max-w-full object-contain pointer-events-none drop-shadow-2xl"
                   draggable={false}
-                  onError={(e) => {
-                    const target = e.currentTarget as HTMLImageElement;
-                    const directHighRes = getHighResImageUrl(currentItem.imageUrl || currentItem.url);
-                    const rawFallback = getImageUrl(currentItem.imageUrl || currentItem.url);
-                    if (target.src !== directHighRes && directHighRes) {
-                      target.src = directHighRes;
-                    } else if (target.src !== rawFallback && rawFallback) {
-                      target.src = rawFallback;
-                    }
-                  }}
+                  decoding="async"
+                  onError={fallbackOnError(getImageUrl(currentItem.imageUrl || currentItem.url))}
                 />
               </div>
 

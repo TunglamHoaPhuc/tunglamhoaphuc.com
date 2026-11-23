@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { SectionData } from '@/types/tong-chi-tu-hoc';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 
 interface SectionCarouselProps {
   section: SectionData;
@@ -18,7 +18,8 @@ export function SectionCarousel({ section, dynamicBgImage }: SectionCarouselProp
   const [canScrollRight, setCanScrollRight] = useState(true);
 
   // Ưu tiên: ảnh nền do trang truyền vào -> bgImage của khối -> bgWatermark
-  const bgImage = getImageUrl(dynamicBgImage || section.bgImage || section.bgWatermark || '');
+  // Nền mờ (opacity 0,3, mặt nạ) phủ cả khối: bản 1280 là đủ.
+  const bgImage = fitImage(getImageUrl(dynamicBgImage || section.bgImage || section.bgWatermark || ''), 1280);
 
   const checkScrollability = useCallback(() => {
     if (scrollRef.current) {
@@ -128,7 +129,8 @@ export function SectionCarousel({ section, dynamicBgImage }: SectionCarouselProp
               className="group relative flex-none w-[280px] md:w-[310px] h-[380px] rounded-xl overflow-hidden cursor-pointer border border-[#593b26] hover:border-[#f2cc8f] transition-all duration-300 ease-out hover:shadow-[0_0_30px_rgba(242,204,143,0.4)] hover:-translate-y-1.5 snap-start block transform-gpu"
             >
               <Image
-                src={getImageUrl(card.imageUrl) || '/images/hero/toan-canh-chua-1280.webp'}
+                // Thẻ cao 310×380, object-cover: ảnh ngang phải phủ hết chiều cao nên cần rộng hơn khung, 960 là vừa.
+                src={fitImage(getImageUrl(card.imageUrl), 960) || '/images/hero/toan-canh-chua-1280.webp'}
                 alt={card.title}
                 fill
                 loading="lazy"

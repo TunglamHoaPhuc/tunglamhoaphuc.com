@@ -3,7 +3,13 @@
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Compass } from 'lucide-react';
-import { getImageUrl } from '@/utils/image';
+import { fallbackOnError, imageSources } from '@/lib/image-sources';
+
+// Thẻ "Tìm hiểu thêm" rộng 260 px (300 px từ 640 px) và cao 360-380 px; ảnh phủ khung (object-cover) nên ảnh ngang phải rộng cỡ chiều cao
+// nhân tỉ lệ (khoảng 540-600 px). Trình duyệt chọn 640 ở màn 1x và 960 ở màn 2x trở lên: không còn ảnh gốc hàng MB cho thẻ 260 px.
+const RELATED_IMAGE_WIDTHS = [360, 640, 960] as const;
+const RELATED_IMAGE_SIZES = '(max-width: 639px) 540px, 600px';
+const RELATED_FALLBACK_IMAGE = '/images/hero/toan-canh-chua-1280.webp';
 
 interface BaiVietLienQuan {
   category?: string;
@@ -133,14 +139,13 @@ export function DiscoverMore({ relatedArticles }: PropsTimHieuThem) {
                 {/* Ảnh bìa */}
                 <div className="w-full h-full relative">
                   <img width={640} height={480}
-                    src={getImageUrl(item.url) || '/images/hero/toan-canh-chua-1280.webp'}
+                    {...imageSources(item.url || RELATED_FALLBACK_IMAGE, 640, RELATED_IMAGE_WIDTHS, RELATED_IMAGE_SIZES)}
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                     style={{ objectPosition: (item as any).thumbnailPosition || (item as any).imagePosition || 'center 20%' }}
                     loading="lazy"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
-                    }}
+                    decoding="async"
+                    onError={fallbackOnError(RELATED_FALLBACK_IMAGE)}
                   />
                 </div>
 

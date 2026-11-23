@@ -4,6 +4,7 @@ import React, { FC, useState, useMemo } from "react";
 import { Search, ChevronLeft, ChevronRight, Eye, Calendar, RefreshCw, Volume2, Sparkles, ChevronDown } from "lucide-react";
 import { GIANG_DUONG_TOPICS, EMOTION_QUICK_TAGS, PHAP_THOAI_FEATURED, PHAP_THOAI_ALL, PhapThoaiTalk } from "@/data/giang-duong-data";
 import { CustomDropdown } from "@/components/common/CustomDropdown";
+import { STATUE_ICON_SRC, LOGO_ROUND_SRC, swapOnError, TOAN_CANH_SRC, fitProps, CARD_WIDTHS } from '@/features/universe/image-props';
 
 // ── Sub-component: PhapThoaiCard (Matching Image 0 reference) ──
 const PhapThoaiCard = React.memo(({ talk }: { talk: PhapThoaiTalk }) => {
@@ -14,14 +15,12 @@ const PhapThoaiCard = React.memo(({ talk }: { talk: PhapThoaiTalk }) => {
       {/* 1. THUMBNAIL CONTAINER */}
       <div className="relative w-full aspect-[16/9] overflow-hidden bg-[#1A120B] shrink-0">
         <img width={640} height={480}
-          src={talk.thumbnailUrl}
+          {...fitProps(talk.thumbnailUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 285px, (min-width: 640px) 46vw, calc(100vw - 32px)' })}
           alt={talk.title}
           loading="lazy"
           decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
-          }}
+          onError={swapOnError(TOAN_CANH_SRC)}
         />
         <div
           className="absolute inset-0 pointer-events-none"
@@ -42,14 +41,12 @@ const PhapThoaiCard = React.memo(({ talk }: { talk: PhapThoaiTalk }) => {
         {/* Center Circular Badge at Top Edge */}
         <div className="absolute top-[-24px] left-1/2 -translate-x-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#F2C14E] bg-[#25170E] flex items-center justify-center p-1 shadow-[0_0_18px_rgba(242,193,78,0.65)] overflow-hidden">
           <img width={128} height={128}
-            src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+            src={STATUE_ICON_SRC}
             alt="Biểu tượng Bảo tượng"
             loading="lazy"
             decoding="async"
             className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-            }}
+            onError={swapOnError(LOGO_ROUND_SRC)}
           />
         </div>
 

@@ -1,7 +1,7 @@
 // Trang Trí Tuệ Phật Pháp: các bài đang hiển thị ở D1 của www (đọc ở máy chủ). Không còn danh sách đóng gói,
 // không còn lời gọi WordPress; D1 không có bài thì trang trống.
 import { WisdomArchiveSection } from '@/features/wisdom/components/WisdomArchiveSection';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 import { livePosts } from '@/lib/v3-live';
 import { toWisdomItem, TRI_TUE_SECTION } from '@/lib/wisdom';
 import type { Metadata } from 'next';
@@ -18,7 +18,8 @@ export const metadata: Metadata = pageMetadata({
 export default async function TriTuePhatPhapPage() {
   const items = (await livePosts(TRI_TUE_SECTION)).map(toWisdomItem);
   // Ảnh nền của đầu trang: ảnh của bài mới nhất (không có bài thì không có ảnh nền).
-  const headerBgImage = getImageUrl(items[0]?.thumbnailUrl || '');
+  // Phủ rộng cả khung nhưng mờ (opacity 0,3, mặt nạ): bản 1280 là đủ, không xin ảnh gốc.
+  const headerBgImage = fitImage(getImageUrl(items[0]?.thumbnailUrl || ''), 1280);
 
   return (
     <div className="min-h-screen bg-[#2A1D14] text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black">

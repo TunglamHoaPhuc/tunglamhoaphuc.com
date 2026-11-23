@@ -23,6 +23,8 @@ import {
 } from 'lucide-react';
 import Header from '@/components/public/layout/Header';
 import Footer from '@/components/public/layout/Footer';
+import { fitImage } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 import { HeroBanner } from '@/components/tong-chi-tu-hoc/HeroBanner';
 import type { HoangPhapArticle } from '@/data/dong-chay-hoang-phap-data';
 import type { ScheduleDetail } from '@/lib/schedule-detail';
@@ -297,10 +299,13 @@ export default function ScheduleDetailClient({ eventInfo, smartRelatedArticles }
                     {/* Ảnh Thumbnail */}
                     <div className="relative w-full h-36 rounded-xl overflow-hidden bg-black/40 border border-[#F2C14E]/20">
                       <img loading="lazy" decoding="async" width={640} height={480}
-                        src={art.thumbnailUrl || art.bannerUrl}
+                        src={fitImage(art.thumbnailUrl || art.bannerUrl, 640)}
+                        srcSet={imageSrcSet(art.thumbnailUrl || art.bannerUrl || '', [360, 640, 960])}
+                        sizes="(min-width: 1024px) 270px, (min-width: 640px) 45vw, 92vw"
                         alt={art.title}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         onError={(e) => {
+                          e.currentTarget.removeAttribute('srcset');
                           (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp';
                         }}
                       />

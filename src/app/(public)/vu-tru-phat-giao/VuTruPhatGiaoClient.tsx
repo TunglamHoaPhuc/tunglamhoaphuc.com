@@ -7,16 +7,17 @@ import { InteractiveMap2D } from '@/features/universe/components/InteractiveMap2
 import { UniverseGridMode } from '@/features/universe/components/UniverseGridMode';
 import type { V3Area } from '@/lib/v3-data';
 import type { MapSpot } from '@/lib/v3-areas';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 
 // Khu vực và các điểm trên sơ đồ do máy chủ đọc từ D1 (page.tsx): khu vực ẩn hay đã xóa không có trong lưới lẫn sơ đồ.
 export default function VuTruPhatGiaoClient({ areas, spots }: { areas: V3Area[]; spots: MapSpot[] }) {
   const [viewMode, setViewMode] = useState<'grid' | '2d'>('grid');
 
   // Lấy ảnh khu vực tiêu biểu (Tam Bảo - Đại Hùng Bảo Điện) làm nền Header
-  const headerBgImage = getImageUrl(
-    areas[0]?.imgUrl ||
-    '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/tam-bao.webp'
+  // Nền mờ 30% dưới mặt nạ: bậc 1280 đủ cho cả màn hình rộng, không cần bản gốc.
+  const headerBgImage = fitImage(
+    getImageUrl(areas[0]?.imgUrl || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/tam-bao.webp'),
+    1280,
   );
 
   return (

@@ -4,6 +4,7 @@ import React, { FC, useState } from 'react';
 import Image from 'next/image';
 import { HeritageMap2D } from './heritage-map/HeritageMap2D';
 import { Compass, Sparkles, ArrowRight } from 'lucide-react';
+import { swapOnError } from '@/features/universe/image-props';
 
 export const BaoTangGrid: FC = () => {
   const [isHeritageMapOpen, setIsHeritageMapOpen] = useState<boolean>(false);
@@ -83,9 +84,7 @@ export const BaoTangGrid: FC = () => {
                 sizes="100vw"
                 className="object-cover object-center"
                 loading="lazy"
-                onError={(e) => {
-                  (e.target as any).src = '/images/vu-tru-phat-giao/to-duong/to-duong-banner.jpg';
-                }}
+                onError={swapOnError('/images/vu-tru-phat-giao/to-duong/to-duong-banner.jpg')}
               />
             </div>
 

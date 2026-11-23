@@ -17,6 +17,8 @@ import {
 } from '@/data/bao-tang-space-data';
 import { OtherAreasSection } from './OtherAreasSection';
 import type { V3Area } from '@/lib/v3-data';
+import { LOGO_ROUND_SRC, swapOnError, TOAN_CANH_SRC, fitProps, TOAN_CANH_BACKDROP, bentoFit, type FitOptions, STATUE_ICON_LARGE_SRC } from '@/features/universe/image-props';
+import { fitImage } from '@/utils/image';
 
 interface SpaceGallerySectionProps {
   areaTitle?: string;
@@ -109,12 +111,10 @@ export const SpaceGallerySection: FC<SpaceGallerySectionProps> = ({
         {/* ── NỀN SECTION: DÙNG ẢNH TRIỂN LÃM SƯ TỔ NGỘ CHÂN TỬ VỚI LỚP PHỦ NÂU VÀNG THIỀN MÔN ── */}
         <div className="absolute top-10 sm:top-14 inset-x-0 h-[460px] sm:h-[540px] z-0 pointer-events-none overflow-hidden">
           <img width={640} height={480}
-            src={isBaoTang ? BAO_TANG_BACKGROUND_IMAGE : '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp'}
+            {...(isBaoTang ? fitProps(BAO_TANG_BACKGROUND_IMAGE, { width: 1280, widths: [640, 960, 1280], sizes: '100vw' }) : TOAN_CANH_BACKDROP)}
             alt="Không gian bảo tàng"
             className="w-full h-full object-cover opacity-15 sm:opacity-20 filter blur-[2px] scale-105"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
-            }}
+            onError={swapOnError('/images/hero/toan-canh-chua-1280.webp')}
           />
           <div className="absolute inset-0 bg-[#2C1C11]/45" />
 
@@ -135,12 +135,10 @@ export const SpaceGallerySection: FC<SpaceGallerySectionProps> = ({
               aria-hidden="true"
             >
               <img width={128} height={128}
-                src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+                src={STATUE_ICON_LARGE_SRC}
                 alt=""
                 className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-                }}
+                onError={swapOnError(LOGO_ROUND_SRC)}
               />
             </div>
 
@@ -202,6 +200,7 @@ export const SpaceGallerySection: FC<SpaceGallerySectionProps> = ({
                           item={space}
                           idx={idx}
                           openLightbox={openLightbox}
+                          fit={bentoFit(spanClass)}
                         />
                       </div>
                     );
@@ -273,9 +272,11 @@ interface SpaceBentoCardProps {
   item: TamBaoSpaceImage | SpaceGalleryItem;
   idx: number;
   openLightbox: (idx: number) => void;
+  /** Bậc ảnh theo số cột ô chiếm trên lưới. */
+  fit: FitOptions;
 }
 
-const SpaceBentoCard: FC<SpaceBentoCardProps> = ({ item, idx, openLightbox }) => {
+const SpaceBentoCard: FC<SpaceBentoCardProps> = ({ item, idx, openLightbox, fit }) => {
   const itemTitle = item.title;
   const itemSubtitle =
     'subtitle' in item && item.subtitle ? item.subtitle : item.caption || '';
@@ -287,13 +288,11 @@ const SpaceBentoCard: FC<SpaceBentoCardProps> = ({ item, idx, openLightbox }) =>
     >
       {/* 1. Base Image */}
       <img width={640} height={480}
-        src={item.imgUrl}
+        {...fitProps(item.imgUrl, fit)}
         alt={itemTitle}
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         loading="lazy"
-        onError={(e) => {
-          (e.target as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
-        }}
+        onError={swapOnError(TOAN_CANH_SRC)}
       />
 
       {/* Soft gradient fade at bottom */}
@@ -506,16 +505,14 @@ const SpaceGalleryModal: FC<SpaceGalleryModalProps> = ({
           {/* Zoomable & Pannable Image Container */}
           <div className="w-full h-full flex items-center justify-center overflow-hidden pointer-events-none">
             <img
-              src={currentItem.imgUrl}
+              src={fitImage(currentItem.imgUrl, 1920)}
               alt={currentItem.title}
               style={{
                 transform: `scale(${zoomScale}) translate(${panOffset.x / zoomScale}px, ${panOffset.y / zoomScale}px)`,
                 transition: isDragging ? 'none' : 'transform 0.25s ease-out',
               }}
               className="max-h-full max-w-full object-contain rounded-lg filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
-              }}
+              onError={swapOnError('/images/hero/toan-canh-chua-1280.webp')}
             />
           </div>
 

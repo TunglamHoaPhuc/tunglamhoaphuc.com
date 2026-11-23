@@ -2,6 +2,7 @@
 
 import React, { FC, useCallback, useEffect, useState } from "react";
 import { ChevronUp } from "lucide-react";
+import { fitImage } from "@/utils/image";
 
 export interface AnchorSection {
   id: string;
@@ -127,7 +128,7 @@ export const VerticalAnchorNav: FC<VerticalAnchorNavProps> = ({
         {/* ── Tầng 1: Top Logo ── */}
         {!imageFailed && logoUrl ? (
           <img
-            src={logoUrl}
+            src={fitImage(logoUrl, 160)}
             alt="Biểu tượng"
             className="h-8 w-auto object-contain mb-1.5 flex-shrink-0 drop-shadow-[0_0_6px_rgba(242,193,78,0.4)]"
             onError={() => setImageFailed(true)}

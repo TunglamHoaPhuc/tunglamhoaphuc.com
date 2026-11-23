@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { ArrowLeft, ArrowRight, Calendar, Sparkles, Scroll, Landmark, User, HeartHandshake, BookOpen } from 'lucide-react';
 import type { GioiThieuTopicDetail } from '@/data/gioi-thieu-data';
 import { InfographicArticleRenderer } from '@/components/tong-chi-tu-hoc/chi-tiet/InfographicArticleRenderer';
+import { fitImage } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 /** Chủ đề khác đang hiển thị, đủ để vẽ một thẻ liên kết. */
 export interface OtherAboutTopic {
@@ -34,7 +36,8 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
           <div
             className="absolute inset-0 bg-cover bg-center opacity-25 blur-[2px] pointer-events-none scale-105"
             style={{
-              backgroundImage: `url('${topic.heroBanner || '/images/hero/toan-canh-chua-1280.webp'}')`,
+              // Nền mờ (opacity 0,25, blur) phủ rộng cả khung: bản 1280 là đủ.
+              backgroundImage: `url('${fitImage(topic.heroBanner, 1280) || '/images/hero/toan-canh-chua-1280.webp'}')`,
               backgroundPosition: topic.heroBannerPosition || 'center 50%',
             }}
           />
@@ -85,11 +88,15 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
                 <div className="lg:col-span-5 relative">
                   <div className="relative rounded-2xl overflow-hidden border-2 border-[#F2C14E]/60 shadow-[0_0_30px_rgba(242,193,78,0.2)] aspect-[4/3] sm:aspect-[16/11] bg-[#1A120B]">
                     <img
-                      src={topic.portraitImage}
+                      src={fitImage(topic.portraitImage, 640)}
+                      srcSet={imageSrcSet(topic.portraitImage, [360, 640, 960])}
+                      sizes="(min-width: 1024px) 440px, 92vw"
                       alt={topic.title}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
+                        const el = e.currentTarget as HTMLImageElement;
+                        el.removeAttribute('srcset');
+                        el.src = '/images/hero/toan-canh-chua-1280.webp';
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1A120B]/80 via-transparent to-transparent pointer-events-none" />
@@ -206,12 +213,16 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
                   >
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <img
-                        src={img.url}
+                        src={fitImage(img.url, 640)}
+                        srcSet={imageSrcSet(img.url, [360, 640, 960])}
+                        sizes="(min-width: 1024px) 288px, (min-width: 640px) 45vw, 92vw"
                         alt={img.caption}
                         loading="lazy"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
+                          const el = e.currentTarget as HTMLImageElement;
+                          el.removeAttribute('srcset');
+                          el.src = '/images/hero/toan-canh-chua-1280.webp';
                         }}
                       />
                     </div>

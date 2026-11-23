@@ -3,6 +3,7 @@
 import { FC, useState } from "react";
 import { X, Volume2, ArrowLeft } from "lucide-react";
 import { C } from "@/config/theme";
+import { fitImage } from "@/utils/image";
 
 // ─── Dữ liệu Timeline Ban Đầu ──────────────────────────────────────────────────────
 const TIMELINE_YEARS = [
@@ -285,7 +286,7 @@ const GalaxyTimelineGallery: FC<GalaxyTimelineGalleryProps> = ({ onClose }) => {
                       background: C.dark,
                     }}
                   >
-                    <img src={yt.icon} alt={yt.year} className="w-full h-full object-cover opacity-70" />
+                    <img src={fitImage(yt.icon, 160)} alt={yt.year} className="w-full h-full object-cover opacity-70" />
                   </div>
                   <span
                     style={{
@@ -352,7 +353,7 @@ const GalaxyTimelineGallery: FC<GalaxyTimelineGalleryProps> = ({ onClose }) => {
                           className="relative h-24 sm:h-28 rounded-lg overflow-hidden border border-[#f2cc8f]/30 hover:border-[#ffde59] group/img cursor-pointer transition-all duration-300 shadow-md"
                         >
                           <img
-                            src={src}
+                            src={fitImage(src, 360)}
                             alt={`${active.year} - ${group.cat} ${pIdx + 1}`}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-110"
                           />
@@ -375,7 +376,7 @@ const GalaxyTimelineGallery: FC<GalaxyTimelineGalleryProps> = ({ onClose }) => {
           className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer animate-in fade-in duration-200"
         >
           <div className="relative max-w-4xl max-h-[85vh] rounded-2xl overflow-hidden border border-[#f2cc8f]/50 shadow-2xl">
-            <img src={lightboxImg} alt="Ảnh Phóng To" className="w-full h-full object-contain" />
+            <img src={fitImage(lightboxImg, 1920)} alt="Ảnh Phóng To" className="w-full h-full object-contain" />
             <button
               onClick={() => setLightboxImg(null)}
               className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/70 text-[#ffde59] border border-[#f2cc8f]/40 flex items-center justify-center cursor-pointer hover:scale-110 transition-all"

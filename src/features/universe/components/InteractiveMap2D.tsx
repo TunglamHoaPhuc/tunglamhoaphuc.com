@@ -24,6 +24,7 @@ import {
 
 // Các điểm trên sơ đồ do máy chủ dựng từ khu vực đang hiển thị ở D1 (lib/v3-areas.ts): khu vực ẩn hay đã xóa không có điểm.
 import type { MapSpot } from '@/lib/v3-areas';
+import { TOAN_CANH_BACKDROP, fitProps, swapOnError } from '@/features/universe/image-props';
 
 function toSentenceCase(str?: string): string {
   if (!str) return '';
@@ -332,10 +333,8 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
             {/* Seamless Anchor Background Image: toan-canh-chua.jpg */}
             <div className="absolute inset-0 z-0">
               <img
-                src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp"
-                onError={(e) => {
-                  e.currentTarget.src = "/images/hero/toan-canh-chua-1280.webp";
-                }}
+                {...TOAN_CANH_BACKDROP}
+                onError={swapOnError("/images/hero/toan-canh-chua-1280.webp")}
                 alt="Toàn cảnh Tùng Lâm Hòa Phúc"
                 className="w-full h-full object-cover scale-105"
               />
@@ -576,10 +575,9 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
         >
           {/* Clean Crisp Flat Map Image borderless edge-to-edge full cover */}
           <img
-            src={MAP_IMAGE_URL}
-            onError={(e) => {
-              e.currentTarget.src = "/images/hero/toan-canh-chua-1280.webp";
-            }}
+            // Sơ đồ phủ cả màn hình, kéo và phóng to được: bậc lớn nhất 1920.
+            {...fitProps(MAP_IMAGE_URL, { width: 1920, widths: [1280, 1920], sizes: "100vw" })}
+            onError={swapOnError("/images/hero/toan-canh-chua-1280.webp")}
             alt="Sơ đồ 2D Tùng Lâm Hòa Phúc - canh-1.png"
             className="min-w-full min-h-full w-full h-full object-cover select-none pointer-events-auto block"
             draggable={false}
@@ -702,7 +700,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
 
                 {/* Close-up Image Preview */}
                 <div className="relative aspect-video rounded-xl overflow-hidden border mb-5 shadow-lg" style={{ borderColor: "rgba(242,193,78,0.35)" }}>
-                  <img src={selectedSpot.imgUrl} alt={selectedSpot.name} className="w-full h-full object-cover" />
+                  <img {...fitProps(selectedSpot.imgUrl, { width: 960, widths: [640, 960], sizes: "380px" })} loading="lazy" decoding="async" alt={selectedSpot.name} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#140D08]/80 via-transparent to-transparent" />
                 </div>
 
@@ -723,7 +721,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
                           style={{ borderColor: "rgba(242,193,78,0.5)" }}
                           title={st.name}
                         >
-                          <img src={st.imgUrl} alt={st.name} className="w-full h-full object-cover" />
+                          <img {...fitProps(st.imgUrl, { width: 160 })} loading="lazy" decoding="async" alt={st.name} className="w-full h-full object-cover" />
                         </div>
                       ))}
                       <div
@@ -781,7 +779,9 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
                           onClick={() => setVideoModalUrl(st.imgUrl)}
                         >
                           <img
-                            src={st.imgUrl}
+                            {...fitProps(st.imgUrl, { width: 160 })}
+                            loading="lazy"
+                            decoding="async"
                             alt={st.title}
                             className="w-14 h-11 rounded-lg object-cover shrink-0"
                           />
@@ -862,7 +862,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
               THƯỚC PHIM TƯ LIỆU THIỀN MÔN
             </h3>
             <div className="aspect-video rounded-xl overflow-hidden bg-black flex items-center justify-center">
-              <img src={videoModalUrl} alt="Video preview" className="w-full h-full object-cover" />
+              <img {...fitProps(videoModalUrl, { width: 1280, widths: [640, 960, 1280], sizes: "(min-width: 768px) 640px, 90vw" })} alt="Video preview" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>

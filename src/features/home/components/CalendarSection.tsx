@@ -1,5 +1,6 @@
 'use client';
 import { fitImage } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 import { FC, useState, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
@@ -429,7 +430,7 @@ export const CalendarSection: FC = () => {
       {/* ── Background Ambient Aura ── */}
       <div className="absolute inset-0 pointer-events-none">
         <img
-          src={fitImage(monthTheme.bannerImg, 1280)}
+          src={fitImage(monthTheme.bannerImg, 640)}
           alt="Bối cảnh Lịch tu học"
           className="w-full h-full object-cover opacity-15 blur-sm"
           loading="lazy"
@@ -490,10 +491,13 @@ export const CalendarSection: FC = () => {
                 {/* 1.1 TRANH MINH HỌA NGHỆ THUẬT (TỈ LỆ GỐC ASPECT 1200/1015 TRÊN DESKTOP, ASPECT 16/10 TRÊN MOBILE) */}
                 <div className="relative w-full aspect-[16/10] sm:aspect-[1200/900] lg:aspect-[1200/1015] shrink-0 overflow-hidden bg-black/40">
                   <img loading="lazy" decoding="async"
-                    src={fitImage(monthTheme.bannerImg, 1280)}
+                    src={fitImage(monthTheme.bannerImg, 960)}
+                    srcSet={imageSrcSet(monthTheme.bannerImg, [640, 960, 1280])}
+                    sizes="(min-width: 1024px) 380px, calc(100vw - 32px)"
                     alt={monthTheme.title}
                     className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-102"
                     onError={(e) => {
+                      e.currentTarget.removeAttribute('srcset');
                       (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp';
                     }}
                   />
@@ -585,7 +589,8 @@ export const CalendarSection: FC = () => {
                   <div
                     className="absolute inset-0 bg-cover bg-center filter blur-xl scale-110 opacity-40 pointer-events-none transition-all duration-700"
                     style={{
-                      backgroundImage: `url(${currentSlide.quote.url || monthTheme.quoteImg || monthTheme.bannerImg})`,
+                      // Lớp nền mờ (blur-xl, opacity 0,4): bản 360 là đủ, không xin ảnh gốc.
+                      backgroundImage: `url(${fitImage(currentSlide.quote.url || monthTheme.quoteImg || monthTheme.bannerImg, 360)})`,
                     }}
                   />
                   {/* Lớp vignette phủ nhẹ làm nổi bật bức tranh chính */}
@@ -1011,12 +1016,15 @@ export const CalendarSection: FC = () => {
               <div className="relative w-full h-[160px] sm:h-[185px] bg-black shrink-0 overflow-hidden">
                 <img loading="lazy" decoding="async"
                   src={fitImage(selectedEvent.imgUrl, 640)}
+                  srcSet={imageSrcSet(selectedEvent.imgUrl, [360, 640, 960])}
+                  sizes="(min-width: 448px) 448px, calc(100vw - 24px)"
                   alt={selectedEvent.title}
                   className="w-full h-full object-cover"
                   style={{
                     objectPosition: `center ${selectedEvent.imgPositionY ?? 50}%`,
                   }}
                   onError={(e) => {
+                    e.currentTarget.removeAttribute('srcset');
                     (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp';
                   }}
                 />
@@ -1266,7 +1274,8 @@ export const CalendarSection: FC = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <img loading="lazy" decoding="async"
-                src={selectedZoomQuote?.url || monthTheme.quoteImg || monthTheme.bannerImg}
+                // Hộp phóng to "xem ảnh rõ nét": bậc 1920, không phải ảnh gốc.
+                src={fitImage(selectedZoomQuote?.url || monthTheme.quoteImg || monthTheme.bannerImg, 1920)}
                 alt={selectedZoomQuote?.title || monthTheme.quoteTitle || monthTheme.title || 'Quote tu học'}
                 className="max-h-[92vh] max-w-[94vw] w-auto h-auto object-contain rounded-2xl shadow-[0_25px_80px_rgba(0,0,0,0.95)] border border-[#F2C14E]/30 animate-in zoom-in-95 duration-200"
               />

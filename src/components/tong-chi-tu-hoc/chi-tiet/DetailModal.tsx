@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, ExternalLink, X } from 'lucide-react';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 
 interface TuKhoaPopup {
   keyword: string;
@@ -68,7 +68,8 @@ export function DetailModal({
               {activeKeywordPopup.imageUrl && (
                 <div className="relative w-24 sm:w-28 h-24 sm:h-28 flex-shrink-0 rounded-2xl overflow-hidden border border-[#F2C14E]/60 shadow-[0_0_20px_rgba(242,193,78,0.2)] bg-black">
                   <img width={640} height={480}
-                    src={getImageUrl(activeKeywordPopup.imageUrl)}
+                    // Ô vuông 96–112 px: bản 360 (trước đây tải ảnh gốc đến 4.160×6.240).
+                    src={fitImage(getImageUrl(activeKeywordPopup.imageUrl), 360)}
                     alt={activeKeywordPopup.title}
                     style={{ objectPosition: activeKeywordPopup.imagePosition || 'center 50%' }}
                     className="w-full h-full object-cover"

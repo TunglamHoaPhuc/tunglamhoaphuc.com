@@ -7,6 +7,7 @@ import { BaoThapMap2D } from './BaoThapMap2D';
 import { QuanAm33Grid } from './QuanAm33Grid';
 import { BAO_THAP_FLOORS } from '@/data/bao-thap-data';
 import { fitImage } from '@/utils/image';
+import { TOAN_CANH_SRC, swapOnError } from '@/features/universe/image-props';
 
 export const BaoThapGrid: FC = () => {
   const [isMapOpen, setIsMapOpen] = useState<boolean>(false);
@@ -32,9 +33,7 @@ export const BaoThapGrid: FC = () => {
                 sizes="100vw"
                 className="object-cover object-center"
                 loading="lazy"
-                onError={(e) => {
-                  (e.target as any).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
-                }}
+                onError={swapOnError(TOAN_CANH_SRC)}
               />
             </div>
 

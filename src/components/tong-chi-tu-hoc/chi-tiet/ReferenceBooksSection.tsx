@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { BookOpen, ExternalLink, Layers } from 'lucide-react';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 
 export interface ReferenceBookItem {
   id?: string;
@@ -63,7 +63,8 @@ export function ReferenceBooksSection({ books = [] }: ReferenceBooksSectionProps
                 {/* Book Cover */}
                 <div className="relative w-16 h-20 sm:w-20 sm:h-24 rounded-xl overflow-hidden border border-[#F2C14E]/35 shadow-md flex-shrink-0 bg-black/40">
                   <img width={300} height={400}
-                    src={getImageUrl(book.coverImage) || '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp'}
+                    // Bìa 64–80 px: bản 160.
+                    src={fitImage(getImageUrl(book.coverImage) || '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp', 160)}
                     alt={book.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"

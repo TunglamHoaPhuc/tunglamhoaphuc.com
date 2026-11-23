@@ -3,6 +3,8 @@
 import { FC } from "react";
 import { X, Play, Volume2, Sparkles } from "lucide-react";
 import { WisdomItem } from "@/types/wisdom-tags";
+import { fitImage } from "@/utils/image";
+import { imageSrcSet } from "@/lib/tlhp-content/media";
 
 interface MediaPlayModalProps {
   item: WisdomItem | null;
@@ -66,7 +68,10 @@ export const MediaPlayModal: FC<MediaPlayModalProps> = ({ item, onClose }) => {
         {/* ── 2. Khối Player Trung Tâm ── */}
         <div className="relative overflow-hidden group" style={{ minHeight: 320, maxHeight: 420 }}>
           <img
-            src={item.thumbnailUrl}
+            src={fitImage(item.thumbnailUrl, 960)}
+            srcSet={imageSrcSet(item.thumbnailUrl, [640, 960, 1280, 1920])}
+            sizes="(min-width: 960px) 896px, 92vw"
+            decoding="async"
             alt={item.title}
             className="w-full h-full object-cover"
           />

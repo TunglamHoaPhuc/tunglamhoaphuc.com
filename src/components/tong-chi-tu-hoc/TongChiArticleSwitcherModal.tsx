@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Search, X, BookOpen, Layers, CheckCircle2, ChevronRight, Sparkles } from 'lucide-react';
 import tongChiRawData from '@/data/tong-chi-data.json';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 
 export interface SwitcherArticleItem {
   id: number;
@@ -230,7 +230,8 @@ export function TongChiArticleSwitcherModal({
                       {/* Thumbnail */}
                       <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-black/50 border border-[#F2C14E]/40 shrink-0 shadow-md">
                         <img width={640} height={480}
-                          src={getImageUrl(item.bannerImage) || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-banner.webp'}
+                          // Ô vuông 64 px (object-cover): bản 360 là đủ cho màn hình 2x.
+                          src={fitImage(getImageUrl(item.bannerImage) || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-banner.webp', 360)}
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                         />

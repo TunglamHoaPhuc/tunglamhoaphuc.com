@@ -10,7 +10,7 @@ import {
   BookMarked,
   Layers,
 } from 'lucide-react';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 import { BookFlipModal } from './BookFlipModal';
 
 export interface SourceBookData {
@@ -125,7 +125,8 @@ export function BookCitationSection({ sourceBook }: BookCitationProps) {
               className="relative w-32 h-44 sm:w-36 sm:h-48 md:w-44 md:h-60 rounded-2xl overflow-hidden border-2 border-[#F2C14E]/50 shadow-2xl shrink-0 bg-black/40 group cursor-pointer"
             >
               <img width={300} height={400}
-                src={getImageUrl(displayedList[0].coverImage) || '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp'}
+                // Bìa hiển thị 128–176 px: bản 640 cho màn hình 2x.
+                src={fitImage(getImageUrl(displayedList[0].coverImage) || '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp', 640)}
                 alt={displayedList[0].bookTitle}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 style={{ objectPosition: displayedList[0].coverPosition || 'center' }}
@@ -207,7 +208,8 @@ export function BookCitationSection({ sourceBook }: BookCitationProps) {
                     className="relative w-16 h-20 sm:w-20 sm:h-24 rounded-xl overflow-hidden border border-[#F2C14E]/35 shadow-md flex-shrink-0 bg-black/40 cursor-pointer"
                   >
                     <img width={300} height={400}
-                      src={getImageUrl(item.coverImage) || '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp'}
+                      // Bìa 64–80 px: bản 160.
+                      src={fitImage(getImageUrl(item.coverImage) || '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp', 160)}
                       alt={item.bookTitle}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       style={{ objectPosition: item.coverPosition || 'center' }}

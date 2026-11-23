@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Map as MapIcon, LayoutGrid } from "lucide-react";
 import type { V3Area } from "@/lib/v3-data";
 import { CategoryFilter, SortOption } from "@/components/common/CategoryFilter";
+import { CARD_WIDTHS, fitProps } from '@/features/universe/image-props';
 
 interface UniverseGridModeProps {
   /** Các khu vực đang hiển thị (D1), theo thứ tự biên tập. */
@@ -51,9 +52,15 @@ export function formatTitleWithSmartPairs(title: string): React.ReactNode {
 // ── Memoized Card Subcomponent with Hardware-Accelerated Smooth Hover & Golden Subtitle ──
 interface UniverseAreaCardProps {
   area: V3Area;
+  /** Thẻ ở hàng đầu của lưới (trên nếp gấp) tải ngay; các thẻ còn lại tải khi cuộn tới. */
+  eager?: boolean;
 }
 
-const UniverseAreaCard = React.memo(({ area }: UniverseAreaCardProps) => {
+// Thẻ rộng khoảng 290 px ở lưới 4 cột, 46% màn hình ở lưới 2 cột, gần trọn bề rộng ở 1 cột: bậc 360/640/960 theo DPR.
+const AREA_CARD_SIZES = "(min-width: 1024px) 290px, (min-width: 640px) 46vw, calc(100vw - 32px)";
+const EAGER_CARDS = 2;
+
+const UniverseAreaCard = React.memo(({ area, eager = false }: UniverseAreaCardProps) => {
   const displayTitle = formatTitleWithSmartPairs(area.name);
 
   return (
@@ -64,9 +71,10 @@ const UniverseAreaCard = React.memo(({ area }: UniverseAreaCardProps) => {
       {/* 1. THUMBNAIL IMAGE FRAME (aspect-[1.618/1] Golden Ratio) */}
       <div className="relative w-full aspect-[1.618/1] overflow-hidden bg-[#1A120B] shrink-0">
         <img width={640} height={480}
-          src={area.imgUrl}
+          {...fitProps(area.imgUrl, { width: 960, widths: CARD_WIDTHS, sizes: AREA_CARD_SIZES })}
           alt={area.name}
-          loading="lazy"
+          loading={eager ? "eager" : "lazy"}
+          fetchPriority={eager ? "high" : undefined}
           decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 transform-gpu"
         />
@@ -222,8 +230,8 @@ export const UniverseGridMode: FC<UniverseGridModeProps> = ({ areas, viewMode, o
       {viewMode === "grid" && (
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6">
-            {visibleAreas.map((area) => (
-              <UniverseAreaCard key={area.id} area={area} />
+            {visibleAreas.map((area, index) => (
+              <UniverseAreaCard key={area.id} area={area} eager={index < EAGER_CARDS} />
             ))}
           </div>
 

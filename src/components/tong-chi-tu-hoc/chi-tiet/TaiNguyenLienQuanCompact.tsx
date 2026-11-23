@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Play, BookOpen, Images, ExternalLink, X, ArrowUpRight } from 'lucide-react';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 import { SourceBookData } from './BookCitationSection';
 import { AnhTuLieu } from './PhotoGallery';
 
@@ -69,7 +70,10 @@ export function TaiNguyenLienQuanCompact({
   const videoUrl = videoBlock?.videoUrl || '';
   const videoEmbed = formatYoutubeEmbed(videoUrl);
   const videoTitle = videoBlock?.title || '';
-  const videoThumb = getImageUrl(heroBanner) || '/images/hero/toan-canh-chua-1280.webp';
+  // Thẻ video rộng khoảng 280 px (di động ~350 px), tỉ lệ 16:9.
+  const videoThumb = fitImage(getImageUrl(heroBanner) || '/images/hero/toan-canh-chua-1280.webp', 640);
+  const videoThumbSet = imageSrcSet(getImageUrl(heroBanner) || '/images/hero/toan-canh-chua-1280.webp', [360, 640, 960]);
+  const VIDEO_THUMB_SIZES = '(min-width: 768px) 280px, calc(100vw - 64px)';
 
   const previewPhotos = photoGallery.slice(0, 4);
 
@@ -104,6 +108,8 @@ export function TaiNguyenLienQuanCompact({
             <div className="relative aspect-video rounded-xl overflow-hidden mb-3.5 border border-[#F2C14E]/30 bg-black/60 group-hover:border-[#F2C14E]/60 transition-colors">
               <img width={640} height={480}
                 src={videoThumb}
+                srcSet={videoThumbSet}
+                sizes={VIDEO_THUMB_SIZES}
                 alt={videoTitle}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-85 group-hover:opacity-100"
                 loading="lazy"
@@ -169,7 +175,8 @@ export function TaiNguyenLienQuanCompact({
             <div className="relative aspect-video rounded-xl overflow-hidden mb-3.5 border border-[#F2C14E]/30 bg-black/40 p-2 flex items-center justify-center group-hover:border-[#F2C14E]/60 transition-colors">
               <div className="h-full flex items-center justify-center gap-3">
                 <img width={300} height={400}
-                  src={getImageUrl(mainBook.coverImage) || '/images/sach-mau.jpg'}
+                  // Bìa cao khoảng 140 px: bản 360.
+                  src={fitImage(getImageUrl(mainBook.coverImage) || '/images/sach-mau.jpg', 360)}
                   alt={mainBook.bookTitle || mainBook.title || 'Sách tham khảo'}
                   className="h-full w-auto object-contain rounded-md shadow-md border border-[#F2C14E]/40 group-hover:scale-105 transition-transform"
                   loading="lazy"
@@ -233,7 +240,8 @@ export function TaiNguyenLienQuanCompact({
                 previewPhotos.map((p, idx) => (
                   <div key={idx} className="relative h-full overflow-hidden rounded">
                     <img width={640} height={480}
-                      src={getImageUrl(p.imageUrl || p.url) || '/images/hero/toan-canh-chua-1280.webp'}
+                      // Ô xem trước 137–170 px: bản 360.
+                      src={fitImage(getImageUrl(p.imageUrl || p.url) || '/images/hero/toan-canh-chua-1280.webp', 360)}
                       alt={p.title || `Ảnh tư liệu ${idx + 1}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"
@@ -244,6 +252,8 @@ export function TaiNguyenLienQuanCompact({
                 <div className="col-span-2 flex items-center justify-center h-full">
                   <img width={640} height={480}
                     src={videoThumb}
+                    srcSet={videoThumbSet}
+                    sizes={VIDEO_THUMB_SIZES}
                     alt="Bộ sưu tập ảnh"
                     className="w-full h-full object-cover rounded"
                   />

@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
 import { NAV_ITEMS } from '@/data/tong-chi-tu-hoc-data';
 import { NavDropdownPanel } from './NavDropdownPanel';
+import { fitImage } from '@/utils/image';
 
 interface NavItem {
   id: string;
@@ -85,7 +86,7 @@ export function SubNavbar({
 
           <Link href={homeHref} title={homeTitle} className="flex items-center">
             <img width={128} height={128}
-              src={logoSrc}
+              src={fitImage(logoSrc, 160)}
               alt={homeTitle}
               decoding="async"
               className="h-10 md:h-12 w-auto object-contain flex-shrink-0 my-auto drop-shadow-[0_0_8px_rgba(242,193,78,0.4)] hover:scale-105 transition-transform"

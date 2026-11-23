@@ -2,6 +2,7 @@
 
 import React, { FC, useState } from "react";
 import { Video, Play } from "lucide-react";
+import { fitProps } from '@/features/universe/image-props';
 
 export interface StoryItem {
   id: string;
@@ -62,7 +63,7 @@ const StoryCard = React.memo(({ story, isPlaying, onPlay }: StoryCardProps) => {
               onClick={() => onPlay(story.id)}
             >
               <img width={640} height={480}
-                src={story.thumbnailUrl}
+                {...fitProps(story.thumbnailUrl, { width: 1280, widths: [640, 960, 1280], sizes: '(min-width: 1024px) 560px, calc(100vw - 32px)' })}
                 alt={story.title}
                 loading="lazy"
                 decoding="async"

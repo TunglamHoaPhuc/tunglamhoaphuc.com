@@ -22,6 +22,8 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { fitImage } from '@/utils/image';
+import { fitProps } from '@/features/universe/image-props';
 
 interface HeritageMap2DProps {
   onClose: () => void;
@@ -109,7 +111,8 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
 
     // Preload image in background
     const img = new window.Image();
-    img.src = HERITAGE_MAP_IMAGE;
+    // Tải trước đúng địa chỉ mà thẻ ảnh bên dưới dùng (cùng bậc), không tải bản gốc.
+    img.src = fitImage(HERITAGE_MAP_IMAGE, 1920);
 
     const interval = setInterval(() => {
       setLoadingProgress((prev) => {
@@ -584,7 +587,8 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
         >
           {/* FULL MAP IMAGE: BAN-DO-DANH-TANG-VIET-NAM-FINAL */}
           <img
-            src={HERITAGE_MAP_IMAGE}
+            // Bản đồ phủ cả màn hình, kéo và phóng to được: bậc lớn nhất 1920.
+            src={fitImage(HERITAGE_MAP_IMAGE, 1920)}
             alt="Bản đồ Di sản Phật giáo Việt Nam"
             className="w-full h-full object-cover select-none pointer-events-auto block filter brightness-95 contrast-105"
             loading="lazy"
@@ -739,7 +743,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
                       {/* Thumbnail Frame */}
                       <div className="relative w-16 h-20 rounded-xl overflow-hidden border-2 border-[#F2C14E]/50 shrink-0 bg-[#1A120B] shadow-md group-hover:border-[#F2C14E]">
                         <img
-                          src={photo.imgUrl}
+                          {...fitProps(photo.imgUrl, { width: 160 })}
                           alt={photo.title}
                           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                           loading="lazy"
@@ -865,7 +869,8 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
                         }}
                       >
                         <img
-                          src={selectedPhoto.imgUrl}
+                          // Ảnh xem lớn, có phóng to: bậc lớn nhất 1920.
+                          src={fitImage(selectedPhoto.imgUrl, 1920)}
                           alt={selectedPhoto.title}
                           className="max-h-full max-w-full object-contain pointer-events-none drop-shadow-2xl"
                           loading="lazy"

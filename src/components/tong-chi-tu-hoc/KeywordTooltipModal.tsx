@@ -2,7 +2,8 @@
 
 import { FC, useEffect } from 'react';
 import Link from 'next/link';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 import { X, ArrowRight, ExternalLink } from 'lucide-react';
 
 interface KeywordPopup {
@@ -65,10 +66,14 @@ export const KeywordTooltipModal: FC<KeywordTooltipModalProps> = ({ popup, onClo
         {popup.imageUrl && (
           <div className="relative overflow-hidden w-full" style={{ height: 210 }}>
             <img width={640} height={480}
-              src={getImageUrl(popup.imageUrl)}
+              src={fitImage(getImageUrl(popup.imageUrl), 960)}
+              srcSet={imageSrcSet(getImageUrl(popup.imageUrl), [360, 640, 960])}
+              sizes="(min-width: 448px) 448px, 92vw"
+              decoding="async"
               alt={popup.title}
               className="w-full h-full object-cover"
               onError={(e) => {
+                e.currentTarget.removeAttribute('srcset');
                 (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
               }}
             />

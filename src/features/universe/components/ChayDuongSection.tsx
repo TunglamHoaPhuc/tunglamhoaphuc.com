@@ -3,6 +3,7 @@
 import React, { FC, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Utensils, Heart, BookOpen, ShieldCheck, ChevronRight, X, Clock, Eye } from 'lucide-react';
+import { fitProps, CARD_WIDTHS } from '@/features/universe/image-props';
 
 interface ChayArticle {
   id: string;
@@ -98,7 +99,7 @@ export const ChayDuongSection: FC = () => {
               {/* Thumbnail Image */}
               <div className="relative w-full h-[220px] rounded-xl overflow-hidden mb-4 bg-[#140B05] border border-[#F2C14E]/20">
                 <img loading="lazy" decoding="async" width={640} height={480}
-                  src={art.imageUrl}
+                  {...fitProps(art.imageUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 768px) 520px, calc(100vw - 72px)' })}
                   alt={art.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                 />
@@ -191,7 +192,7 @@ export const ChayDuongSection: FC = () => {
               {/* Cover Image inside modal */}
               <div className="relative w-full h-[260px] rounded-2xl overflow-hidden border border-[#F2C14E]/40 my-3">
                 <img
-                  src={selectedArticle.imageUrl}
+                  {...fitProps(selectedArticle.imageUrl, { width: 1280, widths: [640, 960, 1280], sizes: '(min-width: 768px) 640px, 90vw' })}
                   alt={selectedArticle.title}
                   className="w-full h-full object-cover"
                 />

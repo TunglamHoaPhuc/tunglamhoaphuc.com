@@ -4,6 +4,8 @@ import React, { FC, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, ArrowRight } from 'lucide-react';
 import { AN_TRIEU_NGUYEN_LIST, AnTrieuNguyenItem } from '@/data/anTrieuNguyenData';
+import { swapOnError, fitProps, CARD_WIDTHS, MODAL_FIT } from '@/features/universe/image-props';
+import { fitImage } from '@/utils/image';
 
 export const DaiNamQuocMauGrid: FC = () => {
   const [selectedSeal, setSelectedSeal] = useState<AnTrieuNguyenItem | null>(null);
@@ -49,12 +51,10 @@ export const DaiNamQuocMauGrid: FC = () => {
               {/* 1. FULL-BLEED IMAGE FRAME (No inner padding, zero exposed image border, 57% Height Ratio) */}
               <div className="relative w-full h-[195px] bg-[#1A120B] overflow-hidden shrink-0">
                 <img loading="lazy" decoding="async" width={640} height={480}
-                  src={seal.imgUrl}
+                  {...fitProps(seal.imgUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 285px, (min-width: 768px) 30vw, (min-width: 640px) 46vw, calc(100vw - 32px)' })}
                   alt={seal.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = '/images/bao_tuong_phat_giao/linh_vat_phat_giao/cac_an_rong_trieu_dai_nha_nguyen_viet_nam.jpg';
-                  }}
+                  onError={swapOnError('/images/bao_tuong_phat_giao/linh_vat_phat_giao/cac_an_rong_trieu_dai_nha_nguyen_viet_nam.jpg')}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#25170E] via-transparent to-black/40 pointer-events-none" />
 
@@ -78,12 +78,10 @@ export const DaiNamQuocMauGrid: FC = () => {
                   {/* FLOATING CIRCULAR GOLD LOGO (Positioned at top-0 -translate-y-1/2, z-30 so NOT clipped) */}
                   <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#1A120B] border-2 border-[#F2C14E] p-1 flex items-center justify-center shadow-[0_0_18px_rgba(242,193,78,0.75)] overflow-hidden">
                     <img loading="lazy" decoding="async" width={128} height={128}
-                      src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-bao-vat-phat-giao.webp"
+                      src={fitImage('/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-bao-vat-phat-giao.webp', 160)}
                       alt="Bảo Vật Triều Nguyễn"
                       className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.95)] scale-145 sm:scale-150 transform-gpu"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-bao-tuong-phat-giao.webp';
-                      }}
+                      onError={swapOnError(fitImage('/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-bao-tuong-phat-giao.webp', 160))}
                     />
                   </div>
 
@@ -157,12 +155,10 @@ export const DaiNamQuocMauGrid: FC = () => {
                 {/* Image Container (38% Golden Ratio) */}
                 <div className="w-full md:w-[38%] shrink-0 rounded-2xl overflow-hidden border-2 border-[#F2C14E]/60 bg-black/60 p-3 shadow-2xl relative self-stretch flex items-center justify-center">
                   <img
-                    src={selectedSeal.imgUrl}
+                    {...fitProps(selectedSeal.imgUrl, MODAL_FIT)}
                     alt={selectedSeal.title}
                     className="w-full h-auto max-h-[340px] md:max-h-[420px] object-cover rounded-xl shadow-inner"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/bao_tuong_phat_giao/linh_vat_phat_giao/cac_an_rong_trieu_dai_nha_nguyen_viet_nam.jpg';
-                    }}
+                    onError={swapOnError('/images/bao_tuong_phat_giao/linh_vat_phat_giao/cac_an_rong_trieu_dai_nha_nguyen_viet_nam.jpg')}
                   />
                   <div className="absolute inset-0 pointer-events-none rounded-xl border border-[#F2C14E]/20" />
                 </div>

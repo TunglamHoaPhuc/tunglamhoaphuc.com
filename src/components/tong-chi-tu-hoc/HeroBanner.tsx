@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { MoveVertical } from 'lucide-react';
 import { fitImage, getImageUrl, getHighResImageUrl } from '@/utils/image';
+import { imageSources } from '@/lib/image-sources';
 
 interface HeroBannerProps {
   id?: string;
@@ -19,6 +19,10 @@ interface HeroBannerProps {
   backLink?: string;
   backText?: string;
 }
+
+/** Bậc của biểu ngữ: 960/1280/1920 (không có bậc nhỏ hơn: ảnh phủ cả khung nên luôn lớn). */
+const BANNER_WIDTHS = [960, 1280, 1920] as const;
+const BANNER_SIZES = '(max-width: 767px) 240vw, 100vw';
 
 const DEFAULT_BANNER_IMAGE = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
 
@@ -89,6 +93,10 @@ export function HeroBanner({
     }
   };
 
+  // srcset chỉ khi đang hiện ảnh của bài: sau lỗi, địa chỉ thay thế đi một mình (trình duyệt luôn ưu tiên srcset hơn src).
+  const fromPost = imgSrc === getHighResImageUrl(bannerUrl || bgImage);
+  const { src: bannerSrc, srcSet: bannerSet } = fromPost ? imageSources(imgSrc || DEFAULT_BANNER_IMAGE, 1920, BANNER_WIDTHS, BANNER_SIZES) : { src: fitImage(imgSrc || DEFAULT_BANNER_IMAGE, 1920), srcSet: undefined };
+
   return (
     <section
       id={id}
@@ -104,15 +112,20 @@ export function HeroBanner({
           isEditable ? 'cursor-grab active:cursor-grabbing group/banner' : ''
         }`}
       >
-        <Image
-          src={fitImage(imgSrc || DEFAULT_BANNER_IMAGE, 1920)}
+        {/* Ảnh đầu trang (LCP): thẻ img thường để có srcset (next/image `unoptimized` không có srcset), tải ngay với ưu tiên cao.
+            Ảnh phủ khung cao 500-860 px nên trên điện thoại phải rộng cỡ 2-2,8 lần màn hình: sizes giữ bậc 1920 ở đó, và hạ xuống 1280/960
+            ở máy tính, nơi 100vw đúng bằng chiều rộng cần. */}
+        <img
+          width={1920}
+          height={1080}
+          src={bannerSrc}
+          {...(bannerSet ? { srcSet: bannerSet, sizes: BANNER_SIZES } : {})}
           alt={title || 'Hero Banner Tông Chỉ Tu Học'}
-          fill
-          unoptimized
-          priority
-          sizes="100vw"
-          className="object-cover transition-all duration-300 scale-105 pointer-events-none"
-          style={{ objectPosition: currentPos || 'center' }}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover transition-all duration-300 scale-105 pointer-events-none"
+          style={{ objectPosition: currentPos || 'center', color: 'transparent' }}
           onError={() => {
             const rawFallback = getImageUrl(bannerUrl || bgImage);
             if (rawFallback && imgSrc !== rawFallback) {

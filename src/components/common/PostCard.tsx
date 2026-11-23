@@ -1,5 +1,7 @@
 'use client';
 import { fitImage } from '@/utils/image';
+import { imageSources } from '@/lib/image-sources';
+import { IMAGE_WIDTH } from '@/lib/tlhp-content/media';
 
 import React, { FC } from 'react';
 import Link from 'next/link';
@@ -14,6 +16,12 @@ export interface PostCardProps {
   /** Thẻ đầu danh sách (trên nếp gấp): tải ngay, không lazy. */
   priority?: boolean;
 }
+
+// Thẻ "golden" của danh sách Dòng Chảy: lưới 1 cột dưới 768 px (thẻ rộng 100vw trừ lề 16 px mỗi bên), 2 cột từ 768 px (lề 40 px mỗi bên,
+// khoảng cách 40 px, trần 1.280 px nên thẻ rộng nhất 580 px). Trình duyệt chọn bậc 360/640/960/1280 theo bề rộng thẻ và mật độ điểm ảnh.
+const GOLDEN_IMAGE_WIDTHS = [360, 640, 960, 1280] as const;
+const GOLDEN_IMAGE_SIZES = '(max-width: 767px) calc(100vw - 32px), (max-width: 1279px) calc((100vw - 120px) / 2), 580px';
+const GOLDEN_FALLBACK_IMAGE = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp';
 
 const DEFAULT_TEMPLE_LOGO = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/bieu-tuong-tong-chi-tu-hoc-tung-lam-hoa-phuc.webp';
 
@@ -142,6 +150,9 @@ export const PostCard: FC<PostCardProps> = ({
 
   const categoryTag = post.category1 || 'Phật Pháp – Đời Sống';
   const logoUrl = getCategoryIcon(post.category1, post.category2, post.title, post.category1IconUrl);
+  // Huy hiệu 44-54 px: icon tĩnh của site (/images/icons/…-128.webp) giữ nguyên kèm ?v=4; icon do admin chọn hay logo ở /anh-goc/ (có thể là
+  // PNG 2.000 px) đi bằng biến thể 160 px (một địa chỉ có ?v=4 thì không có biến thể).
+  const badgeUrl = logoUrl.startsWith('/images/') ? `${logoUrl}?v=4` : fitImage(logoUrl, IMAGE_WIDTH.icon);
 
   if (variant === 'golden') {
     return (
@@ -152,7 +163,7 @@ export const PostCard: FC<PostCardProps> = ({
         {/* 1. Khung ảnh Thumbnail: flex-1 min-h-0 co lại mượt mà vào trong khi hover */}
         <div className="relative w-full flex-1 min-h-0 overflow-hidden bg-[#1A120B] transition-all duration-500 ease-out">
           <img width={640} height={520}
-            src={fitImage(post.imageUrl || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp', 640)}
+            {...imageSources(post.imageUrl || GOLDEN_FALLBACK_IMAGE, 640, GOLDEN_IMAGE_WIDTHS, GOLDEN_IMAGE_SIZES)}
             alt={post.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             style={{ objectPosition: post.thumbnailPosition || post.imagePosition || 'center 20%' }}
@@ -168,7 +179,7 @@ export const PostCard: FC<PostCardProps> = ({
           {/* Huy hiệu Logo Chuyên mục con nổi chính giữa tim đường kẻ */}
           <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[44px] h-[44px] md:w-[50px] md:h-[50px] rounded-full border-2 border-[#F2C14E] bg-[#24160E] flex items-center justify-center p-2 shadow-[0_0_16px_rgba(242,193,78,0.6)] group-hover:scale-110 group-hover:shadow-[0_0_24px_rgba(242,193,78,0.85)] transition-all duration-300">
             <img width={128} height={128} loading="lazy" decoding="async"
-              src={`${logoUrl}?v=4`}
+              src={badgeUrl}
               alt={post.title}
               className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.5)]"
             />
@@ -256,7 +267,7 @@ export const PostCard: FC<PostCardProps> = ({
         {/* Huy hiệu Logo Danh mục nổi chính giữa tim đường kẻ (Phóng to trang nghiêm, tròn trịa cân đối) */}
         <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[46px] h-[46px] md:w-[54px] md:h-[54px] rounded-full border-2 border-[#F2C14E] bg-[#24160E] flex items-center justify-center p-2 md:p-2.5 shadow-[0_0_16px_rgba(242,193,78,0.6)] group-hover:scale-110 group-hover:shadow-[0_0_24px_rgba(242,193,78,0.85)] transition-all duration-300">
           <img width={128} height={128} loading="lazy" decoding="async"
-            src={`${logoUrl}?v=4`}
+            src={badgeUrl}
             alt={categoryTag}
             className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.5)]"
           />

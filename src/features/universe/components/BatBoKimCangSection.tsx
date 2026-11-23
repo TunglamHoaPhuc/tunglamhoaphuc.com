@@ -4,6 +4,7 @@ import React, { FC, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Shield } from 'lucide-react';
 import { BAT_BO_KIM_CANG_DATA, BatBoKimCangItem } from '@/data/batBoKimCangData';
+import { STATUE_ICON_SRC, LOGO_ROUND_SRC, swapOnError, TOAN_CANH_SRC, fitProps, CARD_WIDTHS, MODAL_FIT, STATUE_ICON_LARGE_SRC } from '@/features/universe/image-props';
 
 export const BatBoKimCangSection: FC = () => {
   const [selectedStatue, setSelectedStatue] = useState<BatBoKimCangItem | null>(null);
@@ -14,12 +15,10 @@ export const BatBoKimCangSection: FC = () => {
       <div className="flex flex-col items-center text-center mb-8">
         <div className="w-14 h-14 sm:w-16 sm:h-16 mb-2 flex items-center justify-center" aria-hidden="true">
           <img decoding="async" width={128} height={128}
-            src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+            src={STATUE_ICON_LARGE_SRC}
             alt="Bát Bộ Kim Cang"
             className="w-full h-full object-contain filter drop-shadow-[0_0_18px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-            }}
+            onError={swapOnError(LOGO_ROUND_SRC)}
           />
         </div>
 
@@ -62,14 +61,12 @@ export const BatBoKimCangSection: FC = () => {
               {/* IMAGE FRAME */}
               <div className="relative w-full h-[240px] sm:h-[265px] overflow-hidden bg-[#1A120B] shrink-0">
                 <img width={640} height={480}
-                  src={item.imgUrl}
+                  {...fitProps(item.imgUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 160px, (min-width: 640px) 23vw, 46vw' })}
                   alt={item.name}
                   loading="lazy"
                   decoding="async"
                   className="w-full h-full object-cover object-[center_20%] group-hover:scale-108 transition-transform duration-700 transform-gpu filter drop-shadow-[0_6px_16px_rgba(0,0,0,0.8)]"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
-                  }}
+                  onError={swapOnError(TOAN_CANH_SRC)}
                 />
 
                 {/* Subtle vignette gradient */}
@@ -96,7 +93,7 @@ export const BatBoKimCangSection: FC = () => {
                   {/* Miniature Floating Emblem */}
                   <div className="absolute top-[-16px] left-1/2 -translate-x-1/2 z-40 w-7 h-7 rounded-full border border-[#F2C14E] bg-[#25170E] flex items-center justify-center p-0.5 shadow-[0_0_12px_rgba(242,193,78,0.7)] overflow-hidden">
                     <img loading="lazy" decoding="async" width={128} height={128}
-                      src="/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+                      src={STATUE_ICON_SRC}
                       alt=""
                       className="w-full h-full object-contain filter drop-shadow-[0_0_4px_rgba(242,193,78,0.9)] scale-135"
                     />
@@ -172,12 +169,10 @@ export const BatBoKimCangSection: FC = () => {
                 {/* IMAGE CONTAINER */}
                 <div className="w-full md:w-[40%] shrink-0 rounded-2xl overflow-hidden border-2 border-[#F2C14E]/60 bg-black/60 p-3 shadow-2xl relative self-stretch flex items-center justify-center">
                   <img
-                    src={selectedStatue.imgUrl}
+                    {...fitProps(selectedStatue.imgUrl, MODAL_FIT)}
                     alt={selectedStatue.name}
                     className="w-full h-auto max-h-[360px] md:max-h-[440px] object-cover rounded-xl shadow-inner"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
-                    }}
+                    onError={swapOnError(TOAN_CANH_SRC)}
                   />
                   <div className="absolute inset-0 pointer-events-none rounded-xl border border-[#F2C14E]/20" />
                 </div>

@@ -29,6 +29,8 @@ import {
   BAO_THAP_BANNER_IMAGE,
   BaoThapFloor,
 } from '@/data/bao-thap-data';
+import { swapOnError, fitProps } from '@/features/universe/image-props';
+import { fitImage } from '@/utils/image';
 
 interface BaoThapMap2DProps {
   onClose: () => void;
@@ -78,9 +80,10 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
     if (screenState !== 'loading') return;
 
     const img = new Image();
-    img.src = BAO_THAP_MAP_IMAGE;
+    // Tải trước đúng địa chỉ mà thẻ ảnh bên dưới dùng (cùng bậc), không tải bản gốc.
+    img.src = fitImage(BAO_THAP_MAP_IMAGE, 1920);
     const bannerImg = new Image();
-    bannerImg.src = BAO_THAP_BANNER_IMAGE;
+    bannerImg.src = fitImage(BAO_THAP_BANNER_IMAGE, 1280);
 
     const interval = setInterval(() => {
       setLoadingProgress((prev) => {
@@ -299,7 +302,8 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
             {/* Background Ambient Aura & Banner */}
             <div className="absolute inset-0 z-0 bg-[#2c1c11]">
               <img
-                src={BAO_THAP_BANNER_IMAGE}
+                // Nền mờ (blur, opacity 50%) phủ cả màn hình: bậc 1280.
+                src={fitImage(BAO_THAP_BANNER_IMAGE, 1280)}
                 alt="Bảo Tháp Vạn Phật Xá Lợi"
                 className="w-full h-full object-cover scale-105 blur-sm opacity-50"
                 loading="lazy"
@@ -541,7 +545,8 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
           >
             {/* FULL COVER MAP IMAGE - ZERO BLACK GAPS */}
             <img
-              src={BAO_THAP_MAP_IMAGE}
+              // Sơ đồ phủ cả màn hình, kéo và phóng to được: bậc lớn nhất 1920.
+              src={fitImage(BAO_THAP_MAP_IMAGE, 1920)}
               alt="Sơ đồ Bảo Tháp"
               className="w-full h-full object-cover pointer-events-none select-none"
             />
@@ -778,12 +783,10 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
                   className="relative h-[240px] sm:h-[280px] rounded-2xl overflow-hidden border-2 border-[#F2C14E]/50 bg-[#120A06] cursor-pointer group shadow-xl"
                 >
                   <img
-                    src={activeTab === 'mandala' ? selectedFloor.mandalaImg : selectedFloor.statueImg}
+                    {...fitProps(activeTab === 'mandala' ? selectedFloor.mandalaImg : selectedFloor.statueImg, { width: 960, widths: [640, 960], sizes: '(min-width: 768px) 480px, 90vw' })}
                     alt={activeTab === 'mandala' ? selectedFloor.mandalaName : selectedFloor.statueName}
                     className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
-                    }}
+                    onError={swapOnError('/images/hero/toan-canh-chua-1280.webp')}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-3">
                     <span
@@ -1004,7 +1007,8 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
               style={{ cursor: lightboxZoom > 1 ? (isLightboxDragging ? 'grabbing' : 'grab') : 'default' }}
             >
               <img
-                src={lightboxImage.src}
+                // Xem lớn và phóng to: bậc lớn nhất 1920.
+                src={fitImage(lightboxImage.src, 1920)}
                 alt={lightboxImage.title}
                 className="max-h-full max-w-full object-contain rounded-xl select-none pointer-events-none"
                 style={{

@@ -2,6 +2,8 @@
 
 import { FC, useState, useEffect } from "react";
 import { X, Sparkles, MapPin, BookOpen, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { CARD_WIDTHS, fitProps } from "@/features/universe/image-props";
+import { fitImage } from "@/utils/image";
 
 interface ArtVariation {
   id: string;
@@ -102,7 +104,9 @@ export const BuddhistArtGallery: FC<BuddhistArtGalleryProps> = ({ variations }) 
             className="group relative overflow-hidden cursor-pointer rounded-2xl border border-[#f2c14e]/35 hover:border-[#ffde59] transition-all duration-500 shadow-xl bg-[#1c120b] aspect-[4/3]"
           >
             <img
-              src={art.imgUrl}
+              {...fitProps(art.imgUrl, { width: 960, widths: CARD_WIDTHS, sizes: "(min-width: 768px) 400px, calc(100vw - 32px)" })}
+              loading="lazy"
+              decoding="async"
               alt={art.title}
               className="w-full h-full object-cover object-[center_15%] group-hover:scale-105 transition-transform duration-700"
             />
@@ -175,7 +179,8 @@ export const BuddhistArtGallery: FC<BuddhistArtGalleryProps> = ({ variations }) 
             >
               <div className="w-full h-full flex items-center justify-center overflow-hidden pointer-events-none">
                 <img
-                  src={selectedArt.imgUrl}
+                  // Xem lớn và phóng to đến 4 lần: bậc lớn nhất 1920.
+                  src={fitImage(selectedArt.imgUrl, 1920)}
                   alt={selectedArt.title}
                   draggable={false}
                   style={{

@@ -2,6 +2,8 @@
 
 import React, { FC, useState, useEffect, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
+import { swapOnError } from '@/features/universe/image-props';
+import { fitImage } from '@/utils/image';
 
 export interface NTPGModalItem {
   id: string;
@@ -154,16 +156,14 @@ export const ArtisticStatueModal: FC<ArtisticStatueModalProps> = ({
           {/* Zoomable & Pannable Image Container */}
           <div className="w-full h-full flex items-center justify-center overflow-hidden pointer-events-none">
             <img
-              src={currentItem.imgUrl}
+              src={fitImage(currentItem.imgUrl, 1920)}
               alt={currentItem.title}
               style={{
                 transform: `scale(${zoomScale}) translate(${panOffset.x / zoomScale}px, ${panOffset.y / zoomScale}px)`,
                 transition: isDragging ? 'none' : 'transform 0.25s ease-out',
               }}
               className="max-h-full max-w-full object-contain rounded-lg filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
-              }}
+              onError={swapOnError('/images/hero/toan-canh-chua-1280.webp')}
             />
           </div>
 

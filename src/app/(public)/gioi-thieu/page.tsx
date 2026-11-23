@@ -6,6 +6,8 @@ import { Scroll, Landmark, User, HeartHandshake, ArrowRight } from 'lucide-react
 import { liveAbout } from '@/lib/v3-live';
 import type { Metadata } from 'next';
 import { pageMetadata } from '@/lib/v3-seo';
+import { fitImage } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 export const revalidate = 60;
 
@@ -85,7 +87,9 @@ export default async function GioiThieuOverviewPage() {
                   {/* Thumbnail frame */}
                   <div className="relative w-full aspect-[16/10] overflow-hidden bg-[#1A120B]">
                     <img
-                      src={topic.image}
+                      src={fitImage(topic.image, 640)}
+                      srcSet={imageSrcSet(topic.image, [360, 640, 960])}
+                      sizes="(min-width: 1024px) 379px, (min-width: 768px) 45vw, 92vw"
                       alt={topic.title}
                       loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

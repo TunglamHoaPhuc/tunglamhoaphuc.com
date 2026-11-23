@@ -7,7 +7,10 @@ import type { DongChayPage } from '@/lib/dong-chay';
 import { CategoryFilter } from '@/components/common/CategoryFilter';
 import { PostCard } from '@/components/common/PostCard';
 import { PostItem } from '@/types/post';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
+
+/** Bề rộng của hình nền đầu trang (nền phủ khung, mờ 30%): bậc 1280 của biến thể. */
+const HEADER_BG_WIDTH = 1280;
 
 type SortOption = 'newest' | 'oldest' | 'a-z' | 'z-a';
 
@@ -91,10 +94,14 @@ export default function DongChayHoangPhapClient({ initial, categories }: { initi
 
   // Ảnh nền đầu trang: bài mới nhất (cố định, không đổi theo trang đang xem).
   const featuredArticle = initial.items[0];
-  const headerBgImage = getImageUrl(
-    featuredArticle?.bannerUrl ||
-    featuredArticle?.thumbnailUrl ||
-    '/images/hero/toan-canh-chua-1280.webp'
+  // Là hình nền mờ 30% trong khung đầu trang: bản 1280 px (biến thể dựng sẵn), không phải ảnh gốc.
+  const headerBgImage = fitImage(
+    getImageUrl(
+      featuredArticle?.bannerUrl ||
+      featuredArticle?.thumbnailUrl ||
+      '/images/hero/toan-canh-chua-1280.webp'
+    ),
+    HEADER_BG_WIDTH
   );
 
   return (

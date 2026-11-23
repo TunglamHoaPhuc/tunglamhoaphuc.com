@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { SourceBookData } from './BookCitationSection';
+import { fitImage } from '@/utils/image';
 
 interface BookFlipModalProps {
   isOpen: boolean;
@@ -47,7 +48,8 @@ export const BookFlipModal: FC<BookFlipModalProps> = ({
   const pages = React.useMemo(() => {
     return Array.from({ length: totalPages }, (_, i) => ({
       pageNumber: i + 1,
-      src: `/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/08-tu-an-book/page_${String(i + 1).padStart(2, '0')}.webp`,
+      // Trang sách đọc và phóng to đến 4,5 lần (Ctrl + lăn chuột): giữ bản 1920, không xin ảnh gốc.
+      src: fitImage(`/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/08-tu-an-book/page_${String(i + 1).padStart(2, '0')}.webp`, 1920),
       title: i === 0 ? (book?.bookTitle || book?.title || 'Bìa Sách') : i === totalPages - 1 ? 'Bìa Sau' : `Trang ${i + 1}`,
     }));
   }, [totalPages, book]);

@@ -3,7 +3,8 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 interface PropsBaiVietNoiBat {
   heroBanner?: string;
@@ -18,7 +19,9 @@ interface PropsBaiVietNoiBat {
 }
 
 export function FeaturedPosts({ heroBanner, featuredArticle }: PropsBaiVietNoiBat) {
-  const bgImageSrc = getImageUrl(featuredArticle?.bgImage || heroBanner) || '/images/hero/toan-canh-chua-1280.webp';
+  // Ảnh nền phủ cả chiều ngang màn hình (mờ 40%, phủ gradient): bản vừa chiều ngang, không xin ảnh gốc.
+  const bgImageSrc = fitImage(getImageUrl(featuredArticle?.bgImage || heroBanner), 1280) || '/images/hero/toan-canh-chua-1280.webp';
+  const bgImageSet = imageSrcSet(getImageUrl(featuredArticle?.bgImage || heroBanner), [640, 960, 1280, 1920]);
 
   return (
     <section id="bai-viet-noibat" className="scroll-mt-24 py-12 relative w-full">
@@ -28,11 +31,14 @@ export function FeaturedPosts({ heroBanner, featuredArticle }: PropsBaiVietNoiBa
         <div className="absolute inset-0 opacity-40 scale-105 transition-transform duration-1000 ease-out group-hover:scale-100">
           <img width={640} height={480}
             src={bgImageSrc}
+            srcSet={bgImageSet}
+            sizes="100vw"
             alt={featuredArticle?.title || 'Bài viết nổi bật'}
             className="w-full h-full object-cover transition-all duration-700"
             style={{ objectPosition: featuredArticle?.bgPosition || 'center' }}
             loading="lazy"
             onError={(e) => {
+              e.currentTarget.removeAttribute('srcset');
               (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
             }}
           />

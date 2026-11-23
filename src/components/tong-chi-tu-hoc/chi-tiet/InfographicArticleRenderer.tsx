@@ -21,6 +21,7 @@ import {
   Users
 } from 'lucide-react';
 import { getImageUrl } from '@/utils/image';
+import { bodyImageSources, bodyZoomSrc } from '@/lib/body-images';
 import { FourCirclesPortalSection } from './FourCirclesPortalSection';
 import { RichHtmlBody } from '@/components/article/RichHtmlBody';
 import { htmlToRendererText, needsRichHtml, splitLinks } from '@/lib/article-html';
@@ -1568,10 +1569,11 @@ export function InfographicArticleRenderer({
                       className="rounded-2xl overflow-hidden border-2 border-[#F2C14E]/50 shadow-[0_10px_35px_rgba(0,0,0,0.8)] bg-black/40 group p-1 backdrop-blur-sm cursor-zoom-in relative inline-block max-w-full"
                     >
                       <img
-                        src={getImageUrl(el.src)}
+                        {...bodyImageSources(el.src, '(max-width: 704px) 100vw, 672px')}
                         alt={el.alt || el.caption || 'Hình ảnh minh họa'}
                         className="w-full max-h-[650px] h-auto object-contain rounded-xl transition-transform duration-500 group-hover:scale-[1.01]"
                         loading="lazy"
+                        decoding="async"
                       />
                       <div className="absolute bottom-3 right-3 p-1.5 rounded-lg bg-black/75 text-[#F2C14E] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[11px] backdrop-blur-xs">
                         <ZoomIn className="w-3.5 h-3.5" />
@@ -1789,7 +1791,7 @@ export function InfographicArticleRenderer({
               <X className="w-6 h-6" />
             </button>
             <img
-              src={getImageUrl(zoomImage.src)}
+              src={bodyZoomSrc(zoomImage.src)}
               alt={zoomImage.caption || 'Phóng to ảnh'}
               className="max-h-[80vh] w-auto object-contain rounded-2xl border-2 border-[#F2C14E]/60 shadow-[0_0_50px_rgba(242,193,78,0.3)]"
             />

@@ -1,8 +1,11 @@
 'use client';
 
 import React, { useState, useEffect, useRef, FC } from 'react';
+import { fitImage } from '@/utils/image';
 import { ChevronLeft, ChevronRight, Maximize2, Minimize2, ZoomIn, ZoomOut, RotateCcw, BookOpen, Sparkles, Download, Layers } from 'lucide-react';
 
+// Trang sách đọc có phóng to và toàn màn hình: bậc lớn nhất 1920 (chữ phải đọc được), không dùng bản gốc.
+const PAGE_WIDTH = 1920;
 const TOTAL_PAGES = 30;
 
 const PAGES = Array.from({ length: TOTAL_PAGES }, (_, i) => ({
@@ -255,7 +258,7 @@ export const TuAnFlipbook: FC = () => {
               /* BÌA TRƯỚC (ĐỨNG ĐƠN ĐỘC Ở GIỮA) */
               <div className="relative rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.9)] border-2 border-[#F2C14E]/50 bg-[#120803] max-w-[480px] max-h-[68vh] aspect-[3/4] flex items-center justify-center">
                 <img
-                  src={PAGES[0].src}
+                  src={fitImage(PAGES[0].src, PAGE_WIDTH)}
                   alt={PAGES[0].title}
                   className="w-full h-full object-contain"
                 />
@@ -268,7 +271,7 @@ export const TuAnFlipbook: FC = () => {
                 {leftPageNum && leftPageNum <= TOTAL_PAGES ? (
                   <div className="relative w-1/2 h-full overflow-hidden bg-[#1A1009] flex items-center justify-center">
                     <img
-                      src={PAGES[leftPageNum - 1].src}
+                      src={fitImage(PAGES[leftPageNum - 1].src, PAGE_WIDTH)}
                       alt={PAGES[leftPageNum - 1].title}
                       className="w-full h-full object-contain"
                     />
@@ -286,7 +289,7 @@ export const TuAnFlipbook: FC = () => {
                 {rightPageNum && rightPageNum <= TOTAL_PAGES ? (
                   <div className="relative w-1/2 h-full overflow-hidden bg-[#1A1009] flex items-center justify-center">
                     <img
-                      src={PAGES[rightPageNum - 1].src}
+                      src={fitImage(PAGES[rightPageNum - 1].src, PAGE_WIDTH)}
                       alt={PAGES[rightPageNum - 1].title}
                       className="w-full h-full object-contain"
                     />
@@ -302,7 +305,7 @@ export const TuAnFlipbook: FC = () => {
             /* ── SINGLE PAGE VIEW (MOBILE) ── */
             <div className="relative rounded-2xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.9)] border-2 border-[#F2C14E]/50 bg-[#120803] max-w-[480px] max-h-[68vh] aspect-[3/4] flex items-center justify-center">
               <img
-                src={PAGES[currentPage - 1].src}
+                src={fitImage(PAGES[currentPage - 1].src, PAGE_WIDTH)}
                 alt={PAGES[currentPage - 1].title}
                 className="w-full h-full object-contain"
               />

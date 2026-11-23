@@ -10,6 +10,8 @@ import {
   Repeat,
 } from 'lucide-react';
 import { QUAN_AM_33_DATA, QuanAm33Item } from '@/data/quan-am-33-data';
+import { swapOnError, fitProps, CARD_WIDTHS } from '@/features/universe/image-props';
+import { fitImage } from '@/utils/image';
 
 // ── Web Audio Sound Generator for Authentic Shaking & Card Flip Chime ──
 function playBambooRattleSound() {
@@ -76,7 +78,7 @@ const QuanAmCard = React.memo(({ item, onSelect }: CardProps) => {
       {/* 1. TOP ARTWORK IMAGE FRAME */}
       <div className="relative w-full h-[270px] sm:h-[295px] bg-[#120A06] overflow-hidden shrink-0">
         <img width={640} height={480}
-          src={item.imgUrl}
+          {...fitProps(item.imgUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 285px, (min-width: 768px) 30vw, (min-width: 640px) 46vw, calc(100vw - 32px)' })}
           alt={item.name}
           loading="lazy"
           decoding="async"
@@ -269,9 +271,7 @@ export const QuanAm33Grid: FC = () => {
               src="/images/icon-minh-hoa/GIEO THẺ QUAN ÂM LOGO.svg"
               alt="Gieo Quẻ Quan Âm"
               className="w-full h-full object-contain filter drop-shadow-[0_0_16px_rgba(242,193,78,0.95)]"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-bao-tuong-phat-giao.webp';
-              }}
+              onError={swapOnError(fitImage('/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-bao-tuong-phat-giao.webp', 160))}
             />
           </div>
 
@@ -373,7 +373,7 @@ export const QuanAm33Grid: FC = () => {
                 className="w-[280px] sm:w-[320px] h-[400px] sm:h-[460px] rounded-3xl overflow-hidden border-2 border-[#F2C14E] bg-[#1C120B] shadow-[0_0_50px_rgba(242,193,78,0.7)] p-2 flex flex-col items-center justify-center"
               >
                 <img
-                  src={shuffleCard.imgUrl}
+                  {...fitProps(shuffleCard.imgUrl, { width: 640, widths: [360, 640], sizes: '320px' })}
                   alt={shuffleCard.name}
                   className="w-full h-full object-contain rounded-2xl"
                 />
@@ -465,7 +465,7 @@ export const QuanAm33Grid: FC = () => {
                     style={{ backfaceVisibility: 'hidden' }}
                   >
                     <img
-                      src={selectedItem.imgUrl}
+                      src={fitImage(selectedItem.imgUrl, 1920)}
                       alt={selectedItem.name}
                       className="w-full h-full object-contain rounded-2xl pointer-events-none"
                       style={{
@@ -492,7 +492,7 @@ export const QuanAm33Grid: FC = () => {
                     }}
                   >
                     <img
-                      src={selectedItem.backImgUrl || selectedItem.imgUrl}
+                      src={fitImage(selectedItem.backImgUrl || selectedItem.imgUrl, 1920)}
                       alt={`Mặt sau Lời Dạy Quẻ Số ${selectedItem.number}`}
                       className="w-full h-full object-contain rounded-2xl pointer-events-none"
                       style={{
