@@ -9,19 +9,32 @@ Cập nhật 23/11/2026. V3 (`v3.tunglamhoaphuc.com`, Worker `tlhp-v3`) không c
 - Menu đầu trang, giờ mở cửa, địa chỉ, điện thoại, mạng xã hội, bản đồ, tên chùa, thông báo (`site.announcement`, có công tắc và hạn).
 - Chuyên mục (tên, icon) và nhóm Tông Chỉ: dựng từ D1; bộ lọc Dòng Chảy và bảng điều hướng phụ cũng vậy.
 
-## Đã nối thêm (cập nhật cuối 23/11/2026)
+## Trang chủ V3 do admin điều khiển (cập nhật 23/11/2026)
 
-- Trang chủ: tiêu đề, dòng phụ và video của Hero theo `home.hero` và `home.welcome.videoUrl` (video nằm ở khối "Lời chào" trong admin); "Dấu ấn hoằng pháp" theo lượt xem thật.
-- Lịch tu học trên trang chủ: sự kiện riêng lẻ từ `calendar_event` (chỉ đã xuất bản, chưa xóa), khóa lễ thường kỳ từ `featured_program`, chủ đề tháng từ `month_theme`; kết quả khớp mã đọc lịch của www qua 36 tháng. Bộ sinh ngày âm lịch viết sẵn chỉ còn là dự phòng khi D1 không có chương trình thường kỳ: các đại lễ cố định (Tết, Phật Đản, Vu Lan…) không tự hiện nữa nếu admin chưa tạo thành sự kiện (www cũng không tự sinh chúng).
-- Bảo tượng: danh sách hiện đủ mọi tượng đang hiển thị (62 tượng chính theo chúng hội, 64 tượng "Nghệ thuật Phật giáo" ở khối riêng, bộ lọc "Loại"); trang tượng liệt kê hết biến thể.
-- Thứ tự chuyên mục Dòng Chảy theo vị trí admin sắp xếp. Lớp đọc đã có thêm vị trí chuyên mục, vị trí nhóm Tông Chỉ, ảnh nhiều góc, thông số và SEO của tượng, và `listQuotes()`.
+Mọi khối của trang chủ đọc từ D1 trong mỗi lần dựng trang (kiểm bằng 33 tình huống admin ghi, V3 đọc: `tests/unit/v3-www-admin-home-roundtrip.test.ts`):
 
-## Chưa nối (cần chủ dự án quyết cách thiết kế)
+| Khối | Nguồn trong admin |
+|---|---|
+| Đầu trang (nhiều khung xoay, nút, khung "Khóa tu sắp tới", khung "Pháp sự mới nhất") | Trang chủ › khung đầu trang (`home.hero`), Lịch tu học, Bài viết |
+| Video đầu trang | Trang chủ › Lời chào (`home.welcome.videoUrl`) |
+| Lời chào, số liệu (tối đa 3), Phật lịch | `home.welcome`, `home.stats`, `home.buddhist_year`; số bài đếm từ bài đang hiển thị |
+| Tin mới nhất | Bài viết (nháp, ẩn, hẹn giờ, thùng rác, ghim), Tông Chỉ, Giới thiệu, Bảo tượng |
+| Dấu ấn hoằng pháp | Lượt xem thật của bài |
+| Lời Thầy dạy | Lời Thầy (`quote`) + `home.quotes` (nguồn, chế độ), hoặc câu kệ chủ đề tháng |
+| Lịch tu học | Sự kiện, khóa lễ thường kỳ, chủ đề tháng (khớp www từng ngày) |
+| Khu vực & Bảo tượng | Khu vực nổi bật (`area.featured`), tượng đang hiển thị |
+| Chân trang, thông báo | Cài đặt › Thông tin trang, `site.announcement` |
 
-- Trang chủ V3 không có khối chào, số liệu (472 bài…, Phật lịch) và Lời Thầy để vẽ; hàm đọc đã có (`homeSettings.ts`, `listQuotes()`). Chữ phụ, nút và ảnh của từng slide Hero, cờ tự lấy sự kiện/bài mới cũng chưa dùng vì Hero V3 chỉ có một video.
-- Thứ tự nhóm Tông Chỉ do admin sắp xếp chưa dùng: thứ tự nhóm gắn với ảnh nền và số thứ tự của thiết kế 5 nhóm.
-- Trang tượng chưa vẽ ảnh nhiều góc, thông số, "Bảo tượng liên quan" (dữ liệu đã có trong lớp đọc).
-- Chân trang không vẽ menu chân trang; V3 không có `sitemap.xml` (V3 đang `noindex`); nhóm Giới thiệu chưa có vị trí.
+Cũng đã nối: bài (ghim, lời dẫn, bài liên quan, trường riêng, SEO từng trang), menu phụ, chuyên mục (tên, icon, thứ tự Dòng Chảy), Bảo tượng đủ 126, âm lịch đúng tháng nhuận (trước đây V3 lệch ở 2025 và 2028).
+
+## Chưa nối
+
+- Chữ phụ, ảnh của từng khung đầu trang: Hero V3 là video toàn khung, chưa có chỗ vẽ ảnh khung. Ảnh dải bên cạnh video của khối Lời chào và hộp "Chư Tôn Đức" cũng chưa vẽ.
+- Đại lễ cố định (Tết, Phật Đản, Vu Lan…) không còn tự hiện trên lịch nếu admin chưa tạo thành sự kiện (www cũng không tự sinh).
+- "Kho ảnh tư liệu" (Galaxy timeline): chữ và ảnh mẫu viết sẵn, admin chưa có màn hình nào cho nó; nên ẩn nút mở nó hoặc thêm màn "ảnh theo mốc".
+- Trợ lý Phật học (thanh tìm kiếm AI) là bản trả lời soạn sẵn, hai liên kết trong đó sai (`/tong-chi-tu-hoc/bo-de-tam`, `/#lich-tu`).
+- Bảo tượng nổi bật: admin chưa có cờ `featured` cho tượng (V3 giữ 4 mã chọn sẵn).
+- Thứ tự nhóm Tông Chỉ (gắn với ảnh nền của thiết kế 5 nhóm); trang tượng chưa vẽ ảnh nhiều góc, thông số, tượng liên quan; chân trang không vẽ menu chân trang; V3 chưa có `sitemap.xml` và đang `noindex` (phải bỏ khi V3 thành trang chính).
 
 ## Độ trễ sau khi sửa trong admin
 
