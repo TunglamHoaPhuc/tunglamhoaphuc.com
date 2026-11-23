@@ -7,6 +7,12 @@ import { AboutTopicPage } from '../AboutTopicPage';
 // sửa hay gỡ ở /quan-tri của www hiện ở đây sau khoảng 30 giây, lâu nhất khoảng 45 giây).
 export const revalidate = 30;
 
+// Không tạo trang nào lúc build: khai báo này chỉ để vinext coi tuyến có tham số là "tạo tĩnh theo yêu cầu" (ISR), nhờ đó
+// bộ nhớ đệm của Workers giữ bản trang theo `revalidate` thay vì dựng lại ở mỗi lượt xem (TTFB trang chi tiết ~1 s → ~0,3 s).
+export async function generateStaticParams() {
+  return [];
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   return aboutMetadataFor((await params).slug);
 }

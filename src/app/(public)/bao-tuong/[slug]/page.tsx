@@ -9,6 +9,12 @@ import { liveStatuePage } from '@/lib/v3-statues';
 
 export const revalidate = 60;
 
+// Không tạo trang nào lúc build: khai báo này chỉ để vinext coi tuyến có tham số là "tạo tĩnh theo yêu cầu" (ISR), nhờ đó
+// bộ nhớ đệm của Workers giữ bản trang theo `revalidate` thay vì dựng lại ở mỗi lượt xem.
+export async function generateStaticParams() {
+  return [];
+}
+
 // Tiêu đề, mô tả, canonical và ảnh chia sẻ của từng tượng (trước đây mọi tượng mang tiêu đề chung của site).
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   return statueMetadataFor((await params).slug);

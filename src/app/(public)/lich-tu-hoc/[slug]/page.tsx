@@ -14,6 +14,12 @@ import ScheduleDetailClient from './ScheduleDetailClient';
 // Mỗi phút một lần (tương đương các lời gọi có ?t= ở các trang khác): sửa ở /quan-tri của www hiện ở đây sau khoảng một phút.
 export const revalidate = 60;
 
+// Không tạo trang nào lúc build: khai báo này chỉ để vinext coi tuyến có tham số là "tạo tĩnh theo yêu cầu" (ISR), nhờ đó
+// bộ nhớ đệm của Workers giữ bản trang theo `revalidate` thay vì dựng lại ở mỗi lượt xem (TTFB trang chi tiết ~1 s → ~0,3 s).
+export async function generateStaticParams() {
+  return [];
+}
+
 // Tiêu đề, mô tả, canonical và ảnh của từng sự kiện hay khóa lễ (trước đây mọi trang lịch mang tiêu đề chung của site).
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   return scheduleMetadataFor((await params).slug);
