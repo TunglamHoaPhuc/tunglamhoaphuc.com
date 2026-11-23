@@ -22,7 +22,7 @@ import { getCategoryInfo } from "@/data/taxonomy";
 export interface CategoryIconProps {
   categoryName?: string;
   iconName?: string;
-  iconUrl?: string; // WordPress CMS custom SVG/PNG image URL
+  iconUrl?: string; // Icon do admin đặt cho chuyên mục (ảnh thư viện, đường dẫn, hoặc SVG dạng data:) — xem lib/category-icons.ts
   iconNode?: ReactNode;
   className?: string;
 }
@@ -45,10 +45,13 @@ const LUCIDE_ICON_MAP: Record<string, FC<{ className?: string }>> = {
   HelpCircle,
 };
 
+/** "flower-2" (the name the admin's icon library uses) → "Flower2" (the key of LUCIDE_ICON_MAP). */
+const pascal = (name: string) => name.replace(/(^|-)([a-z0-9])/g, (_m, _dash, ch: string) => ch.toUpperCase());
+
 /**
- * Flexible Category/Taxonomy Icon component ready for WordPress CMS integration.
+ * Flexible Category/Taxonomy Icon component.
  * Priority rendering:
- * 1. iconUrl: If WordPress CMS SVG/PNG URL exists -> renders <img loading="lazy" decoding="async" src={iconUrl} />
+ * 1. iconUrl: the icon the admin set for the category (picture or data: SVG) -> renders <img loading="lazy" decoding="async" src={iconUrl} />
  * 2. iconNode: If custom ReactNode provided -> renders iconNode
  * 3. iconName: If Lucide iconName string provided -> renders matched Lucide icon
  * 4. categoryName: If categoryName provided -> queries taxonomy mapping getCategoryInfo
@@ -77,8 +80,9 @@ export function getCategory1Icon(
   }
 
   // 3. Lucide Icon Name String
-  if (iconName && LUCIDE_ICON_MAP[iconName]) {
-    const DynamicIcon = LUCIDE_ICON_MAP[iconName];
+  const lucideKey = iconName ? (LUCIDE_ICON_MAP[iconName] ? iconName : pascal(iconName)) : '';
+  if (lucideKey && LUCIDE_ICON_MAP[lucideKey]) {
+    const DynamicIcon = LUCIDE_ICON_MAP[lucideKey];
     return <DynamicIcon className={className} />;
   }
 

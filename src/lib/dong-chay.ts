@@ -2,7 +2,7 @@
 // thay vì cả mấy trăm bài (trước đây trang nặng 2,6 MB HTML).
 import type { HoangPhapArticle } from "@/data/dong-chay-hoang-phap-data";
 import type { ContentRepository } from "@/lib/tlhp-content/types";
-import type { V3Post } from "@/lib/v3-data";
+import { chosenRelatedCards, type V3Post } from "@/lib/v3-data";
 import { livePosts } from "@/lib/v3-live";
 
 export const DONG_CHAY_SECTION = "dong-chay-hoang-phap";
@@ -17,8 +17,11 @@ export interface DongChayQuery {
 	page?: number;
 }
 
+/** A card of the list; `pinned` is the editors' pin (pinned posts come first when sorted by date or title, as on www). */
+export type DongChayArticle = HoangPhapArticle & { pinned?: boolean };
+
 export interface DongChayPage {
-	items: HoangPhapArticle[];
+	items: DongChayArticle[];
 	total: number;
 	page: number;
 	pageCount: number;
@@ -32,15 +35,16 @@ function shortSummary(text: string): string {
 	return text.length > 200 ? `${text.slice(0, 200).trimEnd()}…` : text;
 }
 
-export function toArticle(p: V3Post): HoangPhapArticle {
+export function toArticle(p: V3Post): DongChayArticle {
 	return {
 		id: p.id,
 		slug: p.slug,
 		title: p.title,
 		subtitle: p.subtitle || "",
 		date: p.publishedDate || "",
-		author: p.author || "Ban Văn Hóa Tùng Lâm",
-		category: p.subCategory || "cong-tu",
+		// As on www: a post with no author shows none, one with no category has none (nothing is made up).
+		author: p.author || "",
+		category: p.subCategory || "",
 		subCategory: p.subtitle || p.categoryName || "Dòng Chảy Hoằng Pháp",
 		subCategoryIcon: "",
 		templeLogo: "tung-lam-hoa-phuc",
@@ -50,27 +54,31 @@ export function toArticle(p: V3Post): HoangPhapArticle {
 		thumbnailPosition: p.thumbnailPosition || "center center",
 		bannerUrl: p.bannerUrl || FALLBACK_IMAGE,
 		summary: p.summary && !p.summary.includes("Tóm tắt") ? shortSummary(p.summary) : "",
+		pinned: p.pinned === true,
 	};
 }
 
 /** Chỉ các bài đang hiển thị ở D1. Không có bài thì danh sách trống: không còn bộ bài đóng gói để thay vào. */
-export async function allArticles(repo?: ContentRepository): Promise<HoangPhapArticle[]> {
+export async function allArticles(repo?: ContentRepository): Promise<DongChayArticle[]> {
 	return (await livePosts(DONG_CHAY_SECTION, repo)).map(toArticle);
 }
 
-const time = (d: string) => (d ? new Date(d).getTime() || 0 : 0);
+// The same order as www (queryPosts in its content repository): by date or title with the same collation, and the
+// editors' pinned posts first in every order here (V3 has no "most read" order, which www leaves unpinned).
+const collator = new Intl.Collator("vi", { sensitivity: "base", numeric: true });
 
-function compare(sort: DongChaySort) {
-	switch (sort) {
-		case "oldest":
-			return (a: HoangPhapArticle, b: HoangPhapArticle) => time(a.date) - time(b.date);
-		case "a-z":
-			return (a: HoangPhapArticle, b: HoangPhapArticle) => a.title.localeCompare(b.title, "vi");
-		case "z-a":
-			return (a: HoangPhapArticle, b: HoangPhapArticle) => b.title.localeCompare(a.title, "vi");
-		default:
-			return (a: HoangPhapArticle, b: HoangPhapArticle) => time(b.date) - time(a.date);
-	}
+const byDate = (a: DongChayArticle, b: DongChayArticle) => b.date.localeCompare(a.date) || collator.compare(a.title, b.title);
+
+const ORDERS: Record<DongChaySort, (a: DongChayArticle, b: DongChayArticle) => number> = {
+	newest: byDate,
+	oldest: (a, b) => a.date.localeCompare(b.date) || collator.compare(a.title, b.title),
+	"a-z": (a, b) => collator.compare(a.title, b.title) || b.date.localeCompare(a.date),
+	"z-a": (a, b) => collator.compare(b.title, a.title) || b.date.localeCompare(a.date),
+};
+
+export function compare(sort: DongChaySort) {
+	const by = ORDERS[sort] ?? byDate;
+	return (a: DongChayArticle, b: DongChayArticle) => Number(b.pinned === true) - Number(a.pinned === true) || by(a, b);
 }
 
 export function normalizeQuery(q: DongChayQuery): Required<DongChayQuery> & { sort: DongChaySort } {
@@ -83,7 +91,7 @@ export function normalizeQuery(q: DongChayQuery): Required<DongChayQuery> & { so
 export async function dongChayPage(query: DongChayQuery, repo?: ContentRepository): Promise<DongChayPage> {
 	const { category, sort, page } = normalizeQuery(query);
 	const all = await allArticles(repo);
-	const filtered = category === "all" ? all : all.filter((a) => (a.category || "cong-tu") === category);
+	const filtered = category === "all" ? all : all.filter((a) => a.category === category);
 	const sorted = [...filtered].sort(compare(sort));
 	const pageCount = Math.max(1, Math.ceil(sorted.length / DONG_CHAY_PAGE_SIZE));
 	const current = Math.min(page, pageCount);
@@ -99,14 +107,17 @@ export async function dongChayPage(query: DongChayQuery, repo?: ContentRepositor
 }
 
 /**
- * Bài "Tìm hiểu thêm" của một bài: cùng chuyên mục, trùng từ khóa hoặc trùng từ trong tiêu đề lên trước.
- * Chỉ chọn trong các bài đang hiển thị, không bao giờ chọn chính nó.
+ * Bài "Tìm hiểu thêm" của một bài: như www, ưu tiên các bài người biên tập đã chọn (`related`, theo thứ tự họ chọn, tối đa 3,
+ * không bao giờ là chính nó). Chưa chọn bài nào thì đoán: cùng chuyên mục, trùng từ khóa hoặc trùng từ trong tiêu đề lên trước.
+ * Phần đoán chỉ chọn trong các bài đang hiển thị, không bao giờ chọn chính nó.
  */
-export function relatedArticles(current: Pick<V3Post, "id" | "slug" | "title" | "subCategory" | "keywords">, all: HoangPhapArticle[], limit = 12) {
+export function relatedArticles(current: Pick<V3Post, "id" | "slug" | "title" | "subCategory" | "keywords"> & Partial<Pick<V3Post, "related">>, all: DongChayArticle[], limit = 12) {
+	const chosen = chosenRelatedCards(current, FALLBACK_IMAGE, "DÒNG CHẢY HOẰNG PHÁP");
+	if (chosen.length) return chosen;
 	const category = (current.subCategory || "").toLowerCase();
 	const keywords = (current.keywords || []).map((k) => (k.keyword || "").toLowerCase()).filter(Boolean);
 	const words = (current.title || "").toLowerCase().split(/\s+/).filter((w) => w.length > 2);
-	const score = (a: HoangPhapArticle) => {
+	const score = (a: DongChayArticle) => {
 		const title = (a.title || "").toLowerCase();
 		return (a.category && a.category.toLowerCase() === category ? 3 : 0) + (keywords.some((kw) => title.includes(kw)) ? 2 : 0) + (words.some((w) => title.includes(w)) ? 1 : 0);
 	};

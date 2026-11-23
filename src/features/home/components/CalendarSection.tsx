@@ -641,7 +641,7 @@ export const CalendarSection: FC = () => {
   const currentSlide = slides[activeSlideIdx] || slides[0];
 
   return (
-    <section className="w-full py-20 relative overflow-hidden bg-[#1A120B]">
+    <section id="lich-tu-hoc" className="w-full py-20 relative overflow-hidden bg-[#1A120B]">
       {/* ── Seamless Gradient Blur Overlay ── */}
       <SectionTransitionOverlay position="both" />
 

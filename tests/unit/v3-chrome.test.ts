@@ -73,7 +73,7 @@ test("số điện thoại chân trang do admin lưu: chỉ dòng hợp lệ; ch
 });
 
 test("giờ mở cửa, địa chỉ, khẩu hiệu: có khóa thì dùng (kể cả rỗng), không có khóa thì null", () => {
-	assert.deepEqual(infoFromSetting({ openingHours: " 7h–11h ", address: "", name: "x" }), { openingHours: "7h–11h", address: "", slogan: null });
+	assert.deepEqual(infoFromSetting({ openingHours: " 7h–11h ", address: "", name: "x" }), { name: "x", openingHours: "7h–11h", address: "", slogan: null, mapsUrl: "", social: [] });
 	assert.equal(infoFromSetting(null), null);
 });
 
@@ -95,7 +95,7 @@ test("đọc D1 lỗi: khung trang rỗng, không phải menu và số điện t
 	const frame = buildChrome({ areas: [], failed: true, nodes: null, settings: {} });
 	assert.deepEqual(frame.nav, []);
 	assert.deepEqual(frame.contacts, []);
-	assert.deepEqual(frame.info, { openingHours: "", address: "", slogan: "" });
+	assert.deepEqual(frame.info, { name: null, openingHours: "", address: "", slogan: "", mapsUrl: "", social: [] });
 	const fresh = buildChrome({ areas: [], failed: false, nodes: null, settings: {} });
 	assert.equal(fresh.nav, null);
 	assert.equal(fresh.contacts, null);

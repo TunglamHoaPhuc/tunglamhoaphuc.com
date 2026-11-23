@@ -1,11 +1,13 @@
 'use client';
 
 import { FC } from "react";
-import { Phone, Clock } from "lucide-react";
+import { Phone, Clock, MapPin } from "lucide-react";
 import { FaFacebook, FaYoutube, FaInstagram, FaTiktok, FaGlobe, FaUsers } from "react-icons/fa6";
+import type { ComponentType } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useSiteChrome } from "@/components/public/SiteChrome";
 import { contactGroups, formatPhone, type ContactLine } from "@/lib/contact-format";
+import type { SocialNetwork } from "@/lib/v3-menu";
 
 // Các dòng liên hệ có sẵn của V3: chỉ dùng khi D1 chưa có số điện thoại nào do admin lưu.
 const BUILT_IN_CONTACTS: ContactLine[] = [
@@ -17,6 +19,20 @@ const BUILT_IN_CONTACTS: ContactLine[] = [
   { role: "Hỗ trợ thông tin", name: "Tịnh Hòa Hưng", phone: "0329630394" },
   { role: "Hỗ trợ thông tin", name: "Liên Phúc Huyền", phone: "0328812922" },
 ];
+
+// Biểu tượng và màu của từng mạng xã hội. Liên kết, tên và thứ tự là của admin (`site.info`.social); ô nào admin chưa nhập thì không có nút.
+const ZaloMark: ComponentType<{ className?: string }> = ({ className }) => (
+  <span aria-hidden="true" className={`${className ?? ''} flex items-center justify-center font-bold leading-none`}>Z</span>
+);
+const SOCIAL_LOOK: Record<SocialNetwork, { Icon: ComponentType<{ className?: string }>; bg: string }> = {
+  facebook: { Icon: FaFacebook, bg: '#1877F2' },
+  'facebook-group': { Icon: FaUsers, bg: '#1877F2' },
+  youtube: { Icon: FaYoutube, bg: '#FF0000' },
+  tiktok: { Icon: FaTiktok, bg: '#010101' },
+  instagram: { Icon: FaInstagram, bg: '#C13584' },
+  zalo: { Icon: ZaloMark, bg: '#0068FF' },
+  website: { Icon: FaGlobe, bg: '#5C4630' },
+};
 
 /**
  * Footer chuẩn hệ thống (Responsive & Grid 12 Cột Optimized):
@@ -35,6 +51,10 @@ export const Footer: FC = () => {
   const address = info?.address ?? 'THÔN HOÀ TRÚC - XÃ PHÚ CÁT - THÀNH PHỐ HÀ NỘI';
   const openingHours = info?.openingHours ?? 'Sáng 7:30 – 10:30 | Chiều 13:30 – 17:30 (Ngày thường)';
   const slogan = info?.slogan ?? 'Nơi để trở về – Chốn thiêng bình yên';
+  // Tên chùa do admin đặt; chưa có hay để trống thì giữ tên có sẵn.
+  const name = info?.name || 'Tùng Lâm Hòa Phúc';
+  const mapsUrl = info?.mapsUrl ?? '';
+  const social = info?.social ?? [];
   const contactRows = contactGroups(contacts ?? BUILT_IN_CONTACTS).flatMap(({ role, people }) =>
     Array.from({ length: Math.ceil(people.length / 2) }, (_, i) => ({ role, people: people.slice(i * 2, i * 2 + 2) })),
   );
@@ -116,7 +136,7 @@ export const Footer: FC = () => {
               textShadow: "0 0 12px rgba(242,193,78,0.5)",
             }}
           >
-            TÙNG LÂM HÒA PHÚC
+            {name}
           </h2>
 
           {address && (
@@ -130,6 +150,20 @@ export const Footer: FC = () => {
               {address}
             </p>
           )}
+
+          {mapsUrl && (
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Xem bản đồ chỉ đường đến chùa (mở trong tab mới)"
+              className="mt-3 inline-flex items-center gap-1.5 text-xs md:text-sm text-[#F2C14E] hover:underline"
+              style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: 'bold' }}
+            >
+              <MapPin className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <span>Xem bản đồ chỉ đường</span>
+            </a>
+          )}
         </div>
 
         {/* ── Đường Phân Cách Ngang Toàn Chiều Rộng ── */}
@@ -140,61 +174,40 @@ export const Footer: FC = () => {
 
           {/* ─ Cột Trái (w-full lg:w-auto shrink-0) ─ */}
           <div className="w-full lg:w-auto shrink-0">
-            {/* Kênh 1: Theo dõi Tùng Lâm Hòa Phúc */}
-            <h4
-              className="text-xs uppercase tracking-widest mb-3 text-[#F2C14E]"
-              style={{
-                fontFamily: "'UTM Avo', sans-serif",
-                fontWeight: "bold",
-              }}
-            >
-              Theo dõi Tùng Lâm Hòa Phúc
-            </h4>
-            <div className="flex items-center gap-3 mb-6">
-              {[
-                { Icon: FaUsers, label: "Zalo", bg: "#0068FF" },
-                { Icon: FaUsers, label: "Group", bg: "#1877F2" },
-                { Icon: FaInstagram, label: "Instagram", bg: "#C13584" },
-                { Icon: FaFacebook, label: "Facebook", bg: "#1877F2" },
-                { Icon: FaTiktok, label: "TikTok", bg: "#010101" },
-                { Icon: FaYoutube, label: "YouTube", bg: "#FF0000" },
-              ].map(({ Icon, label, bg }) => (
-                <button
-                  key={label}
-                  aria-label={label}
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md transition-all hover:scale-110 cursor-pointer"
-                  style={{ background: bg }}
+            {/* Mạng xã hội: danh sách, tên và liên kết do admin lưu (site.info.social); admin chưa nhập thì không có khối này, không có nút trống. */}
+            {social.length > 0 && (
+              <>
+                <h4
+                  className="text-xs uppercase tracking-widest mb-3 text-[#F2C14E]"
+                  style={{
+                    fontFamily: "'UTM Avo', sans-serif",
+                    fontWeight: "bold",
+                  }}
                 >
-                  <Icon className="w-4 h-4" />
-                </button>
-              ))}
-            </div>
-
-            {/* Kênh 2: Theo dõi Quỳnh Nhai Cam Lộ Tự */}
-            <h4
-              className="text-xs uppercase tracking-widest mb-3 text-[#F2C14E]"
-              style={{
-                fontFamily: "'UTM Avo', sans-serif",
-                fontWeight: "bold",
-              }}
-            >
-              Theo dõi Quỳnh Nhai Cam Lộ Tự
-            </h4>
-            <div className="flex items-center gap-3 mb-6">
-              {[
-                { Icon: FaFacebook, label: "Facebook QNCLT", bg: "#1877F2" },
-                { Icon: FaGlobe, label: "Website QNCLT", bg: "#5C4630" },
-              ].map(({ Icon, label, bg }) => (
-                <button
-                  key={label}
-                  aria-label={label}
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md transition-all hover:scale-110 cursor-pointer"
-                  style={{ background: bg }}
-                >
-                  <Icon className="w-4 h-4" />
-                </button>
-              ))}
-            </div>
+                  Theo dõi {name}
+                </h4>
+                <ul className="flex flex-wrap items-center gap-3 mb-6 list-none p-0 m-0">
+                  {social.map(({ label, url, network }) => {
+                    const { Icon, bg } = SOCIAL_LOOK[network];
+                    return (
+                      <li key={`${label}-${url}`}>
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${label} (mở trong tab mới)`}
+                          title={label}
+                          className="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md transition-all hover:scale-110 cursor-pointer"
+                          style={{ background: bg }}
+                        >
+                          <Icon className="w-4 h-4" />
+                        </a>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </>
+            )}
 
             {/* Thông tin mở cửa (Tách 2 dòng thoáng mắt & Không ngắt cụm (Ngày thường)) */}
             {openingHours && (
@@ -267,7 +280,7 @@ export const Footer: FC = () => {
             fontWeight: "normal",
           }}
         >
-          <p>© 2026 Tùng Lâm Hòa Phúc. Bảo lưu mọi quyền.</p>
+          <p>© 2026 {name}. Bảo lưu mọi quyền.</p>
           {slogan && (
             <p className="italic" style={{ fontFamily: "'UTM Avo', sans-serif", fontStyle: "italic" }}>
               &quot;{slogan}&quot; 🪷

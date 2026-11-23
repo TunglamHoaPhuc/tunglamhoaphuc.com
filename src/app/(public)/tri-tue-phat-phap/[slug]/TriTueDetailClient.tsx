@@ -51,6 +51,16 @@ export default function TriTueDetailClient({ item, relatedFormatted }: { item: a
             </Link>
           </div>
 
+          {/* Lời dẫn do người biên tập viết (như www hiện dưới tiêu đề); để trống thì không có khối này. */}
+          {item.intro ? (
+            <p
+              style={{ fontFamily: "'UTM Avo', sans-serif" }}
+              className="max-w-3xl mx-auto mb-8 border-l-2 border-[#F2C14E]/60 pl-4 sm:pl-5 text-base sm:text-lg italic leading-relaxed text-[#FFE5A3]"
+            >
+              {item.intro}
+            </p>
+          ) : null}
+
           <InfographicArticleRenderer
             rawContent={item.content || item.contentHtml || item.excerpt || ''}
             title={item.title}

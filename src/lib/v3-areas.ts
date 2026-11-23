@@ -1,7 +1,8 @@
 // Vũ Trụ Phật Giáo for the pages that show every area at once (the 2D map): the visible areas D1 holds, placed on the map.
 // A hidden or deleted area is not in `areas` (lib/v3-live.ts), so it has no pin, no card and no menu entry.
-// Where the pins go is design, not data: it stays here (www config/vuTru.ts holds the same table); an area the table does
-// not know yet (new in the admin) goes where its editors placed it (`mapPos`), or is left off the map when they gave none.
+// Where an area's pin goes: where its editors placed it in the admin (`mapPos`, the map_x and map_y they edit) when they gave
+// both numbers; otherwise the design table below (www config/vuTru.ts holds the same table); an area with neither is left off
+// the map. The table also gives the order of the walk.
 import type { StatueRecord } from "@/lib/statue-types";
 import type { V3Area } from "@/lib/v3-data";
 
@@ -53,7 +54,7 @@ export function mapSpotsOf(areas: V3Area[], statues: StatueRecord[], temple = "t
 		.sort((a, b) => rank(a.area.slug) - rank(b.area.slug) || a.index - b.index);
 	for (const { area } of placed) {
 		const pin = MAP_PINS.find((item) => item.slug === area.slug);
-		const mapPos = pin ? { x: pin.x, y: pin.y } : area.mapPos;
+		const mapPos = area.mapPos ?? (pin ? { x: pin.x, y: pin.y } : undefined);
 		if (!mapPos) continue;
 		spots.push({
 			id: area.id,

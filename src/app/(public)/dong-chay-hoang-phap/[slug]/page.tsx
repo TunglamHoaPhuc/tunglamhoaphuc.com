@@ -1,16 +1,31 @@
 // Một bài Dòng chảy hoằng pháp, đọc ở máy chủ từ D1 của www. Bài nháp, hẹn giờ chưa tới, trong thùng rác,
 // của chuyên mục khác hay không có: 404. Không còn 35 bài đóng gói để thay vào.
+import type { Metadata } from 'next';
+import { NavPanelProvider } from '@/components/tong-chi-tu-hoc/NavPanelData';
+import { buildDongChayNavList } from '@/data/dong-chay-hoang-phap-data';
 import { allArticles, DONG_CHAY_SECTION, relatedArticles } from '@/lib/dong-chay';
 import { livePost } from '@/lib/v3-live';
+import { postMetadataFor } from '@/lib/v3-seo';
 import { notFoundOrMoved } from '@/lib/v3-redirect';
 import DongChayDetailClient from './DongChayDetailClient';
 
-export const revalidate = 60;
+// Làm mới tối đa mỗi 30 giây. V3 không có chỗ nào để admin xóa cache, còn bản đọc D1 trong bộ nhớ làm mới mỗi 15 giây
+// (D1_RENEW_MS): bài sửa hay gỡ ở /quan-tri của www hiện ở đây sau khoảng 30 giây, chậm nhất khoảng 45 giây.
+export const revalidate = 30;
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  return postMetadataFor((await params).slug, DONG_CHAY_SECTION);
+}
 
 export default async function DongChayHoangPhapDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const article = await livePost(slug, DONG_CHAY_SECTION);
   if (!article) return notFoundOrMoved(`/dong-chay-hoang-phap/${slug}`);
-  const related = relatedArticles(article, await allArticles());
-  return <DongChayDetailClient article={article} relatedArticlesFormatted={related} />;
+  const all = await allArticles();
+  const related = relatedArticles(article, all);
+  return (
+    <NavPanelProvider data={{ dongChay: buildDongChayNavList(all) }}>
+      <DongChayDetailClient article={article} relatedArticlesFormatted={related} />
+    </NavPanelProvider>
+  );
 }

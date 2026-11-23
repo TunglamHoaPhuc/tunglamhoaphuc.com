@@ -27,6 +27,56 @@ export const repo = () => getContentRepository();
 
 // ── Posts ───────────────────────────────────────────────────────────────────
 
+/** A post the editors chose as related (what the "Tìm hiểu thêm" cards need). */
+export interface V3RelatedPost {
+	id: string;
+	slug: string;
+	section: string;
+	title: string;
+	subtitle: string;
+	categoryName: string;
+	subCategory: string;
+	thumbnailUrl: string;
+	bannerUrl: string;
+}
+
+const toRelatedRecord = (p: PostSummary): V3RelatedPost => ({
+	id: p.id,
+	slug: p.slug,
+	section: p.section,
+	title: p.title,
+	subtitle: p.subtitle,
+	categoryName: p.category.name,
+	subCategory: p.category.slug,
+	thumbnailUrl: pic(p.thumbnail ?? p.banner),
+	bannerUrl: pic(p.banner ?? p.thumbnail),
+});
+
+/** Where V3 opens a post of each section (the same two sections www links "Tìm hiểu thêm" to); a related post of another section is left out, as on www. */
+const RELATED_PATHS: Record<string, string> = {
+	"dong-chay-hoang-phap": "/dong-chay-hoang-phap",
+	"tri-tue-phat-phap": "/tri-tue-phat-phap",
+};
+
+/** www shows at most three chosen posts under "Tìm hiểu thêm". */
+export const CHOSEN_RELATED_LIMIT = 3;
+
+/**
+ * The cards of "Tìm hiểu thêm" built from the posts the editors chose (`post.related`, in their order), the same rule as
+ * www: never the post itself, only posts V3 can open, at most three. Empty when none were chosen: the caller then guesses.
+ */
+export function chosenRelatedCards(current: { id: string; related?: V3RelatedPost[] }, fallbackImage: string, fallbackCategory: string) {
+	return (current.related ?? [])
+		.filter((r) => r.id !== current.id && r.section in RELATED_PATHS)
+		.slice(0, CHOSEN_RELATED_LIMIT)
+		.map((r) => ({
+			category: r.subtitle || r.categoryName || fallbackCategory,
+			title: r.title,
+			url: r.thumbnailUrl || r.bannerUrl || fallbackImage,
+			link: `${RELATED_PATHS[r.section]}/${r.slug}`,
+		}));
+}
+
 export function toPostRecord(post: PostSummary | Post) {
 	const full = "contentHtml" in post ? post : null;
 	return {
@@ -46,9 +96,17 @@ export function toPostRecord(post: PostSummary | Post) {
 		bannerUrl: pic(post.banner ?? post.thumbnail),
 		bannerPosition: pos(post.banner),
 		summary: post.summary,
+		// Pinned by the editors: first in the lists ordered by date or title (as on www).
+		pinned: post.pinned === true,
+		// The lead text www shows under the title; empty when it only repeats the opening lines of the body.
+		intro: full?.intro ?? "",
+		// The posts the editors chose for "Tìm hiểu thêm", in their order (www's `post.related`).
+		related: (full?.related ?? []).map(toRelatedRecord),
 		content: "",
 		contentHtml: full?.contentHtml ?? "",
 		keywords: full ? full.keywords.map((k) => ({ ...k })) : [],
+		// The video id of a Video Phật Pháp post (its video is already in `videoBlock`).
+		youtubeId: full?.extra?.youtubeId || undefined,
 		videoBlock: full?.videos[0] ? { videoUrl: full.videos[0].url, title: post.title, summary: "" } : undefined,
 		// What the editors fill in for a category: the book of an "Ấn phẩm & Sách" post and the sound of a "Pháp Âm" post (as www shows them).
 		sourceBook: full?.extra.book ? { bookTitle: full.extra.book.title, author: full.extra.book.author, coverImage: full.extra.book.cover ? absUrl(full.extra.book.cover) : "", description: "", linkUrl: full.extra.book.link ?? undefined } : undefined,

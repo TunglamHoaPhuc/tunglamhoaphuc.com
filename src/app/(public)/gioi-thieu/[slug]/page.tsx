@@ -1,13 +1,14 @@
 // Địa chỉ của mọi chủ đề Giới thiệu, kể cả chủ đề mới tạo ở admin. Hỏi D1 theo slug; không có thì 404.
 import type { Metadata } from 'next';
-import { liveAboutTopic } from '@/lib/v3-live';
+import { aboutMetadataFor } from '@/lib/v3-seo';
 import { AboutTopicPage } from '../AboutTopicPage';
 
-export const revalidate = 60;
+// Làm mới tối đa mỗi 30 giây (V3 không có chỗ nào để admin xóa cache; D1_RENEW_MS của bản đọc trong bộ nhớ là 15 giây, nên bài
+// sửa hay gỡ ở /quan-tri của www hiện ở đây sau khoảng 30 giây, lâu nhất khoảng 45 giây).
+export const revalidate = 30;
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
-  const topic = await liveAboutTopic((await params).slug);
-  return topic ? { title: `${topic.title} | Tùng Lâm Hòa Phúc`, description: topic.overviewSummary || topic.subtitle } : {};
+  return aboutMetadataFor((await params).slug);
 }
 
 export default async function GioiThieuTopicPage({ params }: { params: Promise<{ slug: string }> }) {
