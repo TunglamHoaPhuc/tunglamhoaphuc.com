@@ -116,6 +116,10 @@ export function parseStatues(file: unknown): ParsedStatues {
 			cluster: NO_GROUP.has(bare(statue.clusterName)) ? "" : plain(statue.clusterName),
 			quote: quote && bare(quote) !== bare(name) && bare(quote) !== bare(statue.title) ? { text: quote, author: titleCase(plain(statue.quoteAuthor)) } : null,
 			art,
+			images: [],
+			specs: [],
+			seoTitle: "",
+			seoDescription: "",
 			// The same text is stored twice, as text and as paragraphs of HTML.
 			text: withoutTrailingNumber(statue.articleContent) || paragraphsOf(statue.fullHistoryHtml),
 		};
