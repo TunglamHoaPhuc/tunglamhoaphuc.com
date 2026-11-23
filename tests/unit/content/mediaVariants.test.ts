@@ -55,11 +55,12 @@ describe("imageAt / fitting in both delivery modes", () => {
 		expect(imageAt(b2, 640, "cgi")).toBe(cgi);
 		expect(IMAGE_DELIVERY).toBe("variants");
 		expect(imageAt(b2, 640)).toBe(`/anh-goc/s2-cnv03/${B2_KEY}@640`);
-		// a picture outside the prefixes that have variants keeps going through /cdn-cgi/image, even in 'variants' mode
+		// a picture outside the prefixes that have variants (old WordPress, small) goes as it is in 'variants' mode: no transformation quota
 		const old = "/anh-goc/s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2018/07/a-668x445.jpg";
 		expect(hasVariants(old)).toBe(false);
-		expect(imageAt(old, 640, "variants")).toBe(`/cdn-cgi/image/width=640,quality=75,format=auto,onerror=redirect${old}`);
-		expect(imageSrcSet(old, [360, 640], null, "variants")).toBe(imageSrcSet(old, [360, 640], null, "cgi"));
+		expect(imageAt(old, 640, "variants")).toBe(old);
+		expect(imageSrcSet(old, [360, 640], null, "variants")).toBeUndefined();
+		expect(albumImageAt(old, 640, "variants")).toBe(old);
 		expect(hasVariants("/anh-goc/media-tunglamhoaphuc/x/a.webp")).toBe(true);
 		expect(hasVariants("wordpress/2026/09/a.jpg")).toBe(true);
 		expect(hasVariants("wordpress/2018/09/a.jpg")).toBe(false);
