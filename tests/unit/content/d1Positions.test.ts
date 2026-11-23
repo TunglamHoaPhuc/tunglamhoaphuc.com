@@ -123,7 +123,8 @@ describe("Tông Chỉ group order: listTongChi comes group by group in the edito
 		db.exec("update category set position = 0 where kind = 'tong-chi'; update teaching_article set position = 9 where id = '1'; update teaching_article set position = 1 where id = '2'");
 		const list = await repoOf(db).listTongChi();
 		const runs = list.map((item) => item.group.slug).filter((slug, index, all) => slug !== all[index - 1]);
-		expect(runs.sort()).toEqual(["g1", "g2", "g3"]);
+		// Groups with no place of their own keep the order their first article has.
+		expect(runs).toEqual(["g1", "g2", "g3"]);
 		expect(list.filter((item) => item.group.slug === "g1").map((item) => item.slug)).toEqual(["bai-2", "bai-1"]);
 	});
 

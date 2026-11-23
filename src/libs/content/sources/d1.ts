@@ -281,7 +281,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 				o.r2_key as og_key, o.url as og_url
 			from teaching_article a left join category c on c.id = a.group_id left join media b on b.id = a.banner_media_id left join media o on o.id = a.og_media_id
 			${viewsOf("tong-chi")}a.id
-			where ${live("a")} order by coalesce(c.position, 1e9), c.id, a.position, a.id`,
+			where ${live("a")} order by coalesce(c.position, 1e9), min(a.position) over (partition by a.group_id), c.id, a.position, a.id`,
 		);
 		const photos = await galleries(all, "teaching");
 		return rows.map((row) => ({
