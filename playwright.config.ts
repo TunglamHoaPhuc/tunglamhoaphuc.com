@@ -14,6 +14,8 @@ const welcomeNoticeSeen = {
 
 export default defineConfig({
 	testDir: "tests/e2e",
+	// The admin specs need a server with the admin on and a prepared local database (see tests/e2e/admin/helpers.ts), which CI does not have: set ADMIN_E2E=1 to run them.
+	testIgnore: process.env.ADMIN_E2E ? [] : ["**/admin/**"],
 	use: { baseURL, storageState: welcomeNoticeSeen },
 	projects: [
 		{ name: "desktop", use: { ...devices["Desktop Chrome"] } },
