@@ -1,12 +1,12 @@
 // Helpers for the admin end-to-end tests. They run against a server that has the admin switched on and a
 // prepared LOCAL database (`npm run dev:db -- --init --seed`, then `npm run dev`):
-//   BASE_URL=http://localhost:3001 npx playwright test tests/e2e/admin --project=desktop
+//   ADMIN_E2E=1 BASE_URL=http://localhost:3001 npx playwright test tests/e2e/admin --project=desktop  (ADMIN_E2E=1: playwright.config.ts skips this folder without it)
 // The first Super Admin comes from .dev.vars (git-ignored); the other accounts are made through the API by the tests.
 //
 // Without a Cloudflare login (a clean machine, CI): `npm run dev` asks for one because vite.config.ts uses remote bindings. The same
 // server without them, which is all the admin needs (the local D1 and R2 are simulated by miniflare):
 //   TLHP_ADMIN=1 TLHP_CONTENT_SOURCE=d1 ADMIN_BASE_URL=http://localhost:3021 npx vite dev --config vite.e2e.config.ts --port 3021
-//   BASE_URL=http://localhost:3021 npx playwright test tests/e2e/admin --project=desktop --workers=1
+//   ADMIN_E2E=1 BASE_URL=http://localhost:3021 npx playwright test tests/e2e/admin --project=desktop --workers=1
 // (ADMIN_BASE_URL in .dev.vars must be the same address: the admin answers only there.)
 //
 // The seeded Super Admin must change its password at its first sign-in (ADMIN_SEED_PASSWORD is a one-time password), so `superAdminApi`

@@ -34,7 +34,7 @@ export function MediaGrid({ items, selectedId, onOpen, busy }: { items: MediaIte
 							}}
 						>
 							<span style={{ display: "block", aspectRatio: "1 / 1", background: "var(--tq-line-soft)", borderRadius: 6, overflow: "hidden" }}>
-								<img src={item.thumbUrl || item.url} alt={item.alt || item.filename} loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+								<img src={item.thumbUrl || item.url} alt={item.alt || item.filename} loading="lazy" decoding="async" width={140} height={140} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
 							</span>
 							<span style={{ display: "block", marginTop: 6, fontSize: 13, wordBreak: "break-all", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={item.filename}>
 								{item.filename}
