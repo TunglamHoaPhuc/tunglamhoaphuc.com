@@ -22,7 +22,7 @@ export default defineConfig({
 	webServer: process.env.BASE_URL
 		? undefined
 		: {
-				command: "npm run preview -- --port 4173 --strictPort",
+				command: "npm run preview -- --config vite.e2e.config.ts --port 4173 --strictPort",
 				url: baseURL,
 				reuseExistingServer: true,
 				timeout: 120_000,
