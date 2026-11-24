@@ -70,6 +70,7 @@ function readToolbarState(current: Editor | null) {
 		paragraph: current.isActive("paragraph"),
 		bullet: current.isActive("bulletList"),
 		ordered: current.isActive("orderedList"),
+		task: current.isActive("taskList"),
 		quote: current.isActive("blockquote", { variant: null }),
 		kinh: current.isActive("blockquote", { variant: "kinh" }),
 		tho: current.isActive("blockquote", { variant: "tho" }),
@@ -278,6 +279,9 @@ export function RichEditor({ initial, onChange, label = "Nội dung bài", readO
 					<ToolButton label="Danh sách đánh số" active={state.ordered} onClick={() => chain().toggleOrderedList().run()}>
 						1.
 					</ToolButton>
+					<ToolButton label="Danh sách việc có ô tích (checklist)" active={state.task} onClick={() => chain().toggleTaskList().run()}>
+						☑
+					</ToolButton>
 					<ToolButton label="Trích dẫn" active={state.quote} onClick={() => quote(null)}>
 						❝
 					</ToolButton>
@@ -373,6 +377,10 @@ const CONTENT_CSS = `
 .tq-rich-content th { background: var(--tq-line-soft); }
 .tq-rich-content hr { border: 0; border-top: 1px solid var(--tq-line); }
 .tq-rich-content .ProseMirror-selectednode { outline: 3px solid var(--tq-accent); }
+.tq-rich-content ul[data-type="taskList"] { list-style: none; padding-left: 4px; }
+.tq-rich-content ul[data-type="taskList"] li { display: flex; align-items: flex-start; gap: 8px; }
+.tq-rich-content ul[data-type="taskList"] li > label { margin-top: 3px; user-select: none; }
+.tq-rich-content ul[data-type="taskList"] li > div { flex: 1; }
 .tq-rich-content a { text-decoration: underline; }
 `;
 

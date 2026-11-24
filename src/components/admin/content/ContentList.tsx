@@ -138,8 +138,8 @@ export function ContentList({ kind }: { kind: KindName }) {
 				})}
 			</nav>
 
-			<div className="tq-toolbar" role="search" style={{ marginBottom: 14 }}>
-				<TextField label="Tìm kiếm" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tiêu đề hoặc nội dung, gõ có dấu hay không đều được" />
+			<div className="tq-toolbar tq-toolbar--row" role="search" style={{ marginBottom: 14 }}>
+				<TextField label="Tìm kiếm" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tiêu đề, nội dung" />
 				{ui.hasSection ? (
 					<SelectField
 						label="Chuyên trang"

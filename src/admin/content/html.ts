@@ -352,6 +352,20 @@ function attributesOf(tag: string, raw: [string, string][], options: SanitizeOpt
 			if (cellStyle) out.style = cellStyle;
 			return out;
 		}
+		case "ul":
+			// A checklist: the editor's task list. Only this exact marker is kept; the checkbox it draws (label, input) is dropped
+			// and the page draws the box from data-checked.
+			if (decoded(get("data-type") ?? "") === "taskList") out["data-type"] = "taskList";
+			return out;
+		case "li": {
+			const style = safeStyle(tag, get("style"));
+			if (style) out.style = style;
+			if (decoded(get("data-type") ?? "") === "taskItem") {
+				out["data-type"] = "taskItem";
+				out["data-checked"] = decoded(get("data-checked") ?? "") === "true" ? "true" : "false";
+			}
+			return out;
+		}
 		case "col": {
 			const span = digits(get("span"), 50);
 			if (span && span !== "1") out.span = span;

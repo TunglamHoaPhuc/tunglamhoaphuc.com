@@ -5,6 +5,7 @@
 import { Extension, mergeAttributes, Node, type Extensions } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Table, TableCell, TableHeader, TableRow } from "@tiptap/extension-table";
+import { TaskItem, TaskList } from "@tiptap/extension-list";
 import Youtube from "@tiptap/extension-youtube";
 import { Color, FontFamily, FontSize, TextStyle } from "@tiptap/extension-text-style";
 import TextAlign from "@tiptap/extension-text-align";
@@ -197,6 +198,8 @@ export function editorExtensions(): Extensions {
 		Subscript,
 		Superscript,
 		TextAlign.configure({ types: ["heading", "paragraph", "tableCell", "tableHeader"] }),
+		TaskList,
+		TaskItem.configure({ nested: false }),
 		BlockSpacing,
 		QuoteBlock,
 		FigureImage,
