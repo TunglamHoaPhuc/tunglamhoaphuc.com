@@ -27,6 +27,6 @@ Chỉ bước deploy của `deploy-v2.yml` được đọc hai secret Cloudflare
 
 ## 4. Giới hạn đã biết
 
-- **Snapshot lấy từ site công khai cũ** (`scripts/fetch-snapshot.ts` gọi các lệnh GET của `www`). Sau khi `www` chuyển sang site mới (T22) nguồn đó biến mất; lúc đó workflow phải đọc từ B2 (T19, `CONTENT_SOURCE=b2` cùng khóa chỉ đọc là secret của Worker, không phải của CI) hoặc từ một bản snapshot đã lưu.
+- **Snapshot lấy từ release `snapshot-data`** (24/11/2026): `www` đã chuyển sang site mới nên `snapshot:fetch` nhận 404. Action tải `snapshot.tar.gz` từ release đó bằng `GITHUB_TOKEN` rồi giải nén vào `data/snapshot/`. Repo đang công khai nên gói này ai cũng tải được (nội dung vốn đã công khai trên web). Cập nhật gói: `tar -czf snapshot.tar.gz *.json` trong `data/snapshot/` rồi `gh release upload snapshot-data snapshot.tar.gz --clobber`.
 - Bản build của CI có thể mang dữ liệu mới hơn bản build trên máy vì snapshot được lấy lại mỗi tuần.
 - Chạy cùng lúc nhiều lần deploy bị xếp hàng, không hủy giữa chừng (`cancel-in-progress: false`).
