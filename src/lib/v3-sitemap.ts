@@ -25,6 +25,7 @@ export const FIXED_PATHS = [
 	TRI_TUE_PATH,
 	BOOK_PATH,
 	"/tri-tue-phat-phap/hoc-tieng-tang",
+	"/van-hoa-viet-nam",
 	"/lien-he",
 ] as const;
 
