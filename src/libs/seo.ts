@@ -42,6 +42,7 @@ export const FIXED_PATHS = [
 	"/tri-tue-phat-phap/hoc-tieng-tang",
 	"/lich-tu-hoc",
 	"/lien-he",
+	"/van-hoa-viet-nam",
 ];
 
 export type SitemapEntry = { path: string; lastModified?: string };

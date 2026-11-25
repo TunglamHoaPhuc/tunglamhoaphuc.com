@@ -25,6 +25,7 @@ const PAGES = [
 	"/tri-tue-phat-phap/di-qua-kho-vui-cuoc-doi",
 	"/tri-tue-phat-phap/hoc-tieng-tang",
 	"/lien-he",
+	"/van-hoa-viet-nam",
 	"/tim-kiem?q=niem+phat",
 ];
 
