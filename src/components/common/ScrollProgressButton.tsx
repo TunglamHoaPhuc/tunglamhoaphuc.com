@@ -12,7 +12,7 @@ const BASE_BOTTOM = 20; // khớp bottom-5 của các nút nổi khác
 
 /**
  * Nút tròn nhỏ ở góc dưới phải: vòng cung vàng chạy quanh viền theo phần trăm đã cuộn,
- * số % ở giữa, bấm để cuộn mượt lên đầu trang. Chỉ hiện ở trang dài và sau khi cuộn quá một màn hình.
+ * số % ở giữa, bấm để cuộn mượt lên đầu trang. Gắn một lần ở layout gốc nên có ở mọi trang; chỉ hiện khi trang cuộn được và đã cuộn quá một khoảng nhỏ.
  * Phần tử cố định khác ở góc dưới (đánh dấu data-fab-avoid) được tránh bằng cách đẩy nút lên cao hơn.
  */
 export default function ScrollProgressButton() {

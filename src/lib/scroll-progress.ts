@@ -8,10 +8,13 @@ export function scrollPercent(scrollY: number, scrollHeight: number, innerHeight
 	return Math.min(100, Math.max(0, p));
 }
 
-/** Nút chỉ hiện ở trang dài (ít nhất 2 màn hình) và khi đã cuộn quá một màn hình. */
-export function shouldShowScrollButton(scrollY: number, scrollHeight: number, innerHeight: number): boolean {
-	if (!(innerHeight > 0) || !(scrollHeight >= innerHeight * 2)) return false;
-	return scrollY > innerHeight;
+/** Quãng cuộn (px) tối thiểu trước khi nút hiện, để không che nội dung ở đầu trang. */
+export const SCROLL_BUTTON_THRESHOLD = 240;
+
+/** Nút hiện ở mọi trang cuộn được, sau khi đã cuộn quá ngưỡng nhỏ. Trang không cuộn được thì không hiện. */
+export function shouldShowScrollButton(scrollY: number, scrollHeight: number, innerHeight: number, threshold = SCROLL_BUTTON_THRESHOLD): boolean {
+	if (!(innerHeight > 0) || !(scrollHeight - innerHeight > 0)) return false;
+	return scrollY > threshold;
 }
 
 /** Phần bù (px) để nút nổi nằm trên cao hơn mọi phần tử cố định ở góc dưới phải. `tops` là mép trên (px từ đỉnh khung nhìn) của các phần tử đó. */
