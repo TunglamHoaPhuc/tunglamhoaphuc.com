@@ -79,7 +79,7 @@ export default function VuTruPhatGiaoClient({ areas, spots }: { areas: V3Area[];
             </div>
           </div>
 
-          <main className="max-w-[1280px] mx-auto px-4 md:px-10 pb-16 w-full flex-1">
+          <main className="max-w-[1280px] mx-auto px-4 md:px-10 pb-12 md:pb-16 w-full flex-1">
             <UniverseGridMode areas={areas} viewMode={viewMode} onToggleViewMode={setViewMode} />
           </main>
         </div>

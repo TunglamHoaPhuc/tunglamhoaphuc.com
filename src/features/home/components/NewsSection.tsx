@@ -81,7 +81,7 @@ export const NewsSection: FC<NewsSectionProps> = ({ items }) => {
   const animClass = slideDirection === 'next' ? 'animate-slide-next' : 'animate-slide-prev';
 
   return (
-    <section className="w-full py-16 relative overflow-hidden bg-[#1A120B]">
+    <section className="w-full py-12 md:py-16 relative overflow-hidden bg-[#1A120B]">
       {/* ── Keyframe Animations cho hiệu ứng trượt ngang mượt mà ── */}
       <style>{`
         @keyframes slideInFromRight {

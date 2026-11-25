@@ -73,7 +73,7 @@ export const Footer: FC = () => {
   return (
     <footer
       id="footer"
-      className="relative overflow-hidden pt-16 pb-[max(2.5rem,env(safe-area-inset-bottom))] px-4 md:px-10 border-t z-10"
+      className="relative overflow-hidden pt-12 md:pt-16 pb-[max(2.5rem,env(safe-area-inset-bottom))] px-4 md:px-10 border-t z-10"
       style={{
         background: "linear-gradient(180deg, #3D2B1F 0%, #2A1D14 100%)",
         borderColor: "rgba(242,193,78,0.2)",

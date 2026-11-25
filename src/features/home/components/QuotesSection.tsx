@@ -48,7 +48,7 @@ const QuoteSlide: FC<{ quote: HomeQuoteItem; index: number; total: number; activ
       className={`col-start-1 row-start-1 m-0 flex flex-col items-center justify-center px-2 text-center transition-[opacity,visibility] duration-700 motion-reduce:transition-none ${active ? "visible opacity-100" : "invisible opacity-0"}`}
     >
       <Quote aria-hidden="true" className="mb-5 h-9 w-9 text-[#F2C14E]/45 md:h-11 md:w-11" strokeWidth={1.5} />
-      <blockquote className="m-0 max-w-3xl space-y-3 text-xl font-medium leading-relaxed text-amber-50/95 md:text-2xl md:leading-relaxed lg:text-[1.75rem]" style={FONT_BODY}>
+      <blockquote className="m-0 max-w-3xl space-y-3 text-lg font-medium leading-relaxed sm:text-xl text-amber-50/95 md:text-2xl md:leading-relaxed lg:text-[1.75rem]" style={FONT_BODY}>
         {quote.text.split(/\n+/).filter((line) => line.trim()).map((line, i) => (
           <p key={i} className="m-0 text-pretty">
             {line}
@@ -128,7 +128,7 @@ export const QuotesSection: FC<{ quotes: HomeQuotes | null }> = ({ quotes }) => 
     <section
       aria-roledescription="trình chiếu"
       aria-label="Lời Thầy dạy"
-      className="relative w-full overflow-hidden bg-[#1A120B] py-16"
+      className="relative w-full overflow-hidden bg-[#1A120B] py-12 md:py-16"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)}
@@ -147,11 +147,11 @@ export const QuotesSection: FC<{ quotes: HomeQuotes | null }> = ({ quotes }) => 
         </div>
 
         {total > 1 ? (
-          <div className="mt-8 flex items-center justify-center gap-3 md:gap-5">
+          <div className="mt-8 flex flex-nowrap items-center justify-center gap-1 md:gap-5">
             <button type="button" className={ROUND_BUTTON} aria-label="Lời dạy trước" onClick={() => go(current - 1)}>
               <ChevronLeft aria-hidden="true" className="h-5 w-5" />
             </button>
-            <div className="flex flex-wrap items-center justify-center">
+            <div className="flex min-w-0 max-w-xs flex-1 flex-nowrap items-center justify-center md:max-w-none md:flex-none md:flex-wrap">
               {items.map((quote, i) => (
                 <button
                   key={quote.id}
@@ -159,7 +159,7 @@ export const QuotesSection: FC<{ quotes: HomeQuotes | null }> = ({ quotes }) => 
                   aria-label={`Xem lời dạy ${i + 1}/${total}`}
                   aria-current={i === current ? "true" : undefined}
                   onClick={() => go(i)}
-                  className={`group inline-flex h-11 w-5 items-center justify-center md:w-6 ${FOCUS}`}
+                  className={`group inline-flex h-11 min-w-0 max-w-6 flex-1 items-center justify-center md:w-6 md:flex-none ${FOCUS}`}
                 >
                   <span aria-hidden="true" className={`block h-2.5 w-2.5 rounded-full border border-[#F2C14E]/70 transition-colors ${i === current ? "bg-[#F2C14E]" : "bg-transparent group-hover:bg-[#F2C14E]/40"}`} />
                 </button>

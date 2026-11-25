@@ -30,7 +30,7 @@ export const SectionHeader: FC<SectionHeaderProps> = ({
   iconClassName,
 }) => {
   return (
-    <div className={`relative z-10 flex flex-col items-center justify-center text-center mb-10 md:mb-14 overflow-visible pt-3 sm:pt-4 ${className}`}>
+    <div className={`relative z-10 flex flex-col items-center justify-center text-center mb-8 md:mb-14 overflow-visible pt-3 sm:pt-4 ${className}`}>
       {/* Tầng 1: Icon - Chiều cao chuẩn tương xứng tiêu đề (Có không gian thở để hào quang tỏa đều 360 độ) */}
       <div className="mb-3 md:mb-4 flex items-center justify-center overflow-visible pt-1">
         {iconUrl ? (

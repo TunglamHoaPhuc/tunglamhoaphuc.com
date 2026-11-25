@@ -49,7 +49,7 @@ export default function ContactView({ data }: { data: ContactPageData }) {
   const groups = contactGroups(data.phones);
   return (
     <div className="min-h-screen bg-[#2A1D14] text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black">
-      <main className="pb-16">
+      <main className="pb-12 md:pb-16">
         <PlainHero title="Liên hệ">{data.slogan}</PlainHero>
 
         <div className="max-w-[1280px] mx-auto px-4 md:px-10 mt-8 flex flex-col gap-10">

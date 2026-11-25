@@ -451,7 +451,7 @@ export const CalendarSection: FC = () => {
   const currentSlide = slides[slideIdx] || slides[0];
 
   return (
-    <section id="lich-tu-hoc" className="w-full py-20 relative overflow-hidden bg-[#1A120B]">
+    <section id="lich-tu-hoc" className="w-full py-14 md:py-20 relative overflow-hidden bg-[#1A120B]">
       {/* ── Seamless Gradient Blur Overlay ── */}
       <SectionTransitionOverlay position="both" />
 
@@ -718,7 +718,8 @@ export const CalendarSection: FC = () => {
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     className="text-[11px] sm:text-xs font-medium text-amber-200/90 whitespace-nowrap"
                   >
-                    Tháng {firstDayLunar.month === lastDayLunar.month ? firstDayLunar.month : `${firstDayLunar.month}-${lastDayLunar.month}`} ÂL {firstDayLunar.canChiYear || 'Bính Ngọ'}
+                    <span className="sm:hidden">ÂL {firstDayLunar.month === lastDayLunar.month ? firstDayLunar.month : `${firstDayLunar.month}-${lastDayLunar.month}`} {firstDayLunar.canChiYear || 'Bính Ngọ'}</span>
+                    <span className="hidden sm:inline">Tháng {firstDayLunar.month === lastDayLunar.month ? firstDayLunar.month : `${firstDayLunar.month}-${lastDayLunar.month}`} ÂL {firstDayLunar.canChiYear || 'Bính Ngọ'}</span>
                   </span>
                 </div>
               </div>
@@ -979,7 +980,7 @@ export const CalendarSection: FC = () => {
               {/* Dòng chú thích căn CHÍNH GIỮA tuyệt đối giữa đường kẻ và mép đáy khung */}
               <div
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                className="py-3.5 sm:py-4 flex flex-wrap items-center justify-end gap-3.5 sm:gap-4 text-xs"
+                className="py-3.5 sm:py-4 flex flex-nowrap sm:flex-wrap items-center justify-between sm:justify-end gap-2 sm:gap-4 text-xs whitespace-nowrap overflow-x-auto sm:overflow-visible [scrollbar-width:none]"
               >
                 <span className="text-[#F2C14E] font-bold uppercase tracking-wider flex items-center gap-1">
                   ❖ Chú thích:
@@ -1002,7 +1003,7 @@ export const CalendarSection: FC = () => {
                     alt="Khóa Lễ Truyền Thống"
                     className="w-4 h-4 object-contain"
                   />
-                  <span className="font-normal italic text-[#FFE5A3]/95">Khóa Lễ Truyền Thống</span>
+                  <span className="font-normal italic text-[#FFE5A3]/95"><span className="sm:hidden" aria-hidden="true">Khóa lễ</span><span className="hidden sm:inline">Khóa Lễ Truyền Thống</span></span>
                 </div>
 
                 {/* Logo 3: Đại Lễ Sự Kiện (Bỏ khung, để trên nền, chữ nghiêng) */}
@@ -1012,7 +1013,7 @@ export const CalendarSection: FC = () => {
                     alt="Đại Lễ Sự Kiện"
                     className="w-4 h-4 object-contain"
                   />
-                  <span className="font-normal italic text-[#FFE5A3]/95">Đại Lễ Sự Kiện</span>
+                  <span className="font-normal italic text-[#FFE5A3]/95"><span className="sm:hidden" aria-hidden="true">Đại lễ</span><span className="hidden sm:inline">Đại Lễ Sự Kiện</span></span>
                 </div>
               </div>
             </div>

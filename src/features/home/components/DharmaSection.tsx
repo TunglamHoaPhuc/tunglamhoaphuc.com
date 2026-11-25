@@ -182,7 +182,7 @@ const DharmaSection: FC<DharmaSectionProps> = ({ sectionRef, posts }) => {
     <section
       ref={sectionRef}
       id="hoang-phap"
-      className="py-16 md:py-24 px-4 md:px-10 relative overflow-hidden bg-[#1A120B]"
+      className="py-12 md:py-24 px-4 md:px-10 relative overflow-hidden bg-[#1A120B]"
     >
       {/* ── Seamless Gradient Blur Overlay ── */}
       <SectionTransitionOverlay position="both" />
