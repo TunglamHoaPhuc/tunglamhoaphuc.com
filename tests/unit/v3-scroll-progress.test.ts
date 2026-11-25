@@ -17,11 +17,15 @@ test("scrollPercent: kẹp trong 0–100 và an toàn khi trang không cuộn đ
 	assert.equal(scrollPercent(Number.NaN, 3000, 1000), 0);
 });
 
-test("shouldShowScrollButton: chỉ trang dài và đã cuộn quá một màn hình", () => {
+test("shouldShowScrollButton: mọi trang cuộn được, hiện sau ngưỡng nhỏ", () => {
 	assert.equal(shouldShowScrollButton(0, 5000, 800), false);
-	assert.equal(shouldShowScrollButton(800, 5000, 800), false);
-	assert.equal(shouldShowScrollButton(801, 5000, 800), true);
-	assert.equal(shouldShowScrollButton(900, 1200, 800), false);
+	assert.equal(shouldShowScrollButton(240, 5000, 800), false);
+	assert.equal(shouldShowScrollButton(241, 5000, 800), true);
+	// trang vừa quá một màn hình vẫn hiện khi đã cuộn quá ngưỡng
+	assert.equal(shouldShowScrollButton(300, 1200, 800), true);
+	// trang không cuộn được thì không hiện
+	assert.equal(shouldShowScrollButton(300, 800, 800), false);
+	assert.equal(shouldShowScrollButton(300, 700, 800), false);
 	assert.equal(shouldShowScrollButton(900, 5000, 0), false);
 });
 

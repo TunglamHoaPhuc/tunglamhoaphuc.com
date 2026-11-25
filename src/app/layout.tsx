@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import ScrollProgressButton from "@/components/common/ScrollProgressButton";
 import { SiteChromeProvider } from "@/components/public/SiteChrome";
 import { loadSiteChrome } from "@/lib/v3-chrome";
 import { PUBLIC_ORIGIN } from "@/lib/site-url";
@@ -69,6 +70,8 @@ export default async function RootLayout({
       </head>
       <body className="min-h-full flex flex-col m-0 p-0 font-sans relative" suppressHydrationWarning>
         <SiteChromeProvider value={chrome}>{children}</SiteChromeProvider>
+        {/* Nút phần trăm cuộn: gắn một lần cho mọi trang; tự ẩn khi trang không cuộn được (vd. /van-hoa-viet-nam) */}
+        <ScrollProgressButton />
         {/* <ZenAudioPlayer /> - Tắt tạm thời */}
       </body>
     </html>

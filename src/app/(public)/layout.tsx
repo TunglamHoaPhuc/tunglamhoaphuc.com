@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import Header from "@/components/public/layout/Header";
-import ScrollProgressButton from "@/components/common/ScrollProgressButton";
 import ContactSection from "@/features/home/components/ContactSection";
 
 export default function PublicLayout({
@@ -26,9 +25,6 @@ export default function PublicLayout({
       <main className="flex-1">{children}</main>
 
       <ContactSection />
-
-      {/* Nút phần trăm cuộn: chỉ hiện ở trang dài, sau khi cuộn quá một màn hình */}
-      <ScrollProgressButton />
     </div>
   );
 }
