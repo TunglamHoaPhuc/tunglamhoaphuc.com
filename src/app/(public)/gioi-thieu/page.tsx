@@ -61,7 +61,7 @@ export default async function GioiThieuOverviewPage() {
               <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/50 to-[#F2C14E]" />
               <h1
                 style={{ fontFamily: "'UTM Niagara', sans-serif" }}
-                className="text-5xl sm:text-6xl md:text-7xl font-normal text-[#ffde59] uppercase tracking-wider drop-shadow-[0_0_18px_rgba(242,193,78,0.7)] whitespace-nowrap flex-shrink-0"
+                className="text-4xl sm:text-5xl md:text-7xl font-normal text-[#ffde59] uppercase tracking-wider drop-shadow-[0_0_18px_rgba(242,193,78,0.7)] text-balance md:text-wrap md:whitespace-nowrap min-w-0 md:flex-shrink-0"
               >
                 GIỚI THIỆU TÙNG LÂM HÒA PHÚC
               </h1>
