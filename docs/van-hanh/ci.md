@@ -8,7 +8,7 @@
 | File | Việc |
 |---|---|
 | `.github/workflows/ci.yml` | Mỗi pull request và mỗi lần đẩy vào `main`: job `check` (lint, kiểm kiểu, test đơn vị, build) và job `e2e` (toàn bộ e2e, máy tính và điện thoại, trừ nhóm ảnh mẫu `visual`) |
-| `.github/workflows/deploy-v2.yml` | Đẩy vào `main`: chạy test đơn vị, `npm run deploy:v2`, rồi `smoke` và `seo` thẳng vào `https://v2.tunglamhoaphuc.com` |
+| `.github/workflows/deploy-v2.yml` | Chạy tay (không còn tự chạy khi đẩy vào `main`): test đơn vị rồi `npm run deploy:v2` với `TLHP_ADMIN=1` và `ADMIN_BASE_URL=https://quantri.tunglamhoaphuc.com`. Worker `tlhp-web` chỉ còn phục vụ admin; `v2.` đã gỡ ngày 25/11/2026, www do Worker `tlhp-v3` phục vụ |
 | `.github/actions/snapshot/action.yml` | Đặt `data/snapshot/*.json` vào chỗ (không nằm trong git, nhưng bản build gói chúng vào Worker): lấy từ cache theo tuần, không có thì `npm run snapshot:fetch -- --albums` |
 
 Chỉ bước deploy của `deploy-v2.yml` được đọc hai secret Cloudflare; pull request từ nhánh khác không bao giờ thấy chúng.
