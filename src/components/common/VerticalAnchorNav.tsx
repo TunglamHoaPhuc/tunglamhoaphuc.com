@@ -1,7 +1,6 @@
 'use client';
 
 import React, { FC, useCallback, useEffect, useState } from "react";
-import { ChevronUp } from "lucide-react";
 import { fitImage } from "@/utils/image";
 
 export interface AnchorSection {
@@ -173,18 +172,6 @@ export const VerticalAnchorNav: FC<VerticalAnchorNavProps> = ({
             </span>
           ))}
         </div>
-
-        <div className="w-4 h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/50 to-transparent my-2" />
-
-        {/* ── Tầng 3: Nút Lên Đầu Trang ── */}
-        <button
-          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-          className="w-8 h-8 rounded-full bg-[#e8dbb8] text-[#2c1c11] border-2 border-[#b8a679] flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.7),0_0_8px_rgba(255,222,89,0.25)] hover:scale-110 hover:bg-[#F2C14E] hover:border-[#F2C14E] transition-all duration-300 my-1 cursor-pointer flex-shrink-0"
-          title="Về đầu trang"
-          type="button"
-        >
-          <ChevronUp className="w-4 h-4 stroke-[2.5]" />
-        </button>
 
         <div className="w-4 h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/50 to-transparent my-2" />
 
