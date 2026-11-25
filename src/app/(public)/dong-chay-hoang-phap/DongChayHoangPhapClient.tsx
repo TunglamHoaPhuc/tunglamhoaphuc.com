@@ -150,7 +150,7 @@ export default function DongChayHoangPhapClient({ initial, categories }: { initi
         </div>
       </div>
 
-      <main className="pb-20 px-4 md:px-10 max-w-[1280px] mx-auto">
+      <main className="pb-12 md:pb-20 px-4 md:px-10 max-w-[1280px] mx-auto">
         {/* ── THANH LỰA CHỌN DANH MỤC & SẮP XẾP ── */}
         <div className="mb-12 scroll-mt-24" ref={gridTopRef}>
           <div className="mb-4">
@@ -232,11 +232,11 @@ function Pagination({
 }) {
   if (pageCount <= 1) return null;
   const base =
-    'min-w-11 h-11 sm:min-w-10 sm:h-10 px-3 rounded-lg border text-sm font-bold flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed';
+    'min-w-10 h-11 sm:min-w-10 sm:h-10 px-2 sm:px-3 shrink-0 rounded-lg border text-sm font-bold flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed';
   const idle = 'border-[#F2C14E]/40 text-[#e3d2c1] hover:border-[#F2C14E] hover:text-[#F2C14E]';
   return (
     <nav aria-label="Phân trang" className="mt-12 flex flex-col items-center gap-3" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
-      <div className="flex flex-wrap items-center justify-center gap-2">
+      <div className="flex max-w-full flex-nowrap items-center justify-center gap-1 sm:gap-2">
         <button type="button" className={`${base} ${idle}`} disabled={disabled || page <= 1} onClick={() => onPage(page - 1)} aria-label="Trang trước">
           <ChevronLeft className="w-4 h-4" />
         </button>

@@ -162,12 +162,12 @@ export const WisdomArchiveSection: FC<{ items: WisdomItem[] }> = ({ items }) => 
   return (
     <div className="w-full">
       {/* ── 1. Thanh Bộ Lọc Tinh Gọn & Tối Giản (Không Đường Kẻ Dưới, Dropdown Gradient & Hover Nâu Vàng) ── */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-8 pb-2">
+      <div className="relative flex flex-wrap items-center justify-between gap-3 mb-8 pb-2">
         
         <div className="flex flex-wrap items-center gap-3 flex-1 min-w-[280px]">
           {/* Nhãn LỰA CHỌN nhẹ nhàng thanh lịch */}
           <span
-            className="text-xs font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5 w-full sm:w-auto"
+            className="text-xs font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5 w-full sm:w-auto min-h-8 flex items-center"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             LỰA CHỌN:
@@ -196,6 +196,7 @@ export const WisdomArchiveSection: FC<{ items: WisdomItem[] }> = ({ items }) => 
             options={typeOptions}
             onChange={setSelectedType}
             placeholder="Tất cả"
+            className="min-w-0 flex-1 sm:flex-none"
           />
 
           {/* Vạch phân định nhẹ mờ */}
@@ -208,11 +209,12 @@ export const WisdomArchiveSection: FC<{ items: WisdomItem[] }> = ({ items }) => 
             options={sortOptions}
             onChange={setSortBy}
             placeholder="Mới nhất"
+            className="min-w-0 flex-1 sm:flex-none"
           />
         </div>
 
         {/* Result Count Badge */}
-        <div className="text-sm sm:text-xs text-[#F2C14E] font-bold shrink-0 px-3 py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 rounded-xl border border-[#F2C14E]/35 shadow-sm" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+        <div className="absolute right-0 top-0 sm:static text-xs font-bold shrink-0 px-3 py-1 sm:py-1.5 text-[#F2C14E] bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 rounded-xl border border-[#F2C14E]/35 shadow-sm" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
           {filteredItems.length} Nội dung
         </div>
       </div>

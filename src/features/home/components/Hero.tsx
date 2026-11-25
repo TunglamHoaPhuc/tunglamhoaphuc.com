@@ -40,7 +40,7 @@ const FrameView: FC<{ frame: HeroFrame; index: number; total: number; active: bo
       aria-label={total > 1 ? `Khung ${index + 1} trên ${total}` : undefined}
       aria-hidden={active ? undefined : true}
       inert={!active}
-      className={`col-start-1 row-start-1 flex flex-col items-center gap-4 transition-opacity duration-700 motion-reduce:transition-none ${active ? "opacity-100" : "invisible opacity-0 pointer-events-none"}`}
+      className={`col-start-1 row-start-1 flex flex-col items-center justify-end md:justify-start gap-4 transition-opacity duration-700 motion-reduce:transition-none ${active ? "opacity-100" : "invisible opacity-0 pointer-events-none"}`}
     >
       {frame.overline && (
         <p
@@ -295,36 +295,36 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
           </div>
 
           {frames.length > 1 && (
-            <div className="flex items-center justify-center gap-1">
-              <button type="button" className={CONTROL_CLASS} onClick={() => go(active - 1)} aria-label="Khung trước">
+            <div className="flex flex-nowrap items-center justify-center gap-0.5 md:gap-1 w-full max-w-sm md:w-auto md:max-w-full">
+              <button type="button" className={`${CONTROL_CLASS} shrink-0`} onClick={() => go(active - 1)} aria-label="Khung trước">
                 <ChevronLeft className="w-5 h-5" aria-hidden="true" />
               </button>
-              <ul className="flex items-center list-none m-0 p-0">
+              <ul className="flex flex-1 md:flex-none min-w-0 items-center justify-center list-none m-0 p-0">
                 {frames.map((frame, index) => (
-                  <li key={frame.id}>
+                  <li key={frame.id} className="min-w-0 flex-1 max-w-8 md:flex-none md:max-w-none">
                     <button
                       type="button"
                       onClick={() => go(index)}
                       aria-label={`Xem khung ${index + 1} trên ${frames.length}: ${frame.title}`}
                       aria-current={index === active ? "true" : undefined}
-                      className="inline-flex items-center justify-center w-8 h-11 md:w-6 md:h-6 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F2C14E]"
+                      className="inline-flex items-center justify-center w-full h-11 md:w-6 md:h-6 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F2C14E]"
                     >
                       <span
                         aria-hidden="true"
-                        className="block rounded-full transition-all"
-                        style={{ width: index === active ? 22 : 9, height: 9, background: index === active ? GOLD : "rgba(242,193,78,0.4)" }}
+                        className={`block rounded-full transition-all h-2 md:h-[9px] ${index === active ? "w-[18px] md:w-[22px]" : "w-2 md:w-[9px]"}`}
+                        style={{ background: index === active ? GOLD : "rgba(242,193,78,0.4)" }}
                       />
                     </button>
                   </li>
                 ))}
               </ul>
-              <button type="button" className={CONTROL_CLASS} onClick={() => go(active + 1)} aria-label="Khung sau">
+              <button type="button" className={`${CONTROL_CLASS} shrink-0`} onClick={() => go(active + 1)} aria-label="Khung sau">
                 <ChevronRight className="w-5 h-5" aria-hidden="true" />
               </button>
               {!reducedMotion && (
                 <button
                   type="button"
-                  className={`${CONTROL_CLASS} ml-1`}
+                  className={`${CONTROL_CLASS} shrink-0 md:ml-1`}
                   onClick={() => setUserPaused((paused) => !paused)}
                   aria-label={userPaused ? "Tiếp tục tự chuyển khung" : "Tạm dừng tự chuyển khung"}
                 >
@@ -340,7 +340,7 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
           {/* 1. PHÁP THOẠI MỚI NHẤT */}
           <Link prefetch={false}
             href="/vu-tru-phat-giao/giang-duong"
-            className="min-h-11 px-3 md:px-5 py-2 md:py-2.5 rounded-full text-[12px] md:text-xs font-bold uppercase tracking-wider flex flex-row items-center justify-center gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0 col-span-2 md:col-span-1"
+            className="min-h-11 px-2 md:px-5 py-2 md:py-2.5 rounded-full text-[11px] md:text-xs font-bold uppercase tracking-normal md:tracking-wider flex flex-row items-center justify-center gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0 col-span-2 md:col-span-1"
             style={{
               background: "linear-gradient(135deg, #4A3728 0%, #3D2B1F 100%)",
               border: "1.5px solid #F2C14E",
@@ -357,7 +357,7 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
           {/* 2. KHO ẢNH TƯ LIỆU */}
           <button
             onClick={() => setIsGalaxyOpen(true)}
-            className="min-h-11 px-3 md:px-5 py-2 md:py-2.5 rounded-full text-[12px] md:text-xs font-bold uppercase tracking-wider flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0"
+            className="min-h-11 px-2 md:px-5 py-2 md:py-2.5 rounded-full text-[11px] md:text-xs font-bold uppercase tracking-normal md:tracking-wider flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0"
             style={{
               background: "rgba(42,29,20,0.85)",
               border: "1px solid rgba(242,193,78,0.5)",
@@ -372,7 +372,7 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
           {/* 3. ẤN PHẨM PHẬT GIÁO */}
           <Link prefetch={false}
             href="/tri-tue-phat-phap"
-            className="min-h-11 px-3 md:px-5 py-2 md:py-2.5 rounded-full text-[12px] md:text-xs font-bold uppercase tracking-wider flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0"
+            className="min-h-11 px-2 md:px-5 py-2 md:py-2.5 rounded-full text-[11px] md:text-xs font-bold uppercase tracking-normal md:tracking-wider flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0"
             style={{
               background: "rgba(42,29,20,0.85)",
               border: "1px solid rgba(242,193,78,0.5)",
@@ -387,7 +387,7 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
           {/* 4. ĐĂNG KÝ CỘNG TU */}
           <Link prefetch={false}
             href="/dong-chay-hoang-phap"
-            className="min-h-11 px-3 md:px-5 py-2 md:py-2.5 rounded-full text-[12px] md:text-xs font-bold uppercase tracking-wider flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0"
+            className="min-h-11 px-2 md:px-5 py-2 md:py-2.5 rounded-full text-[11px] md:text-xs font-bold uppercase tracking-normal md:tracking-wider flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0"
             style={{
               background: "rgba(42,29,20,0.85)",
               border: "1px solid rgba(242,193,78,0.5)",
@@ -402,7 +402,7 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
           {/* 5. TÌM KIẾM & THAM VẤN */}
           <Link prefetch={false}
             href="/tim-kiem"
-            className="min-h-11 px-3 md:px-5 py-2 md:py-2.5 rounded-full text-[12px] md:text-xs font-bold uppercase tracking-wider flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0"
+            className="min-h-11 px-2 md:px-5 py-2 md:py-2.5 rounded-full text-[11px] md:text-xs font-bold uppercase tracking-normal md:tracking-wider flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0"
             style={{
               background: "rgba(42,29,20,0.85)",
               border: "1px solid rgba(242,193,78,0.5)",

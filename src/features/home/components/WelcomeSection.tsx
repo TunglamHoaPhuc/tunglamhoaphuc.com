@@ -138,7 +138,7 @@ export const WelcomeSection: FC<{ welcome: HomeWelcome | null }> = ({ welcome })
       id="loi-chao"
       aria-labelledby={title ? "loi-chao-tieu-de" : undefined}
       aria-label={title ? undefined : "Lời chào"}
-      className="relative px-4 py-20 md:px-10 md:py-28"
+      className="relative px-4 py-14 md:px-10 md:py-28"
       style={{ background: `linear-gradient(180deg,#1A120B 0%,${C.dark} 50%,#1A120B 100%)` }}
     >
       <div className="mx-auto max-w-[1280px]">

@@ -49,7 +49,7 @@ export const CustomDropdown: FC<CustomDropdownProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="appearance-none bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 hover:border-[#F2C14E] rounded-xl px-3.5 py-1.5 pr-8 min-h-11 md:min-h-0 text-xs text-[#FFE5A3] focus:outline-none focus:border-[#F2C14E] cursor-pointer transition-all duration-300 hover:shadow-[0_0_15px_rgba(242,193,78,0.25)] flex items-center justify-between gap-2 shrink-0 group shadow-sm w-full"
+        className="max-sm:w-full appearance-none bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 hover:border-[#F2C14E] rounded-xl px-3.5 py-1.5 pr-8 min-h-11 md:min-h-0 text-xs text-[#FFE5A3] focus:outline-none focus:border-[#F2C14E] cursor-pointer transition-all duration-300 hover:shadow-[0_0_15px_rgba(242,193,78,0.25)] flex items-center justify-between gap-2 shrink-0 group shadow-sm w-full"
         style={{ fontFamily: "'UTM Avo', sans-serif" }}
       >
         <span className="truncate max-w-[200px]">

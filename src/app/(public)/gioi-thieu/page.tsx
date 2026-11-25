@@ -36,7 +36,7 @@ export default async function GioiThieuOverviewPage() {
   }));
   return (
     <div className="min-h-screen bg-[#2A1D14] text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black flex flex-col justify-between">
-      <main className="flex-1 pb-16">
+      <main className="flex-1 pb-12 md:pb-16">
         {/* ── HERO BANNER TOP ── */}
         <div className="relative w-full overflow-hidden bg-[#2A1D14] pt-28 pb-12">
           {/* Background image */}

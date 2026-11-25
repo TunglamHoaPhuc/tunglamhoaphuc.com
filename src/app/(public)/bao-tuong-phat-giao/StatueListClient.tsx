@@ -147,12 +147,12 @@ export default function BaoTuongPhatGiaoClient({
 
       {/* ── 2. THANH BỘ LỌC TỐI GIẢN & TINH TẾ (BỎ ĐƯỜNG KẺ DƯỚI, DROPDOWN GRADIENT & HOVER NÂU VÀNG) ── */}
       <main className="max-w-[1280px] mx-auto px-4 md:px-10 py-6">
-        <div className="flex flex-wrap items-center justify-between gap-3 mb-10 pb-2">
+        <div className="relative flex flex-wrap items-center justify-between gap-3 mb-10 pb-2">
           
           <div className="flex flex-wrap items-center gap-3 flex-1 min-w-[280px]">
             {/* Nhãn LỰA CHỌN nhẹ nhàng thanh lịch */}
             <span
-              className="text-xs sm:text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5"
+              className="text-xs sm:text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5 w-full sm:w-auto min-h-8 flex items-center"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
               LỰA CHỌN:
@@ -181,6 +181,7 @@ export default function BaoTuongPhatGiaoClient({
               options={assemblyOptions}
               onChange={setSelectedAssembly}
               placeholder="Tất cả"
+              className="min-w-[140px] flex-1 sm:flex-none"
             />
 
             {/* Vạch phân định nhẹ mờ */}
@@ -193,6 +194,7 @@ export default function BaoTuongPhatGiaoClient({
               options={areaOptions}
               onChange={setSelectedArea}
               placeholder="Tất cả"
+              className="min-w-[140px] flex-1 sm:flex-none"
             />
 
             {/* Vạch phân định nhẹ mờ */}
@@ -205,11 +207,12 @@ export default function BaoTuongPhatGiaoClient({
               options={KIND_OPTIONS}
               onChange={(v) => setSelectedKind(v as StatueKind)}
               placeholder="Tất cả"
+              className="basis-full sm:basis-auto sm:flex-none"
             />
           </div>
 
           {/* Count Badge Tinh Gọn */}
-          <div className="text-xs text-[#F2C14E] font-bold shrink-0 px-3 py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 rounded-xl border border-[#F2C14E]/35 shadow-sm" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+          <div className="absolute right-0 top-0 sm:static text-xs text-[#F2C14E] font-bold shrink-0 px-3 py-1 sm:py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 rounded-xl border border-[#F2C14E]/35 shadow-sm" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
             {totalShown} Bảo tượng
           </div>
         </div>
@@ -226,12 +229,12 @@ export default function BaoTuongPhatGiaoClient({
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h2
-                    className="text-2xl md:text-3xl font-normal uppercase tracking-widest text-[#F2C14E]"
+                    className="text-xl sm:text-2xl md:text-3xl font-normal uppercase tracking-wide sm:tracking-widest text-[#F2C14E]"
                     style={{ fontFamily: "'UTM ClassizismAntiqua', 'UTM Classic Antiqua', serif" }}
                   >
                     {selectedAssembly !== 'all' ? (STATUE_ASSEMBLIES.find(a => a.id === selectedAssembly)?.name || 'KẾT QUẢ TÌM KIẾM') : (selectedArea !== 'all' ? `KHU VỰC: ${formatAreaTitleCase(selectedArea)}` : 'KẾT QUẢ TÌM KIẾM')}
                   </h2>
-                  <span className="text-xs text-[#FFE5A3]/70 font-bold" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                  <span className="shrink-0 whitespace-nowrap text-xs text-[#FFE5A3]/70 font-bold" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                     {totalShown} Tôn tượng
                   </span>
                 </div>
@@ -296,12 +299,12 @@ function StatueSection({ title, note, count, statues, eager }: { title: string; 
       <div className="pb-2 border-b border-[#F2C14E]/40">
         <div className="flex items-center justify-between">
           <h2
-            className="text-2xl md:text-3xl font-normal uppercase tracking-widest text-[#F2C14E]"
+            className="text-xl sm:text-2xl md:text-3xl font-normal uppercase tracking-wide sm:tracking-widest text-[#F2C14E]"
             style={{ fontFamily: "'UTM ClassizismAntiqua', 'UTM Classic Antiqua', serif" }}
           >
             {title}
           </h2>
-          <span className="text-xs text-[#FFE5A3] font-bold px-3 py-1 rounded-full bg-[#1C130D] border border-[#F2C14E]/40 shadow-sm" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+          <span className="shrink-0 whitespace-nowrap text-xs text-[#FFE5A3] font-bold px-3 py-1 rounded-full bg-[#1C130D] border border-[#F2C14E]/40 shadow-sm" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
             {count} Tôn tượng
           </span>
         </div>

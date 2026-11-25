@@ -56,7 +56,7 @@ export const GallerySection: FC<GallerySectionProps> = ({ areas: FEATURED_AREAS,
   const nextStatue = FEATURED_STATUES[nextStatueIdx];
 
   return (
-    <div className="w-full space-y-12 md:space-y-24 py-16 bg-[#1A120B] relative">
+    <div className="w-full space-y-10 md:space-y-24 py-12 md:py-16 bg-[#1A120B] relative">
       {/* ── Seamless Gradient Blur Overlay ── */}
       <SectionTransitionOverlay position="both" />
 

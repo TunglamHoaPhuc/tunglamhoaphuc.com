@@ -47,10 +47,10 @@ function Suggestions() {
   return (
     <nav aria-label="Gợi ý chuyên mục" className="mt-4 flex flex-col gap-3">
       <p className="text-sm" style={AVO}>Hoặc xem theo chuyên mục:</p>
-      <ul className="flex flex-wrap gap-3 list-none p-0 m-0">
+      <ul className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3 list-none p-0 m-0">
         {SEARCH_SECTIONS.map((section) => (
-          <li key={section.slug}>
-            <Link prefetch={false} className={`${PILL} ${PILL_OFF}`} style={AVO} href={section.href}>
+          <li key={section.slug} className="min-w-0">
+            <Link prefetch={false} className={`${PILL} ${PILL_OFF} max-sm:w-full max-sm:justify-center max-sm:px-2 max-sm:text-[13px] max-sm:text-center`} style={AVO} href={section.href}>
               {section.name}
             </Link>
           </li>
@@ -70,12 +70,12 @@ export function pageNumbers(page: number, pageCount: number): (number | "...")[]
 function Pager({ page, pageCount, hrefFor }: { page: number; pageCount: number; hrefFor: (page: number) => string }) {
   if (pageCount <= 1) return null;
   return (
-    <nav aria-label="Các trang kết quả" className="mt-6">
-      <ul className="flex flex-wrap items-center gap-2 list-none p-0 m-0">
+    <nav aria-label="Các trang kết quả" className="mt-6 max-sm:overflow-x-auto max-sm:[scrollbar-width:none]">
+      <ul className="mx-auto flex w-max max-w-none flex-nowrap items-center gap-1 sm:mx-0 sm:w-auto sm:flex-wrap sm:gap-2 list-none p-0 m-0 [&>li]:shrink-0">
         {page > 1 ? (
           <li>
-            <Link prefetch={false} className={`${PILL} ${PILL_OFF}`} style={AVO} href={hrefFor(page - 1)} rel="prev">
-              Trang trước
+            <Link prefetch={false} className={`${PILL} ${PILL_OFF} max-sm:min-w-11 max-sm:justify-center max-sm:px-2`} style={AVO} href={hrefFor(page - 1)} rel="prev" aria-label="Trang trước">
+              <span aria-hidden="true" className="sm:hidden">‹</span><span className="hidden sm:inline">Trang trước</span>
             </Link>
           </li>
         ) : null}
@@ -84,7 +84,7 @@ function Pager({ page, pageCount, hrefFor }: { page: number; pageCount: number; 
             <li key={`gap-${i}`} aria-hidden="true" className="px-1">…</li>
           ) : (
             <li key={n}>
-              <Link prefetch={false} className={`${PILL} ${n === page ? PILL_ON : PILL_OFF} min-w-11 justify-center`} style={AVO} href={hrefFor(n)} aria-current={n === page ? "page" : undefined}>
+              <Link prefetch={false} className={`${PILL} ${n === page ? PILL_ON : PILL_OFF} min-w-11 justify-center max-sm:px-2`} style={AVO} href={hrefFor(n)} aria-current={n === page ? "page" : undefined}>
                 <span className="sr-only">Trang </span>
                 {n}
               </Link>
@@ -93,8 +93,8 @@ function Pager({ page, pageCount, hrefFor }: { page: number; pageCount: number; 
         )}
         {page < pageCount ? (
           <li>
-            <Link prefetch={false} className={`${PILL} ${PILL_OFF}`} style={AVO} href={hrefFor(page + 1)} rel="next">
-              Trang sau
+            <Link prefetch={false} className={`${PILL} ${PILL_OFF} max-sm:min-w-11 max-sm:justify-center max-sm:px-2`} style={AVO} href={hrefFor(page + 1)} rel="next" aria-label="Trang sau">
+              <span aria-hidden="true" className="sm:hidden">›</span><span className="hidden sm:inline">Trang sau</span>
             </Link>
           </li>
         ) : null}
@@ -118,7 +118,7 @@ export default function SearchView({ query, results }: { query: SearchQuery; res
 
   return (
     <div className="min-h-screen bg-[#2A1D14] text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black">
-      <main className="pb-16">
+      <main className="pb-12 md:pb-16">
         <PlainHero title="Tìm kiếm" />
         <div className="max-w-[960px] mx-auto px-4 md:px-10 mt-4 flex flex-col gap-6">
           <form action={SEARCH_PATH} method="get" role="search" aria-label="Tìm trên trang" className="flex flex-col gap-2">
@@ -159,7 +159,7 @@ export default function SearchView({ query, results }: { query: SearchQuery; res
 
           {query.q && results.length ? (
             <nav aria-label="Chuyên mục">
-              <ul className="flex flex-wrap gap-3 list-none p-0 m-0">
+              <ul className="-mx-4 flex snap-x snap-proximity flex-nowrap gap-2 overflow-x-auto px-4 pb-1 [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:gap-3 sm:overflow-visible sm:px-0 list-none p-0 m-0 [&>li]:shrink-0 [&>li]:snap-start">
                 <li>
                   <Link prefetch={false} className={`${PILL} ${!query.section ? PILL_ON : PILL_OFF}`} style={AVO} href={href({ section: "", page: 1 })} aria-current={!query.section ? "page" : undefined}>
                     Tất cả <span className="opacity-80">{number(results.length)}</span>
