@@ -2,7 +2,7 @@
 import { fitImage } from '@/utils/image';
 import { imageSrcSet } from '@/lib/tlhp-content/media';
 
-import { FC, useState, useMemo, useEffect } from "react";
+import { FC, useState, useMemo, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import {
@@ -33,6 +33,19 @@ import {
   calcDaysDifference,
 } from "@/data/schedule-data";
 import { decodeHtmlEntities } from "@/lib/html-entities";
+import {
+  buildQuoteList,
+  buildSlides,
+  clampSlide,
+  nextSlideIndex,
+  prevSlideIndex,
+  quoteImageKey,
+  slideKey,
+  swipeDirection,
+  webpRetryUrl,
+  type QuoteItem,
+  type SlideItem,
+} from "@/features/home/calendar-slides";
 import { monthEvents, resolveMonthTheme, type CalendarPayload } from "@/lib/v3-calendar";
 
 function toSlug(str: string): string {
@@ -320,80 +333,95 @@ export const CalendarSection: FC = () => {
     return list;
   }, [monthEventsMap]);
 
-  // Danh sách toàn bộ ảnh quote dùng chung (ưu tiên ảnh quote của tháng đang chọn lên trước)
+  // Ảnh quote đã báo lỗi (khóa theo quoteImageKey): loại khỏi slide để không hiện khung trống hay ảnh thay thế lặp lại.
+  const [failedQuoteKeys, setFailedQuoteKeys] = useState<string[]>([]);
+
+  // Danh sách ảnh quote của slide: gộp trùng (id, ảnh), bỏ ảnh lỗi, ảnh của tháng đang chọn lên trước (logic ở calendar-slides.ts)
   const allQuoteList = useMemo(() => {
-    let list: Array<{ id: string; url: string; title?: string }> = [];
+    let gallery: QuoteItem[] = [];
 
     if (dbData?.quoteGallery && dbData.quoteGallery.length > 0) {
-      list = [...dbData.quoteGallery];
+      gallery = dbData.quoteGallery;
     } else {
       // Fallback lấy toàn bộ quoteImg từ 12 tháng nếu quoteGallery chưa có
-      const defaultList: Array<{ id: string; url: string; title?: string }> = [];
       for (let m = 0; m < 12; m++) {
         const theme = (dbData?.monthThemes && dbData.monthThemes[String(m)]) || MONTH_THEMES[m];
         if (theme?.quoteImg) {
-          defaultList.push({
+          gallery.push({
             id: `quote-${m + 1}`,
             url: theme.quoteImg,
             title: theme.quoteTitle || theme.title || `Quote Tu Học Tháng ${m + 1}`,
           });
         }
       }
-      list = defaultList;
     }
 
-    // Ưu tiên đưa quote của tháng đang chọn lên đầu danh sách slide (ngay sau slide chủ đề)
-    if (list.length > 1) {
-      const curQuoteUrl = monthTheme.quoteImg;
-      const curIdx = list.findIndex(
-        (q) => (curQuoteUrl && q.url === curQuoteUrl) || q.id === `quote-${currentMonth + 1}`
-      );
-      if (curIdx > 0) {
-        const matching = list[curIdx];
-        list = [matching, ...list.slice(0, curIdx), ...list.slice(curIdx + 1)];
-      }
-    }
-
-    return list;
-  }, [dbData, monthTheme, currentMonth]);
-
-  // Cấu trúc Slides Cột Trái: Slide 0 là Chủ Đề Tháng, Slide 1..N là toàn bộ Kho Ảnh Quote
-  type SlideItem =
-    | { type: 'theme' }
-    | { type: 'quote'; quote: { id: string; url: string; title?: string } };
-
-  const slides: SlideItem[] = useMemo(() => {
-    const s: SlideItem[] = [{ type: 'theme' }];
-    allQuoteList.forEach((q) => {
-      s.push({ type: 'quote', quote: q });
+    return buildQuoteList(gallery, {
+      currentMonth,
+      currentQuoteUrl: monthTheme.quoteImg,
+      failedKeys: new Set(failedQuoteKeys),
     });
-    return s;
-  }, [allQuoteList]);
+  }, [dbData, monthTheme, currentMonth, failedQuoteKeys]);
+
+  // Cấu trúc Slides Cột Trái: Slide 0 là Chủ Đề Tháng, Slide 1..N là Kho Ảnh Quote (mỗi ảnh một trang, không lặp)
+  const slides: SlideItem[] = useMemo(() => buildSlides(allQuoteList), [allQuoteList]);
+
+  // Chỉ số hiển thị luôn nằm trong danh sách (danh sách có thể ngắn lại khi một ảnh lỗi bị loại)
+  const slideIdx = clampSlide(activeSlideIdx, slides.length);
+  const slideCount = slides.length;
 
   // Reset slide index khi đổi tháng
   useEffect(() => {
     setActiveSlideIdx(0);
   }, [currentMonth, currentYear]);
 
-  // Tự động chạy Slide (Auto-play mỗi 6 giây, tạm dừng khi hover)
+  // Tự động chạy Slide (6 giây mỗi trang, tạm dừng khi hover/chạm; bấm tay hay vuốt thì đếm lại từ đầu)
   useEffect(() => {
-    if (slides.length <= 1 || isSlidePaused) return;
-    const interval = setInterval(() => {
-      setActiveSlideIdx((prev) => (prev + 1) % slides.length);
+    if (slideCount <= 1 || isSlidePaused) return;
+    const timer = setTimeout(() => {
+      setActiveSlideIdx((prev) => nextSlideIndex(prev, slideCount));
     }, 6000);
-    return () => clearInterval(interval);
-  }, [slides.length, isSlidePaused]);
+    return () => clearTimeout(timer);
+  }, [slideCount, isSlidePaused, slideIdx]);
 
   // Cố định lịch không nhảy theo khóa tu nữa
   const activeHighlightedEvent = null;
 
   // Chuyển slide tiếp/lùi
   const handlePrevSlide = () => {
-    setActiveSlideIdx((prev) => (prev > 0 ? prev - 1 : slides.length - 1));
+    setActiveSlideIdx(prevSlideIndex(slideIdx, slideCount));
   };
 
   const handleNextSlide = () => {
-    setActiveSlideIdx((prev) => (prev + 1) % slides.length);
+    setActiveSlideIdx(nextSlideIndex(slideIdx, slideCount));
+  };
+
+  // Vuốt ngang trên điện thoại để đổi trang
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const t = e.touches[0];
+    touchStart.current = t ? { x: t.clientX, y: t.clientY } : null;
+  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const t = e.changedTouches[0];
+    const start = touchStart.current;
+    touchStart.current = null;
+    if (!start || !t) return;
+    const dir = swipeDirection(t.clientX - start.x, t.clientY - start.y);
+    if (dir > 0) handleNextSlide();
+    else if (dir < 0) handlePrevSlide();
+  };
+
+  // Ảnh quote lỗi: thử bản .webp cùng tên một lần, vẫn lỗi thì loại trang đó khỏi slide
+  const handleQuoteImageError = (img: HTMLImageElement, quote: QuoteItem) => {
+    const retry = !img.dataset.retried ? webpRetryUrl(img.getAttribute('src') || '') : null;
+    if (retry) {
+      img.dataset.retried = '1';
+      img.src = retry;
+      return;
+    }
+    const key = quoteImageKey(quote.url);
+    setFailedQuoteKeys((prev) => (prev.includes(key) ? prev : [...prev, key]));
   };
 
   // First and last day lunar info for header
@@ -420,7 +448,7 @@ export const CalendarSection: FC = () => {
     }
   };
 
-  const currentSlide = slides[activeSlideIdx] || slides[0];
+  const currentSlide = slides[slideIdx] || slides[0];
 
   return (
     <section id="lich-tu-hoc" className="w-full py-20 relative overflow-hidden bg-[#1A120B]">
@@ -459,6 +487,8 @@ export const CalendarSection: FC = () => {
           <div
             onMouseEnter={() => setIsSlidePaused(true)}
             onMouseLeave={() => setIsSlidePaused(false)}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
             className="w-full lg:w-[350px] xl:w-[380px] shrink-0 rounded-3xl bg-gradient-to-b from-[#2A170F] via-[#201007] to-[#150A04] border border-[#F2C14E]/40 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-md flex flex-col justify-between overflow-hidden transition-all min-h-[calc(380px+60vw)] sm:min-h-[470px] lg:min-h-[610px] xl:min-h-[620px] h-full lg:self-stretch relative group/leftcol"
           >
 
@@ -487,7 +517,7 @@ export const CalendarSection: FC = () => {
             {/* ── NỘI DUNG SLIDE: CHỦ ĐỀ THÁNG HOẶC QUOTE TU HỌC ── */}
             {currentSlide.type === 'theme' ? (
               /* SLIDE 0: CHỦ ĐỀ KHÓA TU THÁNG (TIÊU ĐỀ NỔI BẬT UTM NIAGARA + QUOTE GỐC CÂN ĐỐI) */
-              <div className="flex-1 flex flex-col justify-between animate-in fade-in duration-500 overflow-hidden h-full">
+              <div key={slideKey(currentSlide)} className="flex-1 flex flex-col justify-between animate-in fade-in duration-500 overflow-hidden h-full">
                 {/* 1.1 TRANH MINH HỌA NGHỆ THUẬT (TỈ LỆ GỐC ASPECT 1200/1015 TRÊN DESKTOP, ASPECT 16/10 TRÊN MOBILE) */}
                 <div className="relative w-full aspect-[16/10] sm:aspect-[1200/900] lg:aspect-[1200/1015] shrink-0 overflow-hidden bg-black/40">
                   <img loading="lazy" decoding="async"
@@ -583,7 +613,7 @@ export const CalendarSection: FC = () => {
               </div>
             ) : (
               /* SLIDE QUOTE: KHO ẢNH PHÁP NGỮ / QUOTE TU HỌC (AMBIENT BLUR NỀN + LỚP MỜ LÀM MỀM KHUNG + CLICK MỞ POPUP TINH GỌN) */
-              <div className="flex-1 flex flex-col justify-center items-center overflow-hidden h-full relative p-2.5 sm:p-3 animate-in fade-in duration-500">
+              <div key={slideKey(currentSlide)} className="flex-1 flex flex-col justify-center items-center overflow-hidden h-full relative p-2.5 sm:p-3 animate-in fade-in duration-500">
                 <div className="w-full h-full flex items-center justify-center overflow-hidden relative rounded-2xl bg-black/60 shadow-inner group/quote">
                   {/* Lớp nền ambient blur tạo hiệu ứng mờ viền hòa sắc tuyệt đẹp */}
                   <div
@@ -609,9 +639,7 @@ export const CalendarSection: FC = () => {
                         src={fitImage(currentSlide.quote.url, 640)}
                         alt={currentSlide.quote.title || 'Quote tu học'}
                         className="h-full w-auto max-w-full object-contain mx-auto transition-transform duration-500 group-hover/imgbox:scale-[1.01]"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src = monthTheme.bannerImg;
-                        }}
+                        onError={(e) => handleQuoteImageError(e.currentTarget, currentSlide.quote)}
                         title="Bấm để xem ảnh rõ nét"
                       />
                       {/* Lớp viền mờ mềm mại (Feather Mask 14px) quanh mép khung ảnh */}
@@ -625,10 +653,10 @@ export const CalendarSection: FC = () => {
             {/* Dải Điều Hướng Slide: Các Dấu Chấm Nhảy Dần Dần (Hỗ trợ cuộn ngang mượt nếu nhiều quote) */}
             <div className="flex items-center justify-center gap-1.5 px-3 pt-2.5 pb-3 shrink-0 overflow-x-auto overflow-y-visible max-w-full scrollbar-none">
               {slides.map((_, idx) => {
-                const isActive = activeSlideIdx === idx;
+                const isActive = slideIdx === idx;
                 return (
                   <button
-                    key={idx}
+                    key={slideKey(slides[idx])}
                     type="button"
                     onClick={() => setActiveSlideIdx(idx)}
                     className="group inline-flex h-11 shrink-0 cursor-pointer items-center justify-center px-1.5 md:h-6 md:px-0.5"
