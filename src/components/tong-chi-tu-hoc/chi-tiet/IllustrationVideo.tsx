@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { ExternalLink, Play, Film } from 'lucide-react';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 interface PropsKhoiVideo {
   heroBanner?: string;
@@ -43,7 +44,9 @@ function formatYoutubeEmbed(url?: string): string {
 
 export function IllustrationVideo({ heroBanner, videoBlock }: PropsKhoiVideo) {
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
-  const thumbnailSrc = getImageUrl(heroBanner) || '/images/toan-canh-chua.jpg';
+  // Khung 16:9 rộng khoảng 560 px (di động ~380 px).
+  const thumbnailSrc = fitImage(getImageUrl(heroBanner) || '/images/hero/toan-canh-chua-1280.webp', 960);
+  const thumbnailSet = imageSrcSet(getImageUrl(heroBanner) || '/images/hero/toan-canh-chua-1280.webp', [640, 960, 1280]);
 
   return (
     <section id="video-minh-hoa" className="scroll-mt-24 pt-8 pb-4 w-full relative">
@@ -76,7 +79,7 @@ export function IllustrationVideo({ heroBanner, videoBlock }: PropsKhoiVideo) {
       </div>
 
       {/* ── 2. KHUNG VIDEO MINH HỌA KHỔ CHUẨN ── */}
-      <div className="relative bg-[#3a2613]/80 border border-[#c8aa6e]/70 rounded-2xl p-6 sm:p-8 md:p-10 shadow-2xl backdrop-blur-md w-full mt-6">
+      <div className="relative bg-[#3a2613]/80 border border-[#c8aa6e]/70 rounded-2xl p-6 sm:p-8 md:p-10 shadow-2xl sm:backdrop-blur-md w-full mt-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 items-center">
           <div className="lg:col-span-7 relative aspect-video w-full rounded-xl overflow-hidden border border-[#c8aa6e]/50 shadow-2xl bg-black group">
             {isPlayingVideo ? (
@@ -89,13 +92,16 @@ export function IllustrationVideo({ heroBanner, videoBlock }: PropsKhoiVideo) {
               />
             ) : (
               <div className="relative w-full h-full cursor-pointer">
-                <img
+                <img width={640} height={480}
                   src={thumbnailSrc}
+                  srcSet={thumbnailSet}
+                  sizes="(min-width: 1024px) 560px, calc(100vw - 32px)"
                   alt="Video Thumbnail"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
                   onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                    e.currentTarget.removeAttribute('srcset');
+                    (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
                   }}
                 />
 

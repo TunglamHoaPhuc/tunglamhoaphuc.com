@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { ChevronRight } from 'lucide-react';
 import { NAV_ITEMS } from '@/data/tong-chi-tu-hoc-data';
 import { NavDropdownPanel } from './NavDropdownPanel';
+import { fitImage } from '@/utils/image';
 
 interface NavItem {
   id: string;
@@ -52,10 +53,10 @@ export function SidebarNav({
 
   const logoSrc = logoUrl || (
     isHoangPhap
-      ? '/images/icons/icon-dong-chay-hoang-phap.webp'
+      ? '/images/icons/icon-dong-chay-hoang-phap-128.webp'
       : isUniverse
-      ? 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-moc-an.webp'
-      : 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/bieu-tuong-tong-chi-tu-hoc-tung-lam-hoa-phuc.webp'
+      ? '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-moc-an.webp'
+      : '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/bieu-tuong-tong-chi-tu-hoc-tung-lam-hoa-phuc.webp'
   );
 
   // Click outside listener
@@ -79,20 +80,19 @@ export function SidebarNav({
         isScrolled ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-20 pointer-events-none'
       }`}
     >
-      <div ref={dropdownRef} className="relative bg-[#382417]/90 border border-[#f2cc8f]/40 px-2.5 py-4 rounded-3xl flex flex-col items-center shadow-2xl backdrop-blur-md">
+      <div ref={dropdownRef} className="relative bg-[#382417]/90 border border-[#f2cc8f]/40 px-2.5 py-4 rounded-3xl flex flex-col items-center shadow-2xl sm:backdrop-blur-md">
         <Link
           href={homeHref}
           title={homeTitle}
           className="group flex flex-col items-center hover:scale-110 transition-transform cursor-pointer"
         >
-          <img
-            src={logoSrc}
+          <img width={128} height={128}
+            src={fitImage(logoSrc, 160)}
             alt={homeTitle}
-            loading="lazy"
             decoding="async"
             className="h-8 w-auto object-contain mb-2 flex-shrink-0 drop-shadow-[0_0_6px_rgba(255,222,89,0.4)] group-hover:drop-shadow-[0_0_12px_rgba(255,222,89,0.9)] transition-all"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-moc-an.webp';
+              (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-moc-an.webp';
             }}
           />
         </Link>
@@ -183,7 +183,7 @@ export function SidebarNav({
 
                   <span
                     style={{ fontFamily: "'UTM Niagara', sans-serif" }}
-                    className={`absolute left-full ml-3 px-2.5 py-1 rounded-md bg-[#21140b]/95 border border-[#f2cc8f]/50 text-lg sm:text-xl whitespace-nowrap uppercase tracking-wider shadow-xl backdrop-blur-md pointer-events-none transition-all duration-300 transform origin-left ${
+                    className={`absolute left-full ml-3 px-2.5 py-1 rounded-md bg-[#21140b]/95 border border-[#f2cc8f]/50 text-lg sm:text-xl whitespace-nowrap uppercase tracking-wider shadow-xl sm:backdrop-blur-md pointer-events-none transition-all duration-300 transform origin-left ${
                       isActive
                         ? 'opacity-100 translate-x-0 text-[#ffde59] drop-shadow-[0_0_6px_rgba(255,222,89,0.4)]'
                         : 'opacity-0 -translate-x-2 text-[#f2cc8f] group-hover:opacity-100 group-hover:translate-x-0 group-hover:text-[#ffde59]'

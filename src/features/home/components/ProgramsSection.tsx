@@ -8,6 +8,8 @@ import { PROGRAMS } from "@/features/home/data/home-data";
 import type { SectionRef } from "@/features/home/types";
 import { SectionHeader } from "@/components/common/SectionHeader";
 import type { HomeProgram } from "@/lib/v3-home-programs";
+import { fitImage } from "@/utils/image";
+import { imageSrcSet } from "@/lib/tlhp-content/media";
 
 interface ProgramsSectionProps {
   /** Optional: the ref a parent uses to scroll to the section. */
@@ -30,7 +32,7 @@ const fromAdmin = (list: HomeProgram[]): Card[] =>
   list.map((p, i) => ({ key: p.id, title: p.title, schedule: p.schedule, imgUrl: p.imgUrl, imgPosition: p.imgPosition, href: p.href, emoji: MARKS[i % MARKS.length] }));
 
 const buttonStyle = { borderColor: `rgba(242,193,78,.4)`, color: C.accent };
-const buttonClass = "mt-5 inline-block font-inter text-[11px] uppercase tracking-[.15em] border rounded-lg px-5 py-2 transition-colors";
+const buttonClass = "mt-5 inline-block font-inter text-xs md:text-[11px] uppercase tracking-[.15em] border rounded-lg px-5 py-2 transition-colors";
 const hoverOn = (e: React.MouseEvent) => ((e.currentTarget as HTMLElement).style.background = "rgba(242,193,78,.1)");
 const hoverOff = (e: React.MouseEvent) => ((e.currentTarget as HTMLElement).style.background = "transparent");
 
@@ -76,7 +78,11 @@ const ProgramsSection: FC<ProgramsSectionProps> = ({ sectionRef, programs }) => 
               <div className="relative overflow-hidden" style={{ height: 240 }}>
                 {prog.imgUrl && (
                   <img
-                    src={prog.imgUrl}
+                    src={fitImage(prog.imgUrl, 960)}
+                    srcSet={imageSrcSet(prog.imgUrl, [360, 640, 960, 1280])}
+                    sizes="(min-width: 1280px) 384px, (min-width: 768px) 30vw, calc(100vw - 80px)"
+                    loading="lazy"
+                    decoding="async"
                     alt={prog.title}
                     style={{ objectPosition: prog.imgPosition }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

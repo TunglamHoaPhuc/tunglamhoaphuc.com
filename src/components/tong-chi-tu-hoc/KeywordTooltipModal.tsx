@@ -2,7 +2,8 @@
 
 import { FC, useEffect } from 'react';
 import Link from 'next/link';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 import { X, ArrowRight, ExternalLink } from 'lucide-react';
 
 interface KeywordPopup {
@@ -64,12 +65,16 @@ export const KeywordTooltipModal: FC<KeywordTooltipModalProps> = ({ popup, onClo
         {/* ── Ảnh minh họa ── */}
         {popup.imageUrl && (
           <div className="relative overflow-hidden w-full" style={{ height: 210 }}>
-            <img
-              src={getImageUrl(popup.imageUrl)}
+            <img width={640} height={480}
+              src={fitImage(getImageUrl(popup.imageUrl), 960)}
+              srcSet={imageSrcSet(getImageUrl(popup.imageUrl), [360, 640, 960])}
+              sizes="(min-width: 448px) 448px, 92vw"
+              decoding="async"
               alt={popup.title}
               className="w-full h-full object-cover"
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                e.currentTarget.removeAttribute('srcset');
+                (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
               }}
             />
             {/* Overlay gradient */}
@@ -108,7 +113,7 @@ export const KeywordTooltipModal: FC<KeywordTooltipModalProps> = ({ popup, onClo
         <div className="p-6 space-y-3.5 text-left">
           {/* Subtitle / Chuyên mục */}
           {popup.subtitle && (
-            <div className="text-[11px] font-bold text-[#F2C14E] uppercase tracking-widest flex items-center gap-1.5">
+            <div className="text-xs sm:text-[11px] font-bold text-[#F2C14E] uppercase tracking-widest flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-[#F2C14E]" />
               <span>{popup.subtitle}</span>
             </div>
@@ -123,7 +128,7 @@ export const KeywordTooltipModal: FC<KeywordTooltipModalProps> = ({ popup, onClo
           </h3>
 
           {/* Description */}
-          <p className="text-xs sm:text-sm text-[#e3d2c1] leading-relaxed">
+          <p className="text-sm text-[#e3d2c1] leading-relaxed">
             {popup.description}
           </p>
 

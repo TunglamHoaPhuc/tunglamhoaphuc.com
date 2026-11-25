@@ -2,6 +2,7 @@
 
 import React, { FC, ReactNode } from "react";
 import { Sparkles } from "lucide-react";
+import { fitImage } from "@/utils/image";
 
 export interface SectionHeaderProps {
   title: string;
@@ -33,8 +34,8 @@ export const SectionHeader: FC<SectionHeaderProps> = ({
       {/* Tầng 1: Icon - Chiều cao chuẩn tương xứng tiêu đề (Có không gian thở để hào quang tỏa đều 360 độ) */}
       <div className="mb-3 md:mb-4 flex items-center justify-center overflow-visible pt-1">
         {iconUrl ? (
-          <img loading="lazy" decoding="async"
-            src={iconUrl}
+          <img width={128} height={128} loading="lazy" decoding="async"
+            src={fitImage(iconUrl, 360)}
             alt={title || "Section Icon"}
             className={
               iconClassName ||

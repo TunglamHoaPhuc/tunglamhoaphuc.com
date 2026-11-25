@@ -1,6 +1,10 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { overLimit, tooMany } from '@/lib/rate-limit';
 
 const MAX_TTS_LENGTH = 260;
+/** The reader sends clauses of at most 165 characters; a longer `text` is not from the reader, so it is refused before any work. */
+const MAX_RAW_LENGTH = 600;
+/** Per visitor and minute: the reader asks once per clause (a few seconds each), so 60 is far above reading and far below scraping. */
+const TTS_VI_LIMIT_PER_MINUTE = 60;
 
 function normalizeVietnameseTtsText(raw: string): string {
   return raw
@@ -13,13 +17,19 @@ function normalizeVietnameseTtsText(raw: string): string {
     .trim();
 }
 
-export async function GET(req: NextRequest) {
+// Web `Request`/`Response` rather than NextRequest/NextResponse: the same on the Worker, and a test can call it without Next.
+export async function GET(req: Request) {
   try {
-    const rawText = req.nextUrl.searchParams.get('text') || '';
+    // The proxy spends Google's voice service on the visitor's behalf: count it like the AI routes, before anything else.
+    if (await overLimit(req, 'tts-vi', TTS_VI_LIMIT_PER_MINUTE)) return tooMany();
+    const rawText = new URL(req.url).searchParams.get('text') || '';
+    if (rawText.length > MAX_RAW_LENGTH) {
+      return Response.json({ error: 'Nội dung quá dài để đọc' }, { status: 400 });
+    }
     const cleaned = normalizeVietnameseTtsText(rawText);
 
     if (!cleaned) {
-      return NextResponse.json({ error: 'Thiếu nội dung text cần đọc' }, { status: 400 });
+      return Response.json({ error: 'Thiếu nội dung text cần đọc' }, { status: 400 });
     }
 
     const capped = cleaned.slice(0, MAX_TTS_LENGTH);
@@ -36,7 +46,7 @@ export async function GET(req: NextRequest) {
     });
 
     if (!upstream.ok) {
-      return NextResponse.json(
+      return Response.json(
         { error: `Không thể lấy giọng đọc (${upstream.status})` },
         { status: 502 }
       );
@@ -44,7 +54,7 @@ export async function GET(req: NextRequest) {
 
     const audioBuffer = await upstream.arrayBuffer();
 
-    return new NextResponse(audioBuffer, {
+    return new Response(audioBuffer, {
       status: 200,
       headers: {
         'Content-Type': 'audio/mpeg',
@@ -52,7 +62,8 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : 'Lỗi dịch vụ đọc tiếng Việt';
-    return NextResponse.json({ error: message }, { status: 500 });
+    // Không trả chi tiết lỗi của lần gọi Google ra ngoài.
+    console.error('[API /api/tts/vi] Lỗi:', err);
+    return Response.json({ error: 'Lỗi dịch vụ đọc tiếng Việt' }, { status: 500 });
   }
 }

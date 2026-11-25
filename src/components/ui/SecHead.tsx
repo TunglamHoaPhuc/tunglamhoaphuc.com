@@ -36,7 +36,7 @@ const SecHead: FC<SecHeadProps> = ({ title, sub }) => {
       </div>
       {sub && (
         <p
-          className="font-inter text-[11px] tracking-[.3em] uppercase"
+          className="font-inter text-xs md:text-[11px] tracking-[.3em] uppercase"
           style={{ color: C.muted }}
         >
           {sub}

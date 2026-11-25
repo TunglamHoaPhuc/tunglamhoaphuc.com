@@ -13,13 +13,15 @@ export default defineConfig({
     entrypoint: "vinext/server/fetch-handler",
     compatibilityDate: "2026-11-02",
     compatibilityFlags: ["nodejs_compat"],
-    domains: ["v3.tunglamhoaphuc.com"],
+    domains: ["www.tunglamhoaphuc.com", "tunglamhoaphuc.com", "v3.tunglamhoaphuc.com"],
     workersDev: false,
     observability: { enabled: true },
     assets: {
       htmlHandling: "none",
       notFoundHandling: "none",
-      runWorkerFirst: ["/*", "!/_next/static/*", "!/*/_next/static/*", "!/tibetan-study/*", "!/fonts/*", "!/*.TTF"],
+      // Ảnh, phông và bộ nhận diện của site đi thẳng từ kho tệp tĩnh, với luật Cache-Control ở public/_headers, không tốn CPU Worker
+      // (tiêu đề của next.config.ts không áp cho chúng). Đường dẫn không có tệp vẫn rơi về Worker (vd /images/[...path] chuyển sang B2).
+      runWorkerFirst: ["/*", "!/_next/static/*", "!/*/_next/static/*", "!/images/*", "!/brand/*", "!/tibetan-study/*", "!/fonts/*", "!/*.TTF"],
     },
     ...cache,
     env: {

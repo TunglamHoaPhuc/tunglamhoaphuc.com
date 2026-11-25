@@ -20,11 +20,16 @@ export interface MemorialRecord {
   age?: string;
   address?: string;
   contactName?: string;
-  contactPhone?: string; // Chỉ lưu trên server / admin, không trả thẳng ra public API
-  contact?: string; // Chuỗi liên hệ đã che SĐT cho giao diện công khai
+  contactPhone?: string; // Chỉ có trong gói máy chủ; toPublicMemorialRecord không chép ra ngoài
+  contact?: string; // như trên
   burialLocation?: string;
 }
 
+/**
+ * Những gì trang công khai /tra-cuu-bai-vi được thấy về một bài vị: đủ để thân nhân nhận ra mã số, không hơn.
+ * KHÔNG có địa chỉ, nơi an táng, tên người liên hệ và số điện thoại (kể cả bản đã che): đó là dữ liệu riêng của người còn sống
+ * hoặc của gia đình, và danh sách này quét được hàng loạt. Thêm trường vào đây là đưa nó ra công khai.
+ */
 export interface MemorialPublicRecord {
   id: string;
   category: string;
@@ -37,10 +42,6 @@ export interface MemorialPublicRecord {
   birthDate?: string;
   deathDate?: string;
   age?: string;
-  address?: string;
-  contactName?: string;
-  contactMasked?: string;
-  burialLocation?: string;
 }
 
 export interface MemorialSyncMeta {
@@ -87,49 +88,10 @@ export function normalizeVietnamese(input: string): string {
 }
 
 /**
- * Che bớt chữ số ở giữa số điện thoại để bảo vệ riêng tư khi quét QR công khai.
- * Vẫn giữ đầu & 3 số cuối để thân nhân dễ nhận biết (vd: 0913****444).
- */
-export function maskPhoneNumber(raw: string): string {
-  if (!raw) return '';
-  return raw.replace(/(?:\+?84|0)(?:[\s.\-]*\d){7,10}/g, (match) => {
-    const digits = match.replace(/\D/g, '');
-    if (digits.length < 7) return match;
-    const prefix = digits.slice(0, 4);
-    const suffix = digits.slice(-3);
-    return `${prefix}****${suffix}`;
-  });
-}
-
-/**
- * Làm sạch chuỗi liên hệ để không lộ SĐT gốc khi gửi ra trang công khai.
- */
-export function buildMaskedContact(
-  contactName?: string,
-  contactPhone?: string,
-  fallbackContact?: string
-): string {
-  const parts: string[] = [];
-  if (contactName && contactName.toUpperCase() !== 'N/A') {
-    parts.push(maskPhoneNumber(contactName));
-  }
-  if (contactPhone && contactPhone.toUpperCase() !== 'N/A') {
-    const maskedPhone = maskPhoneNumber(contactPhone);
-    if (!parts.some((p) => p.includes(maskedPhone))) {
-      parts.push(maskedPhone);
-    }
-  }
-  if (parts.length === 0 && fallbackContact && fallbackContact.toUpperCase() !== 'N/A') {
-    return maskPhoneNumber(fallbackContact);
-  }
-  return parts.join(' • ');
-}
-
-/**
- * Chuyển bản ghi đầy đủ thành bản ghi an toàn cho Client công khai (ẩn SĐT gốc).
+ * Chuyển bản ghi đầy đủ thành bản ghi cho Client công khai: chỉ chép đúng các trường của MemorialPublicRecord,
+ * từng trường một (không `...rec`), để trường mới thêm vào dữ liệu gốc không tự lọt ra ngoài.
  */
 export function toPublicMemorialRecord(rec: MemorialRecord): MemorialPublicRecord {
-  const contactMasked = buildMaskedContact(rec.contactName, rec.contactPhone, rec.contact);
   return {
     id: rec.id,
     category: rec.category,
@@ -142,10 +104,6 @@ export function toPublicMemorialRecord(rec: MemorialRecord): MemorialPublicRecor
     birthDate: rec.birthDate,
     deathDate: rec.deathDate,
     age: rec.age,
-    address: rec.address,
-    contactName: rec.contactName ? maskPhoneNumber(rec.contactName) : undefined,
-    contactMasked: contactMasked || undefined,
-    burialLocation: rec.burialLocation,
   };
 }
 

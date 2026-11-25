@@ -1,0 +1,28 @@
+# Tiêu đề cho các tệp mà Workers Static Assets phục vụ KHÔNG qua Worker (các đường dẫn bị loại khỏi runWorkerFirst trong
+# cloudflare.config.ts). Tiêu đề của next.config.ts (HSTS, X-Frame-Options...) chỉ áp cho những gì Worker trả; tệp tĩnh
+# phục vụ thẳng từ kho nên nhận Cache-Control ở đây. vinext chỉ tự ghi luật đầu tiên, và chỉ khi tệp này chưa có, nên phải
+# giữ nó ở public/.
+
+# Đầu ra của bản build: tên nào cũng mang mã băm nội dung.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Ảnh và phông của chính site (không phải ảnh admin tải lên, ảnh đó nằm ở R2). Một năm, không đổi: tệp thay nội dung thì phải
+# ĐỔI TÊN (logo-moc-an-200.webp...), nếu không khách cũ còn thấy bản cũ tới một năm.
+/images/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/fonts/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# Bộ nhận diện (logo, biểu tượng, ảnh chia sẻ, favicon): có thể được thay dưới cùng tên (ảnh chia sẻ og-tung-lam-hoa-phuc.jpg), nên
+# ngắn: một ngày, rồi dùng tiếp một tuần trong lúc kiểm bản mới.
+/brand/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+# Khóa học tiếng Tạng và phông UTM ở gốc: tên giữ nguyên khi thay, nên ngắn: một ngày.
+/tibetan-study/*
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800
+
+/*.TTF
+  Cache-Control: public, max-age=86400, stale-while-revalidate=604800

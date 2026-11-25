@@ -3,10 +3,11 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { ArrowLeft, ArrowRight, Calendar, Sparkles, Scroll, Landmark, User, HeartHandshake, BookOpen } from 'lucide-react';
 import type { GioiThieuTopicDetail } from '@/data/gioi-thieu-data';
 import { InfographicArticleRenderer } from '@/components/tong-chi-tu-hoc/chi-tiet/InfographicArticleRenderer';
+import { fitImage } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 /** Chủ đề khác đang hiển thị, đủ để vẽ một thẻ liên kết. */
 export interface OtherAboutTopic {
@@ -32,12 +33,19 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
       <div className="flex-1 pb-16 pt-20">
         {/* ── HERO BANNER TOP ── */}
         <div className="relative w-full overflow-hidden bg-[#2A1D14] pt-12 pb-14 border-b border-[#F2C14E]/20">
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-25 blur-[2px] pointer-events-none scale-105"
-            style={{
-              backgroundImage: `url('${topic.heroBanner || '/images/toan-canh-chua.jpg'}')`,
-              backgroundPosition: topic.heroBannerPosition || 'center 50%',
-            }}
+          <img
+            // Nền mờ (opacity 0,25, blur) phủ rộng cả khung: bậc 640 cho điện thoại, 1280 cho máy tính.
+            src={fitImage(topic.heroBanner, 640) || '/images/hero/toan-canh-chua-1280.webp'}
+            srcSet={imageSrcSet(topic.heroBanner || '', [640, 1280])}
+            sizes="(min-width: 1024px) 100vw, 160px"
+            alt=""
+            aria-hidden="true"
+            width={640}
+            height={360}
+            fetchPriority="low"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover opacity-25 blur-[2px] pointer-events-none scale-105"
+            style={{ objectPosition: topic.heroBannerPosition || 'center 50%' }}
           />
           <div className="absolute inset-0 bg-gradient-to-b from-[#2A1D14]/60 via-[#2A1D14]/85 to-[#2A1D14] pointer-events-none" />
 
@@ -45,14 +53,14 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
             {/* Back link */}
             <Link
               href="/gioi-thieu"
-              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#F2C14E]/40 bg-[#25170E]/80 text-[#F2C14E] text-xs font-bold uppercase tracking-wider hover:bg-[#F2C14E] hover:text-black transition-all mb-6 shadow-md"
+              className="inline-flex items-center gap-2 px-4 py-2 min-h-11 sm:min-h-0 sm:py-1.5 rounded-full border border-[#F2C14E]/40 bg-[#25170E]/80 text-[#F2C14E] text-sm sm:text-xs font-bold uppercase tracking-wider hover:bg-[#F2C14E] hover:text-black transition-all mb-6 shadow-md"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Tất Cả Mục Giới Thiệu</span>
             </Link>
 
             {/* Tag badge */}
-            <div className="px-3.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/50 text-[#F2C14E] text-[11px] font-bold tracking-widest uppercase mb-3">
+            <div className="px-3.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/50 text-[#F2C14E] text-xs font-bold tracking-widest uppercase mb-3">
               {topic.tag || topic.groupCategoryName || 'Tùng Lâm Hòa Phúc'}
             </div>
 
@@ -70,7 +78,7 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
 
             <p
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
-              className="text-xs sm:text-sm md:text-base text-[#e3d2c1] tracking-wide font-normal max-w-2xl mx-auto px-4 leading-relaxed text-balance text-center mt-2"
+              className="text-sm md:text-base text-[#e3d2c1] tracking-wide font-normal max-w-2xl mx-auto px-4 leading-relaxed text-balance text-center mt-2"
             >
               {topic.subtitle}
             </p>
@@ -81,16 +89,20 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
         <div className="max-w-[1200px] mx-auto px-4 md:px-8 mt-10 space-y-12">
           {/* 1. OVERVIEW & PORTRAIT BLOCK */}
           {topic.overviewSummary && (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center bg-[#25170E]/80 border border-[#F2C14E]/30 rounded-2xl p-6 sm:p-8 md:p-10 shadow-2xl backdrop-blur-xs">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center bg-[#25170E]/80 border border-[#F2C14E]/30 rounded-2xl p-5 sm:p-8 md:p-10 shadow-2xl backdrop-blur-xs">
               {topic.portraitImage && (
                 <div className="lg:col-span-5 relative">
                   <div className="relative rounded-2xl overflow-hidden border-2 border-[#F2C14E]/60 shadow-[0_0_30px_rgba(242,193,78,0.2)] aspect-[4/3] sm:aspect-[16/11] bg-[#1A120B]">
                     <img
-                      src={topic.portraitImage}
+                      src={fitImage(topic.portraitImage, 640)}
+                      srcSet={imageSrcSet(topic.portraitImage, [360, 640, 960])}
+                      sizes="(min-width: 1024px) 440px, 92vw"
                       alt={topic.title}
                       className="w-full h-full object-cover"
                       onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                        const el = e.currentTarget as HTMLImageElement;
+                        el.removeAttribute('srcset');
+                        el.src = '/images/hero/toan-canh-chua-1280.webp';
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-[#1A120B]/80 via-transparent to-transparent pointer-events-none" />
@@ -105,7 +117,7 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
                 </div>
                 <p
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                  className="text-sm sm:text-base text-[#e3d2c1] leading-relaxed"
+                  className="text-base text-[#e3d2c1] leading-relaxed"
                 >
                   {topic.overviewSummary}
                 </p>
@@ -115,7 +127,7 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
 
           {/* 2. GOLDEN QUOTE / PHÁP NGỮ BLOCK */}
           {topic.quoteContent && topic.quoteContent.length > 0 && (
-            <div className="relative rounded-2xl border border-[#F2C14E]/60 bg-gradient-to-b from-[#321F14] to-[#20140D] p-6 sm:p-10 text-center shadow-xl overflow-hidden">
+            <div className="relative rounded-2xl border border-[#F2C14E]/60 bg-gradient-to-b from-[#321F14] to-[#20140D] p-5 sm:p-10 text-center shadow-xl overflow-hidden">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-[2px] bg-gradient-to-r from-transparent via-[#F2C14E] to-transparent" />
               <div className="w-10 h-10 mx-auto mb-3 rounded-full bg-[#3a2718] border border-[#F2C14E]/80 flex items-center justify-center text-[#ffde59] shadow-md">
                 <span className="text-xl">🪔</span>
@@ -126,7 +138,7 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
               >
                 {topic.quoteTitle || 'LỜI DẠY'}
               </h3>
-              <div className="space-y-1.5 max-w-2xl mx-auto italic text-sm sm:text-base text-[#FFE5A3]">
+              <div className="space-y-1.5 max-w-2xl mx-auto italic text-base text-[#FFE5A3]">
                 {topic.quoteContent.map((line: string, idx: number) => (
                   <p key={idx}>{line}</p>
                 ))}
@@ -146,7 +158,7 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
                 <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/40 to-[#F2C14E]" />
                 <h2
                   style={{ fontFamily: "'UTM Niagara', serif" }}
-                  className="text-3xl sm:text-4xl text-[#ffde59] uppercase tracking-wider font-normal whitespace-nowrap"
+                  className="text-2xl sm:text-4xl text-[#ffde59] uppercase tracking-wider font-normal text-center sm:whitespace-nowrap"
                 >
                   DẤU MỐC LỊCH SỬ &amp; CÔNG HẠNH
                 </h2>
@@ -166,7 +178,7 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
                       <h4 className="text-base font-bold text-white mb-2 leading-snug">
                         {m.title}
                       </h4>
-                      <p className="text-xs text-[#e3d2c1]/80 leading-relaxed">
+                      <p className="text-sm text-[#e3d2c1]/80 leading-relaxed">
                         {m.description}
                       </p>
                     </div>
@@ -177,7 +189,7 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
           )}
 
           {/* 4. MAIN ARTICLE BODY */}
-          <div className="p-6 sm:p-10 rounded-2xl border border-[#F2C14E]/30 bg-[#25170E]/60 shadow-xl space-y-6 text-sm sm:text-base leading-relaxed text-[#e3d2c1] text-left">
+          <div className="p-4 sm:p-10 rounded-2xl border border-[#F2C14E]/30 bg-[#25170E]/60 shadow-xl space-y-6 text-base leading-relaxed text-[#e3d2c1] text-left">
             <InfographicArticleRenderer
               rawContent={topic.content || topic.mainContentHtml || ''}
               title={topic.title}
@@ -192,7 +204,7 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
                 <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/40 to-[#F2C14E]" />
                 <h2
                   style={{ fontFamily: "'UTM Niagara', serif" }}
-                  className="text-3xl sm:text-4xl text-[#ffde59] uppercase tracking-wider font-normal whitespace-nowrap"
+                  className="text-2xl sm:text-4xl text-[#ffde59] uppercase tracking-wider font-normal text-center sm:whitespace-nowrap"
                 >
                   HÌNH ẢNH TƯ LIỆU THỰC TẾ
                 </h2>
@@ -207,16 +219,20 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
                   >
                     <div className="relative aspect-[4/3] overflow-hidden">
                       <img
-                        src={img.url}
+                        src={fitImage(img.url, 640)}
+                        srcSet={imageSrcSet(img.url, [360, 640, 960])}
+                        sizes="(min-width: 1024px) 288px, (min-width: 640px) 45vw, 92vw"
                         alt={img.caption}
                         loading="lazy"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                          const el = e.currentTarget as HTMLImageElement;
+                          el.removeAttribute('srcset');
+                          el.src = '/images/hero/toan-canh-chua-1280.webp';
                         }}
                       />
                     </div>
-                    <div className="p-3 bg-[#20140D] border-t border-[#F2C14E]/20 text-[11px] text-[#e3d2c1]/90 italic text-center">
+                    <div className="p-3 bg-[#20140D] border-t border-[#F2C14E]/20 text-xs text-[#e3d2c1]/90 italic text-center">
                       {img.caption}
                     </div>
                   </div>
@@ -231,7 +247,7 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
               <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/40 to-[#F2C14E]" />
               <h2
                 style={{ fontFamily: "'UTM Niagara', serif" }}
-                className="text-3xl sm:text-4xl text-[#ffde59] uppercase tracking-wider font-normal whitespace-nowrap"
+                className="text-2xl sm:text-4xl text-[#ffde59] uppercase tracking-wider font-normal text-center sm:whitespace-nowrap"
               >
                 CÁC MỤC GIỚI THIỆU KHÁC
               </h2>
@@ -243,10 +259,11 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
                 <Link
                   key={item.id}
                   href={`/gioi-thieu/${item.slug}`}
-                  className="p-4 rounded-xl border border-[#F2C14E]/30 bg-[#25170E] hover:border-[#F2C14E] hover:-translate-y-1 transition-all flex items-center justify-between group shadow-lg"
+                  prefetch={false}
+                  className="p-4 min-h-14 rounded-xl border border-[#F2C14E]/30 bg-[#25170E] hover:border-[#F2C14E] hover:-translate-y-1 transition-all flex items-center justify-between gap-3 group shadow-lg"
                 >
                   <div className="space-y-1">
-                    <span className="text-[10px] font-bold uppercase text-[#F2C14E] tracking-wider">
+                    <span className="text-xs font-bold uppercase text-[#F2C14E] tracking-wider">
                       {item.tag}
                     </span>
                     <h4
@@ -260,11 +277,6 @@ export function GioiThieuDetailLayout({ detail: topic, others }: Props) {
                 </Link>
               ))}
             </div>
-          </div>
-
-          {/* 7. SMART SEARCH AI BAR */}
-          <div className="pt-8">
-            <SmartSearchAIBar contextTitle={`Tra cứu về ${topic.title}`} />
           </div>
         </div>
       </div>

@@ -83,11 +83,11 @@ export function calcDaysDifference(startStr: string, endStr: string): number {
 }
 
 export function getEventCategoryIcon(category?: string): string {
-  if (category === 'Cộng Tu') return '/images/icons/icon-cong-tu.png';
-  if (category === 'Khóa Lễ Truyền Thống') return '/images/icons/icon-khoa-le-truyen-thong.png';
-  if (category === 'Đại Lễ Sự Kiện') return '/images/icons/icon-dai-le-su-kien.png';
-  if (category === 'Tịnh Độ Nhân Gian') return '/images/icons/icon-tinh-do-nhan-gian.png';
-  return '/images/icons/icon-dai-le-su-kien.png';
+  if (category === 'Cộng Tu') return '/images/icons/icon-cong-tu-128.webp';
+  if (category === 'Khóa Lễ Truyền Thống') return '/images/icons/icon-khoa-le-truyen-thong-128.webp';
+  if (category === 'Đại Lễ Sự Kiện') return '/images/icons/icon-dai-le-su-kien-128.webp';
+  if (category === 'Tịnh Độ Nhân Gian') return '/images/icons/icon-tinh-do-nhan-gian-128.webp';
+  return '/images/icons/icon-dai-le-su-kien-128.webp';
 }
 
 export function splitEventTitle(rawTitle: string): { title: string; subtitle: string } {
@@ -121,7 +121,7 @@ export interface MonthThemeInfo {
 export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
   0: {
     "month": 1,
-    "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-01-duc-ban-su-thanh-dao.webp",
+    "bannerImg": "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-01-duc-ban-su-thanh-dao.webp",
     "title": "Đức Bản Sư Thành Đạo",
     "quoteLines": [
       "Hạnh phúc là khi bạn biết",
@@ -132,11 +132,11 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#8B3A1C",
     "secondaryColor": "#F2C14E",
     "themeBg": "#2A170F",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-01-quy-y-tam-bao.png"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-01-quy-y-tam-bao.webp"
   },
   1: {
     "month": 2,
-    "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-02-nghinh-xuan-di-lac.webp",
+    "bannerImg": "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-02-nghinh-xuan-di-lac.webp",
     "title": "Nghinh Xuân Di Lặc",
     "quoteLines": [
       "Nam mô Từ phụ Thích Ca",
@@ -152,11 +152,11 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#1E4B3E",
     "secondaryColor": "#FFDE59",
     "themeBg": "#122620",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-02-tu-hoc-phat-phap.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-02-tu-hoc-phat-phap.webp"
   },
   2: {
     "month": 3,
-    "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-03-huong-sen-tay-bac.webp",
+    "bannerImg": "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-03-huong-sen-tay-bac.webp",
     "title": "Hương Sen Tây Bắc",
     "quoteLines": [
       "Thử thách tạo nên sức mạnh",
@@ -169,11 +169,11 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#6B2D5C",
     "secondaryColor": "#FFE5A3",
     "themeBg": "#261121",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-03-dung-bo-cuoc.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-03-dung-bo-cuoc.webp"
   },
   3: {
     "month": 4,
-    "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-04-huong-ve-coi-nguon.webp",
+    "bannerImg": "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-04-huong-ve-coi-nguon.webp",
     "title": "Hướng Về Cội Nguồn",
     "quoteLines": [
       "Nắng xưa... trở về",
@@ -191,11 +191,11 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#B45309",
     "secondaryColor": "#F2C14E",
     "themeBg": "#2E1A08",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-04-tich-cuc-nang-cao.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-04-tich-cuc-nang-cao.webp"
   },
   4: {
     "month": 5,
-    "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-05-phat-dan.webp",
+    "bannerImg": "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-05-phat-dan.webp",
     "title": "Phật Đản",
     "quoteLines": [
       "Phật về",
@@ -212,11 +212,11 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#854D0E",
     "secondaryColor": "#FFDE59",
     "themeBg": "#261504",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-05-tu-tap-khiem-ha.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-05-tu-tap-khiem-ha.webp"
   },
   5: {
     "month": 6,
-    "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-06-uom-mam-sen-viet.webp",
+    "bannerImg": "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-06-uom-mam-sen-viet.webp",
     "title": "Ươm Mầm Sen Việt",
     "quoteLines": [
       "Tuổi trẻ đến chùa",
@@ -229,11 +229,11 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#0F5132",
     "secondaryColor": "#FFE5A3",
     "themeBg": "#082115",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-06-tinh-thuong-phung-su.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-06-tinh-thuong-phung-su.webp"
   },
   6: {
     "month": 7,
-    "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-07-den-on-dap-nghia.webp",
+    "bannerImg": "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-07-den-on-dap-nghia.webp",
     "title": "Đền Ơn Đáp Nghĩa",
     "quoteLines": [
       "Sống cho riêng mình là người chật hẹp.",
@@ -243,11 +243,11 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#991B1B",
     "secondaryColor": "#FFDE59",
     "themeBg": "#2A0A0A",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-07-biet-minh-biet-ta.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-07-biet-minh-biet-ta.webp"
   },
   7: {
     "month": 8,
-    "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-08-hieu-hanh-dap-den.webp",
+    "bannerImg": "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-08-hieu-hanh-dap-den.webp",
     "title": "Hiếu Hạnh Đáp Đền",
     "quoteLines": [
       "Không một tác phẩm nào đẹp và thiêng liêng",
@@ -259,11 +259,11 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#7C2D12",
     "secondaryColor": "#F2C14E",
     "themeBg": "#240E06",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-08-ve-ben-thay.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-08-ve-ben-thay.webp"
   },
   8: {
     "month": 9,
-    "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-09-thanh-nguyet-huong-thu.webp",
+    "bannerImg": "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-09-thanh-nguyet-huong-thu.webp",
     "title": "Thanh Nguyệt Hương Thu",
     "quoteLines": [
       "Này bạn, dù bên ngoài bão giông",
@@ -276,11 +276,11 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#1E3A8A",
     "secondaryColor": "#FFDE59",
     "themeBg": "#0B1533",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-09-nhan-moi-la-suc-manh.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-09-nhan-moi-la-suc-manh.webp"
   },
   9: {
     "month": 10,
-    "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-10-hanh-nguyen-quan-am.webp",
+    "bannerImg": "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-10-hanh-nguyen-quan-am.webp",
     "title": "Học hạnh buông xả",
     "quoteLines": [
       "Học hạnh buông xả là học cách",
@@ -292,11 +292,11 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#8B3A1C",
     "secondaryColor": "#F2C14E",
     "themeBg": "#2A170F",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-10-tim-ve-yen-lang.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-10-tim-ve-yen-lang.webp"
   },
   10: {
     "month": 11,
-    "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-11-an-duc-to-thay.webp",
+    "bannerImg": "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-11-an-duc-to-thay.webp",
     "title": "Hoằng Pháp - Kiến An mãi nhớ Thầy",
     "quoteLines": [
       "Hoằng Pháp - Kiến An mãi nhớ Thầy",
@@ -312,11 +312,11 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#9A3412",
     "secondaryColor": "#F2C14E",
     "themeBg": "#2B0F05",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-11-ve-ben-thay.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-11-ve-ben-thay.webp"
   },
   11: {
     "month": 12,
-    "bannerImg": "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-12-via-phat-di-da.webp",
+    "bannerImg": "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-12-via-phat-di-da.webp",
     "title": "Vía Phật Di Đà",
     "quoteLines": [
       "Hoa sen cần bùn để sống.",
@@ -327,7 +327,7 @@ export const MONTH_THEMES: Record<number, MonthThemeInfo> = {
     "primaryColor": "#78350F",
     "secondaryColor": "#FFDE59",
     "themeBg": "#210E04",
-    "quoteImg": "/images/lich-tu-hoc/quotes/thang-12-kho-dau-la-chat-lieu.jpg"
+    "quoteImg": "/images/lich-tu-hoc/quotes/thang-12-kho-dau-la-chat-lieu.webp"
   }
 };
 
@@ -348,7 +348,7 @@ export const FEATURED_PROGRAMS = [
     subtitle: "Khóa lễ",
     schedule: "14 VÀ 29/30 ÂM LỊCH HẰNG THÁNG",
     summary: "Thời khóa sám hối trang nghiêm vào tối 19h00 ngày 14 và cuối tháng âm lịch, gột rửa thân tâm và tịnh hóa nghiệp chướng.",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/dai-tieu-sam-hoi-va-thuong-ky.webp",
+    imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/dai-tieu-sam-hoi-va-thuong-ky.webp",
   },
   {
     id: "p2",
@@ -356,7 +356,7 @@ export const FEATURED_PROGRAMS = [
     subtitle: "Khóa lễ",
     schedule: "MÙNG 8 VÀ 23 ÂM LỊCH HẰNG THÁNG",
     summary: "Thời khóa tụng kinh sám hối vào tối 19h00 ngày mùng 8 và 23 âm lịch, nuôi dưỡng tâm bồ đề và huân tu công đức lành.",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/dai-tieu-sam-hoi-va-thuong-ky.webp",
+    imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/dai-tieu-sam-hoi-va-thuong-ky.webp",
   },
   {
     id: "p3",
@@ -364,7 +364,7 @@ export const FEATURED_PROGRAMS = [
     subtitle: "Khóa lễ",
     schedule: "MÙNG 1 VÀ 15 ÂM LỊCH HẰNG THÁNG",
     summary: "Khóa lễ tụng kinh Dược Sư cầu an vào sáng 08h00 mùng 1 và ngày rằm 15 âm lịch, cầu nguyện quốc thái dân an, cát tường như ý.",
-    imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Cau-an-quoc-thai-dan-thuong-ky.webp",
+    imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Cau-an-quoc-thai-dan-thuong-ky.webp",
   },
 ];
 
@@ -413,7 +413,7 @@ export function getEventsForMonth(solarYear: number, solarMonth: number): Record
         timeSlot2Label: "Thời lượng",
         timeSlot2Time: "90 phút",
         color: "#059669",
-        imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/dai-tieu-sam-hoi-va-thuong-ky.webp",
+        imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/dai-tieu-sam-hoi-va-thuong-ky.webp",
       });
     }
 
@@ -438,7 +438,7 @@ export function getEventsForMonth(solarYear: number, solarMonth: number): Record
         timeSlot2Label: "Thời lượng",
         timeSlot2Time: "90 phút",
         color: "#D97706",
-        imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/dai-tieu-sam-hoi-va-thuong-ky.webp",
+        imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/dai-tieu-sam-hoi-va-thuong-ky.webp",
         isImportant: true,
       });
     }
@@ -464,7 +464,7 @@ export function getEventsForMonth(solarYear: number, solarMonth: number): Record
         timeSlot2Label: "Thời lượng",
         timeSlot2Time: "90 phút",
         color: "#4F46E5",
-        imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Cau-an-quoc-thai-dan-thuong-ky.webp",
+        imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Cau-an-quoc-thai-dan-thuong-ky.webp",
         isImportant: true,
       });
     }
@@ -492,7 +492,7 @@ export function getEventsForMonth(solarYear: number, solarMonth: number): Record
         timeSlot2Label: "Thời lượng",
         timeSlot2Time: "120 phút",
         color: "#DC2626",
-        imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-08-hieu-hanh-dap-den.webp",
+        imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-08-hieu-hanh-dap-den.webp",
         isImportant: true,
       });
     }
@@ -516,7 +516,7 @@ export function getEventsForMonth(solarYear: number, solarMonth: number): Record
         timeSlot2Label: "Chiều: Tụng kinh Báo Ân & Cúng Thí Thực",
         timeSlot2Time: "02:00 CHIỀU",
         color: "#DC2626",
-        imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-08-hieu-hanh-dap-den.webp",
+        imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-08-hieu-hanh-dap-den.webp",
         isImportant: true,
       });
     }
@@ -541,7 +541,7 @@ export function getEventsForMonth(solarYear: number, solarMonth: number): Record
         timeSlot2Label: isViaDiDa ? "Đêm Hội Hoa Đăng Khánh Đản" : "Thời khóa Niệm Phật",
         timeSlot2Time: isViaDiDa ? "07:00 TỐI" : "02:00 CHIỀU",
         color: "#DC2626",
-        imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-12-via-phat-di-da.webp",
+        imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-12-via-phat-di-da.webp",
         isImportant: true,
       });
     }
@@ -566,7 +566,7 @@ export function getEventsForMonth(solarYear: number, solarMonth: number): Record
           timeSlot2Label: "Cầu an Hoa Đăng",
           timeSlot2Time: "07:00 TỐI",
           color: "#DC2626",
-          imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-02-nghinh-xuan-di-lac.webp",
+          imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-02-nghinh-xuan-di-lac.webp",
           isImportant: true,
         });
       } else if (lunar.day === 15) {
@@ -587,7 +587,7 @@ export function getEventsForMonth(solarYear: number, solarMonth: number): Record
           timeSlot2Label: "Đêm hội Hoa Đăng",
           timeSlot2Time: "07:00 TỐI",
           color: "#DC2626",
-          imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-02-nghinh-xuan-di-lac.webp",
+          imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-02-nghinh-xuan-di-lac.webp",
           isImportant: true,
         });
       }
@@ -613,7 +613,7 @@ export function getEventsForMonth(solarYear: number, solarMonth: number): Record
         timeSlot2Label: "Đêm hội Văn Nghệ Vesak",
         timeSlot2Time: "07:00 TỐI",
         color: "#DC2626",
-        imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-05-phat-dan.webp",
+        imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-05-phat-dan.webp",
         isImportant: true,
       });
     }
@@ -640,7 +640,7 @@ export function getEventsForMonth(solarYear: number, solarMonth: number): Record
           timeSlot2Label: "Đêm Hoa Đăng Cầu Siêu",
           timeSlot2Time: "07:30 TỐI",
           color: "#DC2626",
-          imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Đại lễ Vu Lan Báo Hiếu.JPG",
+          imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Đại lễ Vu Lan Báo Hiếu.JPG",
           isImportant: true,
         });
       }
@@ -664,7 +664,7 @@ export function getEventsForMonth(solarYear: number, solarMonth: number): Record
           timeSlot2Label: "Kinh hành Niệm Phật",
           timeSlot2Time: "02:00 CHIỀU",
           color: "#7C3AED",
-          imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Pháp hội niệm Phật.jpg",
+          imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Pháp hội niệm Phật.jpg",
           isImportant: true,
         });
       } else if (lunar.day === 25) {
@@ -685,7 +685,7 @@ export function getEventsForMonth(solarYear: number, solarMonth: number): Record
           timeSlot2Label: "Pháp thoại & Hoàn Mãn",
           timeSlot2Time: "02:00 CHIỀU",
           color: "#7C3AED",
-          imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Pháp hội niệm Phật.jpg",
+          imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Pháp hội niệm Phật.jpg",
           isImportant: true,
         });
       }
@@ -711,7 +711,7 @@ export function getEventsForMonth(solarYear: number, solarMonth: number): Record
         timeSlot2Label: "Đêm hội Hoa Đăng Di Đà",
         timeSlot2Time: "06:30 TỐI",
         color: "#DC2626",
-        imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/month_12 - Vía Phật Di Đà.webp",
+        imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/month_12 - Vía Phật Di Đà.webp",
         isImportant: true,
       });
     }
@@ -735,7 +735,7 @@ export function getEventsForMonth(solarYear: number, solarMonth: number): Record
         timeSlot2Label: "Pháp thoại Ý Nghĩa",
         timeSlot2Time: "07:30 TỐI",
         color: "#DC2626",
-        imgUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/month_01 - đức Bản Sư Thành Đạo.webp",
+        imgUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/month_01 - đức Bản Sư Thành Đạo.webp",
         isImportant: true,
       });
     }

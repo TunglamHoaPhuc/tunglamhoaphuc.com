@@ -67,7 +67,7 @@ export interface CalendarPayload {
 export const REGULAR_CATEGORY = "Khóa Lễ Truyền Thống";
 
 /** Ảnh dùng khi sự kiện chưa có ảnh (giao diện luôn cần một ảnh nền cho hộp chi tiết). */
-const DEFAULT_IMAGE = "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp";
+const DEFAULT_IMAGE = "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp";
 
 const WEEKDAYS = ["Chủ Nhật", "Thứ Hai", "Thứ Ba", "Thứ Tư", "Thứ Năm", "Thứ Sáu", "Thứ Bảy"];
 const DAY_MS = 86_400_000;

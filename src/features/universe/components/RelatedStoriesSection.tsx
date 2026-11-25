@@ -2,6 +2,7 @@
 
 import React, { FC, useState } from "react";
 import { Video, Play } from "lucide-react";
+import { fitProps } from '@/features/universe/image-props';
 
 export interface StoryItem {
   id: string;
@@ -23,7 +24,7 @@ const DEFAULT_STORIES: StoryItem[] = [
     title: "CÂU CHUYỆN VỀ KHU VỰC TAM BẢO",
     subtitle: "Tùng Lâm Hòa Phúc - Chốn Tổ Trang Nghiêm",
     summary: "Phật có phải một đấng quyền năng, một đấng thần linh để cứu rỗi, đáp ứng những nguyện vọng, ham muốn của chúng ta hay không?",
-    thumbnailUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
+    thumbnailUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
     videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
   },
   {
@@ -31,7 +32,7 @@ const DEFAULT_STORIES: StoryItem[] = [
     title: "Ý NGHĨA CỦA LỄ GIỖ TỔ & TINH THẦN TRI ÂN",
     subtitle: "Ngày 16/10 Âm Lịch, Lễ Giỗ Tổ lần thứ 37 tại Tổ đình Hoằng Pháp",
     summary: "Bài pháp thoại sâu sắc của Thượng tọa Trụ trì giảng giải về đạo lý Uống nước nhớ nguồn và trách nhiệm tiếp nối ngọn đèn hoằng pháp.",
-    thumbnailUrl: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
+    thumbnailUrl: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
     videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
   },
 ];
@@ -44,7 +45,7 @@ interface StoryCardProps {
 
 const StoryCard = React.memo(({ story, isPlaying, onPlay }: StoryCardProps) => {
   return (
-    <div className="relative bg-[#3a2613]/80 border border-[#c8aa6e]/70 rounded-2xl p-6 sm:p-8 md:p-10 shadow-2xl backdrop-blur-md w-full">
+    <div className="relative bg-[#3a2613]/80 border border-[#c8aa6e]/70 rounded-2xl p-6 sm:p-8 md:p-10 shadow-2xl sm:backdrop-blur-md w-full">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-10 items-center">
         {/* Left: Thumbnail / Video */}
         <div className="lg:col-span-7 relative aspect-video w-full rounded-xl overflow-hidden border border-[#c8aa6e]/50 shadow-2xl bg-black group">
@@ -61,8 +62,8 @@ const StoryCard = React.memo(({ story, isPlaying, onPlay }: StoryCardProps) => {
               className="relative w-full h-full cursor-pointer"
               onClick={() => onPlay(story.id)}
             >
-              <img
-                src={story.thumbnailUrl}
+              <img width={640} height={480}
+                {...fitProps(story.thumbnailUrl, { width: 1280, widths: [640, 960, 1280], sizes: '(min-width: 1024px) 560px, calc(100vw - 32px)' })}
                 alt={story.title}
                 loading="lazy"
                 decoding="async"

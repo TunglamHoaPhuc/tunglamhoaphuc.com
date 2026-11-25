@@ -1,5 +1,6 @@
 'use client';
 import { fitImage } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 import { FC, useState, useEffect } from "react";
 import { SectionTransitionOverlay } from "@/components/common/SectionTransitionOverlay";
@@ -104,7 +105,7 @@ export const NewsSection: FC<NewsSectionProps> = ({ items }) => {
 
       {/* ── Background Image với độ mờ mượt mà ── */}
       <div className="absolute inset-0 pointer-events-none">
-        <img
+        <img width={640} height={480}
           key={`bg-${activeIdx}`}
           src={fitImage(currentNews.imgUrl, 640)}
           alt="Bối cảnh"
@@ -117,7 +118,7 @@ export const NewsSection: FC<NewsSectionProps> = ({ items }) => {
       {/* ── 1. HEADER SECTION ── */}
       <SectionHeader
         title="TIN MỚI NHẤT"
-        iconUrl="/images/icons/icon-tin-moi-nhat.webp"
+        iconUrl="/images/icons/icon-tin-moi-nhat-160.webp"
       />
 
       {/* ── 2. CAROUSEL TRẢI RỘNG VỚI HIỆU ỨNG TRƯỢT (LO L UNIVERSE STYLE - BẢN 3 CARD CHUẨN GỐC) ── */}
@@ -131,7 +132,7 @@ export const NewsSection: FC<NewsSectionProps> = ({ items }) => {
           >
             {/* Box Ảnh Bên Trái với viền mờ dần ở cả 2 mép (mép ngoài và góc trong luồn dưới card chính) */}
             <div className="relative w-full h-[320px] md:h-[380px] lg:h-[430px] overflow-hidden border-y border-l border-[#F2C14E]/30 rounded-l-xl shadow-2xl [mask-image:linear-gradient(to_right,transparent_0%,black_28%,black_82%,transparent_100%)]">
-              <img loading="lazy" decoding="async"
+              <img width={640} height={480} loading="lazy" decoding="async"
                 key={`left-img-${prevNews.id}`}
                 src={fitImage(prevNews.imgUrl, 360)}
                 alt={prevNews.title}
@@ -145,8 +146,8 @@ export const NewsSection: FC<NewsSectionProps> = ({ items }) => {
             <div className="w-full py-2.5 px-3 text-center bg-[#1A120B]/90 border-b border-l border-[#F2C14E]/30 rounded-bl-xl flex flex-col items-center justify-center [mask-image:linear-gradient(to_right,transparent_0%,black_28%,black_82%,transparent_100%)]">
               {prevNews.iconUrl && (
                 <div className="w-7 h-7 rounded-full border border-[#F2C14E]/60 bg-[#1C120B] shadow-[0_0_10px_rgba(242,193,78,0.3)] flex items-center justify-center p-1 mb-1">
-                  <img loading="lazy" decoding="async"
-                    src={prevNews.iconUrl}
+                  <img width={128} height={128} loading="lazy" decoding="async"
+                    src={fitImage(prevNews.iconUrl, 160)}
                     alt="Biểu tượng"
                     className="w-full h-full object-contain opacity-85"
                   />
@@ -179,9 +180,11 @@ export const NewsSection: FC<NewsSectionProps> = ({ items }) => {
               }}
               onClick={() => (window.location.href = currentNews.targetUrl)}
             >
-              <img loading="lazy" decoding="async"
+              <img width={640} height={480} loading="lazy" decoding="async"
                 key={`center-img-${currentNews.id}`}
-                src={fitImage(currentNews.imgUrl, 640)}
+                src={fitImage(currentNews.imgUrl, 960)}
+                srcSet={imageSrcSet(currentNews.imgUrl, [640, 960, 1280, 1920])}
+                sizes="(min-width: 1536px) 1000px, (min-width: 1024px) 66vw, 100vw"
                 alt={currentNews.title}
                 style={{ objectPosition: currentNews.imgPosition || 'center 20%' }}
                 className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out ${animClass}`}
@@ -223,8 +226,8 @@ export const NewsSection: FC<NewsSectionProps> = ({ items }) => {
                 {/* 🌟 Biểu Tượng Icon Đặt Trong Đường Tròn Viền Vàng Hoàng Kim (Tỏa sáng như mẫu thumbnail) */}
                 {currentNews.iconUrl && (
                   <div className="absolute -top-7 sm:-top-8 md:-top-9 left-1/2 -translate-x-1/2 w-14 h-14 sm:w-16 sm:h-16 md:w-18 md:h-18 rounded-full border-2 border-[#F2C14E] bg-[#1C120B] shadow-[0_0_20px_rgba(242,193,78,0.5),0_6px_20px_rgba(0,0,0,0.9)] flex items-center justify-center p-2.5 sm:p-3 transition-transform group-hover:scale-110 duration-300 z-50">
-                    <img
-                      src={currentNews.iconUrl}
+                    <img width={128} height={128}
+                      src={fitImage(currentNews.iconUrl, 160)}
                       alt={currentNews.category || 'Biểu tượng'}
                       className="w-full h-full object-contain drop-shadow-[0_2px_8px_rgba(242,193,78,0.6)]"
                       loading="lazy"
@@ -273,7 +276,7 @@ export const NewsSection: FC<NewsSectionProps> = ({ items }) => {
           >
             {/* Box Ảnh Bên Phải với viền mờ dần ở cả 2 mép (góc trong luồn dưới card chính và mép ngoài) */}
             <div className="relative w-full h-[320px] md:h-[380px] lg:h-[430px] overflow-hidden border-y border-r border-[#F2C14E]/30 rounded-r-xl shadow-2xl [mask-image:linear-gradient(to_right,transparent_0%,black_18%,black_72%,transparent_100%)]">
-              <img loading="lazy" decoding="async"
+              <img width={640} height={480} loading="lazy" decoding="async"
                 key={`right-img-${nextNews.id}`}
                 src={fitImage(nextNews.imgUrl, 360)}
                 alt={nextNews.title}
@@ -287,8 +290,8 @@ export const NewsSection: FC<NewsSectionProps> = ({ items }) => {
             <div className="w-full py-2.5 px-3 text-center bg-[#1A120B]/90 border-b border-r border-[#F2C14E]/30 rounded-br-xl flex flex-col items-center justify-center [mask-image:linear-gradient(to_right,transparent_0%,black_18%,black_72%,transparent_100%)]">
               {nextNews.iconUrl && (
                 <div className="w-7 h-7 rounded-full border border-[#F2C14E]/60 bg-[#1C120B] shadow-[0_0_10px_rgba(242,193,78,0.3)] flex items-center justify-center p-1 mb-1">
-                  <img loading="lazy" decoding="async"
-                    src={nextNews.iconUrl}
+                  <img width={128} height={128} loading="lazy" decoding="async"
+                    src={fitImage(nextNews.iconUrl, 160)}
                     alt="Biểu tượng"
                     className="w-full h-full object-contain opacity-85"
                   />

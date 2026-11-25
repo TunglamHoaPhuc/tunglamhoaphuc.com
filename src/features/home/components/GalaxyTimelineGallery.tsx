@@ -3,6 +3,7 @@
 import { FC, useState } from "react";
 import { X, Volume2, ArrowLeft } from "lucide-react";
 import { C } from "@/config/theme";
+import { fitImage } from "@/utils/image";
 
 // ─── Dữ liệu Timeline Ban Đầu ──────────────────────────────────────────────────────
 const TIMELINE_YEARS = [
@@ -10,22 +11,22 @@ const TIMELINE_YEARS = [
     year: "2015",
     label: "Giai Đoạn Khai Sáng",
     desc: "Văn bản mô tả giai đoạn nền móng kiến tạo đầu tiên, đặt những viên gạch đầu tiên cho Tùng Lâm Hòa Phúc.",
-    icon: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp",
+    icon: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp",
     photos: [
       {
         cat: "Dòng Chảy Hoằng Pháp",
         imgs: [
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp",
         ],
       },
       {
         cat: "Sứ Giả Như Lai",
         imgs: [
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/08-tu-an-book/di-qua-kho-vui-cuoc-doi-bia-1.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-_-tong-phong-truyen-thua_-bai-tho-mien-nam-chon-to_thumbnail_herobanner-1787470412489.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/08-tu-an-book/di-qua-kho-vui-cuoc-doi-bia-1.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-_-tong-phong-truyen-thua_-bai-tho-mien-nam-chon-to_thumbnail_herobanner-1787470412489.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp",
         ],
       },
     ],
@@ -34,22 +35,22 @@ const TIMELINE_YEARS = [
     year: "2018",
     label: "Giai Đoạn Phát Triển",
     desc: "Giai đoạn phát triển rộng khắp, tổ chức nhiều khóa tu và đại lễ, thu hút đông đảo Phật tử về tham dự tu học.",
-    icon: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp",
+    icon: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp",
     photos: [
       {
         cat: "Dòng Chảy Hoằng Pháp",
         imgs: [
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
         ],
       },
       {
         cat: "Sứ Giả Như Lai",
         imgs: [
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/08-tu-an-book/di-qua-kho-vui-cuoc-doi-bia-1.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-_-tong-phong-truyen-thua_-bai-tho-mien-nam-chon-to_thumbnail_herobanner-1787470412489.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/08-tu-an-book/di-qua-kho-vui-cuoc-doi-bia-1.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-_-tong-phong-truyen-thua_-bai-tho-mien-nam-chon-to_thumbnail_herobanner-1787470412489.webp",
         ],
       },
     ],
@@ -58,22 +59,22 @@ const TIMELINE_YEARS = [
     year: "2021",
     label: "Sự Kiện Trọng Đại",
     desc: "Sự kiện quan trọng nhất: Đại lễ Phật đản Giai đoạn II, ghi dấu ấn sâu đậm trong lịch sử Tùng Lâm Hòa Phúc.",
-    icon: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp",
+    icon: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp",
     photos: [
       {
         cat: "Dòng Chảy Hoằng Pháp",
         imgs: [
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp",
         ],
       },
       {
         cat: "Sứ Giả Như Lai",
         imgs: [
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/08-tu-an-book/di-qua-kho-vui-cuoc-doi-bia-1.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/08-tu-an-book/di-qua-kho-vui-cuoc-doi-bia-1.webp",
         ],
       },
     ],
@@ -82,22 +83,22 @@ const TIMELINE_YEARS = [
     year: "2024",
     label: "Hoằng Pháp Phát Triển",
     desc: "Giai đoạn hoằng pháp phát triển rộng khắp, tổ chức nhiều khóa tu và đại lễ lớn trong và ngoài nước.",
-    icon: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-_-tong-phong-truyen-thua_-bai-tho-mien-nam-chon-to_thumbnail_herobanner-1787470412489.webp",
+    icon: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-_-tong-phong-truyen-thua_-bai-tho-mien-nam-chon-to_thumbnail_herobanner-1787470412489.webp",
     photos: [
       {
         cat: "Dòng Chảy Hoằng Pháp",
         imgs: [
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp",
         ],
       },
       {
         cat: "Sứ Giả Như Lai",
         imgs: [
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp",
         ],
       },
     ],
@@ -106,22 +107,22 @@ const TIMELINE_YEARS = [
     year: "2026+",
     label: "Tương Lai Phát Triển",
     desc: "Tầm nhìn phát triển bền vững — mở rộng không gian tu học, số hóa kho tư liệu Phật học và hoằng pháp toàn cầu.",
-    icon: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/08-tu-an-book/di-qua-kho-vui-cuoc-doi-bia-1.webp",
+    icon: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/08-tu-an-book/di-qua-kho-vui-cuoc-doi-bia-1.webp",
     photos: [
       {
         cat: "Dòng Chảy Hoằng Pháp",
         imgs: [
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-_-tong-phong-truyen-thua_-bai-tho-mien-nam-chon-to_thumbnail_herobanner-1787470412489.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-_-tong-phong-truyen-thua_-bai-tho-mien-nam-chon-to_thumbnail_herobanner-1787470412489.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp",
         ],
       },
       {
         cat: "Sứ Giả Như Lai",
         imgs: [
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp",
-          "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp",
+          "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
         ],
       },
     ],
@@ -285,7 +286,7 @@ const GalaxyTimelineGallery: FC<GalaxyTimelineGalleryProps> = ({ onClose }) => {
                       background: C.dark,
                     }}
                   >
-                    <img src={yt.icon} alt={yt.year} className="w-full h-full object-cover opacity-70" />
+                    <img src={fitImage(yt.icon, 160)} alt={yt.year} className="w-full h-full object-cover opacity-70" />
                   </div>
                   <span
                     style={{
@@ -352,7 +353,7 @@ const GalaxyTimelineGallery: FC<GalaxyTimelineGalleryProps> = ({ onClose }) => {
                           className="relative h-24 sm:h-28 rounded-lg overflow-hidden border border-[#f2cc8f]/30 hover:border-[#ffde59] group/img cursor-pointer transition-all duration-300 shadow-md"
                         >
                           <img
-                            src={src}
+                            src={fitImage(src, 360)}
                             alt={`${active.year} - ${group.cat} ${pIdx + 1}`}
                             className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-110"
                           />
@@ -375,7 +376,7 @@ const GalaxyTimelineGallery: FC<GalaxyTimelineGalleryProps> = ({ onClose }) => {
           className="fixed inset-0 z-[200] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-pointer animate-in fade-in duration-200"
         >
           <div className="relative max-w-4xl max-h-[85vh] rounded-2xl overflow-hidden border border-[#f2cc8f]/50 shadow-2xl">
-            <img src={lightboxImg} alt="Ảnh Phóng To" className="w-full h-full object-contain" />
+            <img src={fitImage(lightboxImg, 1920)} alt="Ảnh Phóng To" className="w-full h-full object-contain" />
             <button
               onClick={() => setLightboxImg(null)}
               className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/70 text-[#ffde59] border border-[#f2cc8f]/40 flex items-center justify-center cursor-pointer hover:scale-110 transition-all"

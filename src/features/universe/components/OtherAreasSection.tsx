@@ -3,6 +3,7 @@
 import React, { FC } from 'react';
 import Link from 'next/link';
 import type { V3Area } from '@/lib/v3-data';
+import { LOGO_ROUND_SRC, swapOnError, fitProps, CARD_WIDTHS, STATUE_ICON_LARGE_SRC } from '@/features/universe/image-props';
 
 interface OtherAreasSectionProps {
   currentSlug?: string;
@@ -48,12 +49,13 @@ const OtherAreaCard = React.memo(({ area }: OtherAreaCardProps) => {
 
   return (
     <Link
+      prefetch={false}
       href={`/vu-tru-phat-giao/${area.slug}`}
       className="group relative overflow-hidden rounded-2xl border border-[#e5a93b]/40 bg-[#25170e] hover:border-[#ffde59] transition-all duration-300 shadow-2xl flex flex-col cursor-pointer"
     >
       <div className="relative w-full h-[220px] sm:h-[260px] md:h-[280px] overflow-hidden bg-[#1a120b] shrink-0">
-        <img
-          src={area.imgUrl}
+        <img width={640} height={480}
+          {...fitProps(area.imgUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 400px, (min-width: 640px) 46vw, calc(100vw - 48px)' })}
           alt={shortTitle}
           loading="lazy"
           decoding="async"
@@ -112,15 +114,13 @@ export const OtherAreasSection: FC<OtherAreasSectionProps> = ({
     <section id="khu-vuc-khac" className="w-full scroll-mt-24 py-10">
       <div className="flex flex-col items-center text-center mb-10">
         <div className="w-14 h-14 sm:w-16 sm:h-16 mb-2 flex items-center justify-center" aria-hidden="true">
-          <img
-            src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+          <img width={128} height={128}
+            src={STATUE_ICON_LARGE_SRC}
             alt=""
             loading="lazy"
             decoding="async"
             className="w-full h-full object-contain filter drop-shadow-[0_0_16px_rgba(242,193,78,0.95)] scale-125 transform-gpu"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-            }}
+            onError={swapOnError(LOGO_ROUND_SRC)}
           />
         </div>
 

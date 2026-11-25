@@ -59,8 +59,8 @@ test("thẻ theo đúng bảy chỗ của V3: Sư Tổ, bài mới nhất, Tông
 	assert.equal(items[0].imgPosition, "center 10%");
 	assert.match(items[1].imgUrl, /posts\/a\.webp$/);
 	assert.equal(items[1].category, "Khóa Lễ Truyền Thống");
-	assert.equal(items[1].iconUrl, "/images/icons/icon-khoa-le-truyen-thong.png");
-	assert.equal(items[5].iconUrl, "/images/icons/icon-phap-am.webp");
+	assert.equal(items[1].iconUrl, "/images/icons/icon-khoa-le-truyen-thong-128.webp");
+	assert.equal(items[5].iconUrl, "/images/icons/icon-phap-am-128.webp");
 	assert.equal(items[3].subtitle, "Vô Thượng Năng Nhân");
 	assert.equal(new Set(items.map((i) => i.id)).size, items.length, "không thẻ nào lặp");
 });
@@ -159,7 +159,7 @@ test("bộ dựng thuần: ảnh thiếu dùng ảnh thiết kế, chỗ không 
 		({ id, slug: id, title: `Tựa ${id}`, subtitle: "", mainCategory: section, subCategory: "", categoryName: "", publishedDate: "2026-01-01", thumbnailUrl: "", bannerUrl: "", thumbnailPosition: "", bannerPosition: "", ...extra }) as unknown as HomeNewsInput["posts"][number];
 	const items = buildHomeNews({ posts: [post("a", "dong-chay-hoang-phap"), post("b", "vu-tru-phat-giao")], tongChi: [], statues: [], suTo: null });
 	assert.equal(items.length, 1);
-	assert.match(items[0].imgUrl, /^https:\/\//, "ảnh thiết kế khi bài chưa có ảnh");
+	assert.match(items[0].imgUrl, /^\/anh-goc\/media-tunglamhoaphuc\//, "ảnh thiết kế khi bài chưa có ảnh (trong R2, không phải host ngoài)");
 	assert.equal(items[0].category, "Dòng Chảy Hoằng Pháp");
 	assert.deepEqual(buildHomeNews({ posts: [], tongChi: [], statues: [], suTo: null }), []);
 });

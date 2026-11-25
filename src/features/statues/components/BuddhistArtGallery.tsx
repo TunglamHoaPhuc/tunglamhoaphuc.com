@@ -2,6 +2,8 @@
 
 import { FC, useState, useEffect } from "react";
 import { X, Sparkles, MapPin, BookOpen, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import { CARD_WIDTHS, fitProps } from "@/features/universe/image-props";
+import { fitImage } from "@/utils/image";
 
 interface ArtVariation {
   id: string;
@@ -102,14 +104,16 @@ export const BuddhistArtGallery: FC<BuddhistArtGalleryProps> = ({ variations }) 
             className="group relative overflow-hidden cursor-pointer rounded-2xl border border-[#f2c14e]/35 hover:border-[#ffde59] transition-all duration-500 shadow-xl bg-[#1c120b] aspect-[4/3]"
           >
             <img
-              src={art.imgUrl}
+              {...fitProps(art.imgUrl, { width: 960, widths: CARD_WIDTHS, sizes: "(min-width: 768px) 400px, calc(100vw - 32px)" })}
+              loading="lazy"
+              decoding="async"
               alt={art.title}
               className="w-full h-full object-cover object-[center_15%] group-hover:scale-105 transition-transform duration-700"
             />
             <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#1C120B]/95 via-[#1C120B]/50 to-transparent pointer-events-none" />
 
             {/* Hover Frame Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#25170E]/90 via-[#3D2817]/65 to-transparent backdrop-blur-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex flex-col items-center justify-center p-4 text-center pointer-events-none z-20">
+            <div className="absolute inset-0 bg-gradient-to-t from-[#25170E]/90 via-[#3D2817]/65 to-transparent sm:backdrop-blur-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-400 flex flex-col items-center justify-center p-4 text-center pointer-events-none z-20">
               <div className="absolute inset-3 rounded-xl border border-[#ffde59]/70 bg-[#452a15]/85 flex flex-col items-center justify-center p-3 text-center shadow-[0_0_30px_rgba(242,193,78,0.3)]">
                 <h3
                   style={{ fontFamily: "'UTM ClassizismAntiqua', 'UTM Classic Antiqua', serif" }}
@@ -133,7 +137,7 @@ export const BuddhistArtGallery: FC<BuddhistArtGalleryProps> = ({ variations }) 
       {/* ── Pop-up Lightbox khi nhấp chọn Dị Bản ── */}
       {selectedArt && (
         <div
-          className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 select-none"
+          className="fixed inset-0 z-[9999] bg-black/85 sm:backdrop-blur-md flex items-center justify-center p-3 sm:p-6 select-none"
           onClick={() => setSelectedArt(null)}
           onWheel={(e) => {
             e.preventDefault();
@@ -141,7 +145,7 @@ export const BuddhistArtGallery: FC<BuddhistArtGalleryProps> = ({ variations }) 
           }}
         >
           <div
-            className="relative max-w-3xl w-full rounded-2xl border border-[#F2C14E]/60 bg-[#25170E] p-4 sm:p-6 md:p-8 shadow-[0_0_60px_rgba(0,0,0,0.95)] flex flex-col items-center max-h-[95vh] overflow-y-auto"
+            className="relative max-w-3xl w-full rounded-2xl border border-[#F2C14E]/60 bg-[#25170E] p-4 sm:p-6 md:p-8 shadow-[0_0_60px_rgba(0,0,0,0.95)] flex flex-col items-center max-h-[95svh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
             onWheel={handleWheel}
           >
@@ -158,7 +162,7 @@ export const BuddhistArtGallery: FC<BuddhistArtGalleryProps> = ({ variations }) 
                 type="button"
                 onClick={() => setSelectedArt(null)}
                 aria-label="Đóng"
-                className="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl border border-[#F2C14E]/50 bg-[#1C120B]/80 flex items-center justify-center text-[#F2C14E] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-md"
+                className="absolute right-0 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-9 sm:h-9 rounded-xl border border-[#F2C14E]/50 bg-[#1C120B]/80 flex items-center justify-center text-[#F2C14E] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-md"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -175,7 +179,8 @@ export const BuddhistArtGallery: FC<BuddhistArtGalleryProps> = ({ variations }) 
             >
               <div className="w-full h-full flex items-center justify-center overflow-hidden pointer-events-none">
                 <img
-                  src={selectedArt.imgUrl}
+                  // Xem lớn và phóng to đến 4 lần: bậc lớn nhất 1920.
+                  src={fitImage(selectedArt.imgUrl, 1920)}
                   alt={selectedArt.title}
                   draggable={false}
                   style={{
@@ -187,7 +192,7 @@ export const BuddhistArtGallery: FC<BuddhistArtGalleryProps> = ({ variations }) 
               </div>
 
               {/* Zoom Controls */}
-              <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-[#1C120B]/90 backdrop-blur-md p-1.5 rounded-xl border border-[#F2C14E]/50 opacity-90 group-hover:opacity-100 transition-opacity z-20">
+              <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-[#1C120B]/90 sm:backdrop-blur-md p-1.5 rounded-xl border border-[#F2C14E]/50 opacity-90 group-hover:opacity-100 transition-opacity z-20">
                 <button
                   type="button"
                   onClick={(e) => {
@@ -195,7 +200,7 @@ export const BuddhistArtGallery: FC<BuddhistArtGalleryProps> = ({ variations }) 
                     setZoomScale((prev) => Math.min(prev + 0.35, 4));
                   }}
                   title="Phóng to"
-                  className="w-8 h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors"
+                  className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors"
                 >
                   <ZoomIn className="w-4 h-4" />
                 </button>
@@ -210,7 +215,7 @@ export const BuddhistArtGallery: FC<BuddhistArtGalleryProps> = ({ variations }) 
                     });
                   }}
                   title="Thu nhỏ"
-                  className="w-8 h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors"
+                  className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors"
                 >
                   <ZoomOut className="w-4 h-4" />
                 </button>
@@ -223,7 +228,7 @@ export const BuddhistArtGallery: FC<BuddhistArtGalleryProps> = ({ variations }) 
                       setPanOffset({ x: 0, y: 0 });
                     }}
                     title="Khôi phục gốc"
-                    className="w-8 h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors"
+                    className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors"
                   >
                     <RotateCcw className="w-4 h-4" />
                   </button>
@@ -270,7 +275,7 @@ export const BuddhistArtGallery: FC<BuddhistArtGalleryProps> = ({ variations }) 
                 >
                   Ý NGHĨA
                 </span>
-                <p className="text-xs sm:text-sm text-[#c9b896] leading-relaxed italic" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                <p className="text-sm text-[#c9b896] leading-relaxed italic" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                   &ldquo;{selectedArt.meaning}&rdquo;
                 </p>
               </div>

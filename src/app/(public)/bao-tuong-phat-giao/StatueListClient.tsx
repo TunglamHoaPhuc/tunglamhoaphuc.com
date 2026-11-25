@@ -3,11 +3,31 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Search, ChevronDown } from 'lucide-react';
-import type { StatueItem } from '@/lib/statue-types';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
+import type { StatueRecord } from '@/lib/statue-types';
 import { CustomDropdown } from '@/components/common/CustomDropdown';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 import { KIND_OPTIONS, layoutStatues, type StatueKind } from '@/lib/statue-list';
+import { STATUE_ICON_SRC, LOGO_ROUND_SRC, fitProps, swapOnError, CARD_WIDTHS } from '@/features/universe/image-props';
+
+// Chỉ những trường trang danh sách thực sự dùng (lọc, xếp khối, vẽ thẻ). Phần còn lại của bản ghi (lịch sử, thành viên cụm, ...) không đi qua mạng:
+// trang chi tiết tự lấy.
+export type StatueListItem = Pick<
+  StatueRecord,
+  | 'id'
+  | 'slug'
+  | 'name'
+  | 'subtitle'
+  | 'areaName'
+  | 'group'
+  | 'clusterName'
+  | 'assemblyId'
+  | 'assembly'
+  | 'assemblyName'
+  | 'categoryType'
+  | 'imgUrl'
+  | 'imgPosition'
+  | 'imgRotation'
+>;
 
 function toSentenceCase(str?: string): string {
   if (!str) return '';
@@ -26,14 +46,14 @@ function formatAreaTitleCase(str?: string): string {
 }
 
 const HEADER_FALLBACK_IMAGE =
-  'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/05-bao-tuong-phat-giao/chu_phat_hai_hoi/duc_phat_duoc_su/phat_duoc_su_luu_ly_quang_vuong_nhu_lai_tuong_chinh.webp';
+  '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/05-bao-tuong-phat-giao/chu_phat_hai_hoi/duc_phat_duoc_su/phat_duoc_su_luu_ly_quang_vuong_nhu_lai_tuong_chinh.webp';
 
 // Danh sách tượng do máy chủ đọc từ D1 (page.tsx): chỉ có tượng đang hiển thị; chúng hội lấy từ chính các tượng đó.
 export default function BaoTuongPhatGiaoClient({
   statues: STATUE_LIST,
   assemblies,
 }: {
-  statues: StatueItem[];
+  statues: StatueListItem[];
   assemblies: Array<{ id: string; name: string }>;
 }) {
   const STATUE_ASSEMBLIES = useMemo(() => [{ id: 'all', name: 'Tất cả chúng hội' }, ...assemblies], [assemblies]);
@@ -71,9 +91,8 @@ export default function BaoTuongPhatGiaoClient({
   const totalShown = layout.total;
 
   // Lấy ảnh tôn tượng tiêu biểu cho Header (ưu tiên tôn tượng đầu tiên hoặc Thất Phật Dược Sư)
-  const headerBgImage = getImageUrl(
-    STATUE_LIST[0]?.imgUrl || HEADER_FALLBACK_IMAGE
-  );
+  // Nền mờ 30% dưới mặt nạ: bậc 640 là đủ (ảnh chỉ trang trí, mờ).
+  const headerBgImage = getImageUrl(STATUE_LIST[0]?.imgUrl || HEADER_FALLBACK_IMAGE);
 
   return (
     <div className="min-h-screen bg-[#2A1D14] text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black">
@@ -81,13 +100,20 @@ export default function BaoTuongPhatGiaoClient({
       <div className="relative w-full overflow-hidden bg-[#2A1D14] pt-24 pb-8 md:pt-28 md:pb-10">
         {/* Ảnh nền đằng sau mờ phủ gradient hòa quyện như Tông Phong Truyền Thừa */}
         {headerBgImage && (
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none mix-blend-luminosity [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]"
-            style={{
-              backgroundImage: `url('${headerBgImage}')`,
-              backgroundPosition: STATUE_LIST[0]?.imgPosition || 'center 20%',
-            }}
-          />
+          <div className="absolute inset-0 opacity-30 pointer-events-none mix-blend-luminosity [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]">
+            {/* Ảnh trang trí mờ 30%: bản nhỏ, ưu tiên thấp để không tranh băng thông với nội dung (LCP). */}
+            <img
+              width={640}
+              height={427}
+              src={fitImage(headerBgImage, 640)}
+              alt=""
+              aria-hidden="true"
+              decoding="async"
+              fetchPriority="low"
+              className="w-full h-full object-cover"
+              style={{ objectPosition: STATUE_LIST[0]?.imgPosition || 'center 20%' }}
+            />
+          </div>
         )}
         {/* Hiệu ứng gradient mờ mềm mại hòa vào nền nâu kéo dài đến bộ lọc */}
         <div className="absolute inset-0 bg-gradient-to-b from-[#2A1D14]/40 via-[#2A1D14]/70 to-[#2A1D14] pointer-events-none" />
@@ -112,7 +138,7 @@ export default function BaoTuongPhatGiaoClient({
           {/* Subtitle */}
           <p
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className="text-xs sm:text-sm md:text-base text-[#e3d2c1] tracking-wide font-normal max-w-2xl mx-auto px-4 leading-relaxed text-balance text-center"
+            className="text-sm md:text-base text-[#e3d2c1] tracking-wide font-normal max-w-2xl mx-auto px-4 leading-relaxed text-balance text-center"
           >
             Hệ thống tượng&nbsp;pháp dát&nbsp;vàng, sơn&nbsp;son thếp&nbsp;vàng tôn&nbsp;thờ tại Tùng&nbsp;Lâm&nbsp;Hòa&nbsp;Phúc.
           </p>
@@ -126,21 +152,21 @@ export default function BaoTuongPhatGiaoClient({
           <div className="flex flex-wrap items-center gap-3 flex-1 min-w-[280px]">
             {/* Nhãn LỰA CHỌN nhẹ nhàng thanh lịch */}
             <span
-              className="text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5"
+              className="text-xs sm:text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
               LỰA CHỌN:
             </span>
 
             {/* Search Box Tinh Gọn */}
-            <div className="relative flex-1 min-w-[170px] max-w-xs group">
+            <div className="relative flex-1 min-w-[170px] max-w-full sm:max-w-xs basis-full sm:basis-auto group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#F2C14E]/60 group-hover:text-[#F2C14E] transition-colors" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Tìm tên bảo tượng..."
-                className="w-full pl-9 pr-3 py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 rounded-xl text-xs text-[#FFE5A3] placeholder-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E] hover:border-[#F2C14E]/70 transition-all shadow-inner"
+                className="w-full pl-9 pr-3 py-2.5 sm:py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 rounded-xl text-base sm:text-xs text-[#FFE5A3] placeholder-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E] hover:border-[#F2C14E]/70 transition-all shadow-inner"
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
               />
             </div>
@@ -192,7 +218,7 @@ export default function BaoTuongPhatGiaoClient({
         <div className="relative mb-12">
           <div
             className={`relative transition-all duration-500 overflow-hidden ${
-              !isExpanded && totalShown > 8 ? 'max-h-[950px] md:max-h-[1050px]' : 'pb-8'
+              !isExpanded && totalShown > 8 ? 'max-h-[860px] sm:max-h-[950px] md:max-h-[1050px]' : 'pb-8'
             }`}
           >
             {/* Nếu đang tìm kiếm cụ thể hoặc lọc theo 1 Khu vực -> Hiển thị dạng lưới trực tiếp (cả tượng chính lẫn Nghệ thuật Phật giáo) */}
@@ -210,13 +236,13 @@ export default function BaoTuongPhatGiaoClient({
                   </span>
                 </div>
                 <div className="h-px w-full bg-gradient-to-r from-[#F2C14E] via-[#F2C14E]/40 to-transparent" />
-                <StatueGrid statues={layout.flat} />
+                <StatueGrid statues={layout.flat} eager={FIRST_ROW_EAGER} />
               </div>
             ) : (
               /* Hiển thị theo từng Chúng Hội (tượng chính), rồi khối Nghệ thuật Phật giáo */
               <div className="space-y-16">
-                {layout.groups.map((group) => (
-                  <StatueSection key={group.id} title={group.name} count={group.statues.length} statues={group.statues} />
+                {layout.groups.map((group, index) => (
+                  <StatueSection key={group.id} title={group.name} count={group.statues.length} statues={group.statues} eager={index === 0 ? FIRST_ROW_EAGER : 0} />
                 ))}
                 {layout.art.length > 0 && (
                   <StatueSection
@@ -224,6 +250,7 @@ export default function BaoTuongPhatGiaoClient({
                     note="Các tác phẩm nghệ thuật Phật giáo thể hiện những vị trong hệ thống bảo tượng, tôn thờ tại Tùng Lâm Hòa Phúc."
                     count={layout.art.length}
                     statues={layout.art}
+                    eager={layout.groups.length === 0 ? FIRST_ROW_EAGER : 0}
                   />
                 )}
               </div>
@@ -256,18 +283,13 @@ export default function BaoTuongPhatGiaoClient({
             </div>
           )}
         </div>
-
-        {/* ── 4. KHUNG TRỢ LÝ AI PHẬT HỌC ── */}
-        <div className="mt-12 mb-12">
-          <SmartSearchAIBar contextTitle="Bảo Tượng Phật Giáo Tùng Lâm Hòa Phúc" />
-        </div>
       </main>
     </div>
   );
 }
 
 // ── Khối có tiêu đề (một chúng hội, hoặc Nghệ thuật Phật giáo) và lưới thẻ ──
-function StatueSection({ title, note, count, statues }: { title: string; note?: string; count: number; statues: StatueItem[] }) {
+function StatueSection({ title, note, count, statues, eager }: { title: string; note?: string; count: number; statues: StatueListItem[]; eager: number }) {
   return (
     <div className="space-y-6">
       {/* Assembly Header (UTM Classic Antiqua đồng bộ Bản đồ danh tăng) */}
@@ -289,36 +311,43 @@ function StatueSection({ title, note, count, statues }: { title: string; note?: 
           </p>
         )}
       </div>
-      <StatueGrid statues={statues} />
+      <StatueGrid statues={statues} eager={eager} />
     </div>
   );
 }
 
-function StatueGrid({ statues }: { statues: StatueItem[] }) {
+// Chỉ khối đầu tiên của trang có thẻ tải ngay (2 thẻ đầu, nằm trên nếp gấp); mọi thẻ còn lại tải khi cuộn tới.
+const FIRST_ROW_EAGER = 2;
+// Thẻ cao 330 px, rộng khoảng 378 px ở 1 cột (điện thoại) và khoảng 290 px ở lưới 4 cột: bậc 360/640/960 theo DPR.
+const CARD_SIZES = '(min-width: 1280px) 290px, (min-width: 1024px) 31vw, (min-width: 640px) 46vw, calc(100vw - 32px)';
+
+function StatueGrid({ statues, eager }: { statues: StatueListItem[]; eager: number }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {statues.map((st) => (
-        <StatueItemCard key={st.id} statue={st} />
+      {statues.map((st, index) => (
+        <StatueItemCard key={st.id} statue={st} priority={index < eager} />
       ))}
     </div>
   );
 }
 
 // ── Item Card Component Đồng Bộ Tam Bảo Chuẩn Tỷ Lệ & Hover ──
-function StatueItemCard({ statue }: { statue: StatueItem }) {
+function StatueItemCard({ statue, priority = false }: { statue: StatueListItem; priority?: boolean }) {
   const displayArea = statue.areaName ? formatAreaTitleCase(statue.areaName) : 'Tùng Lâm Hòa Phúc';
 
   return (
     <Link
+      prefetch={false}
       href={`/bao-tuong/${statue.slug}`}
-      className="group relative w-full overflow-hidden rounded-2xl border border-[#F2C14E]/30 bg-[#25170E] hover:border-[#F2C14E] transition-all duration-300 shadow-xl h-[415px] cursor-pointer flex flex-col justify-between block transform-gpu will-change-transform"
+      className="group relative w-full overflow-hidden rounded-2xl border border-[#F2C14E]/30 bg-[#25170E] hover:border-[#F2C14E] transition-all duration-300 shadow-xl h-[380px] sm:h-[415px] cursor-pointer flex flex-col justify-between block transform-gpu will-change-transform"
     >
       {/* 1. KHUNG ẢNH THUMBNAIL (Focus [center 28%] rõ mặt tượng) */}
-      <div className="relative w-full h-[330px] overflow-hidden bg-[#1A120B] shrink-0">
-        <img
-          src={statue.imgUrl}
+      <div className="relative w-full h-[298px] sm:h-[330px] overflow-hidden bg-[#1A120B] shrink-0">
+        <img width={640} height={480}
+          {...fitProps(statue.imgUrl, { width: 960, widths: CARD_WIDTHS, sizes: CARD_SIZES })}
           alt={statue.name}
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : undefined}
           decoding="async"
           className="w-full h-full object-cover object-[center_28%] group-hover:scale-105 transition-transform duration-700 transform-gpu"
           style={{
@@ -327,9 +356,7 @@ function StatueItemCard({ statue }: { statue: StatueItem }) {
               : undefined,
             transformOrigin: 'center center',
           }}
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
-          }}
+          onError={swapOnError('/images/hero/toan-canh-chua-1280.webp')}
         />
         <div
           className="absolute inset-0 pointer-events-none"
@@ -348,15 +375,13 @@ function StatueItemCard({ statue }: { statue: StatueItem }) {
         <div className="relative w-full bg-gradient-to-b from-[#25170E] to-[#1C130D] px-3 pt-5 pb-3.5 text-center flex flex-col items-center justify-start">
           {/* LOGO BADGE CĂN GIỮA */}
           <div className="absolute top-[-24px] left-1/2 -translate-x-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#F2C14E] bg-[#25170E] flex items-center justify-center p-1 shadow-[0_0_18px_rgba(242,193,78,0.75)] overflow-hidden">
-            <img
-              src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+            <img width={128} height={128}
+              src={STATUE_ICON_SRC}
               alt="Logo Bảo tượng"
               loading="lazy"
               decoding="async"
               className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.95)] scale-145 sm:scale-150 transform-gpu"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-              }}
+              onError={swapOnError(LOGO_ROUND_SRC)}
             />
           </div>
 
@@ -370,7 +395,7 @@ function StatueItemCard({ statue }: { statue: StatueItem }) {
             </h3>
 
             <p
-              className="text-[#FFE5A3]/90 text-xs font-bold line-clamp-1"
+              className="text-[#FFE5A3]/90 text-[13px] sm:text-xs font-bold line-clamp-1"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
               {statue.subtitle ? toSentenceCase(statue.subtitle) : displayArea}

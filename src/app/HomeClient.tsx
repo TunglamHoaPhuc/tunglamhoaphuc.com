@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import Header from "@/components/public/layout/Header";
 import Footer from "@/components/public/layout/Footer";
 import Hero from "@/features/home/components/Hero";
@@ -16,14 +16,12 @@ import type { HomeNewsItem } from "@/lib/v3-home-news";
 import type { HomeQuotes } from "@/lib/v3-home-quotes";
 import type { HomeWelcome } from "@/lib/v3-home-welcome";
 import type { PostItem } from "@/types/post";
-import { SmartSearchAIBar } from "@/components/public/SmartSearchAIBar";
 import { VerticalAnchorNav } from "@/components/common/VerticalAnchorNav";
 import { WelcomeNoticeModal } from "@/components/public/modals/WelcomeNoticeModal";
 
 /** The anchors of the page; "Lời chào" and "Lời Thầy" are there only when the admin has content for them. */
 const homeSections = (hasWelcome: boolean, hasQuotes: boolean) => [
   { id: "hero", label: "NƠI ĐỂ TRỞ VỀ" },
-  { id: "ai-search", label: "TRỢ LÝ PHẬT HỌC" },
   ...(hasWelcome ? [{ id: "loi-chao", label: "LỜI CHÀO" }] : []),
   { id: "news", label: "TIN MỚI NHẤT" },
   { id: "dharma", label: "DẤU ẤN HOẰNG PHÁP" },
@@ -47,12 +45,18 @@ type HomeProps = {
 };
 
 const Home: FC<HomeProps> = ({ gallery, hero, dharma, welcome, quotes, news }) => {
-  const [scrollY, setScrollY] = useState<number>(0);
+  const hasWelcome = !!welcome;
+  const hasQuotes = !!quotes?.items.length;
+  // Cùng một mảng giữa các lần dựng: VerticalAnchorNav gắn lại bộ nghe cuộn mỗi khi `sections` đổi danh tính.
+  const sections = useMemo(() => homeSections(hasWelcome, hasQuotes), [hasWelcome, hasQuotes]);
+  // Header chỉ cần biết đã cuộn quá 64 px hay chưa: state là boolean nên chỉ dựng lại khi qua ngưỡng, không phải ở mỗi sự kiện cuộn.
+  const [scrolled, setScrolled] = useState<boolean>(false);
 
   useEffect(() => {
     const onScroll = () => {
-      setScrollY(window.scrollY);
+      setScrolled(window.scrollY > 64);
     };
+    onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -60,25 +64,20 @@ const Home: FC<HomeProps> = ({ gallery, hero, dharma, welcome, quotes, news }) =
   return (
     <div
       style={{ background: "#1A120B" }}
-      className="min-h-screen overflow-x-hidden relative font-sans text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black"
+      className="min-h-svh overflow-x-hidden relative font-sans text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black"
     >
       {/* ── THANH NEO DỌC SANG BÊN PHẢI MÀN HÌNH ── */}
-      <VerticalAnchorNav pageTitle="TRANG CHỦ" sections={homeSections(!!welcome, !!quotes?.items.length)} />
+      <VerticalAnchorNav pageTitle="TRANG CHỦ" sections={sections} />
 
       {/* ── POPUP THÔNG BÁO LẦN ĐẦU MỞ WEB (V1.0.0) ── */}
       <WelcomeNoticeModal />
 
-      <Header scrolled={scrollY > 64} />
+      <Header scrolled={scrolled} />
 
       <main>
         {/* Section 0: Hero Video Banner */}
         <section id="hero">
           <Hero hero={hero} />
-        </section>
-
-        {/* Section 1: TRỢ LÝ PHẬT HỌC AI NGAY DƯỚI HERO VIDEO */}
-        <section id="ai-search" className="max-w-[1280px] mx-auto px-4 md:px-10 my-10 relative z-20">
-          <SmartSearchAIBar contextTitle="Tùng Lâm Hòa Phúc - Bạn muốn tìm điều gì / đặt câu hỏi gì?" />
         </section>
 
         {/* Section 1b: Lời chào, số liệu và Phật lịch (admin: Trang chủ) */}

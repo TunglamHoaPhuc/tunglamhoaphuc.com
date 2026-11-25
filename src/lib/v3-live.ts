@@ -52,7 +52,7 @@ export function relatedTongChi(current: Pick<V3TongChi, "id" | "slug" | "categor
 		.map((a) => ({
 			category: (a.categoryName || a.category || "").toUpperCase(),
 			title: a.title,
-			url: a.bannerImage || "/images/toan-canh-chua.jpg",
+			url: a.bannerImage || "/images/hero/toan-canh-chua-1280.webp",
 			link: `/tong-chi-tu-hoc/${a.slug}`,
 		}));
 }

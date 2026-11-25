@@ -4,6 +4,7 @@ import React, { FC, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowRight } from 'lucide-react';
 import { THAP_BAT_LA_HAN_DATA, ThapBatLaHanItem } from '@/data/thapBatLaHanData';
+import { LOGO_ROUND_SRC, swapOnError, TOAN_CANH_SRC, TOAN_CANH_BACKDROP, fitProps, CARD_WIDTHS, MODAL_FIT, STATUE_ICON_LARGE_SRC } from '@/features/universe/image-props';
 
 export const ThapBatLaHanGrid: FC = () => {
   const [selectedItem, setSelectedItem] = useState<ThapBatLaHanItem | null>(null);
@@ -13,14 +14,12 @@ export const ThapBatLaHanGrid: FC = () => {
     <div className="relative w-full py-10 md:py-14 overflow-hidden bg-transparent transform-gpu">
       {/* ── TOP HEADER BACKGROUND IMAGE ONLY WITH LEFT & RIGHT GRADIENT MASKS ── */}
       <div className="absolute top-8 inset-x-0 h-[360px] z-0 pointer-events-none overflow-hidden">
-        <img
-          src="/images/vu-tru-phat-giao/toan-canh-chua.jpg"
+        <img width={640} height={480}
+          {...TOAN_CANH_BACKDROP}
           alt="Toàn cảnh chùa"
           className="w-full h-full object-cover opacity-12 filter blur-[2px] scale-105"
           loading="lazy"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
-          }}
+          onError={swapOnError('/images/hero/toan-canh-chua-1280.webp')}
         />
         <div className="absolute inset-0 bg-[#2C1C11]/35" />
         <div className="absolute top-0 inset-x-0 h-20 bg-gradient-to-b from-[#2C1C11] via-[#2C1C11]/80 to-transparent" />
@@ -33,13 +32,11 @@ export const ThapBatLaHanGrid: FC = () => {
         {/* SECTION HEADER */}
         <div className="flex flex-col items-center text-center mb-8 sm:mb-10">
           <div className="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center" aria-hidden="true">
-            <img
-              src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+            <img width={128} height={128}
+              src={STATUE_ICON_LARGE_SRC}
               alt="Thập Bát La Hán"
               className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-              }}
+              onError={swapOnError(LOGO_ROUND_SRC)}
             />
           </div>
 
@@ -62,7 +59,7 @@ export const ThapBatLaHanGrid: FC = () => {
             </div>
           </div>
 
-          <p className="text-xs sm:text-sm text-[#FFE5A3]/90 max-w-3xl leading-relaxed font-normal" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+          <p className="text-sm text-[#FFE5A3]/90 max-w-3xl leading-relaxed font-normal" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
             Nghệ thuật Phật giáo bằng gỗ mít
           </p>
         </div>
@@ -84,14 +81,12 @@ export const ThapBatLaHanGrid: FC = () => {
                   className="group relative rounded-2xl border border-[#F2C14E]/35 hover:border-[#ffde59] transition-all duration-300 shadow-xl cursor-pointer overflow-hidden bg-[#1C130D] h-[260px] sm:h-[290px] w-full"
                 >
                   {/* FULL BLEED IMAGE */}
-                  <img
-                    src={item.imgUrl}
+                  <img width={640} height={480}
+                    {...fitProps(item.imgUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 190px, (min-width: 640px) 30vw, 46vw' })}
                     alt={item.name}
                     className="w-full h-full object-cover object-[center_20%] transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/vu-tru-phat-giao/toan-canh-chua.jpg';
-                    }}
+                    onError={swapOnError(TOAN_CANH_SRC)}
                   />
 
                   {/* Soft gradient fade at bottom of card */}
@@ -111,7 +106,7 @@ export const ThapBatLaHanGrid: FC = () => {
 
                       <p
                         style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                        className="text-[#FFE5A3] text-[10px] sm:text-[11px] font-semibold leading-tight tracking-wide text-center line-clamp-2"
+                        className="text-[#FFE5A3] text-xs sm:text-[11px] font-semibold leading-tight tracking-wide text-center line-clamp-2"
                       >
                         {item.sanskritName}
                       </p>
@@ -161,7 +156,7 @@ export const ThapBatLaHanGrid: FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/25 backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto"
+            className="fixed inset-0 z-[200] bg-black/25 sm:backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto"
             onClick={() => setSelectedItem(null)}
           >
             <motion.div
@@ -188,7 +183,7 @@ export const ThapBatLaHanGrid: FC = () => {
               <div className="flex flex-col md:flex-row gap-6 items-center">
                 <div className="w-full md:w-[45%] shrink-0 rounded-2xl overflow-hidden border-2 border-[#F2C14E]/60 bg-black/60 p-2 shadow-2xl">
                   <img
-                    src={selectedItem.imgUrl}
+                    {...fitProps(selectedItem.imgUrl, MODAL_FIT)}
                     alt={selectedItem.name}
                     className="w-full h-auto max-h-[320px] object-cover rounded-xl"
                   />
@@ -203,7 +198,7 @@ export const ThapBatLaHanGrid: FC = () => {
                   </h3>
                   <p className="text-xs text-[#FFE5A3]/90 font-semibold">{selectedItem.sanskritName}</p>
                   <div className="h-[1px] bg-gradient-to-r from-[#F2C14E]/70 via-[#F2C14E]/30 to-transparent my-2" />
-                  <p className="text-xs text-[#D3C0AD] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                  <p className="text-sm text-[#D3C0AD] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                     {selectedItem.meaning}
                   </p>
                 </div>

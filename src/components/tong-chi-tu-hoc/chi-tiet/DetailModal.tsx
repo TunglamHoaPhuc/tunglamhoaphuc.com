@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { ArrowRight, ExternalLink, X } from 'lucide-react';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 
 interface TuKhoaPopup {
   keyword: string;
@@ -46,11 +46,11 @@ export function DetailModal({
       {/* ==================== POPUP CHÚ THÍCH TỪ KHÓA ==================== */}
       {activeKeywordPopup && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 sm:bg-black/80 sm:backdrop-blur-sm animate-fadeIn"
           onClick={onCloseKeywordPopup}
         >
           <div
-            className="relative bg-[#3A2718]/95 border-2 border-[#F2C14E]/70 p-6 sm:p-7 rounded-3xl max-w-lg w-full shadow-[0_0_50px_rgba(0,0,0,0.85)] backdrop-blur-md text-left space-y-4 transition-all animate-in zoom-in-95"
+            className="relative bg-[#3A2718]/95 border-2 border-[#F2C14E]/70 p-6 sm:p-7 rounded-3xl max-w-lg w-full shadow-[0_0_50px_rgba(0,0,0,0.85)] sm:backdrop-blur-md text-left space-y-4 transition-all animate-in zoom-in-95 max-h-[calc(100svh-2rem)] overflow-y-auto overscroll-contain"
             onClick={(e) => e.stopPropagation()}
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
@@ -58,22 +58,23 @@ export function DetailModal({
             <button
               type="button"
               onClick={onCloseKeywordPopup}
-              className="absolute top-4 right-4 w-8 h-8 rounded-full bg-black/50 border border-[#F2C14E]/40 text-[#FFE5A3] hover:text-black hover:bg-[#F2C14E] flex items-center justify-center transition-all cursor-pointer shadow-md"
+              className="absolute top-2 right-2 sm:top-4 sm:right-4 w-11 h-11 sm:w-8 sm:h-8 rounded-full bg-black/50 border border-[#F2C14E]/40 text-[#FFE5A3] hover:text-black hover:bg-[#F2C14E] flex items-center justify-center transition-all cursor-pointer shadow-md"
             >
               <X className="w-4 h-4" />
             </button>
 
             {/* HEADER: ẢNH + TIÊU ĐỀ */}
-            <div className="flex items-center gap-4 sm:gap-5 pr-6 pt-1">
+            <div className="flex items-center gap-4 sm:gap-5 pr-10 sm:pr-6 pt-1">
               {activeKeywordPopup.imageUrl && (
                 <div className="relative w-24 sm:w-28 h-24 sm:h-28 flex-shrink-0 rounded-2xl overflow-hidden border border-[#F2C14E]/60 shadow-[0_0_20px_rgba(242,193,78,0.2)] bg-black">
-                  <img
-                    src={getImageUrl(activeKeywordPopup.imageUrl)}
+                  <img width={640} height={480}
+                    // Ô vuông 96–112 px: bản 360 (trước đây tải ảnh gốc đến 4.160×6.240).
+                    src={fitImage(getImageUrl(activeKeywordPopup.imageUrl), 360)}
                     alt={activeKeywordPopup.title}
                     style={{ objectPosition: activeKeywordPopup.imagePosition || 'center 50%' }}
                     className="w-full h-full object-cover"
                     onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+                      (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
                     }}
                   />
                 </div>
@@ -84,13 +85,13 @@ export function DetailModal({
                 {activeKeywordPopup.keyword &&
                   activeKeywordPopup.title &&
                   activeKeywordPopup.keyword.trim().toLowerCase() !== activeKeywordPopup.title.trim().toLowerCase() && (
-                    <span className="px-2.5 py-0.5 rounded-full bg-[#F2C14E]/20 text-[#F2C14E] text-[10px] font-bold border border-[#F2C14E]/40 uppercase tracking-wider inline-block">
+                    <span className="px-2.5 py-0.5 rounded-full bg-[#F2C14E]/20 text-[#F2C14E] text-xs sm:text-[10px] font-bold border border-[#F2C14E]/40 uppercase tracking-wider inline-block">
                       {activeKeywordPopup.keyword}
                     </span>
                   )}
 
                 {activeKeywordPopup.subtitle && (
-                  <div className="text-[11px] text-[#FFE5A3]/90 font-medium tracking-wide">
+                  <div className="text-xs sm:text-[11px] text-[#FFE5A3]/90 font-medium tracking-wide">
                     {activeKeywordPopup.subtitle}
                   </div>
                 )}
@@ -110,7 +111,7 @@ export function DetailModal({
             </div>
 
             {/* MÔ TẢ CHI TIẾT */}
-            <p className="text-xs sm:text-sm text-[#f7e7ce] leading-relaxed font-normal text-justify whitespace-pre-line">
+            <p className="text-sm text-[#f7e7ce] leading-relaxed font-normal text-left sm:text-justify whitespace-pre-line">
               {activeKeywordPopup.description}
             </p>
 
@@ -121,7 +122,7 @@ export function DetailModal({
                   href={rawLink}
                   target={isExternal ? '_blank' : undefined}
                   rel={isExternal ? 'noopener noreferrer' : undefined}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#F2C14E] to-[#d4a029] hover:from-[#ffde59] hover:to-[#F2C14E] text-[#140D07] text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(242,193,78,0.35)] hover:scale-[1.02] group cursor-pointer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 min-h-11 rounded-xl bg-gradient-to-r from-[#F2C14E] to-[#d4a029] hover:from-[#ffde59] hover:to-[#F2C14E] text-[#140D07] text-xs font-bold uppercase tracking-wider transition-all shadow-[0_0_15px_rgba(242,193,78,0.35)] hover:scale-[1.02] group cursor-pointer"
                 >
                   <span>Xem thêm chi tiết</span>
                   {isExternal ? (

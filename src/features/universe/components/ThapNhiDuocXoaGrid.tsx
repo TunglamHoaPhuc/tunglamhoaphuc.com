@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, ShieldCheck } from 'lucide-react';
 import { THAP_NHI_DUOC_XOA_FULL_DATA, ThapNhiDuocXoaItem } from '@/data/thapNhiDuocXoaData';
 import { ZodiacGoldIcon } from '@/components/common/ZodiacGoldIcon';
+import { LOGO_ROUND_SRC, swapOnError, TOAN_CANH_SRC, fitProps, CARD_WIDTHS, MODAL_FIT, STATUE_ICON_LARGE_SRC } from '@/features/universe/image-props';
 
 export const ThapNhiDuocXoaGrid: FC = () => {
   const [selectedItem, setSelectedItem] = useState<ThapNhiDuocXoaItem | null>(null);
@@ -15,13 +16,11 @@ export const ThapNhiDuocXoaGrid: FC = () => {
         {/* SECTION HEADER: ICON & TIÊU ĐỀ */}
         <div className="flex flex-col items-center text-center mb-10">
           <div className="w-16 h-16 sm:w-20 sm:h-20 mb-3 flex items-center justify-center" aria-hidden="true">
-            <img
-              src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+            <img loading="lazy" decoding="async" width={128} height={128}
+              src={STATUE_ICON_LARGE_SRC}
               alt="Thập Nhị Dược Xoa"
               className="w-full h-full object-contain filter drop-shadow-[0_0_18px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-              }}
+              onError={swapOnError(LOGO_ROUND_SRC)}
             />
           </div>
 
@@ -44,7 +43,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
             </div>
           </div>
 
-          <p className="text-xs sm:text-sm text-[#FFE5A3]/90 max-w-3xl leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+          <p className="text-sm text-[#FFE5A3]/90 max-w-3xl leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
             12 Vị Dược Xoa Đại Tướng • Thủ Hộ Thần 12 Con Giáp &amp; Hóa Thân Chư Phật Bồ Tát (Kinh Dược Sư Bổn Nguyện Công Đức)
           </p>
         </div>
@@ -60,13 +59,11 @@ export const ThapNhiDuocXoaGrid: FC = () => {
             >
               {/* FULL BLEED STATUE IMAGE (NO INITIAL TEXT) */}
               <div className="relative w-full h-full bg-[#1A120B] overflow-hidden">
-                <img
-                  src={item.imgUrl}
+                <img loading="lazy" decoding="async" width={640} height={480}
+                  {...fitProps(item.imgUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 190px, (min-width: 640px) 30vw, 46vw' })}
                   alt={item.title}
                   className="w-full h-full object-cover group-hover:scale-108 transition-transform duration-700 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = '/images/vu-tru-phat-giao/toan-canh-chua.jpg';
-                  }}
+                  onError={swapOnError(TOAN_CANH_SRC)}
                 />
 
                 {/* Subtle top-gradient overlay */}
@@ -91,17 +88,17 @@ export const ThapNhiDuocXoaGrid: FC = () => {
 
                   {/* SUBTITLE WITH ZODIAC ICON */}
                   <p
-                    className="text-[#FFE5A3] text-[10px] font-medium line-clamp-1 flex items-center justify-center gap-1"
+                    className="text-[#FFE5A3] text-xs sm:text-[10px] font-medium line-clamp-1 flex items-center justify-center gap-1"
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                   >
-                    <ZodiacGoldIcon sign={item.zodiacSign} className="text-[10px] py-0 px-1" />
+                    <ZodiacGoldIcon sign={item.zodiacSign} className="text-xs sm:text-[10px] py-0 px-1" />
                     <span className="truncate">{item.subtitle}</span>
                   </p>
 
                   {/* BUTTON */}
                   <div className="pt-2">
                     <span
-                      className="px-4 py-1 rounded-full text-[10px] font-bold text-[#1C130D] bg-gradient-to-r from-[#F2C14E] via-[#E5A93B] to-[#F2C14E] shadow-[0_4px_12px_rgba(242,193,78,0.5)] inline-flex items-center gap-1 uppercase tracking-wider cursor-pointer"
+                      className="px-4 py-1 rounded-full text-xs sm:text-[10px] font-bold text-[#1C130D] bg-gradient-to-r from-[#F2C14E] via-[#E5A93B] to-[#F2C14E] shadow-[0_4px_12px_rgba(242,193,78,0.5)] inline-flex items-center gap-1 uppercase tracking-wider cursor-pointer"
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     >
                       XEM CHI TIẾT ➔
@@ -121,7 +118,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[200] bg-black/25 backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto"
+            className="fixed inset-0 z-[200] bg-black/25 sm:backdrop-blur-md flex items-center justify-center p-4 md:p-6 overflow-y-auto"
             onClick={() => setSelectedItem(null)}
           >
             <motion.div
@@ -150,12 +147,10 @@ export const ThapNhiDuocXoaGrid: FC = () => {
                 {/* IMAGE CONTAINER */}
                 <div className="w-full md:w-[38%] shrink-0 rounded-2xl overflow-hidden border-2 border-[#F2C14E]/60 bg-black/60 p-3 shadow-2xl relative self-stretch flex items-center justify-center">
                   <img
-                    src={selectedItem.imgUrl}
+                    {...fitProps(selectedItem.imgUrl, MODAL_FIT)}
                     alt={selectedItem.title}
                     className="w-full h-auto max-h-[340px] md:max-h-[420px] object-cover rounded-xl shadow-inner"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/vu-tru-phat-giao/toan-canh-chua.jpg';
-                    }}
+                    onError={swapOnError(TOAN_CANH_SRC)}
                   />
                   <div className="absolute inset-0 pointer-events-none rounded-xl border border-[#F2C14E]/20" />
                 </div>
@@ -183,7 +178,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
 
                   {/* SUBTITLE */}
                   <p
-                    className="text-xs sm:text-sm text-[#FFE5A3]/90 font-semibold leading-relaxed"
+                    className="text-sm text-[#FFE5A3]/90 font-semibold leading-relaxed"
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                   >
                     {selectedItem.subtitle}
@@ -198,7 +193,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
 
                   {/* FULL HISTORY HTML */}
                   <div
-                    className="text-xs sm:text-sm text-[#D3C0AD] leading-relaxed font-normal space-y-2"
+                    className="text-sm text-[#D3C0AD] leading-relaxed font-normal space-y-2"
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                   >
                     <p>{selectedItem.fullHistoryHtml}</p>
@@ -206,7 +201,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
 
                   {/* MEANING BOX */}
                   <div
-                    className="bg-[#1C130D]/90 p-4 rounded-xl border border-[#F2C14E]/30 text-xs sm:text-sm text-[#FFE5A3] italic leading-relaxed shadow-sm"
+                    className="bg-[#1C130D]/90 p-4 rounded-xl border border-[#F2C14E]/30 text-sm text-[#FFE5A3] italic leading-relaxed shadow-sm"
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                   >
                     <span className="not-italic font-bold text-[#F2C14E] block mb-1">Ý Nghĩa &amp; Công Đức:</span>
@@ -216,7 +211,7 @@ export const ThapNhiDuocXoaGrid: FC = () => {
                   {/* SOURCE */}
                   <div className="pt-1">
                     <p
-                      className="text-[11px] text-[#c9b896]/70 italic tracking-wide"
+                      className="text-xs sm:text-[11px] text-[#c9b896]/70 italic tracking-wide"
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     >
                       Nguồn tư liệu: {selectedItem.source}

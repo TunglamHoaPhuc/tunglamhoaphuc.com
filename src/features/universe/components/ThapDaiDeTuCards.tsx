@@ -3,6 +3,7 @@
 import React, { FC, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Sparkles, UserCheck, Flame, ArrowRight } from 'lucide-react';
+import { fitProps, CARD_WIDTHS } from '@/features/universe/image-props';
 
 export interface DeTuItem {
   id: string;
@@ -24,7 +25,7 @@ export const THAP_DAI_DE_TU_DATA: DeTuItem[] = [
     role: 'Tổ Sư Thiền Tông • Khổ Hạnh Bậc Nhất',
     quote: '“Niêm hoa vi tiếu — Tâm truyền tâm, không lập văn tự.”',
     description: 'Bậc thượng thủ trong hàng Thánh chúng, giữ gìn giới luật khổ hạnh nghiêm túc nhất, người chủ trì kỳ kết tập kinh điển đầu tiên sau khi Phật nhập Niết Bàn.',
-    imageUrl: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
+    imageUrl: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
   },
   {
     id: 'dt02',
@@ -34,7 +35,7 @@ export const THAP_DAI_DE_TU_DATA: DeTuItem[] = [
     role: 'Thị Giả Của Phật • Ghi Nhớ Toàn Bộ Kinh Tạng',
     quote: '“Như thị ngã văn — Tôi từng nghe Đức Thế Tôn dạy như vầy.”',
     description: 'Thị giả trung thành và tận tụy nhất của Đức Phật, có trí nhớ siêu phàm đã tụng lại toàn bộ các bài kinh Phật dạy trong kỳ kết tập kinh điển.',
-    imageUrl: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
+    imageUrl: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
   },
   {
     id: 'dt03',
@@ -44,7 +45,7 @@ export const THAP_DAI_DE_TU_DATA: DeTuItem[] = [
     role: 'Tướng Quân Chánh Pháp • Bậc Thầy Bát Nhã',
     quote: '“Sắc bất dị không, không bất dị sắc — Trí tuệ soi thấu chân tướng vạn pháp.”',
     description: 'Vị đại đệ tử đứng đầu về trí tuệ siêu việt, thông hiểu tường tận mọi giáo pháp sâu kín của Đức Như Lai và trợ duyên hoằng hóa chúng sinh.',
-    imageUrl: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
+    imageUrl: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
   },
   {
     id: 'dt04',
@@ -54,7 +55,7 @@ export const THAP_DAI_DE_TU_DATA: DeTuItem[] = [
     role: 'Đại Hiếu Mục Kiền Liên • Cứu Mẹ Khỏi Địa Ngục',
     quote: '“Lòng hiếu thảo vô biên mở toang cánh cửa u minh tăm tối.”',
     description: 'Bậc đại thánh tăng thần thông quảng đại, tấm gương hiếu đạo ngàn đời làm khởi nguồn cho Đại lễ Vu Lan Báo Hiếu truyền thống của Phật giáo.',
-    imageUrl: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
+    imageUrl: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
   },
   {
     id: 'dt05',
@@ -64,7 +65,7 @@ export const THAP_DAI_DE_TU_DATA: DeTuItem[] = [
     role: 'Biện Tài Vô Ngại • Xả Thân Hoằng Pháp',
     quote: '“Nơi nào tối tăm, nơi đó cần ngọn đèn chánh pháp soi đường.”',
     description: 'Hùng biện bậc nhất, tâm từ bi vô lượng sẵn sàng đi đến những vùng đất nguy hiểm, biên thùy xa xôi để đem ánh sáng Phật pháp cứu độ dân lành.',
-    imageUrl: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
+    imageUrl: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
   },
   {
     id: 'dt06',
@@ -74,7 +75,7 @@ export const THAP_DAI_DE_TU_DATA: DeTuItem[] = [
     role: 'Phân Tích Giáo Pháp • Khai Sáng Chân Lý',
     quote: '“Lý lẽ sáng tỏ, chặt chẽ như kim cương phá tan tà kiến.”',
     description: 'Tài năng phân tích, diễn giải sâu sắc những lời dạy ngắn gọn của Đức Phật thành những bài thuyết giáo rõ ràng, dễ hiểu cho mọi tầng lớp.',
-    imageUrl: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
+    imageUrl: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
   },
   {
     id: 'dt07',
@@ -84,7 +85,7 @@ export const THAP_DAI_DE_TU_DATA: DeTuItem[] = [
     role: 'Đôi Mắt Trí Tuệ • Tinh Tấn Không Mỏi Mệt',
     quote: '“Khi đôi mắt trần thế khép lại, thiên nhãn tâm linh bừng sáng tam thiên đại thiên thế giới.”',
     description: 'Bậc đại thánh tinh tấn vượt bậc, dù bị mù đôi mắt nhưng đã chứng đắc Thiên Nhãn Thông, nhìn thấu suốt cả tam thiên đại thiên thế giới.',
-    imageUrl: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
+    imageUrl: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
   },
   {
     id: 'dt08',
@@ -94,7 +95,7 @@ export const THAP_DAI_DE_TU_DATA: DeTuItem[] = [
     role: 'Bảo Vệ Giới Luật • Nền Tảng Tăng Đoàn',
     quote: '“Giới luật còn là Phật pháp còn, giới luật thanh tịnh là đạo trang nghiêm.”',
     description: 'Xuất thân người thợ cạo bình dị, tôn giả tu tập nghiêm cẩn tuyệt đối và trở thành người tụng đọc toàn bộ Luật tạng trong lần kết tập đầu tiên.',
-    imageUrl: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
+    imageUrl: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
   },
   {
     id: 'dt09',
@@ -104,7 +105,7 @@ export const THAP_DAI_DE_TU_DATA: DeTuItem[] = [
     role: 'Con Trai Phật Thích Ca • Nhẫn Nhục Lặng Thầm',
     quote: '“Âm thầm tu dưỡng, nhẫn nhục hành trì mọi oai nghi tế hạnh.”',
     description: 'Con trai duy nhất của Đức Phật trước khi xuất gia, tu tập âm thầm khiêm cung, không bao giờ tự hào về xuất thân cao quý, đắc quả A La Hán.',
-    imageUrl: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
+    imageUrl: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
   },
   {
     id: 'dt10',
@@ -114,7 +115,7 @@ export const THAP_DAI_DE_TU_DATA: DeTuItem[] = [
     role: 'Thấu Suốt Tính Không • Trụ Cột Kinh Kim Cương',
     quote: '“Phàm sở hữu tướng, giai thị hư vọng — Thấy các tướng phi tướng tức thấy Như Lai.”',
     description: 'Thấu hiểu sâu sắc nhất về triết lý Tính Không (Śūnyatā) của Bát Nhã, nhân vật đối thoại chính cùng Đức Thế Tôn trong Kinh Kim Cương Bát Nhã.',
-    imageUrl: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
+    imageUrl: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp',
   },
 ];
 
@@ -158,8 +159,8 @@ export const ThapDaiDeTuCards: FC = () => {
           >
             {/* Postcard Image with golden border */}
             <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-[#100702] border border-[#F2C14E]/20 mb-3">
-              <img
-                src={item.imageUrl}
+              <img width={640} height={480}
+                {...fitProps(item.imageUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 230px, (min-width: 768px) 23vw, (min-width: 640px) 30vw, 46vw' })}
                 alt={item.name}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
               />
@@ -168,7 +169,7 @@ export const ThapDaiDeTuCards: FC = () => {
               {/* Badge Đệ nhất */}
               <div className="absolute top-2 left-2 right-2">
                 <span
-                  className="inline-block w-full text-center text-[10px] font-bold text-[#FFE5A3] bg-[#8B1E0F]/90 px-2 py-0.5 rounded border border-[#F2C14E]/50 uppercase tracking-wider backdrop-blur-sm"
+                  className="inline-block w-full text-center text-xs sm:text-[10px] font-bold text-[#FFE5A3] bg-[#8B1E0F]/90 px-2 py-0.5 rounded border border-[#F2C14E]/50 uppercase tracking-wider sm:backdrop-blur-sm"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
                   {item.titleBadge}
@@ -189,13 +190,13 @@ export const ThapDaiDeTuCards: FC = () => {
               >
                 {item.name}
               </h3>
-              <p className="text-[11px] text-[#c9b896]/80 italic truncate" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+              <p className="text-xs sm:text-[11px] text-[#c9b896]/80 italic truncate" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 {item.sanskritName}
               </p>
             </div>
 
             {/* View detail hover action */}
-            <div className="mt-2 pt-2 border-t border-[#F2C14E]/15 flex items-center justify-center text-[11px] text-[#F2C14E] font-bold">
+            <div className="mt-2 pt-2 border-t border-[#F2C14E]/15 flex items-center justify-center text-xs sm:text-[11px] text-[#F2C14E] font-bold">
               <span className="group-hover:underline flex items-center gap-1">
                 <span>Chi tiết công hạnh</span>
                 <ArrowRight className="w-3 h-3" />
@@ -209,7 +210,7 @@ export const ThapDaiDeTuCards: FC = () => {
       <AnimatePresence>
         {selectedDeTu && (
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 sm:backdrop-blur-xl animate-in fade-in"
             onClick={() => setSelectedDeTu(null)}
           >
             <motion.div
@@ -254,12 +255,12 @@ export const ThapDaiDeTuCards: FC = () => {
               </div>
 
               {/* Description */}
-              <p className="text-xs text-[#e3d2c1] leading-relaxed text-justify" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+              <p className="text-sm text-[#e3d2c1] leading-relaxed text-left sm:text-justify" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 {selectedDeTu.description}
               </p>
 
               <div className="text-center pt-2 border-t border-[#F2C14E]/20">
-                <span className="text-[11px] text-[#c9b896]/70 uppercase flex items-center justify-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                <span className="text-xs sm:text-[11px] text-[#c9b896]/70 uppercase flex items-center justify-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                   <Sparkles className="w-3 h-3 text-[#F2C14E]" />
                   <span>TÔN TRÍ TẠI LẦU KINH LUÂN • TÙNG LÂM HÒA PHÚC</span>
                   <Sparkles className="w-3 h-3 text-[#F2C14E]" />

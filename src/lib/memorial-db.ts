@@ -5,6 +5,7 @@ import {
   type MemorialPublicRecord,
   type MemorialRecord,
   type MemorialSyncMeta,
+  matchesCategoryFilter,
   normalizeVietnamese,
   toPublicMemorialRecord,
 } from './memorial-types';
@@ -34,19 +35,21 @@ export async function getAllMemorialRecords(): Promise<MemorialRecord[]> {
   return await loadServerlessJsonAsync<MemorialRecord[]>(MEMORIAL_DB_CONFIG);
 }
 
-export async function getPublicMemorialRecords(): Promise<MemorialPublicRecord[]> {
-  const records = await getAllMemorialRecords();
-  return records.map(toPublicMemorialRecord);
-}
-
 export async function getMemorialSyncMeta(): Promise<MemorialSyncMeta> {
   return await loadServerlessJsonAsync<MemorialSyncMeta>(MEMORIAL_META_CONFIG);
 }
 
+/** Ít nhất bấy nhiêu ký tự (sau khi bỏ dấu, bỏ khoảng trắng) mới tra: chặn việc gõ "a" để kéo cả danh sách. */
+export const MEMORIAL_MIN_QUERY = 3;
+/** Nhiều nhất bấy nhiêu bài vị trả về một lần tra; còn nữa thì báo tổng số và nhờ gõ cụ thể hơn. */
+export const MEMORIAL_MAX_RESULTS = 30;
+/** Cắt chuỗi tra ở độ dài này trước mọi xử lý. */
+export const MEMORIAL_MAX_QUERY = 80;
+
 /**
  * Tìm kiếm bài vị phía Server, bỏ dấu tiếng Việt. Chỉ so với các trường CÔNG KHAI (chính những gì
- * toPublicMemorialRecord trả ra, SĐT đã che): không so với SĐT gốc, nên không dò ra số điện thoại bằng cách thử từng
- * chữ số và không lộ bản ghi nào qua phần ẩn của nó.
+ * toPublicMemorialRecord trả ra): không so với địa chỉ, nơi an táng, người liên hệ hay số điện thoại, nên không dò ra
+ * những thứ đó bằng cách thử từng chữ và không lộ bản ghi nào qua phần ẩn của nó.
  */
 export function filterMemorialRecords(
   records: MemorialRecord[],
@@ -60,23 +63,34 @@ export function filterMemorialRecords(
 
   return publicRecords.filter((rec) => {
     const haystack = normalizeVietnamese(
-      [
-        rec.code,
-        rec.name,
-        rec.dharmaName,
-        rec.lineageType,
-        rec.age,
-        rec.deathDate,
-        rec.birthDate,
-        rec.address,
-        rec.burialLocation,
-        rec.contactName,
-        rec.contactMasked,
-      ]
+      [rec.code, rec.name, rec.dharmaName, rec.lineageType, rec.age, rec.deathDate, rec.birthDate, rec.category]
         .filter(Boolean)
         .join(' ')
     );
 
     return tokens.every((tok) => haystack.includes(tok));
   });
+}
+
+export type MemorialSearch =
+  | { state: 'idle' }
+  | { state: 'short'; query: string }
+  | { state: 'limited'; query: string }
+  | { state: 'done'; query: string; records: MemorialPublicRecord[]; total: number };
+
+/**
+ * Một lần tra của trang công khai: không có từ khóa thì không trả bản ghi nào, từ khóa quá ngắn thì nhờ gõ thêm,
+ * còn lại trả tối đa MEMORIAL_MAX_RESULTS bản ghi công khai (kèm tổng số khớp). Không bao giờ trả cả danh sách.
+ */
+export function searchMemorialRecords(
+  records: MemorialRecord[],
+  rawQuery: string,
+  category = 'all'
+): MemorialSearch {
+  const query = rawQuery.trim().slice(0, MEMORIAL_MAX_QUERY);
+  if (!query) return { state: 'idle' };
+  if (normalizeVietnamese(query).replace(/ /g, '').length < MEMORIAL_MIN_QUERY) return { state: 'short', query };
+  const inCategory = records.filter((rec) => matchesCategoryFilter(rec.categorySlug, category));
+  const found = filterMemorialRecords(inCategory, query);
+  return { state: 'done', query, records: found.slice(0, MEMORIAL_MAX_RESULTS), total: found.length };
 }

@@ -196,7 +196,7 @@ export const Heritage2DInteractiveMap: FC<Heritage2DInteractiveMapProps> = ({
             >
               SƠ ĐỒ 2D KHÔNG GIAN BẢO TÀNG DI SẢN
             </h4>
-            <p className="text-[10px] sm:text-xs text-[#C4B5A5]">
+            <p className="text-xs sm:text-xs text-[#C4B5A5]">
               Chạm hoặc nhấp vào các biểu tượng mạ vàng để thưởng lãm tư liệu 3 miền
             </p>
           </div>
@@ -347,7 +347,7 @@ export const Heritage2DInteractiveMap: FC<Heritage2DInteractiveMapProps> = ({
                   >
                     <div className="relative h-28 rounded-xl overflow-hidden mb-2 border border-[#F2C14E]/30">
                       <img src={pin.thumbnail} alt={pin.name} className="w-full h-full object-cover" />
-                      <div className="absolute top-1.5 right-1.5 bg-[#1A1009]/80 px-2 py-0.5 rounded text-[9px] font-bold text-[#F2C14E]">
+                      <div className="absolute top-1.5 right-1.5 bg-[#1A1009]/80 px-2 py-0.5 rounded text-xs md:text-[9px] font-bold text-[#F2C14E]">
                         {pin.year}
                       </div>
                     </div>
@@ -358,7 +358,7 @@ export const Heritage2DInteractiveMap: FC<Heritage2DInteractiveMapProps> = ({
                     >
                       {pin.name}
                     </h5>
-                    <p className="text-[11px] text-[#D4C3B3] line-clamp-1 mt-0.5">
+                    <p className="text-xs md:text-[11px] text-[#D4C3B3] line-clamp-1 mt-0.5">
                       {pin.featuredTitle}
                     </p>
 
@@ -368,7 +368,7 @@ export const Heritage2DInteractiveMap: FC<Heritage2DInteractiveMapProps> = ({
                           const cluster = HERITAGE_BENTO_CLUSTERS.find((c) => c.region === pin.region);
                           if (cluster) onOpenClusterLightbox(cluster);
                         }}
-                        className="w-full py-1.5 rounded-lg bg-[#F2C14E] hover:bg-[#FFE5A3] text-[#1A1009] font-bold text-[11px] uppercase tracking-wider transition-all flex items-center justify-center gap-1 cursor-pointer"
+                        className="w-full py-1.5 min-h-11 md:min-h-0 rounded-lg bg-[#F2C14E] hover:bg-[#FFE5A3] text-[#1A1009] font-bold text-xs md:text-[11px] uppercase tracking-wider transition-all flex items-center justify-center gap-1 cursor-pointer"
                         style={{ fontFamily: "'UTM Avo', sans-serif" }}
                       >
                         <Eye className="w-3 h-3" />

@@ -2,11 +2,20 @@
 // tạo ở admin có thẻ và địa chỉ ngay). Không còn danh sách sáu chủ đề đóng gói.
 import React from 'react';
 import Link from 'next/link';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { Scroll, Landmark, User, HeartHandshake, ArrowRight } from 'lucide-react';
 import { liveAbout } from '@/lib/v3-live';
+import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/v3-seo';
+import { fitImage } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 export const revalidate = 60;
+
+export const metadata: Metadata = pageMetadata({
+  title: "Giới thiệu",
+  description: "Chốn già lam thanh tịnh – Nơi hội tụ truyền thống truyền thừa, tâm nguyện độ sanh và tinh hoa văn hóa Phật giáo Việt Nam.",
+  path: '/gioi-thieu',
+});
 
 // Biểu tượng theo nhóm là phần thiết kế; nhóm lạ dùng biểu tượng chung.
 const GROUP_ICON: Record<string, typeof Scroll> = {
@@ -22,7 +31,7 @@ export default async function GioiThieuOverviewPage() {
     subtitle: t.subtitle || t.overviewSummary,
     href: `/gioi-thieu/${t.slug}`,
     icon: GROUP_ICON[t.groupCategory] ?? Scroll,
-    image: t.heroBanner || t.portraitImage || '/images/toan-canh-chua.jpg',
+    image: t.heroBanner || t.portraitImage || '/images/hero/toan-canh-chua-1280.webp',
     tag: t.tag || t.groupCategoryName,
   }));
   return (
@@ -31,11 +40,15 @@ export default async function GioiThieuOverviewPage() {
         {/* ── HERO BANNER TOP ── */}
         <div className="relative w-full overflow-hidden bg-[#2A1D14] pt-28 pb-12">
           {/* Background image */}
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-30 blur-[2px] pointer-events-none"
-            style={{
-              backgroundImage: "url('/images/toan-canh-chua.jpg')",
-            }}
+          <img
+            src="/images/hero/toan-canh-chua-1280.webp"
+            alt=""
+            aria-hidden="true"
+            width={1280}
+            height={720}
+            fetchPriority="low"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover opacity-30 blur-[2px] pointer-events-none"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-[#2A1D14]/40 via-[#2A1D14]/80 to-[#2A1D14] pointer-events-none" />
 
@@ -57,7 +70,7 @@ export default async function GioiThieuOverviewPage() {
 
             <p
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
-              className="text-xs sm:text-sm md:text-base text-[#e3d2c1] tracking-wide font-normal max-w-2xl mx-auto px-4 leading-relaxed text-balance text-center"
+              className="text-sm md:text-base text-[#e3d2c1] tracking-wide font-normal max-w-2xl mx-auto px-4 leading-relaxed text-balance text-center"
             >
               Chốn già lam thanh tịnh – Nơi hội tụ truyền thống truyền thừa, tâm nguyện độ sanh và tinh hoa văn hóa Phật giáo Việt Nam.
             </p>
@@ -73,12 +86,15 @@ export default async function GioiThieuOverviewPage() {
                 <Link
                   key={topic.id}
                   href={topic.href}
+                  prefetch={false}
                   className="group relative rounded-2xl overflow-hidden border border-[#F2C14E]/30 bg-[#25170E] hover:border-[#F2C14E] transition-all duration-300 shadow-xl flex flex-col hover:-translate-y-1.5 transform-gpu"
                 >
                   {/* Thumbnail frame */}
                   <div className="relative w-full aspect-[16/10] overflow-hidden bg-[#1A120B]">
                     <img
-                      src={topic.image}
+                      src={fitImage(topic.image, 640)}
+                      srcSet={imageSrcSet(topic.image, [360, 640, 960])}
+                      sizes="(min-width: 1024px) 379px, (min-width: 768px) 45vw, 92vw"
                       alt={topic.title}
                       loading="lazy"
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
@@ -91,7 +107,7 @@ export default async function GioiThieuOverviewPage() {
                     />
 
                     {/* Tag badge */}
-                    <div className="absolute top-3 left-3 px-3 py-1 rounded-full border border-[#F2C14E]/60 bg-[#2C1C11]/90 text-[#F2C14E] text-[11px] font-bold tracking-wider uppercase backdrop-blur-xs flex items-center gap-1.5">
+                    <div className="absolute top-3 left-3 px-3 py-1 rounded-full border border-[#F2C14E]/60 bg-[#2C1C11]/90 text-[#F2C14E] text-xs font-bold tracking-wider uppercase backdrop-blur-xs flex items-center gap-1.5">
                       <IconComp className="w-3.5 h-3.5 text-[#F2C14E]" />
                       <span>{topic.tag}</span>
                     </div>
@@ -110,14 +126,14 @@ export default async function GioiThieuOverviewPage() {
                         {topic.title}
                       </h3>
                       <p
-                        className="text-xs sm:text-sm text-[#e3d2c1]/80 leading-relaxed line-clamp-3"
+                        className="text-sm text-[#e3d2c1]/80 leading-relaxed line-clamp-3"
                         style={{ fontFamily: "'UTM Avo', sans-serif" }}
                       >
                         {topic.subtitle}
                       </p>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-[#F2C14E]/20 flex items-center justify-between text-xs font-bold text-[#F2C14E] uppercase tracking-wider group-hover:translate-x-1 transition-transform">
+                    <div className="mt-4 pt-3 border-t border-[#F2C14E]/20 flex items-center justify-between text-sm sm:text-xs font-bold text-[#F2C14E] uppercase tracking-wider group-hover:translate-x-1 transition-transform">
                       <span>XEM CHI TIẾT</span>
                       <ArrowRight className="w-4 h-4 text-[#F2C14E]" />
                     </div>
@@ -125,11 +141,6 @@ export default async function GioiThieuOverviewPage() {
                 </Link>
               );
             })}
-          </div>
-
-          {/* Smart Search AI Bar */}
-          <div className="mt-16 mb-12">
-            <SmartSearchAIBar contextTitle="Tra cứu Giới thiệu Tùng Lâm Hòa Phúc" />
           </div>
         </div>
       </main>

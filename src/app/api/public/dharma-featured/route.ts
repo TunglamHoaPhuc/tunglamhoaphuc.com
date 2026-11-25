@@ -9,8 +9,9 @@ export const revalidate = 0; // Trực tiếp không cache trên edge
 export async function GET() {
   try {
     return NextResponse.json({ success: true, data: await loadDharmaFeatured() });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    // Chi tiết lỗi (có thể là câu SQL hay tên bảng của D1) chỉ vào nhật ký, không ra công khai.
     console.error('Error fetching dharma featured posts:', error);
-    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
+    return NextResponse.json({ success: false, error: 'Không đọc được Dấu ấn hoằng pháp' }, { status: 500 });
   }
 }

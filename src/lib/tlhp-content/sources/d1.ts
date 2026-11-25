@@ -107,11 +107,22 @@ const summaryOf = (row: Row): PostSummary => ({
 	pinned: row.pinned === 1 || row.pinned === true,
 });
 
-/** The albums of one kind of owner ("page", "teaching"): album id → pictures, in order. */
+/**
+ * The albums of one kind of owner ("page", "teaching"): album id → pictures, in order.
+ *
+ * Album ids are `<owner>:<id>` and the table's primary key (album_id, position) is a binary index, so the albums of one owner are
+ * the range [`<owner>:`, `<owner>;`) (";" is the character after ":"), which D1 reads from the index. The old `album_id like 'page:%'`
+ * could not use that index (LIKE ignores case, so it is a scan): it read the whole table, 21.1 thousand rows (all the posts' albums too)
+ * for the 27 rows of the pages and teachings, and was 85 % of the rows D1 read. The ids are written by the import and the admin
+ * with a lower-case owner, so the match is the same (tests/unit/content/d1Galleries.test.ts).
+ */
 async function galleries(all: <T extends Row>(sql: string, ...params: unknown[]) => Promise<T[]>, prefix: string): Promise<Map<string, GalleryImage[]>> {
+	const from = `${prefix}:`;
+	const until = `${prefix};`;
 	const rows = await all(
-		`select ai.album_id, ai.title, ai.caption, m.r2_key, m.url from album_item ai join media m on m.id = ai.media_id where ai.album_id like ? order by ai.album_id, ai.position`,
-		`${prefix}:%`,
+		`select ai.album_id, ai.title, ai.caption, m.r2_key, m.url from album_item ai join media m on m.id = ai.media_id where ai.album_id >= ? and ai.album_id < ? order by ai.album_id, ai.position`,
+		from,
+		until,
 	);
 	const byOwner = new Map<string, GalleryImage[]>();
 	for (const row of rows) {
@@ -125,7 +136,13 @@ async function galleries(all: <T extends Row>(sql: string, ...params: unknown[])
 
 export function createD1Repository(db: D1Like): ContentRepository {
 	async function all<T extends Row = Row>(sql: string, ...params: unknown[]): Promise<T[]> {
-		return (await db.prepare(sql).bind(...params).all<T>()).results;
+		try {
+			return (await db.prepare(sql).bind(...params).all<T>()).results;
+		} catch (error) {
+			// The logs say which read failed (the first words of the statement), not only that one did.
+			console.error(`d1: câu lệnh lỗi: ${sql.trim().replace(/\s+/g, " ").slice(0, 80)}`, error);
+			throw error;
+		}
 	}
 
 	// Slugs are unique per section (the admin's index): the same slug in two sections is two posts, each at its own address.
@@ -141,7 +158,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 			posts.push(summaryOf(row));
 		}
 		return posts;
-	});
+	}, "d1.summaries");
 
 	const index = lazy(async () => {
 		const bySectionSlug = new Map<string, PostSummary>();
@@ -151,7 +168,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 			if (!bySlug.has(slugKey(post.slug))) bySlug.set(slugKey(post.slug), post);
 		}
 		return { bySectionSlug, bySlug };
-	});
+	}, "d1.index");
 
 	/** The extra fields of a post's category, with the library pictures and sounds they point at as addresses. */
 	async function extraOf(raw: unknown): Promise<PostExtra> {
@@ -398,7 +415,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 			bySection.set(text(row.section), places);
 		}
 		return bySection;
-	});
+	}, "d1.categoryPlaces");
 
 	// The smaller kinds go through the same code as the other sources; only posts are answered here.
 	const rest = createMemoryRepository([], { loadSchedule, loadAbout, loadTongChi, loadAreas, loadStatues, loadQuotes });

@@ -4,6 +4,7 @@ import { FC, useState } from "react";
 import { Search, Filter, ZoomIn, X, Sparkles, BookOpen, Clock } from "lucide-react";
 import { PATRIARCH_NODES, WISDOM_CLUSTERS, PatriarchNode } from "@/data/wisdom-map-data";
 import { CustomDropdown } from "@/components/common/CustomDropdown";
+import { fitProps } from '@/features/universe/image-props';
 
 export const WisdomMapOfPatriarchs: FC = () => {
   // 5 Filter Bar States
@@ -75,7 +76,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
           }}
         >
           <img
-            src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp"
+            {...fitProps('/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/06-33-ung-hoa-than-duc-quan-am/33-ung-hoa-01.webp', { width: 1280, widths: [640, 960, 1280], sizes: '100vw' })}
             alt="Bản đồ Ngân hà Tuệ Giác Danh Tăng"
             className="w-full h-full object-cover opacity-35"
             style={{ minHeight: "580px" }}
@@ -134,12 +135,12 @@ export const WisdomMapOfPatriarchs: FC = () => {
                       : "0 0 12px rgba(242,193,78,0.3)",
                   }}
                 >
-                  <img src={node.portraitUrl} alt={node.name} className="w-full h-full object-cover" />
+                  <img {...fitProps(node.portraitUrl, { width: 360, widths: [160, 360], sizes: '120px' })} loading="lazy" decoding="async" alt={node.name} className="w-full h-full object-cover" />
                 </div>
 
                 {/* Node Name Tag underneath */}
                 <span
-                  className="px-2 py-0.5 rounded text-[10px] font-bold uppercase whitespace-nowrap shadow-md transition-all group-hover:scale-105"
+                  className="px-2 py-0.5 rounded text-xs sm:text-[10px] font-bold uppercase whitespace-nowrap shadow-md transition-all group-hover:scale-105"
                   style={{
                     fontFamily: "'UTM Avo', sans-serif",
                     fontWeight: "bold",
@@ -166,7 +167,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
       >
         {/* 1. Tên Input */}
         <div>
-          <label className="text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
+          <label className="text-xs sm:text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
             <Search className="w-3.5 h-3.5 text-[#F2C14E]" />
             <span>1. TÊN TỔ SƯ</span>
           </label>
@@ -175,7 +176,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
             value={searchName}
             onChange={(e) => setSearchName(e.target.value)}
             placeholder="Nhập tên vị Tổ Sư..."
-            className="w-full py-2 px-3 rounded-lg text-xs focus:outline-none transition-all"
+            className="w-full py-2.5 sm:py-2 px-3 rounded-lg text-base sm:text-xs focus:outline-none transition-all"
             style={{
               background: "rgba(26,15,8,0.8)",
               border: "1px solid rgba(242,193,78,0.3)",
@@ -187,7 +188,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
 
         {/* 2. Thời kỳ Dropdown */}
         <div>
-          <label className="text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
+          <label className="text-xs sm:text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
             <Clock className="w-3.5 h-3.5 text-[#F2C14E]" />
             <span>2. THỜI KỲ</span>
           </label>
@@ -209,7 +210,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
 
         {/* 3. Hệ phái Dropdown */}
         <div>
-          <label className="text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
+          <label className="text-xs sm:text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
             <Sparkles className="w-3.5 h-3.5 text-[#F2C14E]" />
             <span>3. HỆ PHÁI / VÙNG MIỀN</span>
           </label>
@@ -232,7 +233,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
 
         {/* 4. Quote chứa từ khóa Input */}
         <div>
-          <label className="text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
+          <label className="text-xs sm:text-[10px] uppercase font-bold text-[#F2C14E] tracking-wider mb-1 flex items-center gap-1.5" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
             <BookOpen className="w-3.5 h-3.5 text-[#F2C14E]" />
             <span>4. PHÁP NGỮ / TỪ KHÓA</span>
           </label>
@@ -241,7 +242,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
             value={searchQuote}
             onChange={(e) => setSearchQuote(e.target.value)}
             placeholder="Tìm theo câu pháp ngữ..."
-            className="w-full py-2 px-3 rounded-lg text-xs focus:outline-none transition-all"
+            className="w-full py-2.5 sm:py-2 px-3 rounded-lg text-base sm:text-xs focus:outline-none transition-all"
             style={{
               background: "rgba(26,15,8,0.8)",
               border: "1px solid rgba(242,193,78,0.3)",
@@ -253,7 +254,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
 
         {/* 5. Mức độ Zoom Slider */}
         <div>
-          <div className="flex items-center justify-between text-[10px] uppercase font-bold text-[#F2C14E] mb-1" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
+          <div className="flex items-center justify-between text-xs sm:text-[10px] uppercase font-bold text-[#F2C14E] mb-1" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
             <span className="flex items-center gap-1.5">
               <ZoomIn className="w-3.5 h-3.5 text-[#F2C14E]" />
               <span>5. ĐỘ ZOOM BẢN ĐỒ</span>
@@ -266,7 +267,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
             max="140"
             value={zoomLevel}
             onChange={(e) => setZoomLevel(Number(e.target.value))}
-            className="w-full accent-[#F2C14E] cursor-pointer mt-1"
+            className="w-full h-11 sm:h-auto accent-[#F2C14E] cursor-pointer mt-1"
           />
         </div>
       </div>
@@ -315,9 +316,9 @@ export const WisdomMapOfPatriarchs: FC = () => {
                   className="w-40 h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden border-2 shadow-2xl mb-3"
                   style={{ borderColor: "#F2C14E" }}
                 >
-                  <img src={selectedNode.portraitUrl} alt={selectedNode.name} className="w-full h-full object-cover" />
+                  <img {...fitProps(selectedNode.portraitUrl, { width: 640, widths: [360, 640], sizes: '(min-width: 768px) 240px, 90vw' })} alt={selectedNode.name} className="w-full h-full object-cover" />
                 </div>
-                <span className="text-[10px] uppercase font-bold text-[#F2C14E] tracking-widest" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
+                <span className="text-xs sm:text-[10px] uppercase font-bold text-[#F2C14E] tracking-widest" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
                   {selectedNode.clusterName}
                 </span>
                 <span className="text-xs text-[#c9b896] mt-0.5" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
@@ -329,7 +330,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
               <div className="md:col-span-7 space-y-4">
                 {/* Quote phát sáng */}
                 <div className="p-4 rounded-xl border" style={{ background: "rgba(242,193,78,0.08)", borderColor: "rgba(242,193,78,0.3)" }}>
-                  <span className="text-[10px] uppercase font-bold text-[#F2C14E] block mb-1" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
+                  <span className="text-xs sm:text-[10px] uppercase font-bold text-[#F2C14E] block mb-1" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
                     📜 CÂU PHÁP NGỮ BẤT HỦ:
                   </span>
                   <p
@@ -348,7 +349,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
                   <h4 className="text-xs font-bold uppercase text-[#F2C14E] mb-1" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
                     TÍCH THUẬT &amp; CÔNG HẠNH:
                   </h4>
-                  <p className="text-xs text-[#e3d2c1] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                  <p className="text-sm text-[#e3d2c1] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                     {selectedNode.summary}
                   </p>
                 </div>
@@ -359,7 +360,7 @@ export const WisdomMapOfPatriarchs: FC = () => {
                     <h4 className="text-xs font-bold uppercase text-[#F2C14E] mb-1" style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: "bold" }}>
                       DẤU ẤN LỊCH SỬ:
                     </h4>
-                    <p className="text-xs text-[#c9b896] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                    <p className="text-sm text-[#c9b896] leading-relaxed" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                       {selectedNode.historicalMarks}
                     </p>
                   </div>

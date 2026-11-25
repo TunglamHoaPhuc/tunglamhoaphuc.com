@@ -5,20 +5,17 @@ import Header from '@/components/public/layout/Header';
 import Footer from '@/components/public/layout/Footer';
 import { InteractiveMap2D } from '@/features/universe/components/InteractiveMap2D';
 import { UniverseGridMode } from '@/features/universe/components/UniverseGridMode';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import type { V3Area } from '@/lib/v3-data';
 import type { MapSpot } from '@/lib/v3-areas';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 
 // Khu vực và các điểm trên sơ đồ do máy chủ đọc từ D1 (page.tsx): khu vực ẩn hay đã xóa không có trong lưới lẫn sơ đồ.
 export default function VuTruPhatGiaoClient({ areas, spots }: { areas: V3Area[]; spots: MapSpot[] }) {
   const [viewMode, setViewMode] = useState<'grid' | '2d'>('grid');
 
   // Lấy ảnh khu vực tiêu biểu (Tam Bảo - Đại Hùng Bảo Điện) làm nền Header
-  const headerBgImage = getImageUrl(
-    areas[0]?.imgUrl ||
-    'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/tam-bao.webp'
-  );
+  // Nền mờ 30% dưới mặt nạ: bậc 640 là đủ (ảnh chỉ trang trí, mờ).
+  const headerBgImage = getImageUrl(areas[0]?.imgUrl || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc/tam-bao.webp');
 
   return (
     <>
@@ -27,7 +24,7 @@ export default function VuTruPhatGiaoClient({ areas, spots }: { areas: V3Area[];
           TOÀN MÀN HÌNH KHÔNG HEADER - KHÔNG FOOTER - CÓ NÚT QUAY LẠI DẠNG LƯỚI
       ════════════════════════════════════════════════════════════════════════ */}
       {viewMode === '2d' ? (
-        <main className="w-screen h-screen overflow-hidden fixed inset-0 z-50 bg-[#1C130D] text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black">
+        <main className="fixed inset-0 w-full h-dvh overflow-hidden z-50 bg-[#1C130D] text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black">
           <InteractiveMap2D spots={spots} onExit2DMode={() => setViewMode('grid')} />
         </main>
       ) : (
@@ -39,13 +36,20 @@ export default function VuTruPhatGiaoClient({ areas, spots }: { areas: V3Area[];
           <div className="relative w-full overflow-hidden bg-[#2A1D14] pt-28 pb-10">
             {/* Ảnh nền đằng sau mờ phủ gradient hòa quyện như Tông Phong Truyền Thừa */}
             {headerBgImage && (
-              <div
-                className="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none mix-blend-luminosity [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]"
-                style={{
-                  backgroundImage: `url('${headerBgImage}')`,
-                  backgroundPosition: 'center 35%',
-                }}
-              />
+              <div className="absolute inset-0 opacity-30 pointer-events-none mix-blend-luminosity [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]">
+                {/* Ảnh trang trí mờ 30%: bản nhỏ, ưu tiên thấp để không tranh băng thông với nội dung (LCP). */}
+                <img
+                  width={640}
+                  height={427}
+                  src={fitImage(headerBgImage, 640)}
+                  alt=""
+                  aria-hidden="true"
+                  decoding="async"
+                  fetchPriority="low"
+                  className="w-full h-full object-cover"
+                  style={{ objectPosition: 'center 35%' }}
+                />
+              </div>
             )}
             {/* Hiệu ứng gradient mờ mềm mại hòa vào nền nâu */}
             <div className="absolute inset-0 bg-gradient-to-b from-[#2A1D14]/40 via-[#2A1D14]/70 to-[#2A1D14] pointer-events-none" />
@@ -68,7 +72,7 @@ export default function VuTruPhatGiaoClient({ areas, spots }: { areas: V3Area[];
 
               <p
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                className="text-xs sm:text-sm md:text-base text-[#e3d2c1] tracking-wide font-normal max-w-2xl mx-auto px-4 leading-relaxed text-balance text-center"
+                className="text-sm md:text-base text-[#e3d2c1] tracking-wide font-normal max-w-2xl mx-auto px-4 leading-relaxed text-balance text-center"
               >
                 Sơ đồ không gian kiến&nbsp;trúc &amp; Hệ&nbsp;thống tự&nbsp;viện Tùng&nbsp;Lâm&nbsp;Hòa&nbsp;Phúc.
               </p>
@@ -77,11 +81,6 @@ export default function VuTruPhatGiaoClient({ areas, spots }: { areas: V3Area[];
 
           <main className="max-w-[1280px] mx-auto px-4 md:px-10 pb-16 w-full flex-1">
             <UniverseGridMode areas={areas} viewMode={viewMode} onToggleViewMode={setViewMode} />
-
-            {/* Smart Search AI Bar */}
-            <div className="mt-16">
-              <SmartSearchAIBar contextTitle="Khung Cảnh &amp; Bảo Tượng Vũ Trụ Phật Giáo" />
-            </div>
           </main>
         </div>
       )}

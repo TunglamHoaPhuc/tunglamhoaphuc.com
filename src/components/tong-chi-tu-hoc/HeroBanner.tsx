@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import { MoveVertical } from 'lucide-react';
-import { getImageUrl, getHighResImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl, getHighResImageUrl } from '@/utils/image';
+import { imageSources } from '@/lib/image-sources';
 
 interface HeroBannerProps {
   id?: string;
@@ -20,7 +20,11 @@ interface HeroBannerProps {
   backText?: string;
 }
 
-const DEFAULT_BANNER_IMAGE = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
+/** Bậc của biểu ngữ: 960/1280/1920 (không có bậc nhỏ hơn: ảnh phủ cả khung nên luôn lớn). */
+const BANNER_WIDTHS = [960, 1280, 1920] as const;
+const BANNER_SIZES = '(max-width: 767px) 240vw, 100vw';
+
+const DEFAULT_BANNER_IMAGE = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
 
 export function HeroBanner({
   id = 'tong-chi-tu-hoc',
@@ -89,6 +93,10 @@ export function HeroBanner({
     }
   };
 
+  // srcset chỉ khi đang hiện ảnh của bài: sau lỗi, địa chỉ thay thế đi một mình (trình duyệt luôn ưu tiên srcset hơn src).
+  const fromPost = imgSrc === getHighResImageUrl(bannerUrl || bgImage);
+  const { src: bannerSrc, srcSet: bannerSet } = fromPost ? imageSources(imgSrc || DEFAULT_BANNER_IMAGE, 1920, BANNER_WIDTHS, BANNER_SIZES) : { src: fitImage(imgSrc || DEFAULT_BANNER_IMAGE, 1920), srcSet: undefined };
+
   return (
     <section
       id={id}
@@ -100,18 +108,24 @@ export function HeroBanner({
       <div
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
-        className={`relative w-full min-h-[500px] sm:min-h-[560px] md:min-h-[640px] lg:min-h-[720px] h-[70vh] sm:h-[75vh] md:h-[78vh] lg:h-[82vh] max-h-[860px] overflow-hidden flex items-end justify-center bg-[#2c1c11] ${
+        className={`relative w-full min-h-[440px] sm:min-h-[560px] md:min-h-[640px] lg:min-h-[720px] h-[64svh] sm:h-[75svh] md:h-[78svh] lg:h-[82svh] max-h-[860px] overflow-hidden flex items-end justify-center bg-[#2c1c11] ${
           isEditable ? 'cursor-grab active:cursor-grabbing group/banner' : ''
         }`}
       >
-        <Image
-          src={imgSrc || DEFAULT_BANNER_IMAGE}
+        {/* Ảnh đầu trang (LCP): thẻ img thường để có srcset (next/image `unoptimized` không có srcset), tải ngay với ưu tiên cao.
+            Ảnh phủ khung cao 500-860 px nên trên điện thoại phải rộng cỡ 2-2,8 lần màn hình: sizes giữ bậc 1920 ở đó, và hạ xuống 1280/960
+            ở máy tính, nơi 100vw đúng bằng chiều rộng cần. */}
+        <img
+          width={1920}
+          height={1080}
+          src={bannerSrc}
+          {...(bannerSet ? { srcSet: bannerSet, sizes: BANNER_SIZES } : {})}
           alt={title || 'Hero Banner Tông Chỉ Tu Học'}
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover transition-all duration-300 scale-105 pointer-events-none"
-          style={{ objectPosition: currentPos || 'center' }}
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 w-full h-full object-cover transition-all duration-300 scale-105 pointer-events-none"
+          style={{ objectPosition: currentPos || 'center', color: 'transparent' }}
           onError={() => {
             const rawFallback = getImageUrl(bannerUrl || bgImage);
             if (rawFallback && imgSrc !== rawFallback) {
@@ -146,7 +160,7 @@ export function HeroBanner({
             <div className="absolute top-3 left-3 z-40">
               <span
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                className="px-3 py-1 rounded-full bg-black/85 border border-[#F2C14E]/70 text-[#ffde59] text-[11px] font-bold shadow-lg backdrop-blur-md flex items-center gap-1.5"
+                className="px-3 py-1 rounded-full bg-black/85 border border-[#F2C14E]/70 text-[#ffde59] text-xs sm:text-[11px] font-bold shadow-lg sm:backdrop-blur-md flex items-center gap-1.5"
               >
                 <MoveVertical className="w-3.5 h-3.5 text-[#ffde59] shrink-0" />
                 <span>{isDragging ? currentPos : 'Kéo để căn chỉnh'}</span>
@@ -174,6 +188,8 @@ export function HeroBanner({
               <div className="relative group/emblem flex items-center justify-center">
                 <div className="absolute -inset-2 rounded-full bg-[#F2C14E]/25 blur-md pointer-events-none" />
                 <img
+                  width={256}
+                  height={256}
                   src={resolvedEmblem}
                   alt={emblemAlt || title || 'Biểu tượng linh thiêng Tùng Lâm Hòa Phúc'}
                   className="h-[48px] sm:h-[72px] md:h-[96px] lg:h-[116px] xl:h-[128px] w-auto object-contain drop-shadow-[0_0_20px_rgba(242,193,78,0.7)] transition-transform duration-300 group-hover/emblem:scale-105 select-none"
@@ -198,7 +214,7 @@ export function HeroBanner({
           {/* 3. Dấu kẻ trang trí hoa văn hoàng kim tỏa sang 2 bên */}
           <div className="relative w-full max-w-2xl sm:max-w-3xl flex items-center justify-center my-1 sm:my-1.5 px-4">
             <div className="flex-1 h-[1.5px]" style={{ background: "linear-gradient(to right, transparent, rgba(242,204,143,0.85))" }} />
-            <div className="mx-3 text-[#f2cc8f] text-[10px] bg-[#2c1c11] px-1 border border-[#f2cc8f]/80 rotate-45 w-3 h-3 flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(242,204,143,0.6)]" />
+            <div className="mx-3 text-[#f2cc8f] text-xs sm:text-[10px] bg-[#2c1c11] px-1 border border-[#f2cc8f]/80 rotate-45 w-3 h-3 flex items-center justify-center shrink-0 shadow-[0_0_10px_rgba(242,204,143,0.6)]" />
             <div className="flex-1 h-[1.5px]" style={{ background: "linear-gradient(to left, transparent, rgba(242,204,143,0.85))" }} />
           </div>
 
@@ -216,7 +232,7 @@ export function HeroBanner({
           {backLink && (
             <a
               href={backLink}
-              className="inline-flex items-center gap-2 text-[11px] sm:text-xs uppercase tracking-widest text-[#F2C14E] border border-[#F2C14E]/40 px-5 py-1.5 rounded-full bg-[#1C130D]/90 hover:bg-[#F2C14E] hover:text-[#2A1D14] transition-all shadow-xl mt-2 cursor-pointer z-20 hover:scale-105"
+              className="inline-flex items-center gap-2 text-xs sm:text-xs uppercase tracking-widest text-[#F2C14E] border border-[#F2C14E]/40 px-5 py-1.5 rounded-full bg-[#1C130D]/90 hover:bg-[#F2C14E] hover:text-[#2A1D14] transition-all shadow-xl mt-2 cursor-pointer z-20 hover:scale-105"
               style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: 'bold' }}
             >
               <svg className="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">

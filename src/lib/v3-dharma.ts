@@ -11,9 +11,9 @@ type Deleted = { id: string; wpPostId?: string | number; slug?: string };
 
 export type DharmaFeatured = { featured: PostItem[]; tongChi: PostItem[]; dongChay: PostItem[]; triTue: PostItem[] };
 
-const IMG_TONG_CHI = "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-hub-banner.webp";
-const IMG_DONG_CHAY = "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp";
-const IMG_TRI_TUE = "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp";
+const IMG_TONG_CHI = "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-hub-banner.webp";
+const IMG_DONG_CHAY = "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp";
+const IMG_TRI_TUE = "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp";
 
 /** "2026-11-03" or "2026/11/03 10:00" → "03/11/2026"; anything else as it is. */
 export function formatDate(rawDate?: string): string {
@@ -44,7 +44,7 @@ export function buildDharmaFeatured(allPosts: V3Post[], tongChiList: V3TongChi[]
 				category1: "Tông Chỉ Tu Học",
 				category2: item.categoryName || "NỀN TẢNG TU HỌC",
 				category1Url: "/tong-chi-tu-hoc",
-				category1IconUrl: "/images/icons/icon-tong-chi-tu-hoc.webp",
+				category1IconUrl: "/images/icons/icon-tong-chi-tu-hoc-256.webp",
 				title: item.title,
 				subtitle: item.subtitle || item.categoryName || "Tông Chỉ Tu Học",
 				description: item.excerpt || item.subtitle || "Hệ thống tông chỉ tu học kế thừa tông phong chư Tổ Tùng Lâm Hòa Phúc.",
@@ -66,7 +66,7 @@ export function buildDharmaFeatured(allPosts: V3Post[], tongChiList: V3TongChi[]
 				category1: "Dòng Chảy Hoằng Pháp",
 				category2: p.categoryName || p.subCategory || "HOẰNG PHÁP ĐỘ SINH",
 				category1Url: "/dong-chay-hoang-phap",
-				category1IconUrl: "/images/icons/icon-dong-chay-hoang-phap.webp",
+				category1IconUrl: "/images/icons/icon-dong-chay-hoang-phap-128.webp",
 				title: p.title,
 				subtitle: p.subtitle || p.categoryName || p.subCategory || "Dòng Chảy Hoằng Pháp",
 				description: p.summary || p.subtitle || "Hành trình lan tỏa chánh pháp, các sự kiện pháp hội và Phật sự trọng đại.",
@@ -89,7 +89,7 @@ export function buildDharmaFeatured(allPosts: V3Post[], tongChiList: V3TongChi[]
 				category1: "Trí Tuệ Phật Pháp",
 				category2: p.categoryName || p.subCategory || "PHÁP ÂM & KHAI THỊ",
 				category1Url: "/tri-tue-phat-phap",
-				category1IconUrl: isPhapAm ? "/images/icons/icon-phap-am.webp" : "/images/icons/icon-tri-tue-phat-phap.webp",
+				category1IconUrl: isPhapAm ? "/images/icons/icon-phap-am-128.webp" : "/images/icons/icon-tri-tue-phat-phap-128.webp",
 				title: p.title,
 				subtitle: p.subtitle || p.categoryName || p.subCategory || "Trí Tuệ Phật Pháp",
 				description: p.summary || p.subtitle || "Kho tàng giáo lý Phật đà, pháp âm giảng giải và các tác phẩm Phật học sâu sắc.",

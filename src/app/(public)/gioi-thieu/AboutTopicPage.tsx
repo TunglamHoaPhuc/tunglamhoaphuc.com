@@ -3,6 +3,8 @@
 // (gioi-thieu/[slug]); sáu địa chỉ cũ chỉ là lớp mỏng gọi lại đúng hàm này.
 import { GioiThieuDetailLayout } from '@/components/gioi-thieu/GioiThieuDetailLayout';
 import { TieuSuSuToOdysseyView } from '@/components/gioi-thieu/TieuSuSuToOdysseyView';
+import JsonLd from '@/components/public/JsonLd';
+import { breadcrumbJsonLd } from '@/lib/v3-jsonld';
 import { liveAbout } from '@/lib/v3-live';
 import { notFoundOrMoved } from '@/lib/v3-redirect';
 
@@ -14,9 +16,14 @@ export async function AboutTopicPage({ slug }: { slug: string }) {
   const topic = topics.find((t) => t.slug === slug);
   if (!topic) return notFoundOrMoved(`/gioi-thieu/${slug}`);
   const others = topics.filter((t) => t.slug !== topic.slug).map(({ id, slug: otherSlug, title, tag }) => ({ id, slug: otherSlug, title, tag }));
-  return slug === SU_TO_SLUG ? (
-    <TieuSuSuToOdysseyView detail={topic} others={others} slug={slug} />
-  ) : (
-    <GioiThieuDetailLayout detail={topic} others={others} slug={slug} />
+  return (
+    <>
+      <JsonLd data={breadcrumbJsonLd([{ name: 'Giới thiệu', path: '/gioi-thieu' }, { name: topic.title, path: `/gioi-thieu/${topic.slug}` }])} />
+      {slug === SU_TO_SLUG ? (
+        <TieuSuSuToOdysseyView detail={topic} others={others} slug={slug} />
+      ) : (
+        <GioiThieuDetailLayout detail={topic} others={others} slug={slug} />
+      )}
+    </>
   );
 }

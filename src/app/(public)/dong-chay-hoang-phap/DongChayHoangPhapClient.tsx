@@ -4,11 +4,15 @@ import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { dongChayBadge, type DongChayCategoryInfo, HoangPhapArticle } from '@/data/dong-chay-hoang-phap-data';
 import type { DongChayPage } from '@/lib/dong-chay';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { CategoryFilter } from '@/components/common/CategoryFilter';
 import { PostCard } from '@/components/common/PostCard';
 import { PostItem } from '@/types/post';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
+
+/** Hình nền đầu trang chỉ là lớp mờ 30% sau chữ: bậc 640 (điện thoại) và 1280 (máy tính), không cần nét, không được tranh băng thông với chữ. */
+const HEADER_BG_WIDTH = 640;
+const HEADER_BG_WIDTHS = [640, 1280] as const;
 
 type SortOption = 'newest' | 'oldest' | 'a-z' | 'z-a';
 
@@ -92,23 +96,31 @@ export default function DongChayHoangPhapClient({ initial, categories }: { initi
 
   // Ảnh nền đầu trang: bài mới nhất (cố định, không đổi theo trang đang xem).
   const featuredArticle = initial.items[0];
-  const headerBgImage = getImageUrl(
+  // Là hình nền mờ 30% trong khung đầu trang: bản 1280 px (biến thể dựng sẵn), không phải ảnh gốc.
+  const headerBgSource = getImageUrl(
     featuredArticle?.bannerUrl ||
     featuredArticle?.thumbnailUrl ||
-    '/images/toan-canh-chua.jpg'
+    '/images/hero/toan-canh-chua-1280.webp'
   );
+  const headerBgImage = fitImage(headerBgSource, HEADER_BG_WIDTH);
 
   return (
     <div className="min-h-screen bg-[#2A1D14] text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black">
       {/* ── HEADER VỚI BACKGROUND WATERMARK TÔNG PHONG TRUYỀN THỪA ── */}
       <div className="relative w-full overflow-hidden bg-[#2A1D14] pt-28 pb-10">
         {headerBgImage && (
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none mix-blend-luminosity [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]"
-            style={{
-              backgroundImage: `url('${headerBgImage}')`,
-              backgroundPosition: featuredArticle?.thumbnailPosition || featuredArticle?.imagePosition || 'center 20%',
-            }}
+          <img
+            src={headerBgImage}
+            srcSet={imageSrcSet(headerBgSource, HEADER_BG_WIDTHS)}
+            sizes="(min-width: 1024px) 100vw, 160px"
+            alt=""
+            aria-hidden="true"
+            width={640}
+            height={360}
+            fetchPriority="low"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none mix-blend-luminosity [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]"
+            style={{ objectPosition: featuredArticle?.thumbnailPosition || featuredArticle?.imagePosition || 'center 20%' }}
           />
         )}
         <div className="absolute inset-0 bg-gradient-to-b from-[#2A1D14]/40 via-[#2A1D14]/70 to-[#2A1D14] pointer-events-none" />
@@ -131,7 +143,7 @@ export default function DongChayHoangPhapClient({ initial, categories }: { initi
 
           <p
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className="text-xs sm:text-sm md:text-base text-[#e3d2c1] tracking-wide font-normal max-w-2xl mx-auto px-4 leading-relaxed text-balance"
+            className="text-sm md:text-base text-[#e3d2c1] tracking-wide font-normal max-w-2xl mx-auto px-4 leading-relaxed text-balance"
           >
             Ghi dấu hành trình phụng&nbsp;sự nhân&nbsp;sinh &amp; hoằng&nbsp;dương chánh&nbsp;pháp của Tùng&nbsp;Lâm&nbsp;Hòa&nbsp;Phúc.
           </p>
@@ -169,7 +181,7 @@ export default function DongChayHoangPhapClient({ initial, categories }: { initi
               <button
                 type="button"
                 onClick={() => load(view)}
-                className="px-4 py-1.5 rounded-lg border border-[#F2C14E] text-[#F2C14E] hover:bg-[#6B4B2A] font-bold"
+                className="px-4 py-2.5 min-h-11 sm:min-h-0 sm:py-1.5 rounded-lg border border-[#F2C14E] text-[#F2C14E] hover:bg-[#6B4B2A] font-bold"
               >
                 Thử lại
               </button>
@@ -180,18 +192,13 @@ export default function DongChayHoangPhapClient({ initial, categories }: { initi
             <p className="text-center py-16 text-[#e3d2c1]/80">Danh mục này chưa có bài viết.</p>
           ) : (
             <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 transition-opacity duration-300 ${loading ? 'opacity-50' : ''}`}>
-              {data.items.map((art) => (
-                <PostCard key={art.id} post={mapArticleToPostItem(art, categories)} variant="golden" />
+              {data.items.map((art, index) => (
+                <PostCard key={art.id} post={mapArticleToPostItem(art, categories)} variant="golden" priority={index === 0} />
               ))}
             </div>
           )}
 
           <Pagination page={data.page} pageCount={data.pageCount} total={data.total} disabled={loading} onPage={(page) => go({ ...view, page })} />
-        </div>
-
-        {/* ── KHUNG TRỢ LÝ AI PHẬT HỌC ── */}
-        <div className="mt-8 mb-12">
-          <SmartSearchAIBar contextTitle="Dòng Chảy Hoằng Pháp & Hoạt Động Tự Viện" />
         </div>
       </main>
     </div>
@@ -225,7 +232,7 @@ function Pagination({
 }) {
   if (pageCount <= 1) return null;
   const base =
-    'min-w-10 h-10 px-3 rounded-lg border text-sm font-bold flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed';
+    'min-w-11 h-11 sm:min-w-10 sm:h-10 px-3 rounded-lg border text-sm font-bold flex items-center justify-center transition-colors disabled:opacity-40 disabled:cursor-not-allowed';
   const idle = 'border-[#F2C14E]/40 text-[#e3d2c1] hover:border-[#F2C14E] hover:text-[#F2C14E]';
   return (
     <nav aria-label="Phân trang" className="mt-12 flex flex-col items-center gap-3" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
@@ -253,7 +260,7 @@ function Pagination({
           <ChevronRight className="w-4 h-4" />
         </button>
       </div>
-      <p className="text-xs text-[#e3d2c1]/70">
+      <p className="text-sm sm:text-xs text-[#e3d2c1]/70">
         Trang {page}/{pageCount} · {total} bài
       </p>
     </nav>
@@ -286,7 +293,7 @@ function mapArticleToPostItem(art: HoangPhapArticle, categories: DongChayCategor
 
   return {
     id: art.id,
-    imageUrl: art.thumbnailUrl || '/images/toan-canh-chua.jpg',
+    imageUrl: art.thumbnailUrl || '/images/hero/toan-canh-chua-1280.webp',
     category1: categoryName,
     category1IconUrl: categoryIconUrl,
     title: decodeHtmlEntities(art.title),

@@ -7,6 +7,12 @@ import { MEDIA_TYPE_OPTIONS } from "@/data/wisdom-archive-data";
 import { WisdomItem } from "@/types/wisdom-tags";
 import { MediaPlayModal } from "@/components/public/modals/MediaPlayModal";
 import { CustomDropdown } from "@/components/common/CustomDropdown";
+import { fitImage } from "@/utils/image";
+import { imageSrcSet } from "@/lib/tlhp-content/media";
+
+// Thẻ hiển thị 282–380 px (lưới 1/2/3/4 cột): chỉ xin bản vừa khung theo màn hình, không xin ảnh gốc.
+const CARD_WIDTHS = [360, 640, 960] as const;
+const CARD_SIZES = "(min-width: 1280px) 282px, (min-width: 1024px) 30vw, (min-width: 640px) 45vw, 92vw";
 
 interface WisdomCardProps {
   item: WisdomItem;
@@ -22,21 +28,25 @@ const WisdomCard = React.memo(({ item, onClick }: WisdomCardProps) => {
       {/* 1. Thumbnail Image */}
       <div className="relative w-full aspect-[16/10] overflow-hidden bg-[#1A120B] shrink-0">
         <img
-          src={item.thumbnailUrl}
+          src={fitImage(item.thumbnailUrl, 640)}
+          srcSet={imageSrcSet(item.thumbnailUrl, CARD_WIDTHS)}
+          sizes={CARD_SIZES}
           alt={item.title}
           loading="lazy"
           decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
           style={{ objectPosition: (item as any).thumbnailPosition || 'center center' }}
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
+            const el = e.currentTarget as HTMLImageElement;
+            el.removeAttribute('srcset');
+            el.src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#2C1C11] via-transparent to-black/40" />
 
         {/* Media type icon overlay */}
         <div
-          className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-[#F2C14E] bg-[#1C130D]/90 border border-[#F2C14E]/40 backdrop-blur-md"
+          className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs sm:text-[10px] font-bold uppercase tracking-wider text-[#F2C14E] bg-[#1C130D]/90 border border-[#F2C14E]/40 backdrop-blur-md"
           style={{ fontFamily: "'UTM Avo', sans-serif" }}
         >
           {item.type === 'audio' && <Volume2 className="w-3.5 h-3.5 inline mr-1 text-[#F2C14E]" />}
@@ -52,7 +62,7 @@ const WisdomCard = React.memo(({ item, onClick }: WisdomCardProps) => {
         <div className="space-y-1.5">
           <div
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className="text-[11px] font-bold text-[#F2C14E] tracking-wide flex items-center gap-1.5"
+            className="text-xs font-bold text-[#F2C14E] tracking-wide flex items-center gap-1.5"
           >
             <Sparkles className="w-3.5 h-3.5 text-[#F2C14E] shrink-0" />
             <span>{item.primaryCategoryTag}</span>
@@ -70,7 +80,7 @@ const WisdomCard = React.memo(({ item, onClick }: WisdomCardProps) => {
           <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/30 to-transparent my-2" />
           <div
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className={`flex items-center ${item.publishDate ? 'justify-between' : 'justify-end'} text-[11px] text-[#FFE5A3]/80 font-bold`}
+            className={`flex items-center ${item.publishDate ? 'justify-between' : 'justify-end'} text-xs text-[#FFE5A3]/80 font-bold`}
           >
             {item.publishDate && (
               <div className="flex items-center gap-1">
@@ -157,21 +167,21 @@ export const WisdomArchiveSection: FC<{ items: WisdomItem[] }> = ({ items }) => 
         <div className="flex flex-wrap items-center gap-3 flex-1 min-w-[280px]">
           {/* Nhãn LỰA CHỌN nhẹ nhàng thanh lịch */}
           <span
-            className="text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5"
+            className="text-xs font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5 w-full sm:w-auto"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             LỰA CHỌN:
           </span>
 
           {/* Search Box */}
-          <div className="relative flex-1 min-w-[180px] max-w-xs group">
+          <div className="relative flex-1 min-w-[180px] basis-full sm:basis-0 max-w-none sm:max-w-xs group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#F2C14E]/60 group-hover:text-[#F2C14E] transition-colors" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm bài viết, pháp âm..."
-              className="w-full pl-9 pr-3 py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 rounded-xl text-xs text-[#FFE5A3] placeholder-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E] hover:border-[#F2C14E]/70 transition-all shadow-inner"
+              className="w-full pl-9 pr-3 py-2.5 min-h-11 md:min-h-0 md:py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 rounded-xl text-base md:text-xs text-[#FFE5A3] placeholder-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E] hover:border-[#F2C14E]/70 transition-all shadow-inner"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             />
           </div>
@@ -202,7 +212,7 @@ export const WisdomArchiveSection: FC<{ items: WisdomItem[] }> = ({ items }) => 
         </div>
 
         {/* Result Count Badge */}
-        <div className="text-xs text-[#F2C14E] font-bold shrink-0 px-3 py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 rounded-xl border border-[#F2C14E]/35 shadow-sm" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+        <div className="text-sm sm:text-xs text-[#F2C14E] font-bold shrink-0 px-3 py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 rounded-xl border border-[#F2C14E]/35 shadow-sm" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
           {filteredItems.length} Nội dung
         </div>
       </div>
@@ -230,20 +240,19 @@ export const WisdomArchiveSection: FC<{ items: WisdomItem[] }> = ({ items }) => 
           <button
             type="button"
             onClick={() => setIsExpanded(true)}
-            className="px-8 py-3 bg-[#6B4B2A] hover:bg-[#8B6439] border border-[#F2C14E] text-[#F2C14E] hover:text-[#FFE5A3] font-bold text-sm rounded-xl transition-all duration-300 shadow-[0_10px_25px_rgba(0,0,0,0.7)] flex items-center gap-2 cursor-pointer uppercase tracking-wider"
+            className="px-5 sm:px-8 py-3 min-h-12 text-center bg-[#6B4B2A] hover:bg-[#8B6439] border border-[#F2C14E] text-[#F2C14E] hover:text-[#FFE5A3] font-bold text-sm rounded-xl transition-all duration-300 shadow-[0_10px_25px_rgba(0,0,0,0.7)] flex items-center gap-2 cursor-pointer uppercase tracking-wider"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             <span>XEM TẤT CẢ {filteredItems.length} PHÁP BẢO LƯU THÔNG</span>
-            <ChevronDown className="w-4 h-4" />
+            <ChevronDown className="w-4 h-4 shrink-0" />
           </button>
         </div>
       )}
 
       {/* ── 4. Mục Học Tiếng Tạng (Sara Book) ── */}
       <div className="mt-16 w-full">
-        <div className="relative overflow-hidden rounded-2xl border border-[#F2C14E]/40 bg-gradient-to-br from-[#2C1C11] via-[#1C130D] to-[#0F0A06] p-8 shadow-2xl">
+        <div className="relative overflow-hidden rounded-2xl border border-[#F2C14E]/40 bg-gradient-to-br from-[#2C1C11] via-[#1C130D] to-[#0F0A06] p-5 sm:p-8 shadow-2xl">
           {/* Background decoration */}
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'url("/images/tibetan-pattern.png")', backgroundSize: '200px' }} />
           <div className="absolute top-0 right-0 w-64 h-64 bg-[#F2C14E]/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl" />
 
           <div className="relative flex flex-col md:flex-row items-center gap-6">
@@ -260,7 +269,7 @@ export const WisdomArchiveSection: FC<{ items: WisdomItem[] }> = ({ items }) => 
               <h3 className="text-2xl font-bold text-[#F2C14E] mb-2" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 Học Tiếng Tạng (Sara Book)
               </h3>
-              <p className="text-sm text-[#c9b896]/80 max-w-lg" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+              <p className="text-base sm:text-sm text-[#c9b896]/90 max-w-lg" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 Học nghiên cứu tiếng Tạng qua bộ giáo trình Sara Book — công cụ học thuật quan trọng dành cho những ai muốn thâm nhập kho tàng triết học Phật giáo Tây Tạng nguyên bản.
               </p>
             </div>
@@ -268,8 +277,9 @@ export const WisdomArchiveSection: FC<{ items: WisdomItem[] }> = ({ items }) => 
             {/* CTA Button */}
             <Link
               href="/tri-tue-phat-phap/hoc-tieng-tang"
+              prefetch={false}
               id="btn-hoc-tieng-tang"
-              className="shrink-0 inline-flex items-center gap-2.5 px-6 py-3 bg-gradient-to-r from-[#C8860A] to-[#F2C14E] hover:from-[#F2C14E] hover:to-[#FFDE59] rounded-xl text-sm font-bold text-[#1C0A00] shadow-lg hover:shadow-[0_0_25px_rgba(242,193,78,0.6)] transition-all duration-300 group"
+              className="shrink-0 inline-flex items-center justify-center gap-2.5 w-full md:w-auto px-6 py-3.5 md:py-3 bg-gradient-to-r from-[#C8860A] to-[#F2C14E] hover:from-[#F2C14E] hover:to-[#FFDE59] rounded-xl text-sm font-bold text-[#1C0A00] shadow-lg hover:shadow-[0_0_25px_rgba(242,193,78,0.6)] transition-all duration-300 group"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
               <span>Vào Học Ngay</span>

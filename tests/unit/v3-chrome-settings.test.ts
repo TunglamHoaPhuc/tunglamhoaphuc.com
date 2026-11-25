@@ -141,12 +141,13 @@ test("thông báo: không có ngày hết hạn, hoặc ngày không đọc đư
 	assert.equal(noticeIsCurrent(1000, 1001), false);
 });
 
-test("thông báo: liên kết chỉ nhận đường dẫn trong trang hoặc https; trang V3 chưa có thì sang www; liên kết ngoài mở tab mới", () => {
+test("thông báo: liên kết chỉ nhận đường dẫn trong trang hoặc https; đường dẫn trong site giữ nguyên (cả trang V3 vừa có như /lien-he); liên kết ngoài mở tab mới", () => {
 	const link = (href: string, label = "Xem") => {
 		const n = noticeFromSetting({ ...NOTICE, link: { label, href } }, NOW);
 		return n.state === "on" ? n.link : "off";
 	};
-	assert.deepEqual(link("/lien-he"), { label: "Xem", href: "https://www.tunglamhoaphuc.com/lien-he", newTab: false });
+	assert.deepEqual(link("/lien-he"), { label: "Xem", href: "/lien-he", newTab: false });
+	assert.deepEqual(link("https://www.tunglamhoaphuc.com/lien-he"), { label: "Xem", href: "/lien-he", newTab: false });
 	assert.deepEqual(link("https://example.org/dang-ky"), { label: "Xem", href: "https://example.org/dang-ky", newTab: true });
 	assert.deepEqual(link("/lich-tu-hoc", ""), { label: "Xem thêm", href: "/lich-tu-hoc", newTab: false });
 	assert.equal(link("javascript:alert(1)"), null);

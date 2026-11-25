@@ -15,6 +15,8 @@ import {
   KNOWN_MONK_LOCATIONS, VIETNAM_PROVINCE_COORDINATES, getMonkLocation,
 } from '@/data/danh-tang-data';
 import { CustomDropdown } from '@/components/common/CustomDropdown';
+import { STATUE_ICON_SRC, LOGO_ROUND_SRC, swapOnError, fitProps, CARD_WIDTHS } from '@/features/universe/image-props';
+import { fitImage } from '@/utils/image';
 
 interface DanhTangMapProps {
   onExitMapMode?: () => void;
@@ -92,7 +94,7 @@ const RegionHubNode = React.memo(({ hub, count, isSelected, onSelect }: RegionHu
         }`} />
 
         {/* Golden Glassmorphic Hub Badge */}
-        <div className={`relative px-5 py-2.5 rounded-2xl border-2 backdrop-blur-md cursor-pointer transition-all duration-300 flex flex-col items-center justify-center ${
+        <div className={`relative px-5 py-2.5 rounded-2xl border-2 sm:backdrop-blur-md cursor-pointer transition-all duration-300 flex flex-col items-center justify-center ${
           isSelected
             ? 'bg-[#2C1C11] border-[#ffde59] text-[#ffde59] scale-110 shadow-[0_0_30px_rgba(242,193,78,0.9)]'
             : 'bg-[#1C130D]/90 border-[#F2C14E] text-[#FFE5A3] shadow-[0_0_20px_rgba(242,193,78,0.6)] hover:scale-105'
@@ -104,7 +106,7 @@ const RegionHubNode = React.memo(({ hub, count, isSelected, onSelect }: RegionHu
             {hub.title}
           </span>
           <span
-            className="text-[11px] text-[#FFE5A3] font-bold mt-0.5"
+            className="text-xs sm:text-[11px] text-[#FFE5A3] font-bold mt-0.5"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             {count > 0 ? `${count} VỊ DANH TĂNG` : hub.countLabel}
@@ -131,12 +133,12 @@ const MonkGridCard = React.memo(({ monk, onSelect }: MonkGridCardProps) => {
     >
       <div className="relative w-full h-[310px] overflow-hidden bg-[#1A120B] shrink-0">
         <img
-          src={monk.avatarUrl}
+          {...fitProps(monk.avatarUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 285px, (min-width: 768px) 30vw, (min-width: 640px) 46vw, calc(100vw - 32px)' })}
           alt={monk.name}
           loading="lazy"
           decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          onError={(e) => { (e.target as HTMLImageElement).src = '/images/icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.png'; }}
+          onError={swapOnError(LOGO_ROUND_SRC)}
         />
         <div
           className="absolute inset-0 pointer-events-none"
@@ -152,14 +154,12 @@ const MonkGridCard = React.memo(({ monk, onSelect }: MonkGridCardProps) => {
         <div className="relative w-full bg-gradient-to-b from-[#25170E] to-[#1C130D] px-3 pt-5 pb-4 text-center flex flex-col items-center justify-start">
           <div className="absolute top-[-24px] left-1/2 -translate-x-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#F2C14E] bg-[#25170E] flex items-center justify-center p-1 shadow-[0_0_18px_rgba(242,193,78,0.65)] overflow-hidden">
             <img
-              src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+              src={STATUE_ICON_SRC}
               alt="Biểu tượng Bảo tượng"
               loading="lazy"
               decoding="async"
               className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-              }}
+              onError={swapOnError(LOGO_ROUND_SRC)}
             />
           </div>
 
@@ -532,7 +532,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
   // ══════════════════════════════════════════════════════
   if (viewMode === 'map') {
     return (
-      <div className="w-screen h-screen fixed inset-0 z-50 bg-[#2c1c11] overflow-hidden select-none">
+      <div className="fixed inset-0 w-full h-dvh z-50 bg-[#2c1c11] overflow-hidden select-none">
         {/* Background Audio */}
         <audio
           ref={audioRef}
@@ -548,7 +548,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
         <button
           type="button"
           onClick={toggleAudio}
-          className="fixed bottom-5 left-5 z-50 w-10 h-10 rounded-full bg-[#1C130D]/80 border border-[#F2C14E]/40 flex items-center justify-center text-[#FFE5A3] cursor-pointer hover:scale-110 transition-all shadow-lg backdrop-blur-md"
+          className="fixed bottom-5 left-5 z-50 w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[#1C130D]/80 border border-[#F2C14E]/40 flex items-center justify-center text-[#FFE5A3] cursor-pointer hover:scale-110 transition-all shadow-lg sm:backdrop-blur-md"
           title={isPlayingAudio ? 'Tắt âm thanh nền' : 'Bật âm thanh nền'}
         >
           {isPlayingAudio ? (
@@ -570,7 +570,8 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
             >
               <div className="absolute inset-0 z-0 bg-[#2c1c11]">
                 <img
-                  src={DANH_TANG_MAP_IMAGE}
+                  // Nền mờ (blur) phủ cả màn hình: bậc 1280.
+                  src={fitImage(DANH_TANG_MAP_IMAGE, 1280)}
                   alt="Bản đồ Danh Tăng"
                   className="w-full h-full object-cover scale-105 blur-sm"
                   loading="lazy"
@@ -585,7 +586,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                     initial={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.7 }}
-                    className="absolute inset-0 z-10 bg-[#0D0907]/80 backdrop-blur-sm flex flex-col items-center justify-center text-[#FFE5A3] p-4"
+                    className="absolute inset-0 z-10 bg-[#0D0907]/80 sm:backdrop-blur-sm flex flex-col items-center justify-center text-[#FFE5A3] p-4"
                   >
                     <div className="w-14 h-14 rounded-full bg-[#2C1C11] border border-[#F2C14E]/40 flex items-center justify-center text-[#F2C14E] mb-6 shadow-[0_0_25px_rgba(242,193,78,0.4)]">
                       <span className="text-3xl animate-spin">☸</span>
@@ -659,7 +660,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
 
         {/* ── TOP LEFT TOGGLE BUTTON PILL ── */}
         <div className="absolute top-5 left-6 z-30 flex items-center">
-          <div className="flex items-center bg-[#1C130D]/90 border border-[#F2C14E]/40 rounded-full p-1 shadow-2xl backdrop-blur-md">
+          <div className="flex items-center bg-[#1C130D]/90 border border-[#F2C14E]/40 rounded-full p-1 shadow-2xl sm:backdrop-blur-md">
             <button
               type="button"
               onClick={() => setViewMode('map')}
@@ -683,7 +684,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
         </div>
 
         {/* ── 3 COMPACT GOLDEN TOOL DOCK BUTTONS (VERTICALLY ALIGNED ALONG LEFT EDGE) ── */}
-        <div className="fixed left-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3.5 bg-[#1C130D]/90 backdrop-blur-md border border-[#F2C14E]/40 p-2 rounded-2xl shadow-2xl">
+        <div className="fixed left-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3.5 bg-[#1C130D]/90 sm:backdrop-blur-md border border-[#F2C14E]/40 p-2 rounded-2xl shadow-2xl">
           {/* Button 1: Quay lại Vũ Trụ */}
           {onExitMapMode && (
             <button
@@ -831,13 +832,13 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                   onChange={(e) => setChatInput(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleSendChatMessage()}
                   placeholder="Hỏi về danh tăng, lịch sử..."
-                  className="flex-1 px-3 py-1.5 bg-[#2C1C11] border border-[#F2C14E]/30 rounded-lg text-xs text-[#FFE5A3] placeholder-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E]"
+                  className="flex-1 px-3 py-2.5 sm:py-1.5 bg-[#2C1C11] border border-[#F2C14E]/30 rounded-lg text-base sm:text-xs text-[#FFE5A3] placeholder-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E]"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 />
                 <button
                   type="button"
                   onClick={handleSendChatMessage}
-                  className="w-8 h-8 rounded-lg bg-[#F2C14E] text-[#1C130D] flex items-center justify-center cursor-pointer hover:scale-105 transition-all"
+                  className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#F2C14E] text-[#1C130D] flex items-center justify-center cursor-pointer hover:scale-105 transition-all"
                 >
                   <Send className="w-4 h-4" />
                 </button>
@@ -867,7 +868,8 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
           >
             {/* FULL SCREEN BACKGROUND MAP IMAGE */}
             <img
-              src={DANH_TANG_MAP_IMAGE}
+              // Bản đồ phủ cả màn hình, kéo và phóng to được: bậc lớn nhất 1920.
+              src={fitImage(DANH_TANG_MAP_IMAGE, 1920)}
               alt="Bản đồ Danh Tăng Việt Nam"
               className="w-full h-full object-cover select-none pointer-events-auto block filter brightness-95 contrast-105"
               loading="lazy"
@@ -894,7 +896,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
           </div>
 
           {/* ── DISCLAIMER NOTE AT BOTTOM ── */}
-          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 pointer-events-none text-[11px] text-[#FFE5A3]/50 italic text-center px-4" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 pointer-events-none text-xs sm:text-[11px] text-[#FFE5A3]/50 italic text-center px-4" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
             * Hình ảnh sơ đồ tạo bởi Gemini AI chỉ mang tính minh họa
           </div>
 
@@ -909,7 +911,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: '100%', opacity: 0 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-                className="side-panel-scroll absolute right-0 top-0 bottom-0 w-full sm:w-[440px] z-40 overflow-y-auto border-l p-6 flex flex-col gap-4"
+                className="side-panel-scroll absolute right-0 top-16 sm:top-0 bottom-0 w-full sm:w-[440px] z-40 overflow-y-auto border-l p-6 flex flex-col gap-4"
                 style={{
                   background: 'linear-gradient(160deg, rgba(44,28,17,0.98) 0%, rgba(28,18,11,0.99) 100%)',
                   borderColor: 'rgba(242,193,78,0.4)',
@@ -940,7 +942,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                       <button
                         type="button"
                         onClick={handleResetRegionHub}
-                        className="w-8 h-8 rounded-full bg-black/60 border border-[#F2C14E]/40 text-[#F2C14E] flex items-center justify-center cursor-pointer hover:scale-110 transition-all shadow-md"
+                        className="w-11 h-11 sm:w-8 sm:h-8 rounded-full bg-black/60 border border-[#F2C14E]/40 text-[#F2C14E] flex items-center justify-center cursor-pointer hover:scale-110 transition-all shadow-md"
                         title="Đóng Bảng"
                       >
                         <X className="w-4 h-4" />
@@ -961,11 +963,11 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                             {/* Larger Avatar Frame (Golden Ratio Proportions) */}
                             <div className="relative w-16 h-20 rounded-xl overflow-hidden border-2 border-[#F2C14E]/50 shrink-0 bg-[#1A120B] shadow-md group-hover:border-[#F2C14E]">
                               <img
-                                src={monk.avatarUrl}
+                                {...fitProps(monk.avatarUrl, { width: 160 })}
                                 alt={monk.name}
                                 className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                                 loading="lazy"
-                                onError={(e) => { (e.target as HTMLImageElement).src = '/images/icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.png'; }}
+                                onError={swapOnError(LOGO_ROUND_SRC)}
                               />
                             </div>
 
@@ -988,7 +990,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
 
                               <div className="flex items-center gap-2">
                                 <span
-                                  className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                                  className={`px-2.5 py-0.5 rounded-full text-xs sm:text-[10px] font-bold ${
                                     isNi
                                       ? 'bg-pink-950/80 text-pink-300 border border-pink-500/40'
                                       : 'bg-[#F2C14E]/15 text-[#F2C14E] border border-[#F2C14E]/40'
@@ -998,7 +1000,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                                   {monk.hoi_chung}
                                 </span>
                                 <span
-                                  className="px-2.5 py-0.5 rounded-full text-[10px] text-[#c9b896] bg-[#1C130D] border border-[#c9b896]/30 truncate max-w-[140px]"
+                                  className="px-2.5 py-0.5 rounded-full text-xs sm:text-[10px] text-[#c9b896] bg-[#1C130D] border border-[#c9b896]/30 truncate max-w-[140px]"
                                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                                 >
                                   {monk.sect}
@@ -1044,7 +1046,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                       <button
                         type="button"
                         onClick={handleResetRegionHub}
-                        className="w-8 h-8 rounded-full bg-black/60 border border-[#F2C14E]/40 text-[#F2C14E] flex items-center justify-center cursor-pointer hover:scale-110 transition-all shadow-md"
+                        className="w-11 h-11 sm:w-8 sm:h-8 rounded-full bg-black/60 border border-[#F2C14E]/40 text-[#F2C14E] flex items-center justify-center cursor-pointer hover:scale-110 transition-all shadow-md"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -1055,11 +1057,11 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                       {/* Portrait */}
                       <div className="relative w-44 h-56 rounded-2xl overflow-hidden border-2 border-[#F2C14E] shadow-2xl mb-4">
                         <img
-                          src={selectedMapMonk.avatarUrl}
+                          {...fitProps(selectedMapMonk.avatarUrl, { width: 640, widths: [360, 640], sizes: '176px' })}
                           alt={selectedMapMonk.name}
                           className="w-full h-full object-cover object-top"
                           loading="lazy"
-                          onError={(e) => { (e.target as HTMLImageElement).src = '/images/icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.png'; }}
+                          onError={swapOnError(LOGO_ROUND_SRC)}
                         />
                       </div>
 
@@ -1106,7 +1108,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                       {/* Bio */}
                       {selectedMapMonk.bio && (
                         <p
-                          className="text-xs md:text-sm text-[#D3C0AD] leading-relaxed text-justify mt-2"
+                          className="text-sm text-[#D3C0AD] leading-relaxed text-left sm:text-justify mt-2"
                           style={{ fontFamily: "'UTM Avo', sans-serif" }}
                         >
                           {selectedMapMonk.bio}
@@ -1116,10 +1118,10 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                       {/* Pháp ngữ */}
                       {selectedMapMonk.phapNgu && (
                         <blockquote
-                          className="w-full border-l-2 border-[#F2C14E] bg-[#3a2718]/80 p-3.5 italic text-xs md:text-sm text-[#FFE5A3] rounded-r-xl leading-relaxed text-left mt-4 shadow-md"
+                          className="w-full border-l-2 border-[#F2C14E] bg-[#3a2718]/80 p-3.5 italic text-sm text-[#FFE5A3] rounded-r-xl leading-relaxed text-left mt-4 shadow-md"
                           style={{ fontFamily: "'UTM Avo', sans-serif" }}
                         >
-                          <span className="text-[#F2C14E] font-bold not-italic text-[10px] uppercase tracking-wider block mb-1">
+                          <span className="text-[#F2C14E] font-bold not-italic text-xs sm:text-[10px] uppercase tracking-wider block mb-1">
                             Pháp Ngữ
                           </span>
                           "{selectedMapMonk.phapNgu}"
@@ -1160,7 +1162,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
           </div>
 
           {/* Toggle Pill at Top-Right (Positioned at the red oval & arrow in screenshot) */}
-          <div className="flex items-center bg-[#1C130D]/90 border border-[#F2C14E]/40 rounded-full p-1 shadow-2xl backdrop-blur-md shrink-0 self-start md:self-auto">
+          <div className="flex items-center bg-[#1C130D]/90 border border-[#F2C14E]/40 rounded-full p-1 shadow-2xl sm:backdrop-blur-md shrink-0 self-start md:self-auto">
             <button
               type="button"
               onClick={() => setViewMode('map')}
@@ -1187,7 +1189,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
         <div className="flex flex-wrap items-center gap-3 mt-6 pb-2">
           {/* Nhãn LỰA CHỌN nhẹ nhàng thanh lịch */}
           <span
-            className="text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5"
+            className="text-xs sm:text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             LỰA CHỌN:
@@ -1201,7 +1203,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm tên danh tăng..."
-              className="w-full pl-9 pr-3 py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 rounded-xl text-xs text-[#FFE5A3] placeholder-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E] hover:border-[#F2C14E]/70 transition-all shadow-inner"
+              className="w-full pl-9 pr-3 py-2.5 sm:py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 rounded-xl text-base sm:text-xs text-[#FFE5A3] placeholder-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E] hover:border-[#F2C14E]/70 transition-all shadow-inner"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             />
           </div>
@@ -1330,7 +1332,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="px-8 py-3 rounded-full bg-[#2C1C11] border border-[#F2C14E]/60 text-[#F2C14E] text-xs font-bold hover:bg-[#F2C14E] hover:text-[#2C1C11] transition-all cursor-pointer shadow-lg uppercase tracking-wider"
+              className="px-8 py-3 min-h-11 rounded-full bg-[#2C1C11] border border-[#F2C14E]/60 text-[#F2C14E] text-xs font-bold hover:bg-[#F2C14E] hover:text-[#2C1C11] transition-all cursor-pointer shadow-lg uppercase tracking-wider"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
               {isExpanded ? 'THU GỌN DANH SÁCH' : 'XEM THÊM DANH SÁCH'}
@@ -1376,7 +1378,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
               <button
                 type="button"
                 onClick={() => setSelectedMonk(null)}
-                className="absolute top-3 right-3 z-20 w-9 h-9 rounded-full bg-black/60 border border-[#c8aa6e]/40 text-white/80 hover:text-white flex items-center justify-center cursor-pointer"
+                className="absolute top-3 right-3 z-20 w-11 h-11 sm:w-9 sm:h-9 rounded-full bg-black/60 border border-[#c8aa6e]/40 text-white/80 hover:text-white flex items-center justify-center cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1399,11 +1401,11 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                   style={{ borderColor: 'rgba(242,193,78,0.5)', aspectRatio: '3/4' }}
                 >
                   <img
-                    src={selectedMonk.avatarUrl}
+                    {...fitProps(selectedMonk.avatarUrl, { width: 960, widths: [640, 960], sizes: '(min-width: 768px) 360px, 90vw' })}
                     alt={selectedMonk.name}
                     loading="lazy"
                     className="w-full h-full object-cover object-top"
-                    onError={(e) => { (e.target as HTMLImageElement).src = '/images/icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.png'; }}
+                    onError={swapOnError(LOGO_ROUND_SRC)}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1C130D]/60 via-transparent to-transparent" />
                 </div>
@@ -1426,13 +1428,13 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
 
                     <div className="flex flex-wrap gap-1.5 mb-2">
                       <span
-                        className="px-2.5 py-0.5 rounded-full text-[10px] font-bold border text-[#F2C14E] border-[#F2C14E]/40 bg-[#F2C14E]/10"
+                        className="px-2.5 py-0.5 rounded-full text-xs sm:text-[10px] font-bold border text-[#F2C14E] border-[#F2C14E]/40 bg-[#F2C14E]/10"
                         style={{ fontFamily: "'UTM Avo', sans-serif" }}
                       >
                         {selectedMonk.era}
                       </span>
                       <span
-                        className="px-2.5 py-0.5 rounded-full text-[10px] font-bold border text-[#c9b896] border-[#c9b896]/40 bg-[#c9b896]/10"
+                        className="px-2.5 py-0.5 rounded-full text-xs sm:text-[10px] font-bold border text-[#c9b896] border-[#c9b896]/40 bg-[#c9b896]/10"
                         style={{ fontFamily: "'UTM Avo', sans-serif" }}
                       >
                         {selectedMonk.sub_era}
@@ -1456,7 +1458,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                   {/* Bio */}
                   {selectedMonk.bio && (
                     <p
-                      className="text-xs md:text-sm text-[#D3C0AD] leading-relaxed text-justify"
+                      className="text-sm text-[#D3C0AD] leading-relaxed text-left sm:text-justify"
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     >
                       {selectedMonk.bio}
@@ -1469,7 +1471,7 @@ export const DanhTangMap: FC<DanhTangMapProps> = ({ onExitMapMode }) => {
                       className="border-l-2 border-[#F2C14E] bg-[#3a2718]/60 p-3 italic text-xs text-[#FFE5A3] rounded-r-lg leading-relaxed"
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     >
-                      <span className="text-[#F2C14E] font-bold not-italic text-[10px] uppercase tracking-wider block mb-1">
+                      <span className="text-[#F2C14E] font-bold not-italic text-xs sm:text-[10px] uppercase tracking-wider block mb-1">
                         Pháp Ngữ
                       </span>
                       "{selectedMonk.phapNgu}"

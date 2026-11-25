@@ -12,7 +12,25 @@ import {
   MapPin, 
   ChevronDown
 } from 'lucide-react';
-import { getImageUrl, getHighResImageUrl, getOptimizedNextImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
+import { fallbackOnError, imageSources } from '@/lib/image-sources';
+
+/** Ảnh thay thế khi cả ảnh thu nhỏ lẫn ảnh gốc đều hỏng. */
+const GALLERY_FALLBACK_IMAGE = '/images/hero/toan-canh-chua-1280.webp';
+/** Ô lưới: ảnh thu nhỏ (360/640/960/1280), mặc định 640 px. Ảnh phủ ô (object-cover) nên ô cao (1 cột x 2 hàng, 2x2) cần ảnh rộng cỡ chiều cao nhân tỉ lệ. */
+const TILE_IMAGE_WIDTHS = [360, 640, 960, 1280] as const;
+const TILE_SIZES = {
+  tall: '(max-width: 639px) 130vw, 600px',
+  wide: '(max-width: 639px) 100vw, 490px',
+  small: '(max-width: 639px) 100vw, 340px',
+} as const;
+/** Bố cục bento lặp 8 ô một vòng (xem getBentoSpan): ô 0 (2x2) và 2 (1x2) cao, ô 4 và 7 ngang 2 cột, còn lại ô vừa. */
+const tileSizes = (index: number) => {
+  const slot = index % 8;
+  return slot === 0 || slot === 2 ? TILE_SIZES.tall : slot === 4 || slot === 7 ? TILE_SIZES.wide : TILE_SIZES.small;
+};
+/** Hộp phóng to: bậc 1920 (hộp rộng tối đa 896 px, kéo phóng đến 4 lần), một tệp cho mọi màn hình. */
+const LIGHTBOX_IMAGE_WIDTH = 1920;
 
 export interface AnhTuLieu {
   imageUrl?: string;
@@ -136,30 +154,30 @@ export function PhotoGallery({
     switch (mod) {
       case 0:
         // Thẻ Hero Bento nổi bật (2 cột x 2 hàng trên desktop)
-        return 'col-span-1 md:col-span-2 row-span-2 min-h-[340px] md:min-h-[460px]';
+        return 'col-span-1 md:col-span-2 row-span-2 max-sm:row-span-1 md:min-h-[460px]';
       case 1:
         // Thẻ vừa (1 cột x 1 hàng)
-        return 'col-span-1 row-span-1 min-h-[220px] md:min-h-[250px]';
+        return 'col-span-1 row-span-1 md:min-h-[250px]';
       case 2:
         // Thẻ ảnh dọc (1 cột x 2 hàng)
-        return 'col-span-1 row-span-2 min-h-[340px] md:min-h-[460px]';
+        return 'col-span-1 row-span-2 max-sm:row-span-1 md:min-h-[460px]';
       case 3:
         // Thẻ vừa (1 cột x 1 hàng)
-        return 'col-span-1 row-span-1 min-h-[220px] md:min-h-[250px]';
+        return 'col-span-1 row-span-1 md:min-h-[250px]';
       case 4:
         // Thẻ ảnh ngang panorama (2 cột x 1 hàng)
-        return 'col-span-1 md:col-span-2 row-span-1 min-h-[230px] md:min-h-[260px]';
+        return 'col-span-1 md:col-span-2 row-span-1 md:min-h-[260px]';
       case 5:
         // Thẻ vừa (1 cột x 1 hàng)
-        return 'col-span-1 row-span-1 min-h-[220px] md:min-h-[250px]';
+        return 'col-span-1 row-span-1 md:min-h-[250px]';
       case 6:
         // Thẻ vừa (1 cột x 1 hàng)
-        return 'col-span-1 row-span-1 min-h-[220px] md:min-h-[250px]';
+        return 'col-span-1 row-span-1 md:min-h-[250px]';
       case 7:
         // Thẻ ảnh ngang panorama (2 cột x 1 hàng)
-        return 'col-span-1 md:col-span-2 row-span-1 min-h-[230px] md:min-h-[260px]';
+        return 'col-span-1 md:col-span-2 row-span-1 md:min-h-[260px]';
       default:
-        return 'col-span-1 row-span-1 min-h-[220px]';
+        return 'col-span-1 row-span-1 md:min-h-[220px]';
     }
   };
 
@@ -201,10 +219,9 @@ export function PhotoGallery({
       {/* ── LƯỚI ADAPTIVE BENTO BOX ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 w-full auto-rows-[minmax(180px,auto)]">
         {visibleItems.map((item, idx) => {
-          const rawSrc = getImageUrl(item.imageUrl || item.url) || '/images/toan-canh-chua.jpg';
-          const directHighRes = getHighResImageUrl(item.imageUrl || item.url) || rawSrc;
-          // Lưới Bento dùng ảnh WebP tối ưu qua GPU/SIMD Sharp (1080px, nén chỉ ~70-120KB)
-          const previewSrc = getOptimizedNextImageUrl(item.imageUrl || item.url, 1080, 75) || directHighRes;
+          const original = getImageUrl(item.imageUrl || item.url) || GALLERY_FALLBACK_IMAGE;
+          // Lưới Bento dùng biến thể dựng sẵn (AVIF/WebP, 360 đến 1280 px theo ô và màn hình), không bao giờ tải ảnh gốc hàng MB cho ô cỡ 240-480 px
+          const tile = imageSources(original, 640, TILE_IMAGE_WIDTHS, tileSizes(idx));
           const spanClass = getBentoSpan(idx);
           const captionText = item.noiDung || item.caption || '';
           const titleText = item.title && item.title !== 'Ảnh tư liệu' ? item.title : '';
@@ -215,25 +232,17 @@ export function PhotoGallery({
               onClick={() => {
                 setLightboxIndex(idx);
               }}
-              className={`group relative ${spanClass} rounded-2xl overflow-hidden border border-[#f2c14e]/35 hover:border-[#ffde59] shadow-xl hover:shadow-[0_0_20px_rgba(255,222,89,0.25)] cursor-pointer bg-[#1C120A] transition-all duration-500`}
+              className={`group relative aspect-[4/3] md:aspect-auto ${spanClass} rounded-2xl overflow-hidden border border-[#f2c14e]/35 hover:border-[#ffde59] shadow-xl hover:shadow-[0_0_20px_rgba(255,222,89,0.25)] cursor-pointer bg-[#1C120A] transition-all duration-500`}
             >
-              {/* Hình ảnh tối ưu hóa WebP siêu nét và nhẹ */}
-              <img
-                src={previewSrc}
+              {/* Hình ảnh tối ưu hóa AVIF/WebP vừa cỡ ô */}
+              <img width={640} height={480}
+                {...tile}
                 alt={titleText || captionText || `Ảnh tư liệu ${idx + 1}`}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
                 style={{ objectPosition: item.imagePosition || 'center 50%' }}
                 loading="lazy"
-                onError={(e) => {
-                  const target = e.currentTarget as HTMLImageElement;
-                  if (target.src !== directHighRes && directHighRes) {
-                    target.src = directHighRes;
-                  } else if (target.src !== rawSrc && rawSrc) {
-                    target.src = rawSrc;
-                  } else {
-                    target.src = '/images/toan-canh-chua.jpg';
-                  }
-                }}
+                decoding="async"
+                onError={fallbackOnError(original !== tile.src ? original : null, GALLERY_FALLBACK_IMAGE)}
               />
 
               {/* Lớp phủ Gradient dịu mắt ở chân ảnh */}
@@ -243,14 +252,14 @@ export function PhotoGallery({
               <div className="absolute top-3 left-3 z-10">
                 <span 
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                  className="px-2.5 py-1 rounded-lg bg-[#1a1008]/85 border border-[#c8aa6e]/60 text-[10px] sm:text-xs font-bold text-[#ffde59] tracking-wider shadow-md backdrop-blur-xs"
+                  className="px-2.5 py-1 rounded-lg bg-[#1a1008]/85 border border-[#c8aa6e]/60 text-xs sm:text-xs font-bold text-[#ffde59] tracking-wider shadow-md backdrop-blur-xs"
                 >
                   {idx + 1}/{totalCount}
                 </span>
               </div>
 
               {/* ── GIAO DIỆN HOVER CHUẨN NGHỆ THUẬT PHẬT GIÁO (KHUNG VIỀN KÉP HOÀNG KIM) ── */}
-              <div className="absolute inset-0 bg-gradient-to-t from-[#25170E]/90 via-[#3D2817]/65 to-transparent backdrop-blur-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col items-center justify-center p-3 sm:p-5 text-center pointer-events-none z-20">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#25170E]/90 via-[#3D2817]/65 to-transparent sm:backdrop-blur-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col items-center justify-center p-3 sm:p-5 text-center pointer-events-none z-20">
                 <div className="absolute inset-3 sm:inset-4 md:inset-5 rounded-xl md:rounded-2xl border border-[#ffde59]/70 bg-[#452a15]/85 flex flex-col items-center justify-center p-3 sm:p-5 text-center shadow-[0_0_30px_rgba(242,193,78,0.3)]">
                   <h3
                     style={{ fontFamily: "'UTM ClassizismAntiqua', 'UTM_ClassizismAntiqua', serif" }}
@@ -263,7 +272,7 @@ export function PhotoGallery({
 
                   <p
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                    className="text-[#e3d2c1] text-xs sm:text-sm font-normal leading-relaxed tracking-wide px-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] text-center line-clamp-3 sm:line-clamp-4"
+                    className="text-[#e3d2c1] text-sm font-normal leading-relaxed tracking-wide px-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] text-center line-clamp-3 sm:line-clamp-4"
                   >
                     {captionText || item.khuVuc || 'Ảnh tư liệu ghi lại tại Tùng Lâm Hòa Phúc'}
                   </p>
@@ -294,12 +303,12 @@ export function PhotoGallery({
       {/* ── POP-UP LIGHTBOX MODAL CHUẨN NGHỆ THUẬT PHẬT GIÁO (HỖ TRỢ ZOOM & PAN) ── */}
       {lightboxIndex !== null && currentItem && (
         <div 
-          className="fixed inset-0 z-[300] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-5 select-none animate-in fade-in duration-200"
+          className="fixed inset-0 z-[300] bg-black/85 sm:backdrop-blur-md flex items-center justify-center p-3 sm:p-5 select-none animate-in fade-in duration-200"
           onClick={() => setLightboxIndex(null)}
         >
           {/* MODAL CONTAINER */}
           <div 
-            className="relative max-w-4xl w-full rounded-2xl border border-[#F2C14E]/60 bg-[#25170E] p-4 sm:p-6 md:p-7 shadow-[0_0_60px_rgba(0,0,0,0.95)] flex flex-col items-center max-h-[95vh] overflow-y-auto"
+            className="relative max-w-4xl w-full rounded-2xl border border-[#F2C14E]/60 bg-[#25170E] p-4 sm:p-6 md:p-7 shadow-[0_0_60px_rgba(0,0,0,0.95)] flex flex-col items-center max-h-[95svh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* 1. HEADER BAR */}
@@ -315,7 +324,7 @@ export function PhotoGallery({
                 type="button"
                 onClick={() => setLightboxIndex(null)}
                 aria-label="Đóng (ESC)"
-                className="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl border border-[#F2C14E]/50 bg-[#1C120B]/80 flex items-center justify-center text-[#F2C14E] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-md"
+                className="absolute right-0 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-9 sm:h-9 rounded-xl border border-[#F2C14E]/50 bg-[#1C120B]/80 flex items-center justify-center text-[#F2C14E] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-md"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -342,7 +351,7 @@ export function PhotoGallery({
                   e.stopPropagation();
                   setLightboxIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : items.length - 1));
                 }}
-                className="absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full border border-[#F2C14E]/60 bg-[#1C120B]/80 hover:bg-[#F2C14E] text-[#FFE5A3] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-lg hover:scale-105 active:scale-95"
+                className="absolute left-2.5 sm:left-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-10 sm:h-10 rounded-full border border-[#F2C14E]/60 bg-[#1C120B]/80 hover:bg-[#F2C14E] text-[#FFE5A3] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-lg hover:scale-105 active:scale-95"
                 title="Ảnh trước (Mũi tên trái)"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -356,24 +365,13 @@ export function PhotoGallery({
                 }}
               >
                 <img
-                  src={
-                    getOptimizedNextImageUrl(currentItem.imageUrl || currentItem.url, 1920, 75) ||
-                    getHighResImageUrl(currentItem.imageUrl || currentItem.url) ||
-                    getImageUrl(currentItem.imageUrl || currentItem.url)
-                  }
+                  key={lightboxIndex}
+                  src={fitImage(getImageUrl(currentItem.imageUrl || currentItem.url), LIGHTBOX_IMAGE_WIDTH)}
                   alt={currentItem.title || 'Ảnh tư liệu'}
                   className="max-h-full max-w-full object-contain pointer-events-none drop-shadow-2xl"
                   draggable={false}
-                  onError={(e) => {
-                    const target = e.currentTarget as HTMLImageElement;
-                    const directHighRes = getHighResImageUrl(currentItem.imageUrl || currentItem.url);
-                    const rawFallback = getImageUrl(currentItem.imageUrl || currentItem.url);
-                    if (target.src !== directHighRes && directHighRes) {
-                      target.src = directHighRes;
-                    } else if (target.src !== rawFallback && rawFallback) {
-                      target.src = rawFallback;
-                    }
-                  }}
+                  decoding="async"
+                  onError={fallbackOnError(getImageUrl(currentItem.imageUrl || currentItem.url))}
                 />
               </div>
 
@@ -384,7 +382,7 @@ export function PhotoGallery({
                   e.stopPropagation();
                   setLightboxIndex((prev) => (prev !== null && prev < items.length - 1 ? prev + 1 : 0));
                 }}
-                className="absolute right-2.5 sm:right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full border border-[#F2C14E]/60 bg-[#1C120B]/80 hover:bg-[#F2C14E] text-[#FFE5A3] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-lg hover:scale-105 active:scale-95"
+                className="absolute right-2.5 sm:right-4 top-1/2 -translate-y-1/2 z-30 w-11 h-11 sm:w-10 sm:h-10 rounded-full border border-[#F2C14E]/60 bg-[#1C120B]/80 hover:bg-[#F2C14E] text-[#FFE5A3] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-lg hover:scale-105 active:scale-95"
                 title="Ảnh tiếp theo (Mũi tên phải)"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -392,7 +390,7 @@ export function PhotoGallery({
 
               {/* Zoom Control Toolbar Floating Bottom-Right */}
               <div
-                className="absolute bottom-3 right-3 z-30 flex items-center gap-1.5 p-1.5 rounded-xl border border-[#F2C14E]/40 bg-[#1C120B]/90 backdrop-blur-md shadow-lg"
+                className="absolute bottom-3 right-3 z-30 flex items-center gap-1.5 p-1.5 rounded-xl border border-[#F2C14E]/40 bg-[#1C120B]/90 sm:backdrop-blur-md shadow-lg"
                 onClick={(e) => e.stopPropagation()}
               >
                 <button
@@ -421,7 +419,7 @@ export function PhotoGallery({
                 </button>
                 <span 
                   style={{ fontFamily: "'UTM Avo', sans-serif" }} 
-                  className="text-[11px] text-[#F2C14E] px-1 font-bold tracking-tight"
+                  className="text-xs sm:text-[11px] text-[#F2C14E] px-1 font-bold tracking-tight"
                 >
                   {Math.round(zoomScale * 100)}%
                 </span>
@@ -446,7 +444,7 @@ export function PhotoGallery({
 
                 <p
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                  className="text-xs sm:text-sm text-[#e3d2c1] font-normal leading-relaxed text-justify [text-align-last:left]"
+                  className="text-sm text-[#e3d2c1] font-normal leading-relaxed text-left sm:text-justify [text-align-last:left]"
                 >
                   {currentItem.noiDung || currentItem.caption || 'Hình ảnh tư liệu tôn nghiêm tại Tùng Lâm Hòa Phúc.'}
                 </p>
@@ -463,7 +461,7 @@ export function PhotoGallery({
               {/* BÊN PHẢI: KHU VỰC / VỊ TRÍ (BỎ KHUNG BỌC, GIỮ CHỮ TINH TẾ) */}
               {currentItem.khuVuc && (
                 <div className="shrink-0 w-full md:w-auto md:min-w-[170px] md:max-w-[250px] flex flex-col gap-1.5 text-left pt-1">
-                  <div className="flex items-center gap-1.5 text-[#F2C14E] text-[11px] uppercase tracking-wider">
+                  <div className="flex items-center gap-1.5 text-[#F2C14E] text-xs sm:text-[11px] uppercase tracking-wider">
                     <MapPin className="w-3.5 h-3.5 text-[#ffde59] shrink-0" />
                     <span
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
@@ -474,7 +472,7 @@ export function PhotoGallery({
                   </div>
                   <p
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                    className="text-xs sm:text-sm text-[#FFE5A3] italic font-medium leading-relaxed pl-5"
+                    className="text-sm text-[#FFE5A3] italic font-medium leading-relaxed pl-5"
                   >
                     {currentItem.khuVuc}
                   </p>

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { BookOpen, ExternalLink, Layers } from 'lucide-react';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 
 export interface ReferenceBookItem {
   id?: string;
@@ -24,7 +24,7 @@ export function ReferenceBooksSection({ books = [] }: ReferenceBooksSectionProps
 
   return (
     <div className="my-12 w-full max-w-4xl mx-auto">
-      <div className="rounded-3xl border border-[#F2C14E]/35 bg-[#170C06]/90 backdrop-blur-md p-5 sm:p-7 md:p-8 shadow-[0_15px_45px_rgba(0,0,0,0.85)] relative overflow-hidden">
+      <div className="rounded-3xl border border-[#F2C14E]/35 bg-[#170C06]/90 sm:backdrop-blur-md p-5 sm:p-7 md:p-8 shadow-[0_15px_45px_rgba(0,0,0,0.85)] relative overflow-hidden">
         {/* Subtle decorative glow */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#F2C14E]/5 rounded-full blur-3xl pointer-events-none" />
 
@@ -62,8 +62,9 @@ export function ReferenceBooksSection({ books = [] }: ReferenceBooksSectionProps
               >
                 {/* Book Cover */}
                 <div className="relative w-16 h-20 sm:w-20 sm:h-24 rounded-xl overflow-hidden border border-[#F2C14E]/35 shadow-md flex-shrink-0 bg-black/40">
-                  <img
-                    src={getImageUrl(book.coverImage) || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/uploads/chua-pho-chieu-hai-phong-1787464212629.webp'}
+                  <img width={300} height={400}
+                    // Bìa 64–80 px: bản 160.
+                    src={fitImage(getImageUrl(book.coverImage) || '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp', 160)}
                     alt={book.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"

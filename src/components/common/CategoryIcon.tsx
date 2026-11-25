@@ -18,6 +18,7 @@ import {
   HelpCircle,
 } from "lucide-react";
 import { getCategoryInfo } from "@/data/taxonomy";
+import { fitImage } from "@/utils/image";
 
 export interface CategoryIconProps {
   categoryName?: string;
@@ -67,7 +68,7 @@ export function getCategory1Icon(
   if (iconUrl) {
     return (
       <img loading="lazy" decoding="async"
-        src={iconUrl}
+        src={fitImage(iconUrl, 160)}
         alt={categoryName || "category icon"}
         className={`object-contain shrink-0 ${className}`}
       />
@@ -91,7 +92,7 @@ export function getCategory1Icon(
   if (taxUrl) {
     return (
       <img loading="lazy" decoding="async"
-        src={taxUrl}
+        src={fitImage(taxUrl, 160)}
         alt={categoryName || "category icon"}
         className={`object-contain shrink-0 ${className}`}
       />

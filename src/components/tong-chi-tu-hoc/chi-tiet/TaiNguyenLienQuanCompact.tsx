@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Play, BookOpen, Images, ExternalLink, X, ArrowUpRight } from 'lucide-react';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 import { SourceBookData } from './BookCitationSection';
 import { AnhTuLieu } from './PhotoGallery';
 
@@ -69,7 +70,10 @@ export function TaiNguyenLienQuanCompact({
   const videoUrl = videoBlock?.videoUrl || '';
   const videoEmbed = formatYoutubeEmbed(videoUrl);
   const videoTitle = videoBlock?.title || '';
-  const videoThumb = getImageUrl(heroBanner) || '/images/toan-canh-chua.jpg';
+  // Thẻ video rộng khoảng 280 px (di động ~350 px), tỉ lệ 16:9.
+  const videoThumb = fitImage(getImageUrl(heroBanner) || '/images/hero/toan-canh-chua-1280.webp', 640);
+  const videoThumbSet = imageSrcSet(getImageUrl(heroBanner) || '/images/hero/toan-canh-chua-1280.webp', [360, 640, 960]);
+  const VIDEO_THUMB_SIZES = '(min-width: 768px) 280px, calc(100vw - 64px)';
 
   const previewPhotos = photoGallery.slice(0, 4);
 
@@ -102,8 +106,10 @@ export function TaiNguyenLienQuanCompact({
         <div className="rounded-2xl bg-gradient-to-b from-[#2A180E] to-[#1A0E07] border border-[#F2C14E]/35 hover:border-[#F2C14E] transition-all p-4 flex flex-col justify-between group shadow-lg hover:shadow-[0_8px_30px_rgba(242,193,78,0.18)]">
           <div>
             <div className="relative aspect-video rounded-xl overflow-hidden mb-3.5 border border-[#F2C14E]/30 bg-black/60 group-hover:border-[#F2C14E]/60 transition-colors">
-              <img
+              <img width={640} height={480}
                 src={videoThumb}
+                srcSet={videoThumbSet}
+                sizes={VIDEO_THUMB_SIZES}
                 alt={videoTitle}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-85 group-hover:opacity-100"
                 loading="lazy"
@@ -117,7 +123,7 @@ export function TaiNguyenLienQuanCompact({
               >
                 <Play className="w-5 h-5 fill-current ml-0.5" />
               </button>
-              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[11px] text-[#FFE5A3]">
+              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-xs sm:text-[11px] text-[#FFE5A3]">
                 <span className="bg-black/70 px-2 py-0.5 rounded-md backdrop-blur-xs font-mono">Pháp Thoại</span>
                 <span className="bg-[#8B4513]/90 text-[#FFDE59] px-2 py-0.5 rounded-md font-semibold">Bồ Đề Tâm</span>
               </div>
@@ -168,17 +174,18 @@ export function TaiNguyenLienQuanCompact({
           <div>
             <div className="relative aspect-video rounded-xl overflow-hidden mb-3.5 border border-[#F2C14E]/30 bg-black/40 p-2 flex items-center justify-center group-hover:border-[#F2C14E]/60 transition-colors">
               <div className="h-full flex items-center justify-center gap-3">
-                <img
-                  src={getImageUrl(mainBook.coverImage) || '/images/sach-mau.jpg'}
+                <img width={300} height={400}
+                  // Bìa cao khoảng 140 px: bản 360.
+                  src={fitImage(getImageUrl(mainBook.coverImage) || '/images/sach-mau.jpg', 360)}
                   alt={mainBook.bookTitle || mainBook.title || 'Sách tham khảo'}
                   className="h-full w-auto object-contain rounded-md shadow-md border border-[#F2C14E]/40 group-hover:scale-105 transition-transform"
                   loading="lazy"
                 />
                 <div className="text-left text-xs space-y-1">
-                  <span className="inline-block px-1.5 py-0.5 rounded bg-[#F2C14E]/20 text-[#FFDE59] text-[10px] font-bold uppercase">
+                  <span className="inline-block px-1.5 py-0.5 rounded bg-[#F2C14E]/20 text-[#FFDE59] text-xs sm:text-[10px] font-bold uppercase">
                     Tàng Kinh Các
                   </span>
-                  <p className="text-[11px] text-[#FFE5A3]/90 font-medium line-clamp-2">
+                  <p className="text-xs sm:text-[11px] text-[#FFE5A3]/90 font-medium line-clamp-2">
                     {mainBook.author || ''}
                   </p>
                 </div>
@@ -232,8 +239,9 @@ export function TaiNguyenLienQuanCompact({
               {previewPhotos.length > 0 ? (
                 previewPhotos.map((p, idx) => (
                   <div key={idx} className="relative h-full overflow-hidden rounded">
-                    <img
-                      src={getImageUrl(p.imageUrl || p.url) || '/images/toan-canh-chua.jpg'}
+                    <img width={640} height={480}
+                      // Ô xem trước 137–170 px: bản 360.
+                      src={fitImage(getImageUrl(p.imageUrl || p.url) || '/images/hero/toan-canh-chua-1280.webp', 360)}
                       alt={p.title || `Ảnh tư liệu ${idx + 1}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       loading="lazy"
@@ -242,15 +250,17 @@ export function TaiNguyenLienQuanCompact({
                 ))
               ) : (
                 <div className="col-span-2 flex items-center justify-center h-full">
-                  <img
+                  <img width={640} height={480}
                     src={videoThumb}
+                    srcSet={videoThumbSet}
+                    sizes={VIDEO_THUMB_SIZES}
                     alt="Bộ sưu tập ảnh"
                     className="w-full h-full object-cover rounded"
                   />
                 </div>
               )}
               <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors flex items-center justify-center">
-                <span className="px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-xs text-[#FFDE59] text-[11px] font-bold border border-[#F2C14E]/50 shadow-md">
+                <span className="px-2.5 py-1 rounded-full bg-black/75 backdrop-blur-xs text-[#FFDE59] text-xs sm:text-[11px] font-bold border border-[#F2C14E]/50 shadow-md">
                   +{photoGallery.length} hình ảnh
                 </span>
               </div>
@@ -275,7 +285,7 @@ export function TaiNguyenLienQuanCompact({
             <button
               type="button"
               onClick={() => onSelectPhoto && onSelectPhoto(0)}
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#F2C14E] hover:text-[#FFDE59] transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 min-h-11 -my-2 text-xs font-bold text-[#F2C14E] hover:text-[#FFDE59] transition-colors cursor-pointer"
             >
               <span>Xem bộ sưu tập</span>
               <Images className="w-3 h-3" />
@@ -290,7 +300,7 @@ export function TaiNguyenLienQuanCompact({
       {isVideoModalOpen && (
         <div
           onClick={() => setIsVideoModalOpen(false)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-md animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 sm:backdrop-blur-md animate-in fade-in"
         >
           <div
             onClick={(e) => e.stopPropagation()}
@@ -301,7 +311,7 @@ export function TaiNguyenLienQuanCompact({
               <button
                 type="button"
                 onClick={() => setIsVideoModalOpen(false)}
-                className="p-1 rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                aria-label="Đóng video" className="w-11 h-11 -mr-2 flex items-center justify-center rounded-lg text-white/80 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>

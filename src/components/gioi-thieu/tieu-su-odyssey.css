@@ -93,6 +93,7 @@ dialog.odyssey-dialog:modal {
   padding: 0;
   max-width: min(94vw, 1080px);
   max-height: 92vh;
+  max-height: 92dvh;
   overflow: visible;
   color: #e3d2c1;
 }

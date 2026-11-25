@@ -41,11 +41,17 @@ test("menu đầu trang: cây hai cấp theo thứ tự admin; mục ẩn và đ
 	assert.equal(nav[0].children[0].newTab, false);
 });
 
-test("địa chỉ: trang V3 có thì giữ, trang V3 không có thì dùng trang cùng địa chỉ ở www, https giữ nguyên", async () => {
+test("địa chỉ: đường dẫn trong site giữ nguyên (V3 là site chính, không đẩy sang www), địa chỉ www/tên miền gốc thành đường dẫn, https khác giữ nguyên", async () => {
 	const nav = menuToNav((await readMenu(seed(), "header")) ?? []);
 	assert.equal(nav.find((n) => n.label === "Lịch tu học")?.href, "/lich-tu-hoc");
-	assert.equal(nav.find((n) => n.label === "Liên hệ")?.href, "https://www.tunglamhoaphuc.com/lien-he");
-	assert.equal(nav.find((n) => n.label === "Đặt trước")?.href, "https://www.tunglamhoaphuc.com/dang-ky");
+	assert.equal(nav.find((n) => n.label === "Liên hệ")?.href, "/lien-he");
+	assert.equal(nav.find((n) => n.label === "Đặt trước")?.href, "/dang-ky");
+	assert.equal(menuHref("/tim-kiem?q=niem+phat"), "/tim-kiem?q=niem+phat");
+	assert.equal(menuHref("/trang-chua-co"), "/trang-chua-co");
+	assert.equal(menuHref("https://www.tunglamhoaphuc.com/lien-he#ban-do"), "/lien-he#ban-do");
+	assert.equal(menuHref("https://tunglamhoaphuc.com"), "/");
+	assert.equal(menuHref("https://www.tunglamhoaphuc.com.evil.example/x"), "https://www.tunglamhoaphuc.com.evil.example/x");
+	assert.equal(menuHref("https://example.org/dang-ky"), "https://example.org/dang-ky");
 	assert.equal(menuHref("/gioi-thieu#nguoi-lien-quan"), "/gioi-thieu#nguoi-lien-quan");
 	assert.equal(menuHref(""), "#");
 	assert.equal(menuHref("javascript:alert(1)"), "#");

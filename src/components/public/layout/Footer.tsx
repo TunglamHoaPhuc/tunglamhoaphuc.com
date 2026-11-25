@@ -73,7 +73,7 @@ export const Footer: FC = () => {
   return (
     <footer
       id="footer"
-      className="relative overflow-hidden pt-16 pb-10 px-6 md:px-10 border-t z-10"
+      className="relative overflow-hidden pt-16 pb-[max(2.5rem,env(safe-area-inset-bottom))] px-4 md:px-10 border-t z-10"
       style={{
         background: "linear-gradient(180deg, #3D2B1F 0%, #2A1D14 100%)",
         borderColor: "rgba(242,193,78,0.2)",
@@ -106,7 +106,7 @@ export const Footer: FC = () => {
         />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+      <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8 w-full relative z-10">
 
         {/* ── Logo Tròn Chính Giữa + Tiêu Đề UTM Niagara Font-Normal & Subtitle ── */}
         <div className="flex flex-col items-center mb-10 text-center">
@@ -118,11 +118,13 @@ export const Footer: FC = () => {
             className="mx-auto flex justify-center items-center mb-4 md:mb-6 p-[2px] bg-gradient-to-tr from-[#F2C14E] via-[#FFE5A3] to-[#B8860B] rounded-full shadow-[0_0_25px_rgba(242,193,78,0.55)] hover:shadow-[0_0_35px_rgba(242,193,78,0.85)] hover:scale-105 transition-all duration-300 cursor-pointer group"
           >
             <img loading="lazy" decoding="async"
-              src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp"
+              src="/brand/logo-tung-lam-hoa-phuc-tron-192.webp"
+              width={192}
+              height={192}
               alt="Logo Tùng Lâm Hòa Phúc"
               className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover bg-white/95 p-[1px] group-hover:scale-105 transition-transform duration-300"
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-moc-an.webp';
+                (e.currentTarget as HTMLImageElement).src = '/brand/logo-moc-an.webp';
               }}
             />
           </button>
@@ -157,7 +159,7 @@ export const Footer: FC = () => {
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Xem bản đồ chỉ đường đến chùa (mở trong tab mới)"
-              className="mt-3 inline-flex items-center gap-1.5 text-xs md:text-sm text-[#F2C14E] hover:underline"
+              className="mt-1 md:mt-3 inline-flex items-center gap-1.5 min-h-11 md:min-h-0 text-sm text-[#F2C14E] hover:underline"
               style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: 'bold' }}
             >
               <MapPin className="w-4 h-4 shrink-0" aria-hidden="true" />
@@ -197,7 +199,7 @@ export const Footer: FC = () => {
                           rel="noopener noreferrer"
                           aria-label={`${label} (mở trong tab mới)`}
                           title={label}
-                          className="w-9 h-9 rounded-full flex items-center justify-center text-white shadow-md transition-all hover:scale-110 cursor-pointer"
+                          className="w-11 h-11 md:w-9 md:h-9 rounded-full flex items-center justify-center text-white shadow-md transition-all hover:scale-110 cursor-pointer"
                           style={{ background: bg }}
                         >
                           <Icon className="w-4 h-4" />
@@ -222,7 +224,7 @@ export const Footer: FC = () => {
                   <Clock className="w-4 h-4 text-[#F2C14E] shrink-0" />
                   <span>Giờ mở cửa đón Phật tử:</span>
                 </p>
-                <p className="pl-6 text-xs sm:text-sm md:text-sm text-[#e3d2c1]">{openingHours}</p>
+                <p className="pl-6 text-sm text-[#e3d2c1]">{openingHours}</p>
               </div>
             )}
           </div>
@@ -247,16 +249,16 @@ export const Footer: FC = () => {
               
               {/* Mỗi vai trò một dòng (tối đa hai người một dòng): số điện thoại do admin lưu ở D1, chưa có thì các dòng có sẵn. */}
               {contactRows.map((row, i) => (
-                <div key={`${row.role}-${i}`} className="flex items-start md:items-center gap-2 text-xs sm:text-sm lg:text-[15px] text-[#e3d2c1] whitespace-normal md:whitespace-nowrap">
+                <div key={`${row.role}-${i}`} className="flex items-start md:items-center gap-2 text-sm lg:text-[15px] text-[#e3d2c1] whitespace-normal md:whitespace-nowrap">
                   <Phone className="w-4 h-4 text-[#F2C14E] shrink-0 mt-0.5 md:mt-0" />
-                  <div className="flex flex-wrap items-center gap-1.5 md:gap-2 leading-normal">
+                  <div className="flex flex-col items-start gap-2 md:flex-row md:flex-wrap md:items-center md:gap-2 leading-normal">
                     <span className="font-medium text-[#E2C89B]">{row.role}:</span>
                     {row.people.map((person, j) => (
-                      <span key={`${person.name}-${person.phone}`} className="contents">
-                        {j > 0 && <span className="text-[#E2C89B]">–</span>}
+                      <span key={`${person.name}-${person.phone}`} className="flex flex-wrap items-center gap-x-2 md:contents">
+                        {j > 0 && <span className="hidden md:inline text-[#E2C89B]">–</span>}
                         <span className="font-medium text-[#E2C89B]">{person.name}{row.people.length > 1 ? ':' : ''}</span>
-                        {row.people.length === 1 && <span className="text-[#E2C89B]">–</span>}
-                        <a href={`tel:${person.phone}`} className="font-bold text-[#F2C14E] hover:underline">
+                        {row.people.length === 1 && <span className="hidden md:inline text-[#E2C89B]">–</span>}
+                        <a href={`tel:${person.phone}`} className="inline-flex items-center min-h-11 md:min-h-0 font-bold text-[#F2C14E] hover:underline">
                           {formatPhone(person.phone)}
                         </a>
                       </span>

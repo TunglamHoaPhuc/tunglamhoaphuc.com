@@ -82,6 +82,10 @@ test("tlhp-content (V3) và libs/content (www): cùng danh sách tệp, nội du
 	for (const file of mine) compare(file, toWww(file));
 });
 
+test("renew-async.ts (đọc D1 giữ theo hạn, không chia sẻ lần đọc đang chạy) của V3 giống libs/renew-async.ts của www", { skip: SKIP_WWW }, () => {
+	compare(path.join(V3, "lib/renew-async.ts"), toWww(path.join(V3, "lib/renew-async.ts")));
+});
+
 test("bộ lọc HTML của V3 (tlhp-admin/content/html.ts, special/html.ts) giống bản của www", { skip: SKIP_WWW }, () => {
 	for (const rel of ["lib/tlhp-admin/content/html.ts", "lib/tlhp-admin/special/html.ts"]) compare(path.join(V3, rel), toWww(path.join(V3, rel)));
 });

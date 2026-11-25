@@ -73,7 +73,7 @@ export function buildTongChiSections(articles: Article[]): SectionData[] {
         id: a.id,
         title: a.title,
         subtitle: a.subtitle || a.excerpt || '',
-        imageUrl: a.bannerImage || '/images/toan-canh-chua.jpg',
+        imageUrl: a.bannerImage || '/images/hero/toan-canh-chua-1280.webp',
         imagePosition: a.bannerPosition || 'center 20%',
         thumbnailPosition: a.bannerPosition || 'center 20%',
         link: `/tong-chi-tu-hoc/${a.slug}`,

@@ -40,10 +40,10 @@ export const NEWS_STATUE_CODE = "TP0001";
 
 /** What a card's picture is when its item has none: design, not data (the same temple pictures V3's other blocks use). */
 const FALLBACK_IMAGE = {
-	post: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
-	tongChi: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-hub-banner.webp",
-	statue: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
-	suTo: "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/07-anh-tho-cac-vi-cao-tang/su-to-ngo-chan-tu/hinh-su-to-final-19d1002.webp",
+	post: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
+	tongChi: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-hub-banner.webp",
+	statue: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp",
+	suTo: "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/07-anh-tho-cac-vi-cao-tang/su-to-ngo-chan-tu/hinh-su-to-final-19d1002.webp",
 };
 
 /** Where V3 opens a post of each section. */
@@ -54,14 +54,14 @@ export function postHref(post: Pick<V3Post, "mainCategory" | "slug">): string {
 /** The mark of a card by where it comes from, and for posts by their category. */
 export function newsIcon(mainCategory?: string, subCategory?: string): string {
 	const sub = (subCategory || "").toLowerCase();
-	if (mainCategory === "tong-chi-tu-hoc") return "/images/icons/icon-tong-chi-tu-hoc.webp";
-	if (mainCategory === "bao-tuong") return "/images/icons/icon-cac-bao-tuong-noi-bat.webp";
-	if (mainCategory === "tri-tue-phat-phap") return sub === "phap-am" ? "/images/icons/icon-phap-am.webp" : "/images/icons/icon-tri-tue-phat-phap.webp";
-	if (sub === "khoa-le-truyen-thong") return "/images/icons/icon-khoa-le-truyen-thong.png";
-	if (sub === "dai-le-su-kien") return "/images/icons/icon-dai-le-su-kien.png";
-	if (sub === "cong-tu" || sub === "su-kien-dinh-ky") return "/images/icons/icon-cong-tu.png";
-	if (sub === "tinh-do-nhan-gian") return "/images/icons/icon-tinh-do-nhan-gian.png";
-	return "/images/icons/icon-dong-chay-hoang-phap.webp";
+	if (mainCategory === "tong-chi-tu-hoc") return "/images/icons/icon-tong-chi-tu-hoc-256.webp";
+	if (mainCategory === "bao-tuong") return "/images/icons/icon-cac-bao-tuong-noi-bat-224.webp";
+	if (mainCategory === "tri-tue-phat-phap") return sub === "phap-am" ? "/images/icons/icon-phap-am-128.webp" : "/images/icons/icon-tri-tue-phat-phap-128.webp";
+	if (sub === "khoa-le-truyen-thong") return "/images/icons/icon-khoa-le-truyen-thong-128.webp";
+	if (sub === "dai-le-su-kien") return "/images/icons/icon-dai-le-su-kien-128.webp";
+	if (sub === "cong-tu" || sub === "su-kien-dinh-ky") return "/images/icons/icon-cong-tu-128.webp";
+	if (sub === "tinh-do-nhan-gian") return "/images/icons/icon-tinh-do-nhan-gian-128.webp";
+	return "/images/icons/icon-dong-chay-hoang-phap-128.webp";
 }
 
 const titleKey = (title: string) => title.toLocaleLowerCase("vi").replace(/\s+/g, " ").trim();

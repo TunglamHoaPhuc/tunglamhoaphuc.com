@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { SuToKaraokeReader } from './SuToKaraokeReader';
 import type { GioiThieuTopicDetail } from '@/data/gioi-thieu-data';
 import type { OtherAboutTopic } from './GioiThieuDetailLayout';
@@ -32,6 +31,8 @@ import {
   X,
 } from 'lucide-react';
 import './tieu-su-odyssey.css';
+import { fitImage } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 interface Props {
   /** Chủ đề đọc từ D1 (đã là chủ đề đang hiển thị); phần còn lại của trang là thiết kế riêng. */
@@ -71,14 +72,14 @@ interface GalleryItem {
 }
 
 const S3_SU_TO_BASE =
-  'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/07-anh-tho-cac-vi-cao-tang/su-to-ngo-chan-tu';
+  '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/07-anh-tho-cac-vi-cao-tang/su-to-ngo-chan-tu';
 
 const FALLBACK_CHUA_IMG =
-  'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
+  '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
 const IMG_ARTWORK_BAO_TUONG =
-  'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/05-bao-tuong-phat-giao/chu_lich_dai_to_su/su_to_ngo_chan_tu.webp';
+  '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/05-bao-tuong-phat-giao/chu_lich_dai_to_su/su_to_ngo_chan_tu.webp';
 const IMG_ARCHIVE_PORTRAIT =
-  'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/07-anh-tho-cac-vi-cao-tang/anh-hoa-thuong-tong-hop/nam/nam/Hoa-Thuong-Ngo-Chan-Tu.webp';
+  '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/07-anh-tho-cac-vi-cao-tang/anh-hoa-thuong-tong-hop/nam/nam/Hoa-Thuong-Ngo-Chan-Tu.webp';
 const IMG_THUO_MOI_TU = `${S3_SU_TO_BASE}/su-to-ngo-chan-tu-thuo-moi-tu-hanh.webp`;
 const IMG_PINNED_HERO_SU_TO = `${S3_SU_TO_BASE}/hinh-su-to-final-19d1002.webp`;
 const IMG_SPOTLIGHT_HOA_PHUC = `${S3_SU_TO_BASE}/su-to-ky-niem-ngay-sinh-hoa-phuc.webp`;
@@ -100,7 +101,7 @@ const IMG_GIO_TO_35 = `${S3_SU_TO_BASE}/gio-to-chua-hoang-phap-lan-35.webp`;
 const IMG_THAP_TO_1 = `${S3_SU_TO_BASE}/bao-thap-nhi-nghiem-su-to.webp`;
 const IMG_THAP_TO_2 = `${S3_SU_TO_BASE}/cong-thap-nhi-nghiem.webp`;
 const IMG_GIO_TO_HOA_PHUC_T10 =
-  'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-11-an-duc-to-thay.webp';
+  '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/calendar_webp/thang-11-an-duc-to-thay.webp';
 
 // Ảnh bìa đầu sách Sư Tổ biên soạn
 const BOOK_NGHI_LUAT = `${S3_SU_TO_BASE}/sach-nghi-luat-tu-tri-thiet-yeu.webp`;
@@ -1317,7 +1318,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
           <button
             type="button"
             onClick={handleEnterLedMode}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[#F2C14E]/60 bg-[#1A1009]/92 text-[#FFDE59] text-[11px] font-bold uppercase tracking-wider shadow-[0_8px_28px_rgba(0,0,0,0.75)] backdrop-blur-md hover:bg-[#F2C14E] hover:text-black transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFDE59]"
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-[#F2C14E]/60 bg-[#1A1009]/92 text-[#FFDE59] text-xs md:text-[11px] font-bold uppercase tracking-wider shadow-[0_8px_28px_rgba(0,0,0,0.75)] backdrop-blur-md hover:bg-[#F2C14E] hover:text-black transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFDE59]"
           >
             <MonitorPlay className="w-3.5 h-3.5" />
             <span>Trình Chiếu LED</span>
@@ -1325,7 +1326,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
           <button
             type="button"
             onClick={() => setIsQrModalOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-[#F2C14E]/45 bg-[#1A1009]/92 text-[#FFE5A3] text-[11px] font-bold uppercase tracking-wider shadow-[0_8px_28px_rgba(0,0,0,0.75)] backdrop-blur-md hover:border-[#FFDE59] hover:text-[#FFDE59] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFDE59]"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full border border-[#F2C14E]/45 bg-[#1A1009]/92 text-[#FFE5A3] text-xs md:text-[11px] font-bold uppercase tracking-wider shadow-[0_8px_28px_rgba(0,0,0,0.75)] backdrop-blur-md hover:border-[#FFDE59] hover:text-[#FFDE59] transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFDE59]"
           >
             <QrCode className="w-3.5 h-3.5" />
             <span>Mã QR Sự Kiện</span>
@@ -1354,7 +1355,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
               key={navItem.id}
               type="button"
               onClick={() => scrollToSection(navItem.id)}
-              className={`group flex items-center gap-2.5 text-[11px] uppercase tracking-[0.18em] transition-colors cursor-pointer py-1 px-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFDE59] ${
+              className={`group flex items-center gap-2.5 text-xs md:text-[11px] uppercase tracking-[0.18em] transition-colors cursor-pointer py-1 px-2 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFDE59] ${
                 isActive ? 'text-[#FFDE59] font-bold' : 'text-[#e3d2c1]/45 hover:text-[#F2C14E]'
               }`}
             >
@@ -1392,9 +1393,10 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
             >
               <div className="odyssey-hero-feather-x relative w-full h-full md:w-auto md:max-w-full md:aspect-[15000/21941]">
                 <Image
-                  src={heroImgSrc}
+                  src={fitImage(heroImgSrc, 1920)}
                   alt={topic.title || 'Sư Tổ Ngộ Chân Tử'}
                   fill
+                  unoptimized
                   priority
                   sizes="(max-width: 768px) 100vw, 760px"
                   className="odyssey-hero-feather-y object-cover object-[center_16%] md:object-top"
@@ -1417,7 +1419,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
               <>
                 <Link
                   href="/gioi-thieu"
-                  className="absolute top-[106px] left-4 sm:top-20 sm:left-12 z-20 inline-flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 min-h-[38px] rounded-full border border-[#F2C14E]/45 bg-[#1C110A]/85 text-[#F2C14E] text-[11px] sm:text-xs font-bold uppercase tracking-widest hover:bg-[#F2C14E] hover:text-black transition-all shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFDE59]"
+                  className="absolute top-[106px] left-4 sm:top-20 sm:left-12 z-20 inline-flex items-center gap-1.5 sm:gap-2 px-3.5 sm:px-4 py-1.5 min-h-11 sm:min-h-[38px] rounded-full border border-[#F2C14E]/45 bg-[#1C110A]/85 text-[#F2C14E] text-xs sm:text-xs font-bold uppercase tracking-widest hover:bg-[#F2C14E] hover:text-black transition-all shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFDE59]"
                   style={{ opacity: Math.max(0.2, heroOpacity) }}
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
@@ -1428,7 +1430,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                 <button
                   type="button"
                   onClick={() => setIsQrModalOpen(true)}
-                  className="md:hidden absolute top-[106px] right-4 z-20 inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[38px] rounded-full border border-[#F2C14E]/45 bg-[#1C110A]/85 text-[#FFE5A3] text-[11px] font-bold uppercase tracking-wider hover:bg-[#F2C14E] hover:text-black transition-all shadow-lg cursor-pointer"
+                  className="md:hidden absolute top-[106px] right-4 z-20 inline-flex items-center gap-1.5 px-3 py-1.5 min-h-11 sm:min-h-[38px] rounded-full border border-[#F2C14E]/45 bg-[#1C110A]/85 text-[#FFE5A3] text-xs md:text-[11px] font-bold uppercase tracking-wider hover:bg-[#F2C14E] hover:text-black transition-all shadow-lg cursor-pointer"
                   style={{ opacity: Math.max(0.2, heroOpacity) }}
                 >
                   <QrCode className="w-3.5 h-3.5" />
@@ -1478,7 +1480,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
               className="relative z-10 pb-2 sm:pb-4 flex flex-col items-center gap-1.5 text-[#FFE5A3] opacity-85 hover:opacity-100 transition-opacity cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FFDE59] rounded-lg px-3 py-1"
               style={{ opacity: prefersReducedMotion ? 0.9 : Math.max(0, 1 - heroProgress / 0.3) }}
             >
-              <span className="text-[10px] font-bold uppercase tracking-[0.25em]" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+              <span className="text-xs md:text-[10px] font-bold uppercase tracking-[0.25em]" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 CUỘN XUỐNG KHÁM PHÁ
               </span>
               <div className={`flex flex-col items-center -space-y-1.5 ${prefersReducedMotion ? '' : 'animate-bounce'}`}>
@@ -1499,7 +1501,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
           {/* Full-Bleed Atmospheric Backdrop */}
           <div className="absolute inset-0 pointer-events-none">
             <img
-              src={IMG_ARTWORK_BAO_TUONG}
+              src={fitImage(IMG_ARTWORK_BAO_TUONG, 1280)}
               alt="Họa phẩm Tổ sư Ngộ Chân Tử"
               loading="lazy"
               className="w-full h-full object-cover object-[center_25%] opacity-25 scale-[1.02]"
@@ -1553,7 +1555,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
             </motion.div>
 
             {/* Overline Tag */}
-            <div className="text-[#F2C14E] text-[11px] sm:text-xs font-bold tracking-[0.3em] uppercase mb-2">
+            <div className="text-[#F2C14E] text-xs sm:text-xs font-bold tracking-[0.3em] uppercase mb-2">
               KHỞI NGUỒN ÁNH SÁNG HOẰNG PHÁP · 1901 – 1988
             </div>
 
@@ -1570,7 +1572,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
               <div className="h-[1px] w-44 mx-auto bg-gradient-to-r from-transparent via-[#F2C14E] to-transparent" />
               <p
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                className="text-sm sm:text-base md:text-[17px] text-[#e3d2c1]/95 leading-relaxed text-balance"
+                className="text-base md:text-[17px] text-[#e3d2c1]/95 leading-relaxed text-balance"
               >
                 {topic.overviewSummary}
               </p>
@@ -1626,7 +1628,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
             >
               {/* Header matching Odyssey's Featured Spotlight */}
               <div className="text-center space-y-2">
-                <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#F2C14E]">
+                <p className="text-xs md:text-[11px] font-bold uppercase tracking-[0.26em] text-[#F2C14E]">
                   PHIM TÀI LIỆU &amp; TƯ LIỆU TRỌNG TÂM
                 </p>
                 <h2
@@ -1666,7 +1668,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                     <>
                       {/* Soft ambient blurred fill so vertical portraits fit 16:9 gracefully without cropping faces */}
                       <img
-                        src={spotlightImage}
+                        src={fitImage(spotlightImage, 360)}
                         alt=""
                         aria-hidden="true"
                         loading="lazy"
@@ -1676,7 +1678,9 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                       <AnimatePresence mode="wait">
                         <motion.img
                           key={spotlightMode}
-                          src={spotlightImage}
+                          src={fitImage(spotlightImage, 1280)}
+                          srcSet={imageSrcSet(spotlightImage, [640, 960, 1280, 1920])}
+                          sizes="(min-width: 960px) 884px, calc(100vw - 32px)"
                           alt={
                             spotlightMode === 'artwork'
                               ? 'Di ảnh thờ Sư Tổ Ngộ Chân Tử tại Tùng Lâm Hòa Phúc'
@@ -1688,6 +1692,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                           transition={{ duration: 0.35 }}
                           className="relative z-0 w-full h-full object-contain object-center"
                           onError={(e) => {
+                            e.currentTarget.removeAttribute('srcset');
                             (e.currentTarget as HTMLImageElement).src = FALLBACK_CHUA_IMG;
                           }}
                         />
@@ -1703,10 +1708,10 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                 {spotlightMode !== 'video' && (
                   <div className="relative sm:absolute sm:bottom-6 sm:left-6 sm:right-6 bg-[#180F09] sm:bg-transparent p-3.5 sm:p-0 border-t border-[#F2C14E]/25 sm:border-0 flex flex-col sm:flex-row sm:items-end justify-between gap-3.5 sm:gap-4 z-10">
                     <div className="space-y-1 text-left">
-                      <span className="inline-block px-2.5 py-0.5 bg-[#F2C14E]/20 border border-[#F2C14E]/50 text-[#FFDE59] text-[10px] font-bold uppercase tracking-widest">
+                      <span className="inline-block px-2.5 py-0.5 bg-[#F2C14E]/20 border border-[#F2C14E]/50 text-[#FFDE59] text-xs md:text-[10px] font-bold uppercase tracking-widest">
                         {spotlightMode === 'artwork' ? 'Ảnh Thờ Tại Tùng Lâm Hòa Phúc' : 'Di Ảnh Lịch Sử Tổ Đình'}
                       </span>
-                      <p className="text-xs sm:text-sm text-[#FFE5A3] max-w-xl leading-relaxed">
+                      <p className="text-sm text-[#FFE5A3] max-w-xl leading-relaxed">
                         {spotlightMode === 'artwork'
                           ? 'Di ảnh tôn kính Sư Tổ Ngộ Chân Tử trong Lễ Kỷ Niệm Ngày Sinh tại Tùng Lâm Hòa Phúc.'
                           : 'Di ảnh truyền thống Cố Lão Hòa Thượng Thích Ngộ Chân Tử (1901 – 1988), Khai sơn Tổ đình Hoằng Pháp.'}
@@ -1719,7 +1724,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                         onClick={() =>
                           setSpotlightMode((m) => (m === 'artwork' ? 'photo' : 'artwork'))
                         }
-                        className="px-3.5 py-2 min-h-[38px] bg-[#1B110A]/90 border border-[#F2C14E]/50 text-[#F2C14E] text-[11px] font-bold uppercase tracking-wider hover:bg-[#F2C14E] hover:text-black transition-colors cursor-pointer"
+                        className="px-3.5 py-2 min-h-11 md:min-h-[38px] bg-[#1B110A]/90 border border-[#F2C14E]/50 text-[#F2C14E] text-xs md:text-[11px] font-bold uppercase tracking-wider hover:bg-[#F2C14E] hover:text-black transition-colors cursor-pointer"
                       >
                         {spotlightMode === 'artwork' ? 'Xem Di Ảnh Cổ' : 'Xem Ảnh Hòa Phúc'}
                       </button>
@@ -1729,7 +1734,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                           setVideoStartSec(599);
                           setSpotlightMode('video');
                         }}
-                        className={`inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[38px] bg-[#2B1B10]/95 border border-[#FFDE59]/70 text-[#FFDE59] text-[11px] font-bold uppercase tracking-wider hover:bg-[#FFDE59] hover:text-black transition-colors cursor-pointer ${
+                        className={`inline-flex items-center gap-1.5 px-3.5 py-2 min-h-11 md:min-h-[38px] bg-[#2B1B10]/95 border border-[#FFDE59]/70 text-[#FFDE59] text-xs md:text-[11px] font-bold uppercase tracking-wider hover:bg-[#FFDE59] hover:text-black transition-colors cursor-pointer ${
                           isLedMode && ledHighlightTarget === 'play-doc-video'
                             ? 'odyssey-led-active-ring'
                             : ''
@@ -1748,7 +1753,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                           })
                         }
                         aria-label="Phóng to hình ảnh"
-                        className="p-2 min-h-[38px] min-w-[38px] flex items-center justify-center bg-[#F2C14E] text-black hover:bg-[#FFDE59] transition-colors cursor-pointer"
+                        className="p-2 min-h-11 min-w-11 md:min-h-[38px] md:min-w-[38px] flex items-center justify-center bg-[#F2C14E] text-black hover:bg-[#FFDE59] transition-colors cursor-pointer"
                       >
                         <Maximize2 className="w-4 h-4" />
                       </button>
@@ -1759,13 +1764,13 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                 {spotlightMode === 'video' && (
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-[#180F09] border-t border-[#F2C14E]/25">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-[#FFDE59] mr-1">
+                      <span className="text-xs md:text-[10px] font-bold uppercase tracking-widest text-[#FFDE59] mr-1">
                         Phim Tài Liệu Về Sư Tổ:
                       </span>
                       <button
                         type="button"
                         onClick={() => setVideoStartSec(599)}
-                        className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider border transition-colors cursor-pointer ${
+                        className={`px-3 py-1.5 min-h-11 md:min-h-0 text-xs md:text-[11px] font-bold uppercase tracking-wider border transition-colors cursor-pointer ${
                           videoStartSec === 599
                             ? 'bg-[#F2C14E] text-black border-[#FFDE59]'
                             : 'bg-[#21140C] text-[#FFE5A3] border-[#F2C14E]/35 hover:border-[#FFDE59]'
@@ -1776,7 +1781,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                       <button
                         type="button"
                         onClick={() => setVideoStartSec(0)}
-                        className={`px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider border transition-colors cursor-pointer ${
+                        className={`px-3 py-1.5 min-h-11 md:min-h-0 text-xs md:text-[11px] font-bold uppercase tracking-wider border transition-colors cursor-pointer ${
                           videoStartSec === 0
                             ? 'bg-[#F2C14E] text-black border-[#FFDE59]'
                             : 'bg-[#21140C] text-[#FFE5A3] border-[#F2C14E]/35 hover:border-[#FFDE59]'
@@ -1789,7 +1794,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                       <button
                         type="button"
                         onClick={() => setSpotlightMode('artwork')}
-                        className="px-3 py-1.5 bg-[#21140C] border border-[#F2C14E]/50 text-[#F2C14E] text-[11px] font-bold uppercase tracking-wider hover:bg-[#F2C14E] hover:text-black transition-colors cursor-pointer"
+                        className="px-3 py-1.5 min-h-11 md:min-h-0 bg-[#21140C] border border-[#F2C14E]/50 text-[#F2C14E] text-xs md:text-[11px] font-bold uppercase tracking-wider hover:bg-[#F2C14E] hover:text-black transition-colors cursor-pointer"
                       >
                         Quay Lại Di Ảnh
                       </button>
@@ -1826,10 +1831,10 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                   className={`max-w-3xl mx-auto italic text-[#FFE5A3] ${
                     isLedMode
                       ? 'text-lg sm:text-xl md:text-2xl leading-relaxed'
-                      : 'text-sm sm:text-base leading-relaxed md:leading-loose'
+                      : 'text-base leading-relaxed md:leading-loose'
                   }`}
                 >
-                  <p className="text-justify [text-align-last:left] indent-6 sm:indent-8">
+                  <p className="text-left sm:text-justify [text-align-last:left] indent-6 sm:indent-8">
                     “{quoteLines.join(' ')}”
                   </p>
                 </div>
@@ -1857,7 +1862,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
           {/* Section Title + Odyssey Horizontal Medallion Roster */}
           <div id="hanh-trinh-selector" className="relative z-20 max-w-[1200px] mx-auto px-4 md:px-8 pt-2">
             <div className="text-center mb-8 space-y-2">
-              <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#F2C14E]">
+              <p className="text-xs md:text-[11px] font-bold uppercase tracking-[0.28em] text-[#F2C14E]">
                 NIÊN BIỂU TƯƠNG TÁC · CHỌN GIAI ĐOẠN LỊCH SỬ
               </p>
               <h2
@@ -1898,7 +1903,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                     }`}
                   >
                     {isLedHighlighted && (
-                      <span className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded bg-[#FFDE59] text-[#140C07] text-[9px] font-extrabold uppercase tracking-wider shadow-lg">
+                      <span className="absolute -top-6 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded bg-[#FFDE59] text-[#140C07] text-xs md:text-[9px] font-extrabold uppercase tracking-wider shadow-lg">
                         Đang Chọn
                       </span>
                     )}
@@ -1911,7 +1916,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                     >
                       <div className="w-full h-full rounded-full overflow-hidden bg-[#1D120B] relative">
                         <img
-                          src={chapter.medallionImage}
+                          src={fitImage(chapter.medallionImage, 160)}
                           alt={chapter.year}
                           loading="lazy"
                           className={`w-full h-full object-cover object-top transition-all duration-300 ${
@@ -1925,7 +1930,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                       </div>
                     </div>
                     <span
-                      className={`text-[11px] font-bold uppercase tracking-[0.14em] transition-colors ${
+                      className={`text-xs md:text-[11px] font-bold uppercase tracking-[0.14em] transition-colors ${
                         isSelected ? 'text-[#FFDE59]' : 'text-[#e3d2c1]/60 group-hover:text-[#F2C14E]'
                       }`}
                     >
@@ -1961,7 +1966,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
           >
             {/* Left & Right Telemetry Ruler Bars */}
             <div className="hidden lg:block absolute left-2 top-8 bottom-8 w-2 odyssey-ruler-y opacity-45 pointer-events-none" />
-            <div className="hidden lg:flex absolute right-2 top-8 bottom-8 flex-col items-center justify-between text-[9px] tracking-[0.28em] text-[#F2C14E]/50 font-mono pointer-events-none select-none">
+            <div className="hidden lg:flex absolute right-2 top-8 bottom-8 flex-col items-center justify-between text-xs md:text-[9px] tracking-[0.28em] text-[#F2C14E]/50 font-mono pointer-events-none select-none">
               <span>TLHP</span>
               <span className="[writing-mode:vertical-rl]">NGỘ · CHÂN · TỬ · 1901-1988</span>
               <span>{activeChapter.code}/{String(chapters.length).padStart(2, '0')}</span>
@@ -1987,13 +1992,16 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                         className="absolute inset-0"
                       >
                         <img
-                          src={activeStagePhoto.url}
+                          src={fitImage(activeStagePhoto.url, 960)}
+                          srcSet={imageSrcSet(activeStagePhoto.url, [640, 960, 1280])}
+                          sizes="(min-width: 1024px) 620px, 100vw"
                           alt={activeStagePhoto.caption || activeChapter.headline}
                           loading="lazy"
                           decoding="async"
                           style={{ objectPosition: activeStagePhoto.objectPosition || 'center 25%' }}
                           className="w-full h-full object-cover"
                           onError={(e) => {
+                            e.currentTarget.removeAttribute('srcset');
                             (e.currentTarget as HTMLImageElement).src = FALLBACK_CHUA_IMG;
                           }}
                         />
@@ -2006,20 +2014,20 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                     <div className="relative z-10 p-4 sm:p-7 flex items-center justify-between gap-2">
                       <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-[#140C07]/85 border border-[#F2C14E]/50 backdrop-blur-sm">
                         <span className="w-2 h-2 rotate-45 bg-[#FFDE59]" />
-                        <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#FFDE59]">
+                        <span className="text-xs md:text-[11px] font-bold uppercase tracking-[0.2em] text-[#FFDE59]">
                           CHƯƠNG {activeChapter.code} / {String(chapters.length).padStart(2, '0')}
                         </span>
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <span className="hidden xs:inline-block px-3 py-1 bg-[#140C07]/80 border border-[#F2C14E]/30 text-[11px] font-semibold text-[#FFE5A3]">
+                        <span className="hidden xs:inline-block px-3 py-1 bg-[#140C07]/80 border border-[#F2C14E]/30 text-xs md:text-[11px] font-semibold text-[#FFE5A3]">
                           {activeChapter.year}
                         </span>
                         <button
                           type="button"
                           onClick={() => setStandalonePreview(activeStagePhoto)}
                           aria-label={`Phóng to: ${activeStagePhoto.caption}`}
-                          className="p-2 bg-[#140C07]/85 border border-[#F2C14E]/45 text-[#FFDE59] hover:bg-[#F2C14E] hover:text-black transition-colors cursor-pointer"
+                          className="p-2 min-w-11 min-h-11 md:min-w-0 md:min-h-0 inline-flex items-center justify-center bg-[#140C07]/85 border border-[#F2C14E]/45 text-[#FFDE59] hover:bg-[#F2C14E] hover:text-black transition-colors cursor-pointer"
                         >
                           <Maximize2 className="w-3.5 h-3.5" />
                         </button>
@@ -2034,7 +2042,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                         type="button"
                         onClick={() => handleStepChapter(-1)}
                         aria-label="Chương trước"
-                        className="w-10 h-10 flex items-center justify-center bg-[#140C07]/85 border border-[#F2C14E]/50 text-[#FFDE59] hover:bg-[#F2C14E] hover:text-black transition-colors cursor-pointer"
+                        className="w-11 h-11 md:w-10 md:h-10 flex items-center justify-center bg-[#140C07]/85 border border-[#F2C14E]/50 text-[#FFDE59] hover:bg-[#F2C14E] hover:text-black transition-colors cursor-pointer"
                       >
                         <ChevronLeft className="w-5 h-5" />
                       </button>
@@ -2042,7 +2050,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                         type="button"
                         onClick={() => handleStepChapter(1)}
                         aria-label="Chương tiếp theo"
-                        className="w-10 h-10 flex items-center justify-center bg-[#140C07]/85 border border-[#F2C14E]/50 text-[#FFDE59] hover:bg-[#F2C14E] hover:text-black transition-colors cursor-pointer"
+                        className="w-11 h-11 md:w-10 md:h-10 flex items-center justify-center bg-[#140C07]/85 border border-[#F2C14E]/50 text-[#FFDE59] hover:bg-[#F2C14E] hover:text-black transition-colors cursor-pointer"
                       >
                         <ChevronRight className="w-5 h-5" />
                       </button>
@@ -2050,7 +2058,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
 
                     {activeChapter.stageGallery && activeChapter.stageGallery.length > 0 && (
                       <div className="flex flex-col items-start sm:items-end gap-1.5 max-w-full">
-                        <span className="px-2.5 py-1 bg-[#140C07]/85 border border-[#F2C14E]/30 text-[11px] text-[#FFE5A3] line-clamp-2 sm:line-clamp-1 backdrop-blur-xs">
+                        <span className="px-2.5 py-1 bg-[#140C07]/85 border border-[#F2C14E]/30 text-xs md:text-[11px] text-[#FFE5A3] line-clamp-2 sm:line-clamp-1 backdrop-blur-xs">
                           {activeStagePhoto.caption}
                         </span>
                         {activeChapter.stageGallery.length > 1 && (
@@ -2070,7 +2078,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                                   } ${isThumbLed ? 'odyssey-led-active-ring' : ''}`}
                                 >
                                   <img
-                                    src={thumb.url}
+                                    src={fitImage(thumb.url, 160)}
                                     alt={thumb.caption}
                                     loading="lazy"
                                     decoding="async"
@@ -2114,19 +2122,19 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                       {/* 2x2 Odyssey Metadata Grid */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-[#F2C14E]/15">
                         <div>
-                          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#F2C14E]">
+                          <div className="text-xs md:text-[10px] font-bold uppercase tracking-[0.2em] text-[#F2C14E]">
                             NIÊN ĐẠI
                           </div>
                           <div className="text-sm font-bold text-white mt-0.5">{activeChapter.year}</div>
                         </div>
                         <div>
-                          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#F2C14E]">
+                          <div className="text-xs md:text-[10px] font-bold uppercase tracking-[0.2em] text-[#F2C14E]">
                             ĐỊA DANH
                           </div>
                           <div className="text-sm font-bold text-white mt-0.5">{activeChapter.location}</div>
                         </div>
                         <div>
-                          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#F2C14E]">
+                          <div className="text-xs md:text-[10px] font-bold uppercase tracking-[0.2em] text-[#F2C14E]">
                             CÔNG HẠNH TRỌNG TÂM
                           </div>
                           <div className="text-sm font-semibold text-[#FFE5A3] mt-0.5 leading-snug">
@@ -2134,7 +2142,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                           </div>
                         </div>
                         <div>
-                          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#F2C14E]">
+                          <div className="text-xs md:text-[10px] font-bold uppercase tracking-[0.2em] text-[#F2C14E]">
                             DẤU ẤN ĐỂ ĐỜI
                           </div>
                           <div className="text-sm font-semibold text-[#FFE5A3] mt-0.5 leading-snug">
@@ -2210,7 +2218,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
             {/* Section Header */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#F2C14E]/20 pb-6">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#F2C14E] mb-1">
+                <p className="text-xs md:text-[11px] font-bold uppercase tracking-[0.26em] text-[#F2C14E] mb-1">
                   TRƯỚC TÁC ẤN TỐNG &amp; TÔNG CHỈ TU HÀNH
                 </p>
                 <h2
@@ -2258,7 +2266,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                         className="relative shrink-0 w-16 h-24 sm:w-20 sm:h-28 bg-[#120A05] border border-[#F2C14E]/45 hover:border-[#FFDE59] overflow-hidden cursor-zoom-in group"
                       >
                         <img
-                          src={pillar.coverImage}
+                          src={fitImage(pillar.coverImage, 160)}
                           alt={pillar.title}
                           loading="lazy"
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
@@ -2274,7 +2282,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                     )}
                     <div className="space-y-2 flex-1 min-w-0">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#F2C14E]">
+                        <span className="text-xs md:text-[10px] font-bold uppercase tracking-[0.22em] text-[#F2C14E]">
                           {pillar.label}
                         </span>
                         <Sparkles className="w-4 h-4 text-[#FFDE59]/70 shrink-0" />
@@ -2287,7 +2295,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                       </h3>
                       <p
                         style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                        className="text-xs sm:text-sm text-[#e3d2c1]/85 leading-relaxed"
+                        className="text-sm text-[#e3d2c1]/85 leading-relaxed"
                       >
                         {pillar.desc}
                       </p>
@@ -2302,7 +2310,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 <div className="lg:col-span-8 space-y-6">
                   <div>
-                    <span className="text-[11px] font-bold uppercase tracking-[0.24em] text-[#F2C14E]">
+                    <span className="text-xs md:text-[11px] font-bold uppercase tracking-[0.24em] text-[#F2C14E]">
                       KINH SÁCH SƯ TỔ BIÊN SOẠN &amp; ẤN TỐNG
                     </span>
                     <h3
@@ -2339,7 +2347,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                               className="relative shrink-0 w-14 h-20 bg-[#0D0704] border border-[#F2C14E]/40 hover:border-[#FFDE59] overflow-hidden cursor-zoom-in group"
                             >
                               <img
-                                src={book.coverImage}
+                                src={fitImage(book.coverImage, 160)}
                                 alt={`Bìa ${book.title}`}
                                 loading="lazy"
                                 className="w-full h-full object-cover group-hover:scale-105 transition-transform"
@@ -2358,7 +2366,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                             </div>
                           )}
                           <div className="min-w-0 flex-1">
-                            <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#F2C14E]">
+                            <div className="text-xs md:text-[10px] font-bold uppercase tracking-[0.18em] text-[#F2C14E]">
                               {book.code}
                             </div>
                             <div className="text-sm sm:text-base font-bold text-white mt-0.5 leading-snug">
@@ -2377,7 +2385,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                 {/* Right CTA Panel */}
                 <div className="lg:col-span-4 flex flex-col justify-between p-6 bg-[#140C07]/80 border border-[#F2C14E]/30 space-y-5 lg:sticky lg:top-24">
                   <div className="space-y-2">
-                    <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#F2C14E]">
+                    <span className="text-xs md:text-[10px] font-bold uppercase tracking-[0.22em] text-[#F2C14E]">
                       TƯ LIỆU LỊCH SỬ CHÍNH THỨC
                     </span>
                     <h4
@@ -2443,7 +2451,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
           <div className="relative z-10 max-w-[1200px] mx-auto px-4 md:px-8 space-y-10">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.26em] text-[#F2C14E]">
+                <p className="text-xs md:text-[11px] font-bold uppercase tracking-[0.26em] text-[#F2C14E]">
                   THÁNH TÍCH · KỶ VẬT · VĂN BIA TƯỞNG NIỆM
                 </p>
                 <h2
@@ -2453,7 +2461,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                   {activeArchiveLabel}
                 </h2>
               </div>
-              <p className="text-xs sm:text-sm text-[#e3d2c1]/75 max-w-md">
+              <p className="text-sm text-[#e3d2c1]/75 max-w-md">
                 Nhấp vào từng khung tròn viền hoàng kim để phóng to tư liệu lịch sử, kỷ vật quý và văn bia tưởng niệm của Sư Tổ Ngộ Chân Tử.
               </p>
             </div>
@@ -2486,7 +2494,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                   >
                     <span>{tab.label}</span>
                     <span
-                      className={`px-1.5 py-0.5 text-[10px] rounded-full ${
+                      className={`px-1.5 py-0.5 text-xs md:text-[10px] rounded-full ${
                         isActive ? 'bg-[#140C07]/20 text-[#140C07]' : 'bg-[#F2C14E]/15 text-[#F2C14E]'
                       }`}
                     >
@@ -2531,7 +2539,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                         <span className="rounded-full absolute inset-0 bg-gradient-to-tr from-[#B67E1E] via-[#F2C14E] to-[#FFE5A3] shadow-[0_0_24px_rgba(242,193,78,0.28)] group-hover:scale-105 group-hover:shadow-[0_0_32px_rgba(255,222,89,0.5)] transition-all duration-300" />
                         <span className="rounded-full absolute inset-[3px] bg-[#140C07] overflow-hidden ring-1 ring-[#FFE5A3]/40">
                           <img
-                            src={item.url}
+                            src={fitImage(item.url, 360)}
                             alt={item.caption}
                             loading="lazy"
                             className="w-full h-full object-cover object-[center_25%] group-hover:scale-110 transition-transform duration-500"
@@ -2581,7 +2589,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                   className="odyssey-bevel-sm p-5 border border-[#F2C14E]/45 bg-[#26170D] hover:border-[#FFDE59] hover:-translate-y-1 transition-all flex items-center justify-between group shadow-lg"
                 >
                   <div className="space-y-1 pr-3">
-                    <span className="text-[10px] font-bold uppercase text-[#F2C14E] tracking-widest">
+                    <span className="text-xs md:text-[10px] font-bold uppercase text-[#F2C14E] tracking-widest">
                       VŨ TRỤ PHẬT GIÁO · THÁNH TÍCH
                     </span>
                     <h3
@@ -2600,7 +2608,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                     className="odyssey-bevel-sm p-5 border border-[#F2C14E]/30 bg-[#1F130B] hover:border-[#F2C14E] hover:-translate-y-1 transition-all flex items-center justify-between group shadow-lg"
                   >
                     <div className="space-y-1 pr-3">
-                      <span className="text-[10px] font-bold uppercase text-[#F2C14E] tracking-widest">
+                      <span className="text-xs md:text-[10px] font-bold uppercase text-[#F2C14E] tracking-widest">
                         {item.tag}
                       </span>
                       <h3
@@ -2615,12 +2623,6 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                 ))}
               </div>
             </div>
-
-            {!isLedMode && (
-              <div className="pt-4">
-                <SmartSearchAIBar contextTitle={`Tra cứu về ${topic.title}`} />
-              </div>
-            )}
           </div>
         </section>
       </div>
@@ -2671,7 +2673,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
           <div className="relative w-[min(92vw,960px)] bg-[#190F09] border border-[#F2C14E]/60 shadow-[0_30px_100px_rgba(0,0,0,0.95)] p-4 sm:p-6">
             <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#F2C14E]/20">
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#F2C14E]">
+                <div className="text-xs md:text-[10px] font-bold uppercase tracking-[0.22em] text-[#F2C14E]">
                   {lightboxState.label} · {lightboxState.idx + 1} / {lightboxState.items.length}
                 </div>
                 <h3 id="odyssey-lightbox-title" className="text-sm sm:text-base font-bold text-[#FFE5A3] mt-1">
@@ -2689,9 +2691,9 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
               </button>
             </div>
 
-            <div className="relative mt-4 aspect-[16/10] max-h-[65vh] w-full bg-[#0E0704] overflow-hidden flex items-center justify-center">
+            <div className="relative mt-4 aspect-[16/10] max-h-[65dvh] w-full bg-[#0E0704] overflow-hidden flex items-center justify-center">
               <img
-                src={lightboxState.items[lightboxState.idx].url}
+                src={fitImage(lightboxState.items[lightboxState.idx].url, 1920)}
                 alt={lightboxState.items[lightboxState.idx].caption}
                 className="max-h-full max-w-full object-contain"
                 onError={(e) => {
@@ -2743,7 +2745,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
           <div className="relative w-[min(92vw,920px)] bg-[#190F09] border border-[#F2C14E]/60 shadow-[0_30px_100px_rgba(0,0,0,0.95)] p-5 sm:p-7">
             <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#F2C14E]/20">
               <div>
-                <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#F2C14E]">
+                <div className="text-xs md:text-[10px] font-bold uppercase tracking-[0.22em] text-[#F2C14E]">
                   {standalonePreview.subtitle || 'TƯ LIỆU HÌNH ẢNH SƯ TỔ'}
                 </div>
                 <h3
@@ -2771,9 +2773,9 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
 
             {standalonePreview.note ? (
               <div className="mt-5 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                <div className="md:col-span-6 relative aspect-[4/5] max-h-[60vh] w-full bg-[#0E0704] border border-[#F2C14E]/30 overflow-hidden flex items-center justify-center p-3">
+                <div className="md:col-span-6 relative aspect-[4/5] max-h-[60dvh] w-full bg-[#0E0704] border border-[#F2C14E]/30 overflow-hidden flex items-center justify-center p-3">
                   <img
-                    src={standalonePreview.url}
+                    src={fitImage(standalonePreview.url, 1920)}
                     alt={standalonePreview.caption}
                     className="max-h-full max-w-full object-contain drop-shadow-[0_12px_30px_rgba(0,0,0,0.9)]"
                     onError={(e) => {
@@ -2782,7 +2784,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                   />
                 </div>
                 <div className="md:col-span-6 space-y-4 text-left">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[11px] font-bold uppercase tracking-widest text-[#FFDE59]">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-xs md:text-[11px] font-bold uppercase tracking-widest text-[#FFDE59]">
                     <BookOpen className="w-3.5 h-3.5" />
                     <span>KINH SÁCH SƯ TỔ BIÊN SOẠN &amp; ẤN TỐNG</span>
                   </div>
@@ -2792,9 +2794,9 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
                 </div>
               </div>
             ) : (
-              <div className="relative mt-4 aspect-[16/11] max-h-[70vh] w-full bg-[#0E0704] overflow-hidden flex items-center justify-center">
+              <div className="relative mt-4 aspect-[16/11] max-h-[70dvh] w-full bg-[#0E0704] overflow-hidden flex items-center justify-center">
                 <img
-                  src={standalonePreview.url}
+                  src={fitImage(standalonePreview.url, 1920)}
                   alt={standalonePreview.caption}
                   className="max-h-full max-w-full object-contain"
                   onError={(e) => {
@@ -2817,7 +2819,7 @@ export function TieuSuSuToOdysseyView({ detail: topic, others }: Props) {
         <div className="relative w-[min(94vw,980px)] max-h-[86dvh] flex flex-col bg-[#1A1009] border border-[#F2C14E]/60 shadow-[0_30px_100px_rgba(0,0,0,0.95)]">
           <div className="flex items-center justify-between gap-4 px-5 sm:px-6 py-4 border-b border-[#F2C14E]/25 bg-[#23150C] shrink-0">
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#F2C14E]">
+              <div className="text-xs md:text-[10px] font-bold uppercase tracking-[0.22em] text-[#F2C14E]">
                 TOÀN VĂN CUỘC ĐỜI SƯ TỔ · NGHE ĐỌC &amp; CHẠY CHỮ KARAOKE
               </div>
               <h3

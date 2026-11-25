@@ -56,7 +56,7 @@ export function mediaKey(url: string | null | undefined): string | null {
  * `null` for an empty or unreadable value.
  */
 export function storedMediaAddress(url: string | null | undefined): string | null {
-	const address = mediaUrl(url);
+	const address = knownMediaUrl(url);
 	if (!address?.startsWith(`${ANH_GOC}/`)) return address;
 	const [bucket, ...rest] = address.slice(ANH_GOC.length + 1).split("/");
 	const path = rest.join("/");
@@ -91,6 +91,46 @@ function wordpressPath(url: string | null | undefined): string | null {
  * unreadable value.
  */
 export function mediaUrl(url: string | null | undefined): string | null {
+	return legacyPicturePath(url) ?? knownMediaUrl(url);
+}
+
+// Hosts of this very site: a picture written with one of them in front is the same /anh-goc/ path.
+const OWN_HOSTS = new Set(["tunglamhoaphuc.com", "www.tunglamhoaphuc.com", "quantri.tunglamhoaphuc.com", "v2.tunglamhoaphuc.com", "v3.tunglamhoaphuc.com"]);
+// The old WordPress server answered on these hosts too (admin. is the one the data names).
+const WORDPRESS_HOSTS = new Set([WORDPRESS_HOST, "old.tunglamhoaphuc.com"]);
+// Backblaze's S3 path style (s3.us-east-005.backblazeb2.com/<bucket>/<key>) and its friendly style (…/file/<bucket>/<key>).
+const B2_PATH_HOST = /^(s3\.us-east-005\.backblazeb2\.com|b1\.congngheviet\.com\.vn|f\d{3}\.backblazeb2\.com)$/;
+
+/**
+ * The /anh-goc/ path of a picture written as an absolute address that maps to it with certainty and that knownMediaUrl() leaves alone:
+ * this site's own host in front of an /anh-goc/ path, the second WordPress host (old.), and Backblaze's path-style and friendly addresses
+ * of either bucket. `null` for anything else, which keeps its address (hosts that cannot be mapped are not guessed at). Not used for
+ * storedMediaAddress(): a media row's id is the hash of the address it was filed under, and these forms never changed it.
+ */
+export function legacyPicturePath(url: string | null | undefined): string | null {
+	const value = url?.trim();
+	if (!value || (value.startsWith("/") && !value.startsWith("//"))) return null;
+	const parsed = parse(value);
+	if (!parsed || (parsed.protocol !== "https:" && parsed.protocol !== "http:") || parsed.username || parsed.password) return null;
+	const host = parsed.hostname.toLowerCase();
+	const path = parsed.pathname;
+	if (OWN_HOSTS.has(host) && path.startsWith(`${ANH_GOC}/`)) return path;
+	if (WORDPRESS_HOSTS.has(host) && host !== WORDPRESS_HOST && path.startsWith("/wp-content/uploads/")) {
+		const upload = path.slice("/wp-content/uploads/".length);
+		return upload && isImagePath(upload) ? `${WORDPRESS_BASE}/${upload}` : null;
+	}
+	if (B2_PATH_HOST.test(host)) {
+		const [, first, second, ...rest] = path.split("/");
+		const pathStyle = host === "s3.us-east-005.backblazeb2.com";
+		if (!pathStyle && first !== "file") return null;
+		const bucket = pathStyle ? first : second;
+		const key = pathStyle ? [second, ...rest] : rest;
+		if (bucket && B2_BUCKETS.has(bucket) && key.length > 0 && key.every(Boolean) && isImagePath(key[key.length - 1])) return `${ANH_GOC}/${bucket}/${key.join("/")}`;
+	}
+	return null;
+}
+
+function knownMediaUrl(url: string | null | undefined): string | null {
 	const value = url?.trim();
 	if (!value) return null;
 	if (value.startsWith("/") && !value.startsWith("//")) return value;
@@ -139,6 +179,79 @@ export function mediaSource(bucket: string, key: string[]): { r2Key: string; ori
 	return origin ? { r2Key: `${bucket}/${key.join("/")}`, origin } : null;
 }
 
+/**
+ * How pictures reach the browser (23/11/2026, docs/van-hanh/anh.md):
+ *  - "cgi": Cloudflare's image transformations on this zone, /cdn-cgi/image/width=…/anh-goc/… (the zone has 5,000 free ones a month);
+ *  - "variants": ready-made AVIF/WebP files kept in R2 next to the original (scripts/media-variants.mjs), asked for as
+ *    /anh-goc/<bucket>/<key>@<width> and chosen by the Accept header (serveMedia). A missing variant falls back to a larger one and in the
+ *    end to the original, so flipping this before every variant exists only costs bytes, never a broken picture.
+ * The one place to flip it: change this constant (rolling back is the same line). Every function below also takes the mode as its last
+ * argument, which is how the tests exercise both.
+ */
+export type ImageDelivery = "cgi" | "variants";
+export const IMAGE_DELIVERY: ImageDelivery = "variants";
+
+/**
+ * Where ready-made variants exist today (first batch of 23/11/2026, scripts/media-variants.mjs): R2 key prefixes. A picture outside them keeps
+ * going through /cdn-cgi/image until its variants are made; a missing variant would only cost the route up to 14 R2 reads (then an hour in the
+ * edge cache), so the list is widened as batches are generated, never to "everything" before they exist.
+ */
+export const VARIANT_PREFIXES = ["media-tunglamhoaphuc/", "s2-cnv03/tunglamhoaphuc2/", "wordpress/2026/", "site/images/", "s2-cnv03/uploads/", "s2-cnv03/tunglamhoaphuc-com/"] as const;
+
+/** True when the R2 key behind an /anh-goc/ path (with or without the leading slash) has its variants. */
+export function hasVariants(path: string): boolean {
+	const key = path.replace(/^\/?anh-goc\//, "");
+	return VARIANT_PREFIXES.some((prefix) => key.startsWith(prefix));
+}
+
+/** Widths of the ready-made variants; scripts/media-variants.mjs has the same list (a test keeps them equal). */
+export const VARIANT_WIDTHS = [160, 360, 640, 960, 1280, 1920] as const;
+/** The biggest variant, "@max": the original's width, at most this many pixels. */
+export const VARIANT_MAX_WIDTH = 2560;
+export type VariantStep = (typeof VARIANT_WIDTHS)[number] | "max";
+export type VariantFormat = "avif" | "webp";
+
+/** The standard width a request of `width` pixels is rounded UP to ("max" past 1920), so nobody can make an unlimited number of cache keys. */
+export function variantStep(width: number): VariantStep {
+	if (!Number.isFinite(width)) return "max";
+	return VARIANT_WIDTHS.find((step) => width <= step) ?? "max";
+}
+
+/** Pictures that get variants. GIF (often animated) and SVG stay as they are; AVIF originals are already the small kind. */
+const VARIANT_SOURCE = /\.(jpe?g|jfif|png|webp)$/i;
+// "<name>@<digits or max>" optionally followed by the extension of the variant: the file part of an /anh-goc/ path.
+const VARIANT_SUFFIX = /^(.+)@(\d{1,5}|max)(?:\.(avif|webp))?$/;
+
+/**
+ * An /anh-goc/ address for the variant of `src` (a path such as "/anh-goc/s2-cnv03/a.jpg") at the standard width that fits `width`.
+ * Without an extension: the Accept header picks AVIF or WebP. A picture that has no variants (GIF, SVG, a query string) comes back as it is.
+ */
+export function variantUrl(src: string, width: number): string {
+	if (!src.startsWith(`${ANH_GOC}/`) || /[?#]/.test(src)) return src;
+	const base = src.replace(/@(?:\d{1,5}|max)(?:\.(?:avif|webp))?$/, "");
+	if (!VARIANT_SOURCE.test(base)) return src;
+	return `${base}@${variantStep(width)}`;
+}
+
+/** What a request for /anh-goc/<bucket>/<key…> means when its last part is "<name>@<width>[.avif|.webp]"; `null` for an ordinary key. */
+export function parseVariantRequest(key: string[]): { base: string[]; step: VariantStep; ext: VariantFormat | null } | null {
+	if (key.length === 0) return null;
+	const match = VARIANT_SUFFIX.exec(key[key.length - 1]);
+	if (!match) return null;
+	const step = match[2] === "max" ? "max" : variantStep(Number(match[2]));
+	return { base: [...key.slice(0, -1), match[1]], step, ext: (match[3] as VariantFormat | undefined) ?? null };
+}
+
+/**
+ * Pictures uploaded in the admin (R2 keys under these prefixes) have no variants yet and can be camera originals of several MB, so even in
+ * "variants" mode they go through /cdn-cgi/image like before: a few new pictures a month, well inside the free 5,000 transformations.
+ * (Variants made at upload time retire this list.)
+ */
+export const CGI_PREFIXES_IN_VARIANTS_MODE = ["s2-cnv03/cms/"] as const;
+function usesCgiInVariantsMode(source: string): boolean {
+	return !hasVariants(source) && CGI_PREFIXES_IN_VARIANTS_MODE.some((prefix) => source.replace(/^\/?anh-goc\//, "").startsWith(prefix));
+}
+
 /** The source of a transformation on this zone: always a picture of this site's /anh-goc/ route. */
 function transformSource(src: string): string | null {
 	const address = src.startsWith("/anh-goc/") ? src : mediaUrl(src);
@@ -146,37 +259,73 @@ function transformSource(src: string): string | null {
 }
 
 /**
- * A picture of the old site at `width` pixels, through Cloudflare's image transformations on
- * this zone (AVIF or WebP as the browser takes). The old admin keeps camera originals of
- * 7–9 MB; at 640 px one is about 25 KB. The zone accepts only sources on itself, which is why
- * B2 files come through /anh-goc/. Past the free 5,000 transformations a month, onerror=redirect
- * sends the browser to the original. The site's own pictures and other hosts stay as they are.
+ * A picture of the old site at `width` pixels. In "cgi" mode (today's default) through Cloudflare's image transformations on
+ * this zone (AVIF or WebP as the browser takes): the old admin keeps camera originals of 7–9 MB; at 640 px one is about 25 KB. The
+ * zone accepts only sources on itself, which is why B2 files come through /anh-goc/. Past the free 5,000 transformations a month,
+ * onerror=redirect sends the browser to the original. In "variants" mode the ready-made file of the standard width (see IMAGE_DELIVERY).
+ * The site's own pictures and other hosts stay as they are.
  */
-export function imageAt(src: string, width: number): string {
+export function imageAt(src: string, width: number, delivery: ImageDelivery = IMAGE_DELIVERY): string {
 	if (src.startsWith("/") && !src.startsWith("//") && !src.startsWith("/anh-goc/")) return src;
 	const source = transformSource(src);
-	return source ? `/cdn-cgi/image/width=${width},quality=75,format=auto,onerror=redirect/${source}` : src;
+	if (!source) return src;
+	// "variants" mode never spends the transformation quota: a picture outside the prefixes that have variants is the old WordPress kind
+	// (about 668 px, median 70 KB), small enough to go as it is.
+	if (delivery === "variants" && !usesCgiInVariantsMode(source)) return hasVariants(source) ? variantUrl(`/${source}`, width) : `/${source}`;
+	return `/cdn-cgi/image/width=${width},quality=75,format=auto,onerror=redirect/${source}`;
 }
 
 /**
- * Album pictures: only WordPress uploads are transformed. The B2 album pictures were made
- * small already (median 92 KB), and an album of 170 would spend the monthly quota.
+ * Album pictures. In "cgi" mode only WordPress uploads are transformed: the B2 album pictures were made small already
+ * (median 92 KB), and an album of 170 would spend the monthly quota. Variants cost no quota, so there every picture gets one.
  */
-export function albumImageAt(src: string, width: number): string {
-	return isWordPressMedia(src) ? imageAt(src, width) : src;
+export function albumImageAt(src: string, width: number, delivery: ImageDelivery = IMAGE_DELIVERY): string {
+	return delivery === "variants" ? (srcHasVariants(src) || srcUsesCgiInVariantsMode(src) ? imageAt(src, width, delivery) : src) : isWordPressMedia(src) ? imageAt(src, width, delivery) : src;
 }
 
-/** Display widths of transformed pictures; few on purpose, each one counts against the quota. */
-export const IMAGE_WIDTH = { small: 360, card: 640, wide: 1280, full: 1920 } as const;
+/** True when `src` is an admin upload that goes through /cdn-cgi/image even in "variants" mode (see CGI_PREFIXES_IN_VARIANTS_MODE). */
+export function srcUsesCgiInVariantsMode(src: string): boolean {
+	const source = transformSource(src);
+	return source !== null && usesCgiInVariantsMode(source);
+}
+
+/** True when the picture behind `src` (any form `mediaUrl` understands) is one of those that have ready-made variants. */
+export function srcHasVariants(src: string): boolean {
+	const source = transformSource(src);
+	return source !== null && hasVariants(source);
+}
+
+/** Display widths of delivered pictures. In "cgi" mode few on purpose, each one counts against the quota; "icon" and "mid" are the standard variant widths between. */
+export const IMAGE_WIDTH = { icon: 160, small: 360, card: 640, mid: 960, wide: 1280, full: 1920 } as const;
 
 /**
- * `srcSet` of a transformed picture at the given widths, for pictures shown much smaller than
- * 640 px on phones (a statue card is about 185 px there: 324 device pixels at Lighthouse's 1.75, so 360, T41b). `undefined` for pictures that
- * are not transformed, which come in one size.
+ * `srcSet` of a delivered picture at the given widths, for pictures shown much smaller than 640 px on phones (a statue card is about
+ * 185 px there: 324 device pixels at Lighthouse's 1.75, so 360, T41b). `undefined` for pictures that are not delivered in sizes, which come in one size.
+ *
+ * "variants" mode: each width is rounded up to a standard one (no widths: all standard widths, and "@max" when the picture is wider than the last); with the picture's own width known
+ * (`originalWidth`, from media.width) the list stops at it, and the "@max" file stands for the original's width, so the browser never
+ * hears of a size that does not exist.
  */
-export function imageSrcSet(src: string, widths: readonly number[]): string | undefined {
-	if (imageAt(src, widths[0]) === src) return undefined;
-	return widths.map((width) => `${imageAt(src, width)} ${width}w`).join(", ");
+export function imageSrcSet(src: string, widths: readonly number[], originalWidth?: number | null, delivery: ImageDelivery = IMAGE_DELIVERY): string | undefined {
+	if (delivery === "variants" && !srcHasVariants(src) && !srcUsesCgiInVariantsMode(src)) return undefined;
+	if (delivery !== "variants" || !srcHasVariants(src)) {
+		if (imageAt(src, widths[0], delivery) === src) return undefined;
+		return widths.map((width) => `${imageAt(src, width, delivery)} ${width}w`).join(", ");
+	}
+	if (imageAt(src, VARIANT_WIDTHS[0], delivery) === src) return undefined;
+	const known = typeof originalWidth === "number" && originalWidth > 0 ? Math.round(originalWidth) : null;
+	const wanted: VariantStep[] = (widths.length ? widths : VARIANT_WIDTHS).map(variantStep);
+	// All standard widths of a picture wider than the last one: its "@max" belongs to the list too.
+	if (!widths.length && known !== null && known > VARIANT_WIDTHS[VARIANT_WIDTHS.length - 1]) wanted.push("max");
+	// From the width the picture itself has, the ladder holds no file: "@max" is it.
+	const steps = new Set<VariantStep>(wanted.map((step) => (step !== "max" && known !== null && step >= known ? "max" : step)));
+	const ordered = [...steps].sort((a, b) => (a === "max" ? Infinity : a) - (b === "max" ? Infinity : b));
+	return ordered
+		.map((step) => {
+			const descriptor = step === "max" ? Math.min(known ?? VARIANT_MAX_WIDTH, VARIANT_MAX_WIDTH) : step;
+			return `${imageAt(src, step === "max" ? VARIANT_MAX_WIDTH + 1 : step, delivery)} ${descriptor}w`;
+		})
+		.join(", ");
 }
 
 /**

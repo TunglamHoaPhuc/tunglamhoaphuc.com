@@ -3,7 +3,8 @@
 import { FC, useState } from 'react';
 import Link from 'next/link';
 import { KeywordTooltipModal } from '@/components/tong-chi-tu-hoc/KeywordTooltipModal';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 // ─── Types ─────────────────────────────────────────────────────────────────
 interface KeywordPopup {
@@ -100,10 +101,14 @@ const ArticleDetailTemplate: FC<ArticleDetailTemplateProps> = ({
       {/* ── 1. HERO BANNER ── */}
       <div
         className="relative overflow-hidden"
-        style={{ height: 'clamp(300px, 55vh, 580px)' }}
+        style={{ height: 'clamp(300px, 55svh, 580px)' }}
       >
-        <img
-          src={getImageUrl(heroBannerUrl) || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp'}
+        <img width={640} height={480}
+          src={fitImage(getImageUrl(heroBannerUrl) || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp', 1280)}
+          srcSet={imageSrcSet(getImageUrl(heroBannerUrl) || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/-ai-le-Vu-Lan-Bao-Hieu-JPG.webp', [640, 960, 1280, 1920])}
+          sizes="100vw"
+          loading="eager"
+          fetchPriority="high"
           alt={title}
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -307,8 +312,12 @@ const ArticleDetailTemplate: FC<ArticleDetailTemplateProps> = ({
                 >
                   {art.imgUrl && (
                     <div className="overflow-hidden" style={{ height: 140 }}>
-                      <img
-                        src={getImageUrl(art.imgUrl)}
+                      <img width={640} height={480}
+                        src={fitImage(getImageUrl(art.imgUrl), 640)}
+                        srcSet={imageSrcSet(getImageUrl(art.imgUrl), [360, 640, 960])}
+                        sizes="(min-width: 1024px) 300px, (min-width: 640px) 31vw, 92vw"
+                        loading="lazy"
+                        decoding="async"
                         alt={art.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -316,7 +325,7 @@ const ArticleDetailTemplate: FC<ArticleDetailTemplateProps> = ({
                   )}
                   <div className="p-4">
                     <span
-                      className="text-[10px] uppercase tracking-widest font-bold block mb-1"
+                      className="text-xs sm:text-[10px] uppercase tracking-widest font-bold block mb-1"
                       style={{ color: '#F2C14E', fontFamily: "'UTM Avo', sans-serif", fontWeight: 'bold' }}
                     >
                       {art.category}

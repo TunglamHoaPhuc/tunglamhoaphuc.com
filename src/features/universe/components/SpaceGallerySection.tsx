@@ -17,6 +17,8 @@ import {
 } from '@/data/bao-tang-space-data';
 import { OtherAreasSection } from './OtherAreasSection';
 import type { V3Area } from '@/lib/v3-data';
+import { LOGO_ROUND_SRC, swapOnError, TOAN_CANH_SRC, fitProps, TOAN_CANH_BACKDROP, bentoFit, type FitOptions, STATUE_ICON_LARGE_SRC } from '@/features/universe/image-props';
+import { fitImage } from '@/utils/image';
 
 interface SpaceGallerySectionProps {
   areaTitle?: string;
@@ -108,13 +110,11 @@ export const SpaceGallerySection: FC<SpaceGallerySectionProps> = ({
       >
         {/* ── NỀN SECTION: DÙNG ẢNH TRIỂN LÃM SƯ TỔ NGỘ CHÂN TỬ VỚI LỚP PHỦ NÂU VÀNG THIỀN MÔN ── */}
         <div className="absolute top-10 sm:top-14 inset-x-0 h-[460px] sm:h-[540px] z-0 pointer-events-none overflow-hidden">
-          <img
-            src={isBaoTang ? BAO_TANG_BACKGROUND_IMAGE : '/images/vu-tru-phat-giao/toan-canh-chua.jpg'}
+          <img width={640} height={480}
+            {...(isBaoTang ? fitProps(BAO_TANG_BACKGROUND_IMAGE, { width: 1280, widths: [640, 960, 1280], sizes: '100vw' }) : TOAN_CANH_BACKDROP)}
             alt="Không gian bảo tàng"
             className="w-full h-full object-cover opacity-15 sm:opacity-20 filter blur-[2px] scale-105"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
-            }}
+            onError={swapOnError('/images/hero/toan-canh-chua-1280.webp')}
           />
           <div className="absolute inset-0 bg-[#2C1C11]/45" />
 
@@ -134,13 +134,11 @@ export const SpaceGallerySection: FC<SpaceGallerySectionProps> = ({
               className="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center"
               aria-hidden="true"
             >
-              <img
-                src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+              <img width={128} height={128}
+                src={STATUE_ICON_LARGE_SRC}
                 alt=""
                 className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-                }}
+                onError={swapOnError(LOGO_ROUND_SRC)}
               />
             </div>
 
@@ -202,6 +200,7 @@ export const SpaceGallerySection: FC<SpaceGallerySectionProps> = ({
                           item={space}
                           idx={idx}
                           openLightbox={openLightbox}
+                          fit={bentoFit(spanClass)}
                         />
                       </div>
                     );
@@ -273,9 +272,11 @@ interface SpaceBentoCardProps {
   item: TamBaoSpaceImage | SpaceGalleryItem;
   idx: number;
   openLightbox: (idx: number) => void;
+  /** Bậc ảnh theo số cột ô chiếm trên lưới. */
+  fit: FitOptions;
 }
 
-const SpaceBentoCard: FC<SpaceBentoCardProps> = ({ item, idx, openLightbox }) => {
+const SpaceBentoCard: FC<SpaceBentoCardProps> = ({ item, idx, openLightbox, fit }) => {
   const itemTitle = item.title;
   const itemSubtitle =
     'subtitle' in item && item.subtitle ? item.subtitle : item.caption || '';
@@ -286,21 +287,19 @@ const SpaceBentoCard: FC<SpaceBentoCardProps> = ({ item, idx, openLightbox }) =>
       className="group relative overflow-hidden cursor-pointer rounded-2xl border border-[#f2c14e]/35 hover:border-[#ffde59] transition-all duration-500 shadow-xl bg-[#1c120b] w-full h-full"
     >
       {/* 1. Base Image */}
-      <img
-        src={item.imgUrl}
+      <img width={640} height={480}
+        {...fitProps(item.imgUrl, fit)}
         alt={itemTitle}
         className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
         loading="lazy"
-        onError={(e) => {
-          (e.target as HTMLImageElement).src = '/images/vu-tru-phat-giao/toan-canh-chua.jpg';
-        }}
+        onError={swapOnError(TOAN_CANH_SRC)}
       />
 
       {/* Soft gradient fade at bottom */}
       <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#1C120B]/90 via-[#1C120B]/40 to-transparent pointer-events-none" />
 
       {/* 2. HOVER REVEAL CARD OVERLAY (Đưa chuột vào mới hiển thị tiêu đề và sub tiêu đề mạ vàng) */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#25170E]/90 via-[#3D2817]/65 to-transparent backdrop-blur-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col items-center justify-center p-3 sm:p-5 text-center pointer-events-none z-20">
+      <div className="absolute inset-0 bg-gradient-to-t from-[#25170E]/90 via-[#3D2817]/65 to-transparent sm:backdrop-blur-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col items-center justify-center p-3 sm:p-5 text-center pointer-events-none z-20">
         <div className="absolute inset-3 sm:inset-4 md:inset-5 rounded-xl md:rounded-2xl border border-[#ffde59]/70 bg-[#452a15]/85 flex flex-col items-center justify-center p-3 sm:p-5 text-center shadow-[0_0_30px_rgba(242,193,78,0.3)]">
           {/* TIÊU ĐỀ: UTM ClassizismAntiqua */}
           <h3
@@ -316,7 +315,7 @@ const SpaceBentoCard: FC<SpaceBentoCardProps> = ({ item, idx, openLightbox }) =>
           {/* TIÊU ĐỀ PHỤ / SUBTITLE: UTM Avo */}
           <p
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className="text-[#e3d2c1] text-xs sm:text-sm font-normal leading-relaxed tracking-wide px-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] text-center line-clamp-3 sm:line-clamp-4"
+            className="text-[#e3d2c1] text-sm font-normal leading-relaxed tracking-wide px-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] text-center line-clamp-3 sm:line-clamp-4"
           >
             {itemSubtitle ||
               ('description' in item && item.description) ||
@@ -457,7 +456,7 @@ const SpaceGalleryModal: FC<SpaceGalleryModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-[300] bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-5"
+      className="fixed inset-0 z-[300] bg-black/80 sm:backdrop-blur-md flex items-center justify-center p-3 sm:p-5"
       onClick={onClose}
       onWheel={(e) => {
         e.stopPropagation();
@@ -465,7 +464,7 @@ const SpaceGalleryModal: FC<SpaceGalleryModalProps> = ({
     >
       {/* ── MODAL CONTAINER ── */}
       <div
-        className="relative max-w-4xl w-full rounded-2xl border border-[#F2C14E]/60 bg-[#25170E] p-4 sm:p-6 md:p-8 shadow-[0_0_60px_rgba(0,0,0,0.95)] flex flex-col items-center max-h-[95vh] overflow-y-auto select-none"
+        className="relative max-w-4xl w-full rounded-2xl border border-[#F2C14E]/60 bg-[#25170E] p-4 sm:p-6 md:p-8 shadow-[0_0_60px_rgba(0,0,0,0.95)] flex flex-col items-center max-h-[95svh] overflow-y-auto select-none"
         onClick={(e) => e.stopPropagation()}
         onWheel={(e) => {
           e.stopPropagation();
@@ -487,7 +486,7 @@ const SpaceGalleryModal: FC<SpaceGalleryModalProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Đóng"
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl border border-[#F2C14E]/50 bg-[#1C120B]/80 flex items-center justify-center text-[#F2C14E] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-md"
+            className="absolute right-0 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-9 sm:h-9 rounded-xl border border-[#F2C14E]/50 bg-[#1C120B]/80 flex items-center justify-center text-[#F2C14E] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-md"
           >
             <X className="w-5 h-5" />
           </button>
@@ -506,16 +505,14 @@ const SpaceGalleryModal: FC<SpaceGalleryModalProps> = ({
           {/* Zoomable & Pannable Image Container */}
           <div className="w-full h-full flex items-center justify-center overflow-hidden pointer-events-none">
             <img
-              src={currentItem.imgUrl}
+              src={fitImage(currentItem.imgUrl, 1920)}
               alt={currentItem.title}
               style={{
                 transform: `scale(${zoomScale}) translate(${panOffset.x / zoomScale}px, ${panOffset.y / zoomScale}px)`,
                 transition: isDragging ? 'none' : 'transform 0.25s ease-out',
               }}
               className="max-h-full max-w-full object-contain rounded-lg filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
-              }}
+              onError={swapOnError('/images/hero/toan-canh-chua-1280.webp')}
             />
           </div>
 
@@ -524,7 +521,7 @@ const SpaceGalleryModal: FC<SpaceGalleryModalProps> = ({
             type="button"
             onClick={handlePrev}
             aria-label="Ảnh trước"
-            className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-[#F2C14E]/60 bg-[#25170E]/80 backdrop-blur-md flex items-center justify-center text-[#ffde59] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.7)] z-20"
+            className="absolute left-3 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-10 sm:h-10 rounded-full border border-[#F2C14E]/60 bg-[#25170E]/80 sm:backdrop-blur-md flex items-center justify-center text-[#ffde59] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.7)] z-20"
           >
             <ChevronLeft className="w-6 h-6 stroke-[2.5]" />
           </button>
@@ -533,18 +530,18 @@ const SpaceGalleryModal: FC<SpaceGalleryModalProps> = ({
             type="button"
             onClick={handleNext}
             aria-label="Ảnh sau"
-            className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full border border-[#F2C14E]/60 bg-[#25170E]/80 backdrop-blur-md flex items-center justify-center text-[#ffde59] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.7)] z-20"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-11 h-11 sm:w-10 sm:h-10 rounded-full border border-[#F2C14E]/60 bg-[#25170E]/80 sm:backdrop-blur-md flex items-center justify-center text-[#ffde59] hover:bg-[#F2C14E] hover:text-[#25170E] transition-all cursor-pointer shadow-[0_4px_12px_rgba(0,0,0,0.7)] z-20"
           >
             <ChevronRight className="w-6 h-6 stroke-[2.5]" />
           </button>
 
           {/* Zoom Controls Overlay */}
-          <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-[#1C120B]/90 backdrop-blur-md p-1.5 rounded-xl border border-[#F2C14E]/50 opacity-90 group-hover:opacity-100 transition-opacity z-20">
+          <div className="absolute top-3 right-3 flex items-center gap-1.5 bg-[#1C120B]/90 sm:backdrop-blur-md p-1.5 rounded-xl border border-[#F2C14E]/50 opacity-90 group-hover:opacity-100 transition-opacity z-20">
             <button
               type="button"
               onClick={handleZoomIn}
               title="Phóng to (Lăn chuột lên)"
-              className="w-8 h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors cursor-pointer"
+              className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors cursor-pointer"
             >
               <ZoomIn className="w-4 h-4" />
             </button>
@@ -552,7 +549,7 @@ const SpaceGalleryModal: FC<SpaceGalleryModalProps> = ({
               type="button"
               onClick={handleZoomOut}
               title="Thu nhỏ (Lăn chuột xuống)"
-              className="w-8 h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors cursor-pointer"
+              className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors cursor-pointer"
             >
               <ZoomOut className="w-4 h-4" />
             </button>
@@ -561,7 +558,7 @@ const SpaceGalleryModal: FC<SpaceGalleryModalProps> = ({
                 type="button"
                 onClick={handleResetZoom}
                 title="Khôi phục gốc"
-                className="w-8 h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors cursor-pointer"
+                className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#25170E] hover:bg-[#F2C14E] text-[#ffde59] hover:text-[#25170E] flex items-center justify-center transition-colors cursor-pointer"
               >
                 <RotateCcw className="w-4 h-4" />
               </button>
@@ -570,7 +567,7 @@ const SpaceGalleryModal: FC<SpaceGalleryModalProps> = ({
 
           {/* Hint Badge when zoomed */}
           {zoomScale > 1 && (
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/80 border border-[#F2C14E]/40 text-[11px] text-[#ffde59] font-medium backdrop-blur-md pointer-events-none z-20">
+            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/80 border border-[#F2C14E]/40 text-xs sm:text-[11px] text-[#ffde59] font-medium sm:backdrop-blur-md pointer-events-none z-20">
               Nhấp giữ &amp; Kéo để xem chi tiết ảnh
             </div>
           )}
@@ -638,7 +635,7 @@ const SpaceGalleryModal: FC<SpaceGalleryModalProps> = ({
               Ý NGHĨA
             </span>
             <p
-              className="text-xs sm:text-sm text-[#c9b896] leading-relaxed italic"
+              className="text-sm text-[#c9b896] leading-relaxed italic"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
               "{currentDesc}"

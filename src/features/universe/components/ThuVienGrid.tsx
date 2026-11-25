@@ -5,6 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Search, ChevronDown, RefreshCw, X, BookOpen, User, FileText, Calendar, ArrowRight, Building, Sparkles } from 'lucide-react';
 import { THU_VIEN_BOOKS, BOOK_CATEGORIES, BookItem } from '@/data/thu-vien-data';
 import { CustomDropdown } from '@/components/common/CustomDropdown';
+import { swapOnError, fitProps } from '@/features/universe/image-props';
+import { fitImage } from '@/utils/image';
 
 interface BookCardProps {
   book: BookItem;
@@ -19,15 +21,13 @@ const BookCard = React.memo(({ book, onSelect }: BookCardProps) => {
     >
       {/* 1. BOOK COVER IMAGE FRAME */}
       <div className="relative w-full h-[260px] overflow-hidden bg-[#1A120B] shrink-0 flex items-center justify-center p-3">
-        <img
-          src={book.coverUrl}
+        <img width={300} height={400}
+          {...fitProps(book.coverUrl, { width: 640, widths: [360, 640], sizes: '230px' })}
           alt={book.title}
           loading="lazy"
           decoding="async"
           className="w-auto h-full max-h-[230px] object-contain shadow-2xl rounded-lg group-hover:scale-105 transition-transform duration-700 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp';
-          }}
+          onError={swapOnError(fitImage('/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp', 960))}
         />
         <div
           className="absolute inset-0 pointer-events-none"
@@ -37,7 +37,7 @@ const BookCard = React.memo(({ book, onSelect }: BookCardProps) => {
         />
 
         {/* Category Badge */}
-        <div className="absolute top-3 left-3 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-[#F2C14E] bg-[#1C130D]/90 border border-[#F2C14E]/40 backdrop-blur-md">
+        <div className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs sm:text-[10px] font-bold uppercase tracking-wider text-[#F2C14E] bg-[#1C130D]/90 border border-[#F2C14E]/40 sm:backdrop-blur-md">
           {book.category}
         </div>
       </div>
@@ -60,7 +60,7 @@ const BookCard = React.memo(({ book, onSelect }: BookCardProps) => {
           </p>
 
           <p
-            className="text-[#c9b896] text-[11px] leading-relaxed line-clamp-2"
+            className="text-[#c9b896] text-xs sm:text-[11px] leading-relaxed line-clamp-2"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             {book.description}
@@ -71,7 +71,7 @@ const BookCard = React.memo(({ book, onSelect }: BookCardProps) => {
         <div>
           <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/30 to-transparent my-2" />
           <div
-            className="flex items-center justify-between text-[11px] text-[#FFE5A3]/70 font-bold px-1"
+            className="flex items-center justify-between text-xs sm:text-[11px] text-[#FFE5A3]/70 font-bold px-1"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             <span className="flex items-center gap-1 truncate max-w-[140px]">
@@ -189,7 +189,7 @@ export const ThuVienGrid: FC = () => {
                 <button
                   key={prompt}
                   onClick={() => handleAiPromptClick(prompt)}
-                  className="px-2.5 py-1 rounded-lg bg-[#2A1D14] border border-[#F2C14E]/30 hover:border-[#F2C14E] text-[#FFE5A3] hover:text-white text-xs transition-all cursor-pointer flex items-center gap-1.5"
+                  className="px-3 py-2.5 min-h-11 sm:min-h-0 sm:px-2.5 sm:py-1 rounded-lg bg-[#2A1D14] border border-[#F2C14E]/30 hover:border-[#F2C14E] text-[#FFE5A3] hover:text-white text-xs transition-all cursor-pointer flex items-center gap-1.5"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
                   <Search className="w-3 h-3 text-[#F2C14E] shrink-0" />
@@ -201,7 +201,7 @@ export const ThuVienGrid: FC = () => {
 
           <div className="flex flex-wrap items-center gap-3 pt-2">
             <span
-              className="text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5"
+              className="text-xs sm:text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
               LỰA CHỌN:
@@ -217,7 +217,7 @@ export const ThuVienGrid: FC = () => {
                   setDisplayCount(8);
                 }}
                 placeholder="Nhập nhu cầu tu học hoặc tên kinh sách..."
-                className="w-full pl-9 pr-8 py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 rounded-xl text-xs md:text-sm text-[#FFE5A3] placeholder-[#c9b896]/60 focus:outline-none focus:border-[#F2C14E] hover:border-[#F2C14E]/70 transition-all shadow-inner"
+                className="w-full pl-9 pr-8 py-2.5 sm:py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 rounded-xl text-base md:text-sm text-[#FFE5A3] placeholder-[#c9b896]/60 focus:outline-none focus:border-[#F2C14E] hover:border-[#F2C14E]/70 transition-all shadow-inner"
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
               />
               {searchQuery && (
@@ -375,7 +375,7 @@ export const ThuVienGrid: FC = () => {
                 {/* Left: Book Cover */}
                 <div className="relative w-40 mx-auto sm:mx-0 shrink-0 rounded-xl overflow-hidden border-2 border-[#F2C14E]/50 shadow-2xl self-start bg-[#1A120B] p-2">
                   <img
-                    src={selectedBook.coverUrl}
+                    {...fitProps(selectedBook.coverUrl, { width: 640, widths: [360, 640], sizes: '160px' })}
                     alt={selectedBook.title}
                     className="w-full h-auto object-contain rounded-lg shadow-lg"
                   />
@@ -402,7 +402,7 @@ export const ThuVienGrid: FC = () => {
 
                   <div className="h-[1px] bg-gradient-to-r from-[#F2C14E]/60 via-[#F2C14E]/20 to-transparent my-1" style={{ width: '61.8%' }} />
 
-                  <p className="text-xs md:text-sm text-[#D3C0AD] leading-relaxed text-justify" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                  <p className="text-sm text-[#D3C0AD] leading-relaxed text-left sm:text-justify" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                     {selectedBook.description}
                   </p>
 

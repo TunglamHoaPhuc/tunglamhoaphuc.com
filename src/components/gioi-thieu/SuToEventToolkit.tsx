@@ -70,10 +70,10 @@ export function LedCornerQrBadge({ targetUrl }: { targetUrl: string }) {
         <img src={qrDataUrl} alt="Mã QR xem Tiểu Sử Sư Tổ trên điện thoại" className="w-24 h-24 block" />
       </div>
       <div className="pr-1.5 space-y-1 max-w-[140px]">
-        <div className="text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#FFDE59]">
+        <div className="text-xs md:text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#FFDE59]">
           QUÉT MÃ QR
         </div>
-        <p className="text-[11px] text-[#FFE5A3] leading-snug">
+        <p className="text-xs md:text-[11px] text-[#FFE5A3] leading-snug">
           Xem bản đầy đủ &amp; tra cứu kinh sách trên điện thoại
         </p>
       </div>
@@ -126,7 +126,7 @@ export function LedFloatingHud({
       <div className="flex flex-wrap items-center justify-between gap-2.5">
         {/* Progress Indicator */}
         <div className="flex items-center gap-2.5 min-w-0 flex-1">
-          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-[#F2C14E]/20 border border-[#F2C14E]/45 text-[10px] font-bold uppercase tracking-widest text-[#FFDE59] shrink-0">
+          <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded bg-[#F2C14E]/20 border border-[#F2C14E]/45 text-xs md:text-[10px] font-bold uppercase tracking-widest text-[#FFDE59] shrink-0">
             <MonitorPlay className="w-3.5 h-3.5" />
             <span>LED {stepIndex + 1}/{totalSteps}</span>
           </span>
@@ -163,7 +163,7 @@ export function LedFloatingHud({
           </button>
 
           {/* Speed Selector */}
-          <div className="hidden sm:flex items-center rounded-lg border border-[#F2C14E]/35 bg-[#1D120B] p-0.5 text-[10px] font-bold uppercase">
+          <div className="hidden sm:flex items-center rounded-lg border border-[#F2C14E]/35 bg-[#1D120B] p-0.5 text-xs md:text-[10px] font-bold uppercase">
             {([
               { id: 'slow', label: 'Chậm' },
               { id: 'normal', label: 'Vừa' },
@@ -186,7 +186,7 @@ export function LedFloatingHud({
             type="button"
             onClick={onToggleCornerQr}
             title="Hiện / Ẩn mã QR ở góc màn hình LED"
-            className={`hidden md:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-[11px] font-bold uppercase transition-colors cursor-pointer ${
+            className={`hidden md:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border text-xs md:text-[11px] font-bold uppercase transition-colors cursor-pointer ${
               showCornerQr
                 ? 'bg-[#F2C14E]/25 border-[#FFDE59] text-[#FFDE59]'
                 : 'bg-[#23150C] border-[#F2C14E]/35 text-[#e3d2c1]/75 hover:text-[#FFDE59]'
@@ -208,7 +208,7 @@ export function LedFloatingHud({
           <button
             type="button"
             onClick={onExitLed}
-            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-red-400/45 bg-red-950/60 text-red-200 text-[11px] font-bold uppercase hover:bg-red-800/80 transition-colors cursor-pointer"
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-red-400/45 bg-red-950/60 text-red-200 text-xs md:text-[11px] font-bold uppercase hover:bg-red-800/80 transition-colors cursor-pointer"
           >
             <X className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Thoát LED</span>
@@ -359,7 +359,7 @@ export function EventQrPanel({
     >
       <div className="flex items-start justify-between gap-4 pb-4 border-b border-[#F2C14E]/20">
         <div>
-          <div className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#F2C14E]">
+          <div className="text-xs md:text-[10px] font-bold uppercase tracking-[0.22em] text-[#F2C14E]">
             PHỤC VỤ SỰ KIỆN · TRÌNH CHIẾU &amp; MÃ QR
           </div>
           <h3
@@ -412,7 +412,7 @@ export function EventQrPanel({
           <div className="space-y-1.5">
             <label
               htmlFor="qr-domain-input"
-              className="block text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]"
+              className="block text-xs md:text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]"
             >
               Tên miền trang web khi phát hành QR
             </label>
@@ -424,7 +424,7 @@ export function EventQrPanel({
               className="w-full px-3 py-2 bg-[#120A05] border border-[#F2C14E]/40 text-xs sm:text-sm text-[#FFE5A3] rounded-lg focus:outline-none focus:border-[#FFDE59]"
             />
             {isLocalhost && (
-              <p className="text-[11px] text-[#FFE5A3]/75 leading-relaxed">
+              <p className="text-xs md:text-[11px] text-[#FFE5A3]/75 leading-relaxed">
                 Đang chạy ở <code className="text-[#FFDE59]">localhost</code> — đã tự động gợi ý{' '}
                 <code className="text-[#FFDE59]">{productionDomainDefault}</code> để in mã QR chuẩn cho Phật tử.
               </p>
@@ -434,38 +434,38 @@ export function EventQrPanel({
           <div className="space-y-2.5">
             <div className="p-3 bg-[#140C07] border border-[#F2C14E]/25 rounded-lg space-y-1.5">
               <div className="flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#FFDE59]">
+                <span className="inline-flex items-center gap-1.5 text-xs md:text-[11px] font-bold uppercase tracking-wider text-[#FFDE59]">
                   <Smartphone className="w-3.5 h-3.5" />
                   <span>Link Gửi Sư Phụ Duyệt &amp; Phật Tử (Responsive)</span>
                 </span>
                 <button
                   type="button"
                   onClick={() => handleCopy(mobileUrl, 'mobile')}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#28180E] border border-[#F2C14E]/45 text-[10px] font-bold uppercase text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black rounded transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#28180E] border border-[#F2C14E]/45 text-xs md:text-[10px] font-bold uppercase text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black rounded transition-colors cursor-pointer"
                 >
                   {copiedKey === 'mobile' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                   <span>{copiedKey === 'mobile' ? 'Đã Chép' : 'Sao Chép'}</span>
                 </button>
               </div>
-              <div className="text-[11px] text-[#e3d2c1]/80 break-all">{mobileUrl}</div>
+              <div className="text-xs md:text-[11px] text-[#e3d2c1]/80 break-all">{mobileUrl}</div>
             </div>
 
             <div className="p-3 bg-[#140C07] border border-[#F2C14E]/25 rounded-lg space-y-1.5">
               <div className="flex items-center justify-between gap-2">
-                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-[#FFDE59]">
+                <span className="inline-flex items-center gap-1.5 text-xs md:text-[11px] font-bold uppercase tracking-wider text-[#FFDE59]">
                   <MonitorPlay className="w-3.5 h-3.5" />
                   <span>Link Trình Chiếu Màn Hình LED Tự Động</span>
                 </span>
                 <button
                   type="button"
                   onClick={() => handleCopy(ledUrl, 'led')}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#28180E] border border-[#F2C14E]/45 text-[10px] font-bold uppercase text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black rounded transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#28180E] border border-[#F2C14E]/45 text-xs md:text-[10px] font-bold uppercase text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black rounded transition-colors cursor-pointer"
                 >
                   {copiedKey === 'led' ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
                   <span>{copiedKey === 'led' ? 'Đã Chép' : 'Sao Chép'}</span>
                 </button>
               </div>
-              <div className="text-[11px] text-[#e3d2c1]/80 break-all">{ledUrl}</div>
+              <div className="text-xs md:text-[11px] text-[#e3d2c1]/80 break-all">{ledUrl}</div>
             </div>
           </div>
 

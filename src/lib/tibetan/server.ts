@@ -1,3 +1,4 @@
+import { throttleIp } from "../throttle-ip";
 import type { Ai, PageWords } from "./api";
 
 // What the course's routes need from the Worker: the AI binding and the static files, read
@@ -22,6 +23,8 @@ const MAX_BODY = 16 * 1024;
 
 /** The JSON body of a POST, or `null` when it is missing, too big or not an object. */
 export async function readBody(request: Request): Promise<Record<string, unknown> | null> {
+	// Refuse a body that says it is too big before reading it.
+	if (Number(request.headers.get("content-length") ?? 0) > MAX_BODY) return null;
 	const text = await request.text();
 	if (text.length > MAX_BODY) return null;
 	try {
@@ -75,3 +78,6 @@ export async function cachedJson<T extends { status?: string }>(kind: string, ke
 	}
 	return value;
 }
+
+// The per-visitor brake on the AI and voice routes lives in src/lib/rate-limit.ts (the lookup page uses it too).
+export { allow, OverLimit, overLimit, tooMany } from "../rate-limit";

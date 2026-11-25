@@ -2,6 +2,7 @@
 
 import React, { FC, useCallback, useEffect, useState } from "react";
 import { ChevronUp } from "lucide-react";
+import { fitImage } from "@/utils/image";
 
 export interface AnchorSection {
   id: string;
@@ -27,14 +28,14 @@ export interface VerticalAnchorNavProps {
 export const VerticalAnchorNav: FC<VerticalAnchorNavProps> = ({
   sections,
   pageTitle = "TRANG CHỦ",
-  logoUrl = "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/bieu-tuong-tong-chi-tu-hoc-tung-lam-hoa-phuc.webp",
+  logoUrl = "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/bieu-tuong-tong-chi-tu-hoc-tung-lam-hoa-phuc.webp",
   activeSectionId,
   onSectionChange,
   position = "left",
   showAfterScroll = 400,
   className = "",
 }) => {
-  const [scrollY, setScrollY] = useState(0);
+  const [pastThreshold, setPastThreshold] = useState(false);
   const [internalActiveId, setInternalActiveId] = useState<string>(sections[0]?.id || "");
   const [imageFailed, setImageFailed] = useState(false);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
@@ -58,11 +59,15 @@ export const VerticalAnchorNav: FC<VerticalAnchorNavProps> = ({
     return () => observer.disconnect();
   }, []);
 
-  // Track window scroll position & determine active section
+  // Theo dõi vị trí cuộn và mục đang xem. Thanh này chỉ hiện từ md trở lên (hidden md:flex) nên trên điện thoại không gắn bộ nghe cuộn.
+  // Mỗi khung hình đọc vị trí một lần (requestAnimationFrame); state chỉ đổi khi giá trị đổi, nên cuộn không làm dựng lại thành phần.
   useEffect(() => {
-    const handleScroll = () => {
+    const wide = window.matchMedia("(min-width: 768px)");
+    let frame = 0;
+    const update = () => {
+      frame = 0;
       const currentScrollY = window.scrollY;
-      setScrollY(currentScrollY);
+      setPastThreshold(currentScrollY > showAfterScroll);
 
       if (activeSectionId === undefined && sections.length > 0) {
         const midScreenPos = currentScrollY + window.innerHeight / 3;
@@ -82,11 +87,28 @@ export const VerticalAnchorNav: FC<VerticalAnchorNavProps> = ({
         setInternalActiveId(currentSec);
       }
     };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    const stop = () => {
+      window.removeEventListener("scroll", onScroll);
+      if (frame) cancelAnimationFrame(frame);
+      frame = 0;
+    };
+    const sync = () => {
+      stop();
+      if (!wide.matches) return;
+      update();
+      window.addEventListener("scroll", onScroll, { passive: true });
+    };
 
-    handleScroll();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [sections, activeSectionId]);
+    sync();
+    wide.addEventListener("change", sync);
+    return () => {
+      stop();
+      wide.removeEventListener("change", sync);
+    };
+  }, [sections, activeSectionId, showAfterScroll]);
 
   const handleScrollToSection = useCallback(
     (id: string) => {
@@ -104,7 +126,7 @@ export const VerticalAnchorNav: FC<VerticalAnchorNavProps> = ({
     [onSectionChange]
   );
 
-  const isVisible = scrollY > showAfterScroll && !isFooterVisible;
+  const isVisible = pastThreshold && !isFooterVisible;
   const titleWords = (pageTitle || "").trim().split(/\s+/);
 
   const positionClass =
@@ -127,7 +149,7 @@ export const VerticalAnchorNav: FC<VerticalAnchorNavProps> = ({
         {/* ── Tầng 1: Top Logo ── */}
         {!imageFailed && logoUrl ? (
           <img
-            src={logoUrl}
+            src={fitImage(logoUrl, 160)}
             alt="Biểu tượng"
             className="h-8 w-auto object-contain mb-1.5 flex-shrink-0 drop-shadow-[0_0_6px_rgba(242,193,78,0.4)]"
             onError={() => setImageFailed(true)}

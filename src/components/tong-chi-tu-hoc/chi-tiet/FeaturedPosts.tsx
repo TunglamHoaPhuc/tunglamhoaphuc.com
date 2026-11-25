@@ -3,7 +3,8 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 interface PropsBaiVietNoiBat {
   heroBanner?: string;
@@ -18,7 +19,9 @@ interface PropsBaiVietNoiBat {
 }
 
 export function FeaturedPosts({ heroBanner, featuredArticle }: PropsBaiVietNoiBat) {
-  const bgImageSrc = getImageUrl(featuredArticle?.bgImage || heroBanner) || '/images/toan-canh-chua.jpg';
+  // Ảnh nền phủ cả chiều ngang màn hình (mờ 40%, phủ gradient): bản vừa chiều ngang, không xin ảnh gốc.
+  const bgImageSrc = fitImage(getImageUrl(featuredArticle?.bgImage || heroBanner), 1280) || '/images/hero/toan-canh-chua-1280.webp';
+  const bgImageSet = imageSrcSet(getImageUrl(featuredArticle?.bgImage || heroBanner), [640, 960, 1280, 1920]);
 
   return (
     <section id="bai-viet-noibat" className="scroll-mt-24 py-12 relative w-full">
@@ -26,14 +29,17 @@ export function FeaturedPosts({ heroBanner, featuredArticle }: PropsBaiVietNoiBa
 
         {/* TỐI ƯU HÓA: Dùng thẻ img với fallback onError mượt mà, không bị crash nếu ảnh WordPress lỗi */}
         <div className="absolute inset-0 opacity-40 scale-105 transition-transform duration-1000 ease-out group-hover:scale-100">
-          <img
+          <img width={640} height={480}
             src={bgImageSrc}
+            srcSet={bgImageSet}
+            sizes="100vw"
             alt={featuredArticle?.title || 'Bài viết nổi bật'}
             className="w-full h-full object-cover transition-all duration-700"
             style={{ objectPosition: featuredArticle?.bgPosition || 'center' }}
             loading="lazy"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+              e.currentTarget.removeAttribute('srcset');
+              (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
             }}
           />
         </div>
@@ -69,7 +75,7 @@ export function FeaturedPosts({ heroBanner, featuredArticle }: PropsBaiVietNoiBa
             <Link
               href={featuredArticle?.linkUrl || '#'}
               style={{ fontFamily: "'UTM ClassizismAntiqua', serif" }}
-              className="inline-flex items-center justify-center border border-[#c8aa6e]/80 bg-[#2a1a0e]/90 hover:bg-[#ffde59] text-[#ffde59] hover:text-[#2c1c11] font-normal px-8 sm:px-10 py-2.5 sm:py-3 rounded-xl transition-all duration-300 shadow-2xl group/btn uppercase text-sm sm:text-base tracking-wider backdrop-blur-xs"
+              className="inline-flex items-center justify-center border border-[#c8aa6e]/80 bg-[#2a1a0e]/90 hover:bg-[#ffde59] text-[#ffde59] hover:text-[#2c1c11] font-normal px-8 sm:px-10 py-2.5 sm:py-3 min-h-11 rounded-xl transition-all duration-300 shadow-2xl group/btn uppercase text-sm sm:text-base tracking-wider backdrop-blur-xs"
             >
               ĐỌC BÀI VIẾT
               <span className="ml-2 group-hover/btn:translate-x-1.5 transition-transform">&rarr;</span>

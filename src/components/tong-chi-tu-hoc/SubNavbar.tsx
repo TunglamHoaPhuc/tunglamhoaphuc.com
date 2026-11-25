@@ -3,9 +3,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ChevronRight } from 'lucide-react';
+import { ChevronDown, ChevronRight, ListTree } from 'lucide-react';
 import { NAV_ITEMS } from '@/data/tong-chi-tu-hoc-data';
 import { NavDropdownPanel } from './NavDropdownPanel';
+import { fitImage } from '@/utils/image';
 
 interface NavItem {
   id: string;
@@ -30,6 +31,7 @@ export function SubNavbar({
   logoUrl,
 }: SubNavbarProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isTocOpen, setIsTocOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname() || '';
 
@@ -51,83 +53,133 @@ export function SubNavbar({
 
   const logoSrc = logoUrl || (
     isHoangPhap
-      ? '/images/icons/icon-dong-chay-hoang-phap.webp'
+      ? '/images/icons/icon-dong-chay-hoang-phap-128.webp'
       : isUniverse
-      ? 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-moc-an.webp'
-      : 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/bieu-tuong-tong-chi-tu-hoc-tung-lam-hoa-phuc.webp'
+      ? '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-moc-an.webp'
+      : '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/bieu-tuong-tong-chi-tu-hoc-tung-lam-hoa-phuc.webp'
   );
 
   // Click outside listener
+  const anyOpen = isDropdownOpen || isTocOpen;
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    function handleClickOutside(event: Event) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsDropdownOpen(false);
+        setIsTocOpen(false);
       }
     }
-    if (isDropdownOpen) {
+    function handleKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsDropdownOpen(false);
+        setIsTocOpen(false);
+      }
+    }
+    if (anyOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside, { passive: true });
+      document.addEventListener('keydown', handleKey);
     }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      document.removeEventListener('keydown', handleKey);
     };
-  }, [isDropdownOpen]);
+  }, [anyOpen]);
 
   return (
     <nav
-      className={`sticky top-[64px] z-30 bg-[#2c1c11]/95 w-full py-3.5 md:py-4 flex items-center min-h-[56px] border-t border-[#F2C14E]/20 backdrop-blur-md border-b border-[#f2cc8f]/20 shadow-xl transition-all duration-300 transform-gpu ease-out ${
-        isScrolled ? 'opacity-0 -translate-y-full pointer-events-none' : 'opacity-100 translate-y-0'
+      className={`sticky md:static top-[64px] z-30 bg-[#2c1c11]/95 w-full py-1.5 md:py-4 flex items-center min-h-[56px] border-t border-[#F2C14E]/20 sm:backdrop-blur-md border-b border-[#f2cc8f]/20 shadow-xl transition-all duration-300 transform-gpu ease-out ${
+        // Trên điện thoại thanh này là lối điều hướng duy nhất (thanh dọc bên trái chỉ có từ md), nên không ẩn khi cuộn.
+        isScrolled ? 'md:opacity-0 md:-translate-y-full md:pointer-events-none' : ''
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 pl-28 md:pl-40 lg:pl-48 h-full flex items-center justify-between gap-4 py-1 w-full my-auto">
-        {/* KHỐI TRÁI: LOGO + NÚT TRÒN ( > ) MỞ DROPDOWN + TIÊU ĐỀ */}
-        <div ref={dropdownRef} className="relative flex items-center justify-center my-auto space-x-2 md:space-x-3 flex-shrink-0">
-          <div className="h-8 w-[1px] bg-gradient-to-b from-transparent via-[#c8aa6e]/60 to-transparent flex-shrink-0 my-auto" />
+      <div className="max-w-7xl mx-auto px-3 pl-[9.5rem] md:px-4 md:pl-40 lg:pl-48 h-full flex items-center justify-between gap-4 py-0 md:py-1 w-full my-auto">
+        {/* KHỐI TRÁI: LOGO + NÚT TRÒN ( > ) MỞ DROPDOWN + TIÊU ĐỀ.
+            Điện thoại: khối này chiếm cả hàng (tiêu đề co lại và cắt bớt chữ), các nút cao 44 px; dropdown trải theo chiều ngang thanh. */}
+        <div ref={dropdownRef} className="md:relative flex items-center justify-center my-auto gap-1 md:gap-0 md:space-x-3 flex-1 min-w-0 md:flex-none md:flex-shrink-0">
+          <div className="hidden md:block h-8 w-[1px] bg-gradient-to-b from-transparent via-[#c8aa6e]/60 to-transparent flex-shrink-0 my-auto" />
 
-          <Link href={homeHref} title={homeTitle} className="flex items-center">
-            <img
-              src={logoSrc}
+          <Link href={homeHref} title={homeTitle} className="hidden md:flex items-center flex-shrink-0">
+            <img width={128} height={128}
+              src={fitImage(logoSrc, 160)}
               alt={homeTitle}
-              loading="lazy"
               decoding="async"
-              className="h-10 md:h-12 w-auto object-contain flex-shrink-0 my-auto drop-shadow-[0_0_8px_rgba(242,193,78,0.4)] hover:scale-105 transition-transform"
+              className="h-9 md:h-12 w-auto object-contain flex-shrink-0 my-auto drop-shadow-[0_0_8px_rgba(242,193,78,0.4)] hover:scale-105 transition-transform"
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-moc-an.webp';
+                (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/logo-moc-an.webp';
               }}
             />
           </Link>
 
-          {/* NÚT TRÒN ( > ) BẤM VÀO ĐỂ MỞ DROPDOWN MƯỢT MÀ */}
+          {/* NÚT TRÒN ( > ) BẤM VÀO ĐỂ MỞ DROPDOWN MƯỢT MÀ (vùng chạm 44 px trên điện thoại, hình tròn vẫn 28 px) */}
           <button
             type="button"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className={`w-6 h-6 md:w-7 md:h-7 rounded-full flex items-center justify-center shadow-md flex-shrink-0 my-auto cursor-pointer transition-all duration-300 border ${
-              isDropdownOpen
-                ? 'bg-[#FFDE59] text-[#1C120A] border-[#FFDE59] shadow-[0_0_12px_#FFDE59] scale-110'
-                : 'bg-[#f2cc8f] hover:bg-[#ffde59] text-[#2c1c11] border-[#f2cc8f] hover:scale-110'
-            }`}
+            onClick={() => {
+              setIsDropdownOpen(!isDropdownOpen);
+              setIsTocOpen(false);
+            }}
+            aria-expanded={isDropdownOpen}
+            aria-label="Xem danh mục nội dung"
+            className="group/chev hidden md:flex w-7 h-7 items-center justify-center flex-shrink-0 my-auto cursor-pointer"
             title="Bấm để xem danh mục nội dung"
           >
-            <ChevronRight
-              className={`w-3.5 h-3.5 md:w-4 md:h-4 stroke-[2.5] transition-transform duration-300 ${
-                isDropdownOpen ? 'rotate-90' : 'rotate-0'
+            <span
+              className={`w-7 h-7 rounded-full flex items-center justify-center shadow-md transition-all duration-300 border ${
+                isDropdownOpen
+                  ? 'bg-[#FFDE59] text-[#1C120A] border-[#FFDE59] shadow-[0_0_12px_#FFDE59] scale-110'
+                  : 'bg-[#f2cc8f] group-hover/chev:bg-[#ffde59] text-[#2c1c11] border-[#f2cc8f] group-hover/chev:scale-110'
               }`}
-            />
+            >
+              <ChevronRight
+                className={`w-4 h-4 stroke-[2.5] transition-transform duration-300 ${
+                  isDropdownOpen ? 'rotate-90' : 'rotate-0'
+                }`}
+              />
+            </span>
           </button>
 
           {/* TIÊU ĐỀ TRÊN THANH BAR (BẤM ĐỂ MỞ DROPDOWN) */}
           <button
             type="button"
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+            onClick={() => {
+              setIsDropdownOpen(!isDropdownOpen);
+              setIsTocOpen(false);
+            }}
             style={{ fontFamily: "'UTM Niagara', sans-serif" }}
-            className="group/title text-xl sm:text-2xl md:text-3xl text-[#ffde59] hover:text-white tracking-wide uppercase drop-shadow-[0_0_10px_rgba(255,222,89,0.4)] whitespace-nowrap flex items-center justify-center gap-1.5 my-auto cursor-pointer px-1.5 py-0.5 rounded-xl hover:bg-[#F2C14E]/10 transition-colors"
+            className="group/title flex-1 min-w-0 md:flex-none text-xl sm:text-2xl md:text-3xl text-[#ffde59] hover:text-white tracking-wide uppercase drop-shadow-[0_0_10px_rgba(255,222,89,0.4)] md:whitespace-nowrap flex items-center justify-start md:justify-center gap-1.5 my-auto cursor-pointer px-1.5 py-0.5 min-h-11 md:min-h-0 rounded-xl hover:bg-[#F2C14E]/10 transition-colors text-left leading-[1.1] md:leading-9"
             title="Bấm để xem danh mục nội dung"
           >
-            <span>{pageTitle}</span>
+            <span className="line-clamp-2 md:line-clamp-none">{pageTitle}</span>
+            <ChevronDown
+              aria-hidden="true"
+              className={`md:hidden w-4 h-4 shrink-0 text-[#f2cc8f] transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`}
+            />
           </button>
+
+          {/* MỤC LỤC CỦA TRANG (CHỈ ĐIỆN THOẠI): thay cho dải chấm điều hướng ngang chỉ có từ md */}
+          {navItems.length > 0 && (
+            <button
+              type="button"
+              onClick={() => {
+                setIsTocOpen(!isTocOpen);
+                setIsDropdownOpen(false);
+              }}
+              aria-expanded={isTocOpen}
+              aria-label="Mục lục trang"
+              title="Mục lục trang"
+              className={`md:hidden w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 my-auto cursor-pointer border transition-colors ${
+                isTocOpen
+                  ? 'bg-[#FFDE59] text-[#1C120A] border-[#FFDE59]'
+                  : 'bg-[#3A2718]/80 text-[#ffde59] border-[#F2C14E]/40'
+              }`}
+            >
+              <ListTree className="w-5 h-5" />
+            </button>
+          )}
 
           {/* 🪷 DROPDOWN MENU CHUẨN XÁC NỘI DUNG VỚI FONT UTM AVO BOLD VIẾT HOA 🪷 */}
           {isDropdownOpen && (
-            <div className="absolute left-10 top-full mt-3 z-[100] animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200">
+            <div className="absolute left-3 right-3 md:right-auto md:left-10 top-full mt-2 md:mt-3 z-[100] animate-in fade-in zoom-in-95 slide-in-from-top-2 duration-200">
               <NavDropdownPanel
                 pageTitle={pageTitle}
                 activeSection={activeSection}
@@ -136,12 +188,47 @@ export function SubNavbar({
             </div>
           )}
 
-          <div className="h-8 w-[1px] bg-gradient-to-b from-transparent via-[#c8aa6e]/60 to-transparent flex-shrink-0 ml-2 my-auto" />
+          {isTocOpen && (
+            <div
+              className="md:hidden absolute left-3 right-3 top-full mt-2 z-[100] rounded-2xl border-2 border-[#F2C14E] bg-[#1C120A]/98 p-2 shadow-[0_12px_40px_rgba(0,0,0,0.85)] animate-in fade-in zoom-in-95 duration-200"
+              style={{ fontFamily: "'UTM Avo', sans-serif" }}
+            >
+              <p className="px-2 pb-1.5 mb-1 border-b border-[#F2C14E]/30 text-xs font-bold uppercase tracking-wider text-[#F2C14E]">
+                Mục lục trang
+              </p>
+              <ul className="max-h-[min(22rem,60svh)] overflow-y-auto overscroll-contain space-y-1">
+                {navItems.map((item) => {
+                  const isActive = activeSection === item.id;
+                  return (
+                    <li key={item.id}>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsTocOpen(false);
+                          onScrollToSection(item.id);
+                        }}
+                        className={`w-full min-h-11 px-3 py-2 rounded-xl border text-left text-sm font-bold uppercase tracking-wide leading-snug transition-colors cursor-pointer ${
+                          isActive
+                            ? 'bg-[#3A2718] border-[#F2C14E] text-[#ffde59]'
+                            : 'bg-[#25170E]/70 border-[#F2C14E]/20 text-[#FFE5A3]'
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          )}
+
+          <div className="hidden md:block h-8 w-[1px] bg-gradient-to-b from-transparent via-[#c8aa6e]/60 to-transparent flex-shrink-0 ml-2 my-auto" />
 
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="w-8 h-8 md:w-9 md:h-9 rounded-full bg-[#e8dbb8] text-[#2c1c11] border-2 border-[#b8a679] flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.7),0_0_8px_rgba(255,222,89,0.25)] hover:scale-110 hover:bg-[#ffde59] hover:border-[#ffde59] transition-all duration-300 ml-1 md:ml-2 flex-shrink-0 cursor-pointer my-auto"
+            className="w-11 h-11 md:w-9 md:h-9 rounded-full bg-[#e8dbb8] text-[#2c1c11] border-2 border-[#b8a679] flex items-center justify-center shadow-[0_4px_12px_rgba(0,0,0,0.7),0_0_8px_rgba(255,222,89,0.25)] hover:scale-110 hover:bg-[#ffde59] hover:border-[#ffde59] transition-all duration-300 md:ml-2 flex-shrink-0 cursor-pointer my-auto"
             title="Lên đầu trang"
+            aria-label="Lên đầu trang"
             type="button"
           >
             <svg className="w-4 h-4 md:w-5 md:h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -150,8 +237,8 @@ export function SubNavbar({
           </button>
         </div>
 
-        {/* KHỐI PHẢI: NAV NGANG */}
-        <div className="flex-1 flex items-center justify-between ml-4 md:ml-8 overflow-x-auto no-scrollbar py-1 my-auto">
+        {/* KHỐI PHẢI: NAV NGANG (từ md; điện thoại dùng nút Mục lục ở trên) */}
+        <div className="hidden md:flex flex-1 items-center justify-between ml-4 md:ml-8 overflow-x-auto no-scrollbar py-1 my-auto">
           {navItems.map((item, idx) => {
             const isActive = activeSection === item.id;
             return (

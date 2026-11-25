@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { SectionData } from '@/types/tong-chi-tu-hoc';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 
 interface SectionCarouselProps {
   section: SectionData;
@@ -18,7 +18,8 @@ export function SectionCarousel({ section, dynamicBgImage }: SectionCarouselProp
   const [canScrollRight, setCanScrollRight] = useState(true);
 
   // Ưu tiên: ảnh nền do trang truyền vào -> bgImage của khối -> bgWatermark
-  const bgImage = getImageUrl(dynamicBgImage || section.bgImage || section.bgWatermark || '');
+  // Nền mờ (opacity 0,3, mặt nạ) phủ cả khối: bản 1280 là đủ.
+  const bgImage = fitImage(getImageUrl(dynamicBgImage || section.bgImage || section.bgWatermark || ''), 640);
 
   const checkScrollability = useCallback(() => {
     if (scrollRef.current) {
@@ -51,21 +52,30 @@ export function SectionCarousel({ section, dynamicBgImage }: SectionCarouselProp
   };
 
   return (
-    <section id={section.id} className="scroll-mt-24 space-y-6 relative rounded-2xl p-6 overflow-hidden">
+    <section id={section.id} className="scroll-mt-36 md:scroll-mt-24 space-y-6 relative rounded-2xl p-3 sm:p-6 overflow-hidden">
       {/* HIỆU ỨNG NỀN MỜ SANG TRỌNG */}
       {bgImage && (
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none mix-blend-luminosity [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]"
-          style={{ backgroundImage: `url('${bgImage}')` }}
-        />
+        <div className="absolute inset-0 opacity-30 pointer-events-none mix-blend-luminosity [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]">
+          <img
+            width={640}
+            height={427}
+            src={bgImage}
+            alt=""
+            aria-hidden="true"
+            loading="lazy"
+            decoding="async"
+            fetchPriority="low"
+            className="w-full h-full object-cover"
+          />
+        </div>
       )}
 
       {/* HEADER SECTION */}
       <div className="flex items-center justify-between border-b border-[#523622] pb-3 relative z-10 gap-4">
-        <div className="flex items-center gap-4 flex-1">
+        <div className="flex items-center gap-4 flex-1 min-w-0">
           <h2
             style={{ fontFamily: "'UTM ClassizismAntiqua', serif" }}
-            className="text-2xl md:text-3xl text-[#ffde59] tracking-wider uppercase whitespace-nowrap"
+            className="text-2xl md:text-3xl text-[#ffde59] tracking-wider uppercase md:whitespace-nowrap leading-tight"
           >
             {section.title}
           </h2>
@@ -76,11 +86,11 @@ export function SectionCarousel({ section, dynamicBgImage }: SectionCarouselProp
           </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
           <button
             type="button"
             onClick={() => handleScroll('left')}
-            className="w-8 h-8 rounded-lg bg-[#382417] border border-[#593b26] hover:border-[#f2cc8f] text-[#f2cc8f] flex items-center justify-center transition-all cursor-pointer shadow-sm hover:scale-105"
+            className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#382417] border border-[#593b26] hover:border-[#f2cc8f] text-[#f2cc8f] flex items-center justify-center transition-all cursor-pointer shadow-sm hover:scale-105"
             title="Cuộn sang trái"
           >
             <ChevronLeft className="w-4 h-4" />
@@ -88,7 +98,7 @@ export function SectionCarousel({ section, dynamicBgImage }: SectionCarouselProp
           <button
             type="button"
             onClick={() => handleScroll('right')}
-            className="w-8 h-8 rounded-lg bg-[#382417] border border-[#593b26] hover:border-[#f2cc8f] text-[#f2cc8f] flex items-center justify-center transition-all cursor-pointer shadow-sm hover:scale-105"
+            className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg bg-[#382417] border border-[#593b26] hover:border-[#f2cc8f] text-[#f2cc8f] flex items-center justify-center transition-all cursor-pointer shadow-sm hover:scale-105"
             title="Cuộn sang phải"
           >
             <ChevronRight className="w-4 h-4" />
@@ -121,14 +131,16 @@ export function SectionCarousel({ section, dynamicBgImage }: SectionCarouselProp
 
           return (
             <Link
+              prefetch={false}
               key={card.id}
               href={card.link || '#'}
               target={isExternal ? '_blank' : '_self'}
               rel={isExternal ? 'noopener noreferrer' : undefined}
-              className="group relative flex-none w-[280px] md:w-[310px] h-[380px] rounded-xl overflow-hidden cursor-pointer border border-[#593b26] hover:border-[#f2cc8f] transition-all duration-300 ease-out hover:shadow-[0_0_30px_rgba(242,204,143,0.4)] hover:-translate-y-1.5 snap-start block transform-gpu"
+              className="group relative flex-none w-[min(280px,80vw)] md:w-[310px] h-[380px] rounded-xl overflow-hidden cursor-pointer border border-[#593b26] hover:border-[#f2cc8f] transition-all duration-300 ease-out hover:shadow-[0_0_30px_rgba(242,204,143,0.4)] hover:-translate-y-1.5 snap-start block transform-gpu"
             >
               <Image
-                src={getImageUrl(card.imageUrl) || '/images/toan-canh-chua.jpg'}
+                // Thẻ cao 310×380, object-cover: ảnh ngang phải phủ hết chiều cao nên cần rộng hơn khung, 960 là vừa.
+                src={fitImage(getImageUrl(card.imageUrl), 960) || '/images/hero/toan-canh-chua-1280.webp'}
                 alt={card.title}
                 fill
                 loading="lazy"

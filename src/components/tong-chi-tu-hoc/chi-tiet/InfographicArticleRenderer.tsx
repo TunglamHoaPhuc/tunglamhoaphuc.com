@@ -21,6 +21,7 @@ import {
   Users
 } from 'lucide-react';
 import { getImageUrl } from '@/utils/image';
+import { bodyImageSources, bodyZoomSrc } from '@/lib/body-images';
 import { FourCirclesPortalSection } from './FourCirclesPortalSection';
 import { RichHtmlBody } from '@/components/article/RichHtmlBody';
 import { htmlToRendererText, needsRichHtml, splitLinks } from '@/lib/article-html';
@@ -302,7 +303,7 @@ function FourPillarsGrid() {
             <div className="w-8 h-0.5 bg-[#F2C14E]/40 mb-3 group-hover:w-16 transition-all" />
             <p
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
-              className="text-xs sm:text-sm text-[#FFE5A3]/90 leading-relaxed"
+              className="text-sm text-[#FFE5A3]/90 leading-relaxed"
             >
               {c.desc}
             </p>
@@ -376,7 +377,7 @@ function FourDrawersSection() {
                   {d.title}
                 </h5>
               </div>
-              <p className="text-xs text-[#FFE5A3]/80 italic mb-3">
+              <p className="text-[13px] sm:text-xs text-[#FFE5A3]/80 italic mb-3">
                 {d.subtitle}
               </p>
               
@@ -390,7 +391,7 @@ function FourDrawersSection() {
                   >
                     <div className="flex items-center gap-2">
                       <span className="w-1.5 h-1.5 rounded-full bg-[#F2C14E] group-hover/item:scale-125 transition-transform" />
-                      <span className="text-xs sm:text-sm font-medium tracking-wide">{item.name}</span>
+                      <span className="text-sm font-medium tracking-wide">{item.name}</span>
                     </div>
                     <ArrowRight className="w-3.5 h-3.5 text-[#F2C14E]/70 group-hover/item:text-[#FFDE59] group-hover/item:translate-x-0.5 transition-all" />
                   </Link>
@@ -451,7 +452,7 @@ function TamQuyThreeJewelsGrid({ onKeywordClick }: { onKeywordClick: (kw: string
   return (
     <div className="my-10 space-y-4 select-none">
       <div className="text-center mb-6">
-        <span className="px-3.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[#FFDE59] text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-1.5 shadow-sm">
+        <span className="px-3.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[#FFDE59] text-xs sm:text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-1.5 shadow-sm">
           <Sparkles className="w-3.5 h-3.5 text-[#F2C14E]" />
           <span>Infographic • Ba Viên Ngọc Quý Của Thế Gian</span>
         </span>
@@ -477,7 +478,7 @@ function TamQuyThreeJewelsGrid({ onKeywordClick }: { onKeywordClick: (kw: string
                 <span className="text-3xl p-2.5 rounded-xl bg-black/40 border border-[#F2C14E]/30 shadow-inner">
                   {j.symbol}
                 </span>
-                <span className="px-2.5 py-1 rounded-full bg-[#1C120A] border border-[#F2C14E]/40 text-[#FFDE59] text-[10px] font-bold uppercase tracking-wider">
+                <span className="px-2.5 py-1 rounded-full bg-[#1C120A] border border-[#F2C14E]/40 text-[#FFDE59] text-xs sm:text-[10px] font-bold uppercase tracking-wider">
                   {j.role}
                 </span>
               </div>
@@ -490,16 +491,16 @@ function TamQuyThreeJewelsGrid({ onKeywordClick }: { onKeywordClick: (kw: string
               </h5>
 
               <div className="my-3.5 p-2.5 rounded-xl bg-black/30 border border-[#F2C14E]/20 space-y-1.5 text-center">
-                <div className="text-xs font-semibold text-[#FFE5A3]">
+                <div className="text-[13px] sm:text-xs font-semibold text-[#FFE5A3]">
                   Hình tượng: <strong className="text-white">{j.badge}</strong>
                 </div>
                 <div className="text-[#F2C14E] text-xs font-bold flex items-center justify-center gap-1">
                   <span>↓</span>
-                  <span className="text-[11px] uppercase tracking-wider">{j.arrowText}</span>
+                  <span className="text-xs sm:text-[11px] uppercase tracking-wider">{j.arrowText}</span>
                 </div>
               </div>
 
-              <p className="text-xs sm:text-sm text-[#FFE5A3]/90 leading-relaxed mt-2">
+              <p className="text-sm text-[#FFE5A3]/90 leading-relaxed mt-2">
                 {j.desc}
               </p>
             </div>
@@ -527,7 +528,7 @@ function TamBaoInnerOuterBranch({ onKeywordClick }: { onKeywordClick: (kw: strin
   return (
     <div className="my-10 space-y-4 select-none">
       <div className="text-center mb-6">
-        <span className="px-3.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[#FFDE59] text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-1.5 shadow-sm">
+        <span className="px-3.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[#FFDE59] text-xs sm:text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-1.5 shadow-sm">
           <Layers className="w-3.5 h-3.5 text-[#F2C14E]" />
           <span>Infographic • Nhị Thể Tam Bảo</span>
         </span>
@@ -546,7 +547,7 @@ function TamBaoInnerOuterBranch({ onKeywordClick }: { onKeywordClick: (kw: strin
           <div>
             <div className="flex items-center justify-between gap-2 border-b border-[#F2C14E]/20 pb-3">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#F2C14E]">
+                <span className="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-[#F2C14E]">
                   Hình tướng thế gian
                 </span>
                 <h5
@@ -559,7 +560,7 @@ function TamBaoInnerOuterBranch({ onKeywordClick }: { onKeywordClick: (kw: strin
               <span className="text-2xl">🏛️</span>
             </div>
 
-            <p className="text-xs italic text-[#FFE5A3]/80 my-3">
+            <p className="text-[13px] sm:text-xs italic text-[#FFE5A3]/80 my-3">
               Hình ảnh tôn nghiêm của Tam Bảo nơi chốn già lam nâng đỡ sơ tâm, gieo duyên lành giải thoát.
             </p>
 
@@ -568,7 +569,7 @@ function TamBaoInnerOuterBranch({ onKeywordClick }: { onKeywordClick: (kw: strin
                 <span className="text-xl shrink-0 mt-0.5">🪷</span>
                 <div>
                   <h6 className="text-xs font-bold text-[#FFDE59] uppercase">PHẬT BẢO</h6>
-                  <p className="text-xs text-[#FFE5A3]/90 mt-0.5">
+                  <p className="text-[13px] sm:text-xs text-[#FFE5A3]/90 mt-0.5">
                     Tôn tượng Phật, tranh ảnh Phật trang nghiêm, nhắc nhở tấm gương giác ngộ viên mãn của Đấng Từ Phụ.
                   </p>
                 </div>
@@ -578,7 +579,7 @@ function TamBaoInnerOuterBranch({ onKeywordClick }: { onKeywordClick: (kw: strin
                 <span className="text-xl shrink-0 mt-0.5">📖</span>
                 <div>
                   <h6 className="text-xs font-bold text-[#FFDE59] uppercase">PHÁP BẢO</h6>
-                  <p className="text-xs text-[#FFE5A3]/90 mt-0.5">
+                  <p className="text-[13px] sm:text-xs text-[#FFE5A3]/90 mt-0.5">
                     Kinh sách, băng giảng, lời dạy chánh biến tri chỉ rõ con đường chuyển hóa khổ đau thành an lạc.
                   </p>
                 </div>
@@ -588,7 +589,7 @@ function TamBaoInnerOuterBranch({ onKeywordClick }: { onKeywordClick: (kw: strin
                 <span className="text-xl shrink-0 mt-0.5">👥</span>
                 <div>
                   <h6 className="text-xs font-bold text-[#FFDE59] uppercase">TĂNG BẢO</h6>
-                  <p className="text-xs text-[#FFE5A3]/90 mt-0.5">
+                  <p className="text-[13px] sm:text-xs text-[#FFE5A3]/90 mt-0.5">
                     Đoàn thể xuất gia hòa hợp, những người thầy, người bạn đồng hành sống đời giới hạnh thanh tịnh.
                   </p>
                 </div>
@@ -613,7 +614,7 @@ function TamBaoInnerOuterBranch({ onKeywordClick }: { onKeywordClick: (kw: strin
           <div>
             <div className="flex items-center justify-between gap-2 border-b border-[#F2C14E]/20 pb-3">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-[#FFDE59]">
+                <span className="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-[#FFDE59]">
                   Tâm tính nội tại
                 </span>
                 <h5
@@ -626,7 +627,7 @@ function TamBaoInnerOuterBranch({ onKeywordClick }: { onKeywordClick: (kw: strin
               <span className="text-2xl">✨</span>
             </div>
 
-            <p className="text-xs italic text-[#FFE5A3]/80 my-3">
+            <p className="text-[13px] sm:text-xs italic text-[#FFE5A3]/80 my-3">
               Ánh sáng giác ngộ không ở đâu xa, mà được nuôi dưỡng ngay trong tự tâm qua từng phút giây tỉnh thức.
             </p>
 
@@ -635,7 +636,7 @@ function TamBaoInnerOuterBranch({ onKeywordClick }: { onKeywordClick: (kw: strin
                 <span className="text-xl shrink-0 mt-0.5">✨</span>
                 <div>
                   <h6 className="text-xs font-bold text-[#FFDE59] uppercase">PHẬT LÀ GIÁC NGỘ</h6>
-                  <p className="text-xs text-[#FFE5A3]/90 mt-0.5">
+                  <p className="text-[13px] sm:text-xs text-[#FFE5A3]/90 mt-0.5">
                     Năng lực tỉnh thức bên trong chính mình. Phật chính là tâm sáng suốt, nhận biết rõ ràng mọi suy nghĩ và hành động.
                   </p>
                 </div>
@@ -645,7 +646,7 @@ function TamBaoInnerOuterBranch({ onKeywordClick }: { onKeywordClick: (kw: strin
                 <span className="text-xl shrink-0 mt-0.5">🌱</span>
                 <div>
                   <h6 className="text-xs font-bold text-[#FFDE59] uppercase">PHÁP LÀ KHỞI NGUYỆN TU HỌC</h6>
-                  <p className="text-xs text-[#FFE5A3]/90 mt-0.5">
+                  <p className="text-[13px] sm:text-xs text-[#FFE5A3]/90 mt-0.5">
                     Ý niệm muốn hướng thiện, muốn tu học Phật pháp. Năng lượng thôi thúc hướng thượng trong tâm chính là Pháp bảo bên trong.
                   </p>
                 </div>
@@ -655,7 +656,7 @@ function TamBaoInnerOuterBranch({ onKeywordClick }: { onKeywordClick: (kw: strin
                 <span className="text-xl shrink-0 mt-0.5">🪷</span>
                 <div>
                   <h6 className="text-xs font-bold text-[#FFDE59] uppercase">TĂNG LÀ TÂM THANH TỊNH</h6>
-                  <p className="text-xs text-[#FFE5A3]/90 mt-0.5">
+                  <p className="text-[13px] sm:text-xs text-[#FFE5A3]/90 mt-0.5">
                     Không hướng tâm vào điều tiêu cực, xấu ác. Ngay khoảnh khắc tâm an định, trong sáng thì Tăng bảo đang hiển lộ trong ta.
                   </p>
                 </div>
@@ -708,7 +709,7 @@ function TamBaoInDailyLifeGrid() {
   return (
     <div className="my-10 space-y-4 select-none">
       <div className="text-center mb-6">
-        <span className="px-3.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[#FFDE59] text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-1.5 shadow-sm">
+        <span className="px-3.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[#FFDE59] text-xs sm:text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-1.5 shadow-sm">
           <Compass className="w-3.5 h-3.5 text-[#F2C14E]" />
           <span>Thực Tại Hiện Tiền • Tam Bảo Trong Mái Ấm</span>
         </span>
@@ -732,7 +733,7 @@ function TamBaoInDailyLifeGrid() {
                 <span className="text-2xl p-2 rounded-xl bg-black/40 border border-[#F2C14E]/30">
                   {c.icon}
                 </span>
-                <span className="text-[10px] font-bold uppercase text-[#F2C14E] tracking-wider">
+                <span className="text-xs sm:text-[10px] font-bold uppercase text-[#F2C14E] tracking-wider">
                   {c.role}
                 </span>
               </div>
@@ -743,11 +744,11 @@ function TamBaoInDailyLifeGrid() {
               >
                 {c.title}
               </h5>
-              <div className="text-xs font-semibold text-[#FFE5A3] mt-1 mb-2">
+              <div className="text-[13px] sm:text-xs font-semibold text-[#FFE5A3] mt-1 mb-2">
                 {c.subtitle}
               </div>
               <div className="w-10 h-0.5 bg-[#F2C14E]/40 mb-3 group-hover:w-20 transition-all" />
-              <p className="text-xs sm:text-sm text-[#FFE5A3]/90 leading-relaxed">
+              <p className="text-sm text-[#FFE5A3]/90 leading-relaxed">
                 {c.desc}
               </p>
             </div>
@@ -814,7 +815,7 @@ function TamQuyDailyPracticesGrid() {
   return (
     <div className="my-10 space-y-4 select-none">
       <div className="text-center mb-6">
-        <span className="px-3.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[#FFDE59] text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-1.5 shadow-sm">
+        <span className="px-3.5 py-1 rounded-full bg-[#F2C14E]/15 border border-[#F2C14E]/40 text-[#FFDE59] text-xs sm:text-[11px] font-bold uppercase tracking-widest inline-flex items-center gap-1.5 shadow-sm">
           <Leaf className="w-3.5 h-3.5 text-[#F2C14E]" />
           <span>Hành Trì Hằng Ngày • Nuôi Dưỡng Đức Tin</span>
         </span>
@@ -839,7 +840,7 @@ function TamQuyDailyPracticesGrid() {
                   {p.icon}
                 </span>
                 <div>
-                  <span className="text-[10px] font-bold text-[#F2C14E] uppercase tracking-wider">
+                  <span className="text-xs sm:text-[10px] font-bold text-[#F2C14E] uppercase tracking-wider">
                     Hành Trì
                   </span>
                   <h5
@@ -851,10 +852,10 @@ function TamQuyDailyPracticesGrid() {
                 </div>
               </div>
 
-              <p className="text-xs font-semibold text-[#FFE5A3] mt-2 mb-1">
+              <p className="text-[13px] sm:text-xs font-semibold text-[#FFE5A3] mt-2 mb-1">
                 {p.action}
               </p>
-              <p className="text-[11px] sm:text-xs text-[#FFE5A3]/80 leading-relaxed mb-4">
+              <p className="text-[13px] sm:text-sm text-[#FFE5A3]/80 leading-relaxed mb-4">
                 {p.desc}
               </p>
             </div>
@@ -1565,21 +1566,25 @@ export function InfographicArticleRenderer({
                   <div key={elIdx} className="my-8 text-center w-full max-w-2xl mx-auto select-none">
                     <div 
                       onClick={() => setZoomImage({ src: el.src, caption: el.caption })}
-                      className="rounded-2xl overflow-hidden border-2 border-[#F2C14E]/50 shadow-[0_10px_35px_rgba(0,0,0,0.8)] bg-black/40 group p-1 backdrop-blur-sm cursor-zoom-in relative inline-block max-w-full"
+                      className="rounded-2xl overflow-hidden border-2 border-[#F2C14E]/50 shadow-[0_10px_35px_rgba(0,0,0,0.8)] bg-black/40 group p-1 sm:backdrop-blur-sm cursor-zoom-in relative inline-block max-w-full"
                     >
+                      {/* width/height chỉ để trình duyệt giữ chỗ theo tỉ lệ 3:2 trước khi ảnh về (h-auto vẫn theo ảnh thật): bớt xô lệch bố cục. */}
                       <img
-                        src={getImageUrl(el.src)}
+                        width={672}
+                        height={448}
+                        {...bodyImageSources(el.src, '(max-width: 704px) 100vw, 672px')}
                         alt={el.alt || el.caption || 'Hình ảnh minh họa'}
                         className="w-full max-h-[650px] h-auto object-contain rounded-xl transition-transform duration-500 group-hover:scale-[1.01]"
                         loading="lazy"
+                        decoding="async"
                       />
-                      <div className="absolute bottom-3 right-3 p-1.5 rounded-lg bg-black/75 text-[#F2C14E] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-[11px] backdrop-blur-xs">
+                      <div className="absolute bottom-3 right-3 p-1.5 rounded-lg bg-black/75 text-[#F2C14E] opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1 text-xs sm:text-[11px] backdrop-blur-xs">
                         <ZoomIn className="w-3.5 h-3.5" />
                         <span>Phóng to</span>
                       </div>
                     </div>
                     {el.caption && (
-                      <p className="mt-2.5 text-xs sm:text-sm italic text-[#FFE5A3]/90 leading-relaxed text-center max-w-xl mx-auto">
+                      <p className="mt-2.5 text-sm italic text-[#FFE5A3]/90 leading-relaxed text-center max-w-xl mx-auto">
                         ({el.caption})
                       </p>
                     )}
@@ -1647,7 +1652,7 @@ export function InfographicArticleRenderer({
                         >
                           {el.ordered ? item.marker : null}
                         </span>
-                        <div className="flex-1 text-justify [text-align-last:left]">
+                        <div className="flex-1 text-left sm:text-justify [text-align-last:left]">
                           {highlightText(item.text, popups, onKeywordClick)}
                         </div>
                       </li>
@@ -1685,7 +1690,7 @@ export function InfographicArticleRenderer({
                   <p
                     key={elIdx}
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                    className="text-base sm:text-lg md:text-xl text-[#FFDE59] leading-relaxed md:leading-loose text-justify [text-align-last:left] tracking-wide my-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] first-letter:float-left first-letter:[font-family:'UTM_ClassizismAntiqua','UTM_ClassicAntiqua',serif] first-letter:text-6xl md:first-letter:text-7xl first-letter:font-bold first-letter:text-[#ffde59] first-letter:mr-3.5 first-letter:mb-1 first-letter:pb-1.5 first-letter:border-b-2 first-letter:border-[#ffde59] first-letter:leading-none"
+                    className="text-base sm:text-lg md:text-xl text-[#FFDE59] leading-relaxed md:leading-loose text-left sm:text-justify [text-align-last:left] tracking-wide my-6 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] first-letter:float-left first-letter:[font-family:'UTM_ClassizismAntiqua','UTM_ClassicAntiqua',serif] first-letter:text-6xl md:first-letter:text-7xl first-letter:font-bold first-letter:text-[#ffde59] first-letter:mr-3.5 first-letter:mb-1 first-letter:pb-1.5 first-letter:border-b-2 first-letter:border-[#ffde59] first-letter:leading-none"
                   >
                     {highlightText(el.text, popups, onKeywordClick)}
                   </p>
@@ -1696,7 +1701,7 @@ export function InfographicArticleRenderer({
                 <p
                   key={elIdx}
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                  className={`text-base sm:text-lg text-[#FFE5A3] leading-relaxed md:leading-loose text-justify [text-align-last:left] tracking-wide whitespace-pre-line my-4 ${
+                  className={`text-base sm:text-lg text-[#FFE5A3] leading-relaxed md:leading-loose text-left sm:text-justify [text-align-last:left] tracking-wide whitespace-pre-line my-4 ${
                     shouldIndent ? 'indent-6 sm:indent-8' : ''
                   }`}
                 >
@@ -1740,7 +1745,7 @@ export function InfographicArticleRenderer({
                 {author.replace(/[—–]/g, '-')}
               </span>
             );
-            const className = 'inline-flex items-center group bg-[#3A2718]/80 px-5 py-2 rounded-full border border-[#F2C14E]/40 shadow-sm';
+            const className = 'inline-flex items-center group bg-[#3A2718]/80 px-5 py-2 min-h-11 rounded-full border border-[#F2C14E]/40 shadow-sm';
             return authorLink ? (
               <Link href={authorLink} className={`${className} cursor-pointer hover:bg-[#4A3220] hover:border-[#F2C14E] transition-all`}>
                 {badge}
@@ -1776,22 +1781,23 @@ export function InfographicArticleRenderer({
       {zoomImage && (
         <div
           onClick={() => setZoomImage(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-md animate-in fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 sm:backdrop-blur-md animate-in fade-in"
         >
           <div 
             onClick={(e) => e.stopPropagation()} 
-            className="relative max-w-4xl max-h-[90vh] flex flex-col items-center"
+            className="relative w-full max-w-4xl max-h-[90svh] flex flex-col items-center"
           >
             <button
               onClick={() => setZoomImage(null)}
-              className="absolute -top-12 right-0 p-2 text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-all"
+              aria-label="Đóng ảnh phóng to"
+              className="absolute top-2 right-2 sm:-top-12 sm:right-0 z-10 w-11 h-11 flex items-center justify-center text-white/80 hover:text-white bg-black/60 sm:bg-white/10 hover:bg-white/20 rounded-full transition-all"
             >
               <X className="w-6 h-6" />
             </button>
             <img
-              src={getImageUrl(zoomImage.src)}
+              src={bodyZoomSrc(zoomImage.src)}
               alt={zoomImage.caption || 'Phóng to ảnh'}
-              className="max-h-[80vh] w-auto object-contain rounded-2xl border-2 border-[#F2C14E]/60 shadow-[0_0_50px_rgba(242,193,78,0.3)]"
+              className="max-h-[78svh] max-w-full w-auto object-contain rounded-2xl border-2 border-[#F2C14E]/60 shadow-[0_0_50px_rgba(242,193,78,0.3)]"
             />
             {zoomImage.caption && (
               <p className="mt-4 text-sm sm:text-base italic text-[#FFE5A3] text-center max-w-xl">

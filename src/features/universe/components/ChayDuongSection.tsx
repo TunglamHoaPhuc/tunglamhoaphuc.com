@@ -3,6 +3,7 @@
 import React, { FC, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Sparkles, Utensils, Heart, BookOpen, ShieldCheck, ChevronRight, X, Clock, Eye } from 'lucide-react';
+import { fitProps, CARD_WIDTHS } from '@/features/universe/image-props';
 
 interface ChayArticle {
   id: string;
@@ -28,7 +29,7 @@ const CHAY_ARTICLES: ChayArticle[] = [
       'Theo truyền thống Phật giáo Đại thừa, Ngài Giám Trai là vị Bồ Tát thị hiện làm thần hộ trì trai trạo, giám sát việc cung cấp ẩm thực thanh tịnh cho đại chúng tu học, xua tan chướng nạn và giữ gìn ngọn lửa từ bi luôn ấm áp.',
       'Phía ngoài Trai đường là tôn tượng Đức Từ Phụ A Di Đà tiếp dẫn với ánh mắt từ bi, nhắc nhở hành giả trước mỗi bữa ăn hãy giữ tâm niệm thanh tịnh, buông xả muộn phiền để tiếp nhận nguồn năng lượng an lành từ đất trời.',
     ],
-    imageUrl: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp',
+    imageUrl: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp',
     readTime: '5 phút đọc',
     views: '12.4K',
   },
@@ -43,7 +44,7 @@ const CHAY_ARTICLES: ChayArticle[] = [
       'Bếp Hương Tích chú trọng phối hợp các nguyên liệu theo thuyết Ngũ Hành: Màu xanh (mộc - dưỡng gan), màu đỏ (hỏa - bổ tim), màu vàng (thổ - kiện tỳ vị), màu trắng (kim - nhuận phế), màu đen (thủy - ích thận).',
       'Thực phẩm hoàn toàn không sử dụng chất bảo quản, mì chính hóa học, mà lấy vị ngọt thanh tự nhiên từ củ cải, mía lau, nấm đông cô và các loại hạt dinh dưỡng như hạt sen, óc chó, hạnh nhân.',
     ],
-    imageUrl: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp',
+    imageUrl: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp',
     readTime: '6 phút đọc',
     views: '18.9K',
   },
@@ -58,7 +59,7 @@ const CHAY_ARTICLES: ChayArticle[] = [
       'Trà Gừng Táo Đỏ: Uống vào buổi sớm giúp làm ấm kinh mạch, tán hàn khí, kích hoạt tiêu hóa và giữ ấm cổ họng trong những ngày đông giá rét.',
       'Nước La Hán Quả Cúc Hoa: Giúp thanh nhiệt giải độc, mát gan sáng mắt, nhuận phế chỉ khái sau những giờ tụng kinh niệm Phật kéo dài.',
     ],
-    imageUrl: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp',
+    imageUrl: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp',
     readTime: '7 phút đọc',
     views: '24.1K',
   },
@@ -75,7 +76,7 @@ const CHAY_ARTICLES: ChayArticle[] = [
       '4. Xem thức ăn như vị thuốc chữa bệnh khô gầy: Ăn để nuôi dưỡng thân mạng tu học, không phải để hưởng thụ khoái lạc.',
       '5. Vì muốn thành tựu đạo nghiệp nên mới thọ nhận thức ăn này: Quyết tâm hướng đến giác ngộ giải thoát và phụng sự chúng sinh.',
     ],
-    imageUrl: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp',
+    imageUrl: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp',
     readTime: '4 phút đọc',
     views: '15.7K',
   },
@@ -97,8 +98,8 @@ export const ChayDuongSection: FC = () => {
             <div>
               {/* Thumbnail Image */}
               <div className="relative w-full h-[220px] rounded-xl overflow-hidden mb-4 bg-[#140B05] border border-[#F2C14E]/20">
-                <img
-                  src={art.imageUrl}
+                <img loading="lazy" decoding="async" width={640} height={480}
+                  {...fitProps(art.imageUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 768px) 520px, calc(100vw - 72px)' })}
                   alt={art.title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90"
                 />
@@ -106,14 +107,14 @@ export const ChayDuongSection: FC = () => {
                 
                 {/* Category badge */}
                 <span
-                  className="absolute top-3 left-3 px-3 py-1 rounded-md text-[10px] font-bold text-[#FFE5A3] bg-[#8B1E0F]/90 border border-[#F2C14E]/50 uppercase tracking-wider backdrop-blur-sm"
+                  className="absolute top-3 left-3 px-3 py-1 rounded-md text-xs sm:text-[10px] font-bold text-[#FFE5A3] bg-[#8B1E0F]/90 border border-[#F2C14E]/50 uppercase tracking-wider sm:backdrop-blur-sm"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
                   {art.category}
                 </span>
 
                 {/* Read time */}
-                <div className="absolute bottom-3 left-3 flex items-center gap-1 text-[11px] text-[#FFE5A3]/90 bg-black/70 px-2 py-0.5 rounded backdrop-blur-sm">
+                <div className="absolute bottom-3 left-3 flex items-center gap-1 text-xs sm:text-[11px] text-[#FFE5A3]/90 bg-black/70 px-2 py-0.5 rounded sm:backdrop-blur-sm">
                   <Clock className="w-3 h-3 text-[#F2C14E]" />
                   <span>{art.readTime}</span>
                 </div>
@@ -129,7 +130,7 @@ export const ChayDuongSection: FC = () => {
               <p className="text-xs text-[#F2C14E] font-bold mb-2 line-clamp-1" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 {art.subtitle}
               </p>
-              <p className="text-xs text-[#e3d2c1]/85 leading-relaxed line-clamp-2" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+              <p className="text-sm text-[#e3d2c1]/85 leading-relaxed line-clamp-2" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 {art.excerpt}
               </p>
             </div>
@@ -139,7 +140,7 @@ export const ChayDuongSection: FC = () => {
               <span className="group-hover:underline flex items-center gap-1">
                 Đọc toàn văn bài viết <ChevronRight className="w-3.5 h-3.5" />
               </span>
-              <div className="flex items-center gap-1 text-[11px] text-[#c9b896]/70">
+              <div className="flex items-center gap-1 text-xs sm:text-[11px] text-[#c9b896]/70">
                 <Eye className="w-3 h-3 text-[#F2C14E]" />
                 <span>{art.views}</span>
               </div>
@@ -152,14 +153,14 @@ export const ChayDuongSection: FC = () => {
       <AnimatePresence>
         {selectedArticle && (
           <div
-            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 backdrop-blur-xl animate-in fade-in"
+            className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/90 sm:backdrop-blur-xl animate-in fade-in"
             onClick={() => setSelectedArticle(null)}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative max-w-2xl w-full max-h-[85vh] overflow-y-auto rounded-3xl border-2 border-[#F2C14E] bg-gradient-to-b from-[#2C180E] via-[#1E1108] to-[#120904] p-6 sm:p-8 shadow-[0_0_60px_rgba(242,193,78,0.4)] text-white space-y-5 scrollbar-none"
+              className="relative max-w-2xl w-full max-h-[85svh] overflow-y-auto rounded-3xl border-2 border-[#F2C14E] bg-gradient-to-b from-[#2C180E] via-[#1E1108] to-[#120904] p-6 sm:p-8 shadow-[0_0_60px_rgba(242,193,78,0.4)] text-white space-y-5 scrollbar-none"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
@@ -172,7 +173,7 @@ export const ChayDuongSection: FC = () => {
 
               <div className="space-y-2">
                 <span
-                  className="px-3 py-1 rounded-full text-[10px] font-bold text-[#FFE5A3] bg-[#8B1E0F] border border-[#F2C14E] uppercase"
+                  className="px-3 py-1 rounded-full text-xs sm:text-[10px] font-bold text-[#FFE5A3] bg-[#8B1E0F] border border-[#F2C14E] uppercase"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
                   {selectedArticle.category}
@@ -191,21 +192,21 @@ export const ChayDuongSection: FC = () => {
               {/* Cover Image inside modal */}
               <div className="relative w-full h-[260px] rounded-2xl overflow-hidden border border-[#F2C14E]/40 my-3">
                 <img
-                  src={selectedArticle.imageUrl}
+                  {...fitProps(selectedArticle.imageUrl, { width: 1280, widths: [640, 960, 1280], sizes: '(min-width: 768px) 640px, 90vw' })}
                   alt={selectedArticle.title}
                   className="w-full h-full object-cover"
                 />
               </div>
 
               {/* Full Article Content */}
-              <div className="space-y-4 text-xs sm:text-sm text-[#e3d2c1] leading-relaxed text-justify" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+              <div className="space-y-4 text-sm text-[#e3d2c1] leading-relaxed text-left sm:text-justify" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                 {selectedArticle.content.map((p, idx) => (
                   <p key={idx}>{p}</p>
                 ))}
               </div>
 
               <div className="text-center pt-4 border-t border-[#F2C14E]/25">
-                <span className="text-[11px] text-[#c9b896]/80 uppercase font-bold" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
+                <span className="text-xs sm:text-[11px] text-[#c9b896]/80 uppercase font-bold" style={{ fontFamily: "'UTM Avo', sans-serif" }}>
                   ❖ HƯƠNG TÍCH BẾP • CHAY ĐƯỜNG TÙNG LÂM HÒA PHÚC ❖
                 </span>
               </div>

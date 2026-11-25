@@ -5,6 +5,7 @@ import { ArrowRight } from 'lucide-react';
 import { normalizeAreaId } from '@/lib/statue-types';
 import { ArtisticStatueModal, NTPGModalItem } from './ArtisticStatueModal';
 import { ThapBatLaHanGrid } from './ThapBatLaHanGrid';
+import { LOGO_ROUND_SRC, swapOnError, TOAN_CANH_SRC, TOAN_CANH_BACKDROP, fitProps, bentoFit, type FitOptions, STATUE_ICON_LARGE_SRC } from '@/features/universe/image-props';
 
 export interface ArtisticStatueItem {
   id: string;
@@ -121,12 +122,10 @@ export const ArtisticStatueSection: FC<ArtisticStatueSectionProps> = ({
         {/* ── AMBIENT BACKGROUND IMAGE POSITIONED DOWNWARDS WITH SOFT OPACITY & 4-EDGE GRADIENT MASKS ── */}
         <div className="absolute top-10 sm:top-14 inset-x-0 h-[420px] sm:h-[480px] z-0 pointer-events-none overflow-hidden">
           <img
-            src="/images/vu-tru-phat-giao/toan-canh-chua.jpg"
+            {...TOAN_CANH_BACKDROP}
             alt="Toàn cảnh chùa"
             className="w-full h-full object-cover opacity-12 sm:opacity-15 filter blur-[2px] scale-105"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
-            }}
+            onError={swapOnError('/images/hero/toan-canh-chua-1280.webp')}
           />
           <div className="absolute inset-0 bg-[#2C1C11]/35" />
 
@@ -144,12 +143,10 @@ export const ArtisticStatueSection: FC<ArtisticStatueSectionProps> = ({
           <div className="flex flex-col items-center text-center mb-10">
             <div className="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center" aria-hidden="true">
               <img
-                src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+                src={STATUE_ICON_LARGE_SRC}
                 alt=""
                 className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-                }}
+                onError={swapOnError(LOGO_ROUND_SRC)}
               />
             </div>
 
@@ -201,6 +198,7 @@ export const ArtisticStatueSection: FC<ArtisticStatueSectionProps> = ({
                           idx={idx}
                           openLightbox={openLightbox}
                           focusPosition={focusPos}
+                          fit={bentoFit(spanClass)}
                         />
                       </div>
                     );
@@ -270,6 +268,8 @@ interface BentoCardProps {
   idx: number;
   openLightbox: (idx: number) => void;
   focusPosition?: string;
+  /** Bậc ảnh theo số cột ô chiếm trên lưới. */
+  fit: FitOptions;
 }
 
 const BentoCard: FC<BentoCardProps> = ({
@@ -277,6 +277,7 @@ const BentoCard: FC<BentoCardProps> = ({
   idx,
   openLightbox,
   focusPosition = 'object-[center_20%]',
+  fit,
 }) => {
   return (
     <div
@@ -284,19 +285,17 @@ const BentoCard: FC<BentoCardProps> = ({
       className="group relative overflow-hidden cursor-pointer rounded-2xl border border-[#f2c14e]/35 hover:border-[#ffde59] transition-all duration-500 shadow-xl bg-[#1c120b] w-full h-full"
     >
       <img
-        src={item.imgUrl}
+        {...fitProps(item.imgUrl, fit)}
         alt={item.title}
         className={`w-full h-full object-cover ${focusPosition} transition-transform duration-700 group-hover:scale-105`}
         loading="lazy"
-        onError={(e) => {
-          (e.target as HTMLImageElement).src = '/images/vu-tru-phat-giao/toan-canh-chua.jpg';
-        }}
+        onError={swapOnError(TOAN_CANH_SRC)}
       />
 
       {/* Soft gradient fade at bottom of card so statue base blends gracefully into dark tone */}
       <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#1C120B]/95 via-[#1C120B]/50 to-transparent pointer-events-none" />
 
-      <div className="absolute inset-0 bg-gradient-to-t from-[#25170E]/90 via-[#3D2817]/65 to-transparent backdrop-blur-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col items-center justify-center p-3 sm:p-5 text-center pointer-events-none z-20">
+      <div className="absolute inset-0 bg-gradient-to-t from-[#25170E]/90 via-[#3D2817]/65 to-transparent sm:backdrop-blur-[3px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col items-center justify-center p-3 sm:p-5 text-center pointer-events-none z-20">
         <div className="absolute inset-3 sm:inset-4 md:inset-5 rounded-xl md:rounded-2xl border border-[#ffde59]/70 bg-[#452a15]/85 flex flex-col items-center justify-center p-3 sm:p-5 text-center shadow-[0_0_30px_rgba(242,193,78,0.3)]">
           <h3
             style={{ fontFamily: "'UTM ClassizismAntiqua', 'UTM_ClassizismAntiqua', serif" }}
@@ -309,7 +308,7 @@ const BentoCard: FC<BentoCardProps> = ({
 
           <p
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className="text-[#e3d2c1] text-xs sm:text-sm font-normal leading-relaxed tracking-wide px-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] text-center line-clamp-3 sm:line-clamp-4"
+            className="text-[#e3d2c1] text-sm font-normal leading-relaxed tracking-wide px-1 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] text-center line-clamp-3 sm:line-clamp-4"
           >
             {item.subtitle || item.caption || item.quote || item.category || 'Nghệ Thuật Phật Giáo Tùng Lâm Hòa Phúc'}
           </p>

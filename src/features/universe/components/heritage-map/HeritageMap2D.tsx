@@ -22,6 +22,8 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { fitImage } from '@/utils/image';
+import { fitProps } from '@/features/universe/image-props';
 
 interface HeritageMap2DProps {
   onClose: () => void;
@@ -109,7 +111,8 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
 
     // Preload image in background
     const img = new window.Image();
-    img.src = HERITAGE_MAP_IMAGE;
+    // Tải trước đúng địa chỉ mà thẻ ảnh bên dưới dùng (cùng bậc), không tải bản gốc.
+    img.src = fitImage(HERITAGE_MAP_IMAGE, 1920);
 
     const interval = setInterval(() => {
       setLoadingProgress((prev) => {
@@ -303,7 +306,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6, ease: 'easeInOut' }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D0907]/95 backdrop-blur-md p-4 overflow-hidden"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D0907]/95 sm:backdrop-blur-md p-4 overflow-hidden"
           >
             {/* Background Ambient Aura */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -372,7 +375,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="absolute top-5 right-6 z-20 w-10 h-10 rounded-full border border-[#F2C14E]/40 bg-[#1C130D]/80 flex items-center justify-center text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black transition-all cursor-pointer shadow-lg backdrop-blur-md"
+                  className="absolute top-3 right-3 sm:top-5 sm:right-6 z-20 w-11 h-11 sm:w-10 sm:h-10 rounded-full border border-[#F2C14E]/40 bg-[#1C130D]/80 flex items-center justify-center text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black transition-all cursor-pointer shadow-lg sm:backdrop-blur-md"
                   title="Đóng triển lãm"
                 >
                   <X className="w-5 h-5" />
@@ -424,7 +427,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
       {/* ══════════════════════════════════════════════════════════════════════
           1. 4 COMPACT GOLDEN TOOL DOCK BUTTONS (VERTICALLY ALIGNED ALONG LEFT EDGE)
       ══════════════════════════════════════════════════════════════════════ */}
-      <div className="fixed left-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3.5 bg-[#1C130D]/90 backdrop-blur-md border border-[#F2C14E]/40 p-2 rounded-2xl shadow-2xl">
+      <div className="fixed left-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3.5 bg-[#1C130D]/90 sm:backdrop-blur-md border border-[#F2C14E]/40 p-2 rounded-2xl shadow-2xl">
         {/* Button 1: Quay lại */}
         <button
           type="button"
@@ -548,7 +551,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
                 value={aiQuestion}
                 onChange={(e) => setAiQuestion(e.target.value)}
                 placeholder="Hỏi về lịch sử, chùa cổ 3 miền..."
-                className="flex-1 px-3 py-1.5 rounded-lg bg-[#1A1009] border border-[#F2C14E]/30 text-xs text-[#E3D2C1] focus:outline-none focus:border-[#F2C14E]"
+                className="flex-1 px-3 py-2.5 sm:py-1.5 rounded-lg bg-[#1A1009] border border-[#F2C14E]/30 text-base sm:text-xs text-[#E3D2C1] focus:outline-none focus:border-[#F2C14E]"
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
               />
               <button
@@ -584,7 +587,8 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
         >
           {/* FULL MAP IMAGE: BAN-DO-DANH-TANG-VIET-NAM-FINAL */}
           <img
-            src={HERITAGE_MAP_IMAGE}
+            // Bản đồ phủ cả màn hình, kéo và phóng to được: bậc lớn nhất 1920.
+            src={fitImage(HERITAGE_MAP_IMAGE, 1920)}
             alt="Bản đồ Di sản Phật giáo Việt Nam"
             className="w-full h-full object-cover select-none pointer-events-auto block filter brightness-95 contrast-105"
             loading="lazy"
@@ -619,7 +623,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
 
                   {/* Golden Glassmorphic Hub Badge */}
                   <div
-                    className={`relative px-5 py-2.5 rounded-2xl border-2 backdrop-blur-md cursor-pointer transition-all duration-300 flex flex-col items-center justify-center ${
+                    className={`relative px-5 py-2.5 rounded-2xl border-2 sm:backdrop-blur-md cursor-pointer transition-all duration-300 flex flex-col items-center justify-center ${
                       isSelected
                         ? 'bg-[#2C1C11] border-[#ffde59] text-[#ffde59] scale-110 shadow-[0_0_30px_rgba(242,193,78,0.9)]'
                         : 'bg-[#1C130D]/90 border-[#F2C14E] text-[#FFE5A3] shadow-[0_0_20px_rgba(242,193,78,0.6)] hover:scale-105'
@@ -632,7 +636,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
                       {hub.name}
                     </span>
                     <span
-                      className="text-[11px] text-[#FFE5A3] font-bold mt-0.5"
+                      className="text-xs sm:text-[11px] text-[#FFE5A3] font-bold mt-0.5"
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     >
                       {count > 0 ? `${count} TƯ LIỆU QUÝ` : hub.countLabel}
@@ -646,7 +650,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
 
         {/* ── DISCLAIMER WATERMARK AT BOTTOM ── */}
         <div
-          className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 pointer-events-none text-[11px] text-[#FFE5A3]/50 italic text-center px-4"
+          className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 pointer-events-none text-xs sm:text-[11px] text-[#FFE5A3]/50 italic text-center px-4"
           style={{ fontFamily: "'UTM Avo', sans-serif" }}
         >
           * Hình ảnh sơ đồ tạo bởi Gemini AI chỉ mang tính minh họa
@@ -665,7 +669,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: '100%', opacity: 0 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed right-0 top-0 bottom-0 w-full sm:w-[440px] z-40 overflow-y-auto border-l border-[#F2C14E]/40 flex flex-col justify-between shadow-[-20px_0_60px_rgba(0,0,0,0.95)]"
+            className="fixed right-0 top-16 sm:top-0 bottom-0 w-full sm:w-[440px] z-40 overflow-y-auto border-l border-[#F2C14E]/40 flex flex-col justify-between shadow-[-20px_0_60px_rgba(0,0,0,0.95)]"
             style={{
               background: 'linear-gradient(160deg, rgba(44,28,17,0.98) 0%, rgba(28,18,11,0.99) 100%)',
               backdropFilter: 'blur(16px)',
@@ -695,7 +699,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
                     <button
                       type="button"
                       onClick={handleResetMap}
-                      className="w-8 h-8 rounded-full bg-black/60 border border-[#F2C14E]/40 text-[#F2C14E] flex items-center justify-center cursor-pointer hover:scale-110 transition-all shadow-md"
+                      className="w-11 h-11 sm:w-8 sm:h-8 rounded-full bg-black/60 border border-[#F2C14E]/40 text-[#F2C14E] flex items-center justify-center cursor-pointer hover:scale-110 transition-all shadow-md"
                       title="Đóng Bảng"
                     >
                       <X className="w-4 h-4" />
@@ -714,7 +718,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
                         <button
                           key={f.id}
                           onClick={() => setThemeFilter(f.id as any)}
-                          className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                          className={`px-3 py-1 rounded-full text-xs sm:text-[11px] font-bold uppercase tracking-wider transition-all cursor-pointer ${
                             isSelected
                               ? 'bg-[#F2C14E] text-[#1C130D]'
                               : 'bg-[#2A1D14] text-[#C4B5A5] hover:text-[#FFE5A3] border border-[#F2C14E]/20'
@@ -739,7 +743,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
                       {/* Thumbnail Frame */}
                       <div className="relative w-16 h-20 rounded-xl overflow-hidden border-2 border-[#F2C14E]/50 shrink-0 bg-[#1A120B] shadow-md group-hover:border-[#F2C14E]">
                         <img
-                          src={photo.imgUrl}
+                          {...fitProps(photo.imgUrl, { width: 160 })}
                           alt={photo.title}
                           className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
                           loading="lazy"
@@ -765,7 +769,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
 
                         <div className="flex items-center gap-2">
                           <span
-                            className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold ${
+                            className={`px-2.5 py-0.5 rounded-full text-xs sm:text-[10px] font-bold ${
                               photo.theme === 'PHAT_GIAO'
                                 ? 'bg-[#F2C14E]/15 text-[#F2C14E] border border-[#F2C14E]/40'
                                 : 'bg-[#264E4C]/60 text-[#8CE8DE] border border-[#8CE8DE]/40'
@@ -785,7 +789,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
                   className="p-4 border-t border-[#F2C14E]/20 bg-[#170E08] text-center"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
-                  <p className="text-[11px] text-[#C4B5A5] italic">
+                  <p className="text-xs sm:text-[11px] text-[#C4B5A5] italic">
                     Nhấp vào từng tư liệu để xem chi tiết
                   </p>
                 </div>
@@ -815,7 +819,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
                     <button
                       type="button"
                       onClick={handleResetMap}
-                      className="w-8 h-8 rounded-full bg-black/60 border border-[#F2C14E]/40 text-[#F2C14E] flex items-center justify-center cursor-pointer hover:scale-110 transition-all shadow-md"
+                      className="w-11 h-11 sm:w-8 sm:h-8 rounded-full bg-black/60 border border-[#F2C14E]/40 text-[#F2C14E] flex items-center justify-center cursor-pointer hover:scale-110 transition-all shadow-md"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -865,7 +869,8 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
                         }}
                       >
                         <img
-                          src={selectedPhoto.imgUrl}
+                          // Ảnh xem lớn, có phóng to: bậc lớn nhất 1920.
+                          src={fitImage(selectedPhoto.imgUrl, 1920)}
                           alt={selectedPhoto.title}
                           className="max-h-full max-w-full object-contain pointer-events-none drop-shadow-2xl"
                           loading="lazy"
@@ -873,7 +878,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
                       </div>
 
                       {/* Photo Zoom Controls Floating Toolbar */}
-                      <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1 bg-[#1A1009]/85 backdrop-blur-md p-1 rounded-xl border border-[#F2C14E]/40 z-20 shadow-lg">
+                      <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1 bg-[#1A1009]/85 sm:backdrop-blur-md p-1 rounded-xl border border-[#F2C14E]/40 z-20 shadow-lg">
                         <button
                           type="button"
                           onClick={() => setPhotoZoom((z) => Math.min(z + 0.35, 3.5))}
@@ -947,7 +952,7 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
                     {/* Caption */}
                     {selectedPhoto.caption && (
                       <p
-                        className="text-xs md:text-sm text-[#D3C0AD] leading-relaxed text-justify mt-2"
+                        className="text-sm text-[#D3C0AD] leading-relaxed text-left sm:text-justify mt-2"
                         style={{ fontFamily: "'UTM Avo', sans-serif" }}
                       >
                         {selectedPhoto.caption}
@@ -957,10 +962,10 @@ export const HeritageMap2D: FC<HeritageMap2DProps> = ({ onClose }) => {
                     {/* Historical Context Callout */}
                     {selectedPhoto.historicalContext && (
                       <blockquote
-                        className="w-full border-l-2 border-[#F2C14E] bg-[#3a2718]/80 p-3.5 italic text-xs md:text-sm text-[#FFE5A3] rounded-r-xl leading-relaxed text-left mt-4 shadow-md"
+                        className="w-full border-l-2 border-[#F2C14E] bg-[#3a2718]/80 p-3.5 italic text-sm text-[#FFE5A3] rounded-r-xl leading-relaxed text-left mt-4 shadow-md"
                         style={{ fontFamily: "'UTM Avo', sans-serif" }}
                       >
-                        <span className="text-[#F2C14E] font-bold not-italic text-[10px] uppercase tracking-wider block mb-1">
+                        <span className="text-[#F2C14E] font-bold not-italic text-xs sm:text-[10px] uppercase tracking-wider block mb-1">
                           Bối Cảnh Lịch Sử &amp; Giá Trị Di Sản
                         </span>
                         "{selectedPhoto.historicalContext}"

@@ -29,6 +29,8 @@ import {
   BAO_THAP_BANNER_IMAGE,
   BaoThapFloor,
 } from '@/data/bao-thap-data';
+import { swapOnError, fitProps } from '@/features/universe/image-props';
+import { fitImage } from '@/utils/image';
 
 interface BaoThapMap2DProps {
   onClose: () => void;
@@ -78,9 +80,10 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
     if (screenState !== 'loading') return;
 
     const img = new Image();
-    img.src = BAO_THAP_MAP_IMAGE;
+    // Tải trước đúng địa chỉ mà thẻ ảnh bên dưới dùng (cùng bậc), không tải bản gốc.
+    img.src = fitImage(BAO_THAP_MAP_IMAGE, 1920);
     const bannerImg = new Image();
-    bannerImg.src = BAO_THAP_BANNER_IMAGE;
+    bannerImg.src = fitImage(BAO_THAP_BANNER_IMAGE, 1280);
 
     const interval = setInterval(() => {
       setLoadingProgress((prev) => {
@@ -294,12 +297,13 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.6, ease: 'easeInOut' }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D0907]/95 backdrop-blur-md p-4 overflow-hidden"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-[#0D0907]/95 sm:backdrop-blur-md p-4 overflow-hidden"
           >
             {/* Background Ambient Aura & Banner */}
             <div className="absolute inset-0 z-0 bg-[#2c1c11]">
               <img
-                src={BAO_THAP_BANNER_IMAGE}
+                // Nền mờ (blur, opacity 50%) phủ cả màn hình: bậc 1280.
+                src={fitImage(BAO_THAP_BANNER_IMAGE, 1280)}
                 alt="Bảo Tháp Vạn Phật Xá Lợi"
                 className="w-full h-full object-cover scale-105 blur-sm opacity-50"
                 loading="lazy"
@@ -368,7 +372,7 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="absolute top-5 right-6 z-20 w-10 h-10 rounded-full border border-[#F2C14E]/40 bg-[#1C130D]/80 flex items-center justify-center text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black transition-all cursor-pointer shadow-lg backdrop-blur-md"
+                  className="absolute top-3 right-3 sm:top-5 sm:right-6 z-20 w-11 h-11 sm:w-10 sm:h-10 rounded-full border border-[#F2C14E]/40 bg-[#1C130D]/80 flex items-center justify-center text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black transition-all cursor-pointer shadow-lg sm:backdrop-blur-md"
                   title="Đóng sơ đồ"
                 >
                   <X className="w-5 h-5" />
@@ -395,7 +399,7 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
                   </h1>
 
                   <p
-                    className="text-[#c9b896] text-xs sm:text-sm md:text-base mb-8 max-w-2xl leading-relaxed uppercase tracking-wider font-bold"
+                    className="text-[#c9b896] text-sm md:text-base mb-8 max-w-2xl leading-relaxed uppercase tracking-wider font-bold"
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                   >
                     KHÁM PHÁ 5 TẦNG THÁP UY NGHIÊM, CHIÊM BÁI BẢO TƯỢNG VÀ TÌM HIỂU Ý NGHĨA 5 ĐẠI MẠN ĐÀ LA MẬT TÔNG
@@ -420,7 +424,7 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
       {/* ══════════════════════════════════════════════════════════════════════
           1. 4 COMPACT GOLDEN TOOL DOCK BUTTONS (VERTICALLY ALIGNED ALONG LEFT EDGE)
       ══════════════════════════════════════════════ */}
-      <div className="fixed left-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3 bg-[#1C130D]/90 backdrop-blur-md border border-[#F2C14E]/40 p-2 rounded-2xl shadow-2xl">
+      <div className="fixed left-4 top-1/2 -translate-y-1/2 z-40 flex flex-col gap-3 bg-[#1C130D]/90 sm:backdrop-blur-md border border-[#F2C14E]/40 p-2 rounded-2xl shadow-2xl">
         {/* Button 1: Quay lại */}
         <button
           type="button"
@@ -504,14 +508,14 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
         <button
           onClick={toggleFullscreen}
           title={isFullscreen ? 'Thu nhỏ' : 'Toàn màn hình'}
-          className="w-10 h-10 rounded-full bg-[#1C130D]/80 border border-[#F2C14E]/40 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-lg backdrop-blur-md"
+          className="w-10 h-10 rounded-full bg-[#1C130D]/80 border border-[#F2C14E]/40 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-lg sm:backdrop-blur-md"
         >
           {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
         </button>
         <button
           onClick={onClose}
           title="Đóng sơ đồ"
-          className="w-10 h-10 rounded-full bg-[#1C130D]/80 border border-[#F2C14E]/40 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-lg backdrop-blur-md"
+          className="w-10 h-10 rounded-full bg-[#1C130D]/80 border border-[#F2C14E]/40 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-lg sm:backdrop-blur-md"
         >
           <X className="w-5 h-5" />
         </button>
@@ -541,7 +545,8 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
           >
             {/* FULL COVER MAP IMAGE - ZERO BLACK GAPS */}
             <img
-              src={BAO_THAP_MAP_IMAGE}
+              // Sơ đồ phủ cả màn hình, kéo và phóng to được: bậc lớn nhất 1920.
+              src={fitImage(BAO_THAP_MAP_IMAGE, 1920)}
               alt="Sơ đồ Bảo Tháp"
               className="w-full h-full object-cover pointer-events-none select-none"
             />
@@ -654,10 +659,10 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: '100%', opacity: 0 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="fixed right-0 top-0 bottom-0 w-full sm:w-[420px] lg:w-[460px] bg-gradient-to-b from-[#24160D] via-[#1C120B] to-[#120A06] border-l border-[#F2C14E]/40 z-50 shadow-[-10px_0_40px_rgba(0,0,0,0.8)] flex flex-col overflow-y-auto"
+              className="fixed right-0 top-16 sm:top-0 bottom-0 w-full sm:w-[420px] lg:w-[460px] bg-gradient-to-b from-[#24160D] via-[#1C120B] to-[#120A06] border-l border-[#F2C14E]/40 z-50 shadow-[-10px_0_40px_rgba(0,0,0,0.8)] flex flex-col overflow-y-auto"
             >
               {/* Header */}
-              <div className="p-5 border-b border-[#F2C14E]/30 bg-[#2A1B10]/80 sticky top-0 z-10 backdrop-blur-md">
+              <div className="p-5 border-b border-[#F2C14E]/30 bg-[#2A1B10]/80 sticky top-0 z-10 sm:backdrop-blur-md">
                 <div className="flex items-center justify-between">
                   <span
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
@@ -702,7 +707,7 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
                         handleResetMap();
                       }}
                       title="Đóng chi tiết"
-                      className="w-8 h-8 rounded-xl bg-[#1C120B] border border-[#F2C14E]/60 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer ml-1"
+                      className="w-11 h-11 sm:w-8 sm:h-8 rounded-xl bg-[#1C120B] border border-[#F2C14E]/60 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer ml-1"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -778,17 +783,15 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
                   className="relative h-[240px] sm:h-[280px] rounded-2xl overflow-hidden border-2 border-[#F2C14E]/50 bg-[#120A06] cursor-pointer group shadow-xl"
                 >
                   <img
-                    src={activeTab === 'mandala' ? selectedFloor.mandalaImg : selectedFloor.statueImg}
+                    {...fitProps(activeTab === 'mandala' ? selectedFloor.mandalaImg : selectedFloor.statueImg, { width: 960, widths: [640, 960], sizes: '(min-width: 768px) 480px, 90vw' })}
                     alt={activeTab === 'mandala' ? selectedFloor.mandalaName : selectedFloor.statueName}
                     className="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
-                    }}
+                    onError={swapOnError('/images/hero/toan-canh-chua-1280.webp')}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end justify-center p-3">
                     <span
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                      className="px-4 py-1 rounded-full bg-[#F2C14E] text-black text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-lg"
+                      className="px-4 py-1 rounded-full bg-[#F2C14E] text-black text-xs sm:text-[11px] font-bold uppercase tracking-wider flex items-center gap-1.5 shadow-lg"
                     >
                       <Eye className="w-3.5 h-3.5" />
                       <span>Xem phóng to chi tiết</span>
@@ -812,7 +815,7 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
                       </div>
                       <p
                         style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                        className="text-xs sm:text-sm text-[#E3D2C1]/90 leading-relaxed"
+                        className="text-sm text-[#E3D2C1]/90 leading-relaxed"
                       >
                         {selectedFloor.mandalaMeaning}
                       </p>
@@ -834,7 +837,7 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
                         </div>
                         <p
                           style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                          className="text-xs sm:text-sm text-[#E3D2C1]/90 leading-relaxed"
+                          className="text-sm text-[#E3D2C1]/90 leading-relaxed"
                         >
                           {selectedFloor.statueDescription}
                         </p>
@@ -852,7 +855,7 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
                         </div>
                         <p
                           style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                          className="text-xs sm:text-sm text-[#E3D2C1]/90 leading-relaxed italic"
+                          className="text-sm text-[#E3D2C1]/90 leading-relaxed italic"
                         >
                           "{selectedFloor.stories}"
                         </p>
@@ -870,7 +873,7 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
           5. AI ASSISTANT CHAT POPUP (RIGHT DOCK)
       ══════════════════════════════════════════════ */}
       {isAiChatOpen && (
-        <div className="fixed bottom-6 left-18 z-50 w-80 sm:w-96 rounded-3xl bg-[#1C120B]/95 border-2 border-[#F2C14E] shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col backdrop-blur-md">
+        <div className="fixed bottom-6 left-18 z-50 w-80 sm:w-96 rounded-3xl bg-[#1C120B]/95 border-2 border-[#F2C14E] shadow-[0_0_50px_rgba(0,0,0,0.9)] overflow-hidden flex flex-col sm:backdrop-blur-md">
           {/* Header */}
           <div className="p-4 border-b border-[#F2C14E]/30 bg-[#2A1D14] flex items-center justify-between">
             <div className="flex items-center gap-2">
@@ -914,7 +917,7 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
               value={aiQuestion}
               onChange={(e) => setAiQuestion(e.target.value)}
               placeholder="Hỏi về tầng tháp, mandala..."
-              className="flex-1 bg-[#120A06] border border-[#F2C14E]/40 rounded-xl px-3 py-2 text-xs text-[#FFE5A3] focus:outline-none focus:border-[#F2C14E]"
+              className="flex-1 bg-[#120A06] border border-[#F2C14E]/40 rounded-xl px-3 py-2.5 sm:py-2 text-base sm:text-xs text-[#FFE5A3] focus:outline-none focus:border-[#F2C14E]"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             />
             <button
@@ -932,7 +935,7 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
       ══════════════════════════════════════════════ */}
       {lightboxImage && (
         <div
-          className="fixed inset-0 z-[250] bg-black/92 backdrop-blur-md flex items-center justify-center p-4"
+          className="fixed inset-0 z-[250] bg-black/92 sm:backdrop-blur-md flex items-center justify-center p-4"
           onClick={() => {
             setLightboxImage(null);
             setLightboxZoom(1);
@@ -963,7 +966,7 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
                 setLightboxZoom(1);
                 setLightboxPan({ x: 0, y: 0 });
               }}
-              className="absolute top-4 right-4 z-30 w-10 h-10 rounded-full bg-black/70 border border-[#F2C14E]/60 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer"
+              className="absolute top-4 right-4 z-30 w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-black/70 border border-[#F2C14E]/60 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -1004,7 +1007,8 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
               style={{ cursor: lightboxZoom > 1 ? (isLightboxDragging ? 'grabbing' : 'grab') : 'default' }}
             >
               <img
-                src={lightboxImage.src}
+                // Xem lớn và phóng to: bậc lớn nhất 1920.
+                src={fitImage(lightboxImage.src, 1920)}
                 alt={lightboxImage.title}
                 className="max-h-full max-w-full object-contain rounded-xl select-none pointer-events-none"
                 style={{
@@ -1014,7 +1018,7 @@ export const BaoThapMap2D: FC<BaoThapMap2DProps> = ({ onClose }) => {
               />
 
               {/* Lightbox Zoom Controls */}
-              <div className="absolute bottom-3 right-3 z-30 flex items-center gap-1.5 bg-[#1C120B]/90 backdrop-blur-md p-1.5 rounded-xl border border-[#F2C14E]/40 shadow-xl">
+              <div className="absolute bottom-3 right-3 z-30 flex items-center gap-1.5 bg-[#1C120B]/90 sm:backdrop-blur-md p-1.5 rounded-xl border border-[#F2C14E]/40 shadow-xl">
                 <button
                   type="button"
                   onClick={() => setLightboxZoom((prev) => Math.min(prev + 0.3, 4))}

@@ -10,6 +10,8 @@ import {
   Repeat,
 } from 'lucide-react';
 import { QUAN_AM_33_DATA, QuanAm33Item } from '@/data/quan-am-33-data';
+import { swapOnError, fitProps, CARD_WIDTHS } from '@/features/universe/image-props';
+import { fitImage } from '@/utils/image';
 
 // ── Web Audio Sound Generator for Authentic Shaking & Card Flip Chime ──
 function playBambooRattleSound() {
@@ -75,15 +77,15 @@ const QuanAmCard = React.memo(({ item, onSelect }: CardProps) => {
     >
       {/* 1. TOP ARTWORK IMAGE FRAME */}
       <div className="relative w-full h-[270px] sm:h-[295px] bg-[#120A06] overflow-hidden shrink-0">
-        <img
-          src={item.imgUrl}
+        <img width={640} height={480}
+          {...fitProps(item.imgUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 285px, (min-width: 768px) 30vw, (min-width: 640px) 46vw, calc(100vw - 32px)' })}
           alt={item.name}
           loading="lazy"
           decoding="async"
           className="w-full h-full object-cover object-[center_12%] transition-transform duration-700 ease-out group-hover:scale-108 filter drop-shadow-[0_10px_20px_rgba(0,0,0,0.8)]"
           onError={(e) => {
             (e.target as HTMLImageElement).src =
-              'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-_-tong-phong-truyen-thua_-bai-tho-mien-nam-chon-to_thumbnail_herobanner-1787470412489.webp';
+              '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/tong-chi-tu-hoc-_-tong-phong-truyen-thua_-bai-tho-mien-nam-chon-to_thumbnail_herobanner-1787470412489.webp';
           }}
         />
 
@@ -93,7 +95,7 @@ const QuanAmCard = React.memo(({ item, onSelect }: CardProps) => {
         {/* Number Badge Top-Left */}
         <div
           style={{ fontFamily: "'UTM Avo', sans-serif" }}
-          className="absolute top-3 left-3 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider text-[#F2C14E] bg-[#1C120B]/90 border border-[#F2C14E]/50 backdrop-blur-md shadow-md z-10"
+          className="absolute top-3 left-3 px-3 py-1 rounded-full text-xs sm:text-[11px] font-bold uppercase tracking-wider text-[#F2C14E] bg-[#1C120B]/90 border border-[#F2C14E]/50 sm:backdrop-blur-md shadow-md z-10"
         >
           QUẺ SỐ {item.number}
         </div>
@@ -112,7 +114,7 @@ const QuanAmCard = React.memo(({ item, onSelect }: CardProps) => {
             
             {/* Center Circle with Logo (Nổi trên bề mặt, tiếp giáp sát đường kẻ) */}
             <div className="w-8 h-8 rounded-full border border-[#F2C14E] bg-[#1C120B] flex items-center justify-center mx-1.5 shadow-[0_0_12px_rgba(242,193,78,0.6)] z-30 shrink-0">
-              <img
+              <img width={128} height={128}
                 src="/images/icon-minh-hoa/GIEO THẺ QUAN ÂM LOGO.svg"
                 alt=""
                 className="w-4 h-4 object-contain filter drop-shadow-[0_0_4px_rgba(242,193,78,0.9)]"
@@ -144,7 +146,7 @@ const QuanAmCard = React.memo(({ item, onSelect }: CardProps) => {
         <div className="absolute inset-x-0 bottom-2 flex justify-center opacity-0 group-hover:opacity-100 translate-y-3 group-hover:translate-y-0 transition-all duration-300 ease-out z-20 pointer-events-none group-hover:pointer-events-auto">
           <span
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className="px-4 py-1 rounded-full text-[11px] font-bold text-[#1C130D] bg-gradient-to-r from-[#F2C14E] via-[#FFDE59] to-[#F2C14E] shadow-[0_4px_15px_rgba(242,193,78,0.6)] flex items-center gap-1.5 uppercase tracking-wider cursor-pointer hover:brightness-110"
+            className="px-4 py-1 rounded-full text-xs sm:text-[11px] font-bold text-[#1C130D] bg-gradient-to-r from-[#F2C14E] via-[#FFDE59] to-[#F2C14E] shadow-[0_4px_15px_rgba(242,193,78,0.6)] flex items-center gap-1.5 uppercase tracking-wider cursor-pointer hover:brightness-110"
           >
             <span>Xem lời dạy và chiêm bái</span>
           </span>
@@ -265,13 +267,11 @@ export const QuanAm33Grid: FC = () => {
         <div className="flex flex-col items-center text-center">
           {/* Standalone Logo above section title */}
           <div className="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center transform hover:scale-105 transition-transform duration-300">
-            <img
+            <img width={128} height={128}
               src="/images/icon-minh-hoa/GIEO THẺ QUAN ÂM LOGO.svg"
               alt="Gieo Quẻ Quan Âm"
               className="w-full h-full object-contain filter drop-shadow-[0_0_16px_rgba(242,193,78,0.95)]"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = '/images/icon-minh-hoa/bieu-tuong-bao-tuong-phat-giao.png';
-              }}
+              onError={swapOnError(fitImage('/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-bao-tuong-phat-giao.webp', 160))}
             />
           </div>
 
@@ -318,7 +318,7 @@ export const QuanAm33Grid: FC = () => {
 
               {/* Logo icon màu nâu trầm đồng bộ */}
               <span className="w-5 h-5 flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
-                <img
+                <img width={128} height={128}
                   src="/images/icon-minh-hoa/GIEO THẺ QUAN ÂM LOGO.svg"
                   alt=""
                   className="w-full h-full object-contain filter brightness-0 sepia hue-rotate-[320deg] saturate-[600%]"
@@ -349,7 +349,7 @@ export const QuanAm33Grid: FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[300] bg-black/92 backdrop-blur-xl flex flex-col items-center justify-center p-4 select-none"
+            className="fixed inset-0 z-[300] bg-black/92 sm:backdrop-blur-xl flex flex-col items-center justify-center p-4 select-none"
           >
             {/* Luminous aura */}
             <div className="w-64 h-64 bg-radial from-[#F2C14E]/30 to-transparent rounded-full blur-3xl animate-pulse pointer-events-none" />
@@ -373,7 +373,7 @@ export const QuanAm33Grid: FC = () => {
                 className="w-[280px] sm:w-[320px] h-[400px] sm:h-[460px] rounded-3xl overflow-hidden border-2 border-[#F2C14E] bg-[#1C120B] shadow-[0_0_50px_rgba(242,193,78,0.7)] p-2 flex flex-col items-center justify-center"
               >
                 <img
-                  src={shuffleCard.imgUrl}
+                  {...fitProps(shuffleCard.imgUrl, { width: 640, widths: [360, 640], sizes: '320px' })}
                   alt={shuffleCard.name}
                   className="w-full h-full object-contain rounded-2xl"
                 />
@@ -392,7 +392,7 @@ export const QuanAm33Grid: FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[250] bg-black/94 backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 select-none overscroll-contain"
+            className="fixed inset-0 z-[250] bg-black/94 sm:backdrop-blur-xl flex items-center justify-center p-3 sm:p-6 select-none overscroll-contain"
             onClick={() => setSelectedItem(null)}
             onWheel={(e) => {
               e.stopPropagation();
@@ -425,7 +425,7 @@ export const QuanAm33Grid: FC = () => {
               <button
                 type="button"
                 onClick={() => setSelectedItem(null)}
-                className="absolute -top-12 right-0 sm:right-2 z-30 w-10 h-10 rounded-full bg-[#1C120B]/90 border border-[#F2C14E]/60 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xl backdrop-blur-md"
+                className="absolute -top-12 right-0 sm:right-2 z-30 w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[#1C120B]/90 border border-[#F2C14E]/60 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black flex items-center justify-center transition-all cursor-pointer shadow-xl sm:backdrop-blur-md"
                 title="Đóng chiêm bái"
               >
                 <X className="w-5 h-5" />
@@ -465,7 +465,7 @@ export const QuanAm33Grid: FC = () => {
                     style={{ backfaceVisibility: 'hidden' }}
                   >
                     <img
-                      src={selectedItem.imgUrl}
+                      src={fitImage(selectedItem.imgUrl, 1920)}
                       alt={selectedItem.name}
                       className="w-full h-full object-contain rounded-2xl pointer-events-none"
                       style={{
@@ -477,7 +477,7 @@ export const QuanAm33Grid: FC = () => {
                     {/* Badge: Mặt trước Tôn Tượng */}
                     <div
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                      className="absolute top-4 left-4 px-3.5 py-1 rounded-full text-[11px] font-bold text-[#F2C14E] bg-[#1C120B]/90 border border-[#F2C14E]/50 shadow-md backdrop-blur-md uppercase"
+                      className="absolute top-4 left-4 px-3.5 py-1 rounded-full text-xs sm:text-[11px] font-bold text-[#F2C14E] bg-[#1C120B]/90 border border-[#F2C14E]/50 shadow-md sm:backdrop-blur-md uppercase"
                     >
                       Mặt trước • Tôn Tượng
                     </div>
@@ -492,7 +492,7 @@ export const QuanAm33Grid: FC = () => {
                     }}
                   >
                     <img
-                      src={selectedItem.backImgUrl || selectedItem.imgUrl}
+                      src={fitImage(selectedItem.backImgUrl || selectedItem.imgUrl, 1920)}
                       alt={`Mặt sau Lời Dạy Quẻ Số ${selectedItem.number}`}
                       className="w-full h-full object-contain rounded-2xl pointer-events-none"
                       style={{
@@ -504,7 +504,7 @@ export const QuanAm33Grid: FC = () => {
                     {/* Badge: Mặt sau Lời Dạy */}
                     <div
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                      className="absolute top-4 left-4 px-3.5 py-1 rounded-full text-[11px] font-bold text-[#FFE5A3] bg-[#3B0000]/90 border border-[#F2C14E]/60 shadow-md backdrop-blur-md uppercase"
+                      className="absolute top-4 left-4 px-3.5 py-1 rounded-full text-xs sm:text-[11px] font-bold text-[#FFE5A3] bg-[#3B0000]/90 border border-[#F2C14E]/60 shadow-md sm:backdrop-blur-md uppercase"
                     >
                       Mặt sau • Lời Dạy Quẻ Số {selectedItem.number}
                     </div>
@@ -513,7 +513,7 @@ export const QuanAm33Grid: FC = () => {
               </div>
 
               {/* ── CONTROLS BAR: TỐI GIẢN GỌN GÀNG, BỎ NÚT XỐC LẠI ── */}
-              <div className="w-full mt-3 flex items-center justify-between gap-3 bg-[#1C120B]/90 border border-[#F2C14E]/40 p-2.5 rounded-2xl shadow-2xl backdrop-blur-md">
+              <div className="w-full mt-3 flex items-center justify-between gap-3 bg-[#1C120B]/90 border border-[#F2C14E]/40 p-2.5 rounded-2xl shadow-2xl sm:backdrop-blur-md">
                 {/* Button: Lật Thẻ 3D */}
                 <button
                   type="button"
@@ -535,7 +535,7 @@ export const QuanAm33Grid: FC = () => {
                   <button
                     type="button"
                     onClick={() => setZoom((prev) => Math.min(prev + 0.3, 3.0))}
-                    className="w-8 h-8 rounded-lg hover:bg-[#F2C14E] text-[#FFDE59] hover:text-black flex items-center justify-center transition-colors cursor-pointer"
+                    className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg hover:bg-[#F2C14E] text-[#FFDE59] hover:text-black flex items-center justify-center transition-colors cursor-pointer"
                     title="Phóng to để đọc chữ rõ hơn"
                   >
                     <ZoomIn className="w-4 h-4" />
@@ -549,7 +549,7 @@ export const QuanAm33Grid: FC = () => {
                         return next;
                       });
                     }}
-                    className="w-8 h-8 rounded-lg hover:bg-[#F2C14E] text-[#FFDE59] hover:text-black flex items-center justify-center transition-colors cursor-pointer"
+                    className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg hover:bg-[#F2C14E] text-[#FFDE59] hover:text-black flex items-center justify-center transition-colors cursor-pointer"
                     title="Thu nhỏ"
                   >
                     <ZoomOut className="w-4 h-4" />
@@ -561,7 +561,7 @@ export const QuanAm33Grid: FC = () => {
                         setZoom(1);
                         setPan({ x: 0, y: 0 });
                       }}
-                      className="w-8 h-8 rounded-lg hover:bg-[#F2C14E] text-[#FFDE59] hover:text-black flex items-center justify-center transition-colors cursor-pointer"
+                      className="w-11 h-11 sm:w-8 sm:h-8 rounded-lg hover:bg-[#F2C14E] text-[#FFDE59] hover:text-black flex items-center justify-center transition-colors cursor-pointer"
                       title="Khôi phục góc nhìn"
                     >
                       <RotateCcw className="w-4 h-4" />

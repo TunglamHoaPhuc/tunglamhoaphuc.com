@@ -24,6 +24,7 @@ import {
 
 // Các điểm trên sơ đồ do máy chủ dựng từ khu vực đang hiển thị ở D1 (lib/v3-areas.ts): khu vực ẩn hay đã xóa không có điểm.
 import type { MapSpot } from '@/lib/v3-areas';
+import { TOAN_CANH_BACKDROP, fitProps, swapOnError } from '@/features/universe/image-props';
 
 function toSentenceCase(str?: string): string {
   if (!str) return '';
@@ -289,10 +290,10 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
     }, 400);
   };
 
-  const MAP_IMAGE_URL = "https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp";
+  const MAP_IMAGE_URL = "/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp";
 
   return (
-    <div className="w-screen h-screen fixed inset-0 z-50 bg-[#1C120C] overflow-hidden select-none">
+    <div className="fixed inset-0 w-full h-dvh z-50 bg-[#1C120C] overflow-hidden select-none">
       {/* ── BACKGROUND AUDIO ELEMENT & FLOATING AUDIO TOGGLE BUTTON ── */}
       <audio
         ref={audioRef}
@@ -309,7 +310,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
       <button
         type="button"
         onClick={toggleAudio}
-        className="fixed bottom-5 left-5 z-50 w-10 h-10 rounded-full bg-[#1C130D]/80 border border-[#F2C14E]/40 flex items-center justify-center text-[#FFE5A3] cursor-pointer hover:scale-110 transition-all shadow-lg backdrop-blur-md"
+        className="fixed bottom-5 left-5 z-50 w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-[#1C130D]/80 border border-[#F2C14E]/40 flex items-center justify-center text-[#FFE5A3] cursor-pointer hover:scale-110 transition-all shadow-lg sm:backdrop-blur-md"
         title={isPlayingAudio ? "Tắt âm thanh nền" : "Bật âm thanh nền"}
       >
         {isPlayingAudio ? (
@@ -332,10 +333,8 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
             {/* Seamless Anchor Background Image: toan-canh-chua.jpg */}
             <div className="absolute inset-0 z-0">
               <img
-                src="/images/vu-tru-phat-giao/toan-canh-chua.jpg"
-                onError={(e) => {
-                  e.currentTarget.src = "/images/toan-canh-chua.jpg";
-                }}
+                {...TOAN_CANH_BACKDROP}
+                onError={swapOnError("/images/hero/toan-canh-chua-1280.webp")}
                 alt="Toàn cảnh Tùng Lâm Hòa Phúc"
                 className="w-full h-full object-cover scale-105"
               />
@@ -350,7 +349,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
                   initial={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.7, ease: "easeInOut" }}
-                  className="absolute inset-0 z-10 bg-[#0D0907]/80 backdrop-blur-sm flex flex-col items-center justify-center text-[#FFE5A3] select-none p-4"
+                  className="absolute inset-0 z-10 bg-[#0D0907]/80 sm:backdrop-blur-sm flex flex-col items-center justify-center text-[#FFE5A3] select-none p-4"
                 >
                   <div className="w-14 h-14 rounded-full bg-[#2C1C11] border border-[#F2C14E]/40 flex items-center justify-center text-[#F2C14E] mb-6 shadow-[0_0_25px_rgba(242,193,78,0.4)]">
                     <span className="text-3xl animate-spin">☸</span>
@@ -423,7 +422,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
         )}
       </AnimatePresence>
       {/* ── 2. CỘT CÔNG CỤ DẠNG DOCK TỐI GIẢN (FLOATING TOOLBAR WITH 3 ICONS ON THE LEFT) ── */}
-      <div className="absolute left-4 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-3 bg-[#1C130D]/85 backdrop-blur-md border border-[#F2C14E]/30 p-2.5 rounded-2xl shadow-2xl">
+      <div className="absolute left-4 top-1/2 -translate-y-1/2 z-30 flex flex-col gap-3 bg-[#1C130D]/85 sm:backdrop-blur-md border border-[#F2C14E]/30 p-2.5 rounded-2xl shadow-2xl">
         {/* Icon 1: Vũ Trụ Phật Giáo (Chuyển về Dạng Lưới Grid) */}
         <div className="relative group">
           <button
@@ -486,7 +485,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
       {/* ── 3. BONG BÓNG CHAT AI MAGIC PHONG CÁCH KÍNH MỜ (MAGIC GLASSMORPHISM & GRADIENT BORDER) ── */}
       {showAiChatBubble && (
         <div
-          className="absolute left-16 bottom-6 z-40 w-80 md:w-96 bg-[#1C130D]/75 backdrop-blur-xl rounded-3xl p-5 shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex flex-col gap-3 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform origin-bottom-left animate-in fade-in slide-in-from-left-4"
+          className="absolute left-16 bottom-6 z-40 w-80 md:w-96 bg-[#1C130D]/75 sm:backdrop-blur-xl rounded-3xl p-5 shadow-[0_20px_50px_rgba(0,0,0,0.6)] flex flex-col gap-3 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] transform origin-bottom-left animate-in fade-in slide-in-from-left-4"
           style={{
             background: "linear-gradient(#1C130D, #1C130D) padding-box, linear-gradient(135deg, rgba(242,193,78,0.8), rgba(255,229,163,0.2), rgba(242,193,78,0.6)) border-box",
             border: "1.5px solid transparent",
@@ -541,7 +540,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
               onChange={(e) => setInputQuery(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
               placeholder="Hỏi về khu vực, bảo tượng..."
-              className="flex-1 bg-[#1C120C]/80 border border-[#F2C14E]/30 rounded-xl px-3 py-2 text-xs text-[#FFE5A3] placeholder-[#c9b896]/60 focus:outline-none focus:border-[#F2C14E] drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
+              className="flex-1 bg-[#1C120C]/80 border border-[#F2C14E]/30 rounded-xl px-3 py-2.5 sm:py-2 text-base sm:text-xs text-[#FFE5A3] placeholder-[#c9b896]/60 focus:outline-none focus:border-[#F2C14E] drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             />
             <button
@@ -576,10 +575,9 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
         >
           {/* Clean Crisp Flat Map Image borderless edge-to-edge full cover */}
           <img
-            src={MAP_IMAGE_URL}
-            onError={(e) => {
-              e.currentTarget.src = "/images/toan-canh-chua.jpg";
-            }}
+            // Sơ đồ phủ cả màn hình, kéo và phóng to được: bậc lớn nhất 1920.
+            {...fitProps(MAP_IMAGE_URL, { width: 1920, widths: [1280, 1920], sizes: "100vw" })}
+            onError={swapOnError("/images/hero/toan-canh-chua-1280.webp")}
             alt="Sơ đồ 2D Tùng Lâm Hòa Phúc - canh-1.png"
             className="min-w-full min-h-full w-full h-full object-cover select-none pointer-events-auto block"
             draggable={false}
@@ -642,7 +640,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "100%", opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="side-panel-scroll absolute right-0 top-0 bottom-0 w-full sm:w-[420px] z-40 overflow-y-auto border-l p-6 flex flex-col justify-between"
+              className="side-panel-scroll absolute right-0 top-16 sm:top-0 bottom-0 w-full sm:w-[420px] z-40 overflow-y-auto border-l p-4 sm:p-6 flex flex-col justify-between"
               style={{
                 background: "linear-gradient(160deg, rgba(30,19,12,0.95) 0%, rgba(18,11,6,0.98) 100%)",
                 borderColor: "rgba(242,193,78,0.35)",
@@ -654,7 +652,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
                 {/* Close Sidebar Button [ ✕ ] */}
                 <div className="flex items-center justify-between mb-4 pt-1">
                   <span
-                    className="text-[10px] font-bold uppercase tracking-widest text-[#F2C14E]"
+                    className="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-[#F2C14E]"
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                   >
                     KHU VỰC SỐ {selectedSpot.number}
@@ -662,7 +660,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
                   <button
                     type="button"
                     onClick={() => setSelectedSpot(null)}
-                    className="w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
+                    className="w-11 h-11 sm:w-8 sm:h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 cursor-pointer"
                     style={{ background: "rgba(0,0,0,0.6)", color: "#F2C14E", border: "1px solid rgba(242,193,78,0.3)" }}
                     aria-label="Đóng bảng thông tin"
                   >
@@ -702,7 +700,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
 
                 {/* Close-up Image Preview */}
                 <div className="relative aspect-video rounded-xl overflow-hidden border mb-5 shadow-lg" style={{ borderColor: "rgba(242,193,78,0.35)" }}>
-                  <img src={selectedSpot.imgUrl} alt={selectedSpot.name} className="w-full h-full object-cover" />
+                  <img {...fitProps(selectedSpot.imgUrl, { width: 960, widths: [640, 960], sizes: "380px" })} loading="lazy" decoding="async" alt={selectedSpot.name} className="w-full h-full object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#140D08]/80 via-transparent to-transparent" />
                 </div>
 
@@ -710,7 +708,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
                 {selectedSpot.statues.length > 0 && (
                   <div className="mb-5">
                     <div
-                      className="text-[10px] font-bold uppercase tracking-widest text-[#F2C14E] mb-2"
+                      className="text-xs sm:text-[10px] font-bold uppercase tracking-widest text-[#F2C14E] mb-2"
                       style={{ fontFamily: "'UTM Avo', sans-serif" }}
                     >
                       BẢO TƯỢNG NỔI BẬT:
@@ -723,7 +721,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
                           style={{ borderColor: "rgba(242,193,78,0.5)" }}
                           title={st.name}
                         >
-                          <img src={st.imgUrl} alt={st.name} className="w-full h-full object-cover" />
+                          <img {...fitProps(st.imgUrl, { width: 160 })} loading="lazy" decoding="async" alt={st.name} className="w-full h-full object-cover" />
                         </div>
                       ))}
                       <div
@@ -742,7 +740,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
 
                 {/* Description */}
                 <p
-                  className="font-sans text-xs md:text-sm text-[#D3C0AD] leading-relaxed text-justify mb-4"
+                  className="font-sans text-sm text-[#D3C0AD] leading-relaxed text-left sm:text-justify mb-4"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
                   {selectedSpot.description}
@@ -751,7 +749,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
                 {/* Zen Meditation Quote Blockquote */}
                 {selectedSpot.quote && (
                   <blockquote
-                    className="border-l-2 border-[#F2C14E] bg-[#3a2718]/60 p-3 italic text-xs md:text-sm text-[#FFE5A3] rounded-r-lg mb-6 leading-relaxed"
+                    className="border-l-2 border-[#F2C14E] bg-[#3a2718]/60 p-3 italic text-sm text-[#FFE5A3] rounded-r-lg mb-6 leading-relaxed"
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
                   >
                     {selectedSpot.quote}
@@ -781,7 +779,9 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
                           onClick={() => setVideoModalUrl(st.imgUrl)}
                         >
                           <img
-                            src={st.imgUrl}
+                            {...fitProps(st.imgUrl, { width: 160 })}
+                            loading="lazy"
+                            decoding="async"
                             alt={st.title}
                             className="w-14 h-11 rounded-lg object-cover shrink-0"
                           />
@@ -793,7 +793,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
                               {st.title}
                             </h5>
                             <p
-                              className="text-[10px] text-[#c9b896] line-clamp-1 mt-0.5"
+                              className="text-xs sm:text-[10px] text-[#c9b896] line-clamp-1 mt-0.5"
                               style={{ fontFamily: "'UTM Avo', sans-serif" }}
                             >
                               {st.summary}
@@ -844,7 +844,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
       {/* Video Modal Popup */}
       {videoModalUrl && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 sm:backdrop-blur-md"
           onClick={() => setVideoModalUrl(null)}
         >
           <div
@@ -862,7 +862,7 @@ export const InteractiveMap2D: FC<InteractiveMap2DProps> = ({ spots, onExit2DMod
               THƯỚC PHIM TƯ LIỆU THIỀN MÔN
             </h3>
             <div className="aspect-video rounded-xl overflow-hidden bg-black flex items-center justify-center">
-              <img src={videoModalUrl} alt="Video preview" className="w-full h-full object-cover" />
+              <img {...fitProps(videoModalUrl, { width: 1280, widths: [640, 960, 1280], sizes: "(min-width: 768px) 640px, 90vw" })} alt="Video preview" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>

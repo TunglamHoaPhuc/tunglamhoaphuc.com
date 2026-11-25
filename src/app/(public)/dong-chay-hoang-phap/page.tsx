@@ -1,6 +1,14 @@
 import DongChayHoangPhapClient from './DongChayHoangPhapClient';
 import { dongChayPage } from '@/lib/dong-chay';
 import { liveDongChayCategories } from '@/lib/dong-chay-categories';
+import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/v3-seo';
+
+export const metadata: Metadata = pageMetadata({
+  title: "Dòng Chảy Hoằng Pháp",
+  description: "Tin hoạt động, khóa lễ, cộng tu và đại lễ tại Tùng Lâm Hòa Phúc.",
+  path: '/dong-chay-hoang-phap',
+});
 
 // Cache ở edge 60 giây (trước là 5 phút: V3 không có chỗ nào để admin xóa cache, bài mới đăng phải hiện sớm). Trang chỉ dựng
 // 12 bài mới nhất; các trang sau, danh mục và cách sắp xếp lấy qua /api/public/dong-chay (không đọc searchParams ở đây, vì

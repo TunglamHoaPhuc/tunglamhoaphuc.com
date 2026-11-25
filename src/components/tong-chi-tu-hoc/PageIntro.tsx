@@ -19,7 +19,7 @@ export function PageIntro({ description }: PageIntroProps) {
           space-y-4 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]
           
           /* Căn đều 2 bên cho tất cả các đoạn văn */
-          [&>p]:text-justify 
+          [&>p]:text-left sm:[&>p]:text-justify 
           [&>p]:mb-4 
           [&>p]:leading-relaxed md:[&>p]:leading-loose
           
@@ -41,7 +41,7 @@ export function PageIntro({ description }: PageIntroProps) {
 
           /* Tối ưu hiển thị cho danh sách bullet nếu có */
           [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:space-y-2 [&_ul]:my-4
-          [&_li]:text-justify [&_li]:pl-1
+          [&_li]:text-left sm:[&_li]:text-justify [&_li]:pl-1
         "
         dangerouslySetInnerHTML={{ __html: description }}
       />

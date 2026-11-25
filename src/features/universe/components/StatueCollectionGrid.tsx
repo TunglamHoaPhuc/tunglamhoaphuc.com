@@ -4,6 +4,7 @@ import React, { FC, useState, useMemo } from "react";
 import Link from "next/link";
 import { ChevronDown, ChevronUp, ArrowRight } from "lucide-react";
 import { type StatueItem, normalizeAreaId } from "@/lib/statue-types";
+import { STATUE_ICON_SRC, LOGO_ROUND_SRC, swapOnError, TOAN_CANH_BACKDROP, fitProps, CARD_WIDTHS, STATUE_ICON_LARGE_SRC } from '@/features/universe/image-props';
 
 interface StatueCollectionGridProps {
   statues?: StatueItem[];
@@ -26,13 +27,14 @@ interface StatueCardProps {
 const StatueCard = React.memo(({ statue }: StatueCardProps) => {
   return (
     <Link
+      prefetch={false}
       href={`/bao-tuong/${statue.slug}`}
       className="group relative w-full max-w-[300px] mx-auto overflow-hidden rounded-2xl border border-[#F2C14E]/30 bg-[#25170E] hover:border-[#F2C14E] transition-all duration-300 shadow-xl h-[415px] cursor-pointer flex flex-col justify-between block transform-gpu will-change-transform"
     >
       {/* 1. KHUNG ẢNH THUMBNAIL (H-[330PX] LAZY & ASYNC DECODING) */}
       <div className="relative w-full h-[330px] overflow-hidden bg-[#1A120B] shrink-0">
-        <img
-          src={statue.imgUrl}
+        <img width={640} height={480}
+          {...fitProps(statue.imgUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 285px, (min-width: 768px) 30vw, (min-width: 640px) 46vw, calc(100vw - 32px)' })}
           alt={statue.name}
           loading="lazy"
           decoding="async"
@@ -44,9 +46,7 @@ const StatueCard = React.memo(({ statue }: StatueCardProps) => {
               : undefined,
             transformOrigin: 'center center',
           }}
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
-          }}
+          onError={swapOnError('/images/hero/toan-canh-chua-1280.webp')}
         />
 
         <div
@@ -66,15 +66,13 @@ const StatueCard = React.memo(({ statue }: StatueCardProps) => {
         <div className="relative w-full bg-gradient-to-b from-[#25170E] to-[#1C130D] px-3 pt-5 pb-3.5 text-center flex flex-col items-center justify-start">
           {/* LOGO BADGE CĂN GIỮA */}
           <div className="absolute top-[-24px] left-1/2 -translate-x-1/2 z-40 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#F2C14E] bg-[#25170E] flex items-center justify-center p-1 shadow-[0_0_18px_rgba(242,193,78,0.75)] overflow-hidden">
-            <img
-              src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+            <img width={128} height={128}
+              src={STATUE_ICON_SRC}
               alt="Logo Bảo tượng"
               loading="lazy"
               decoding="async"
               className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.95)] scale-145 sm:scale-150 transform-gpu"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-              }}
+              onError={swapOnError(LOGO_ROUND_SRC)}
             />
           </div>
 
@@ -142,14 +140,12 @@ export const StatueCollectionGrid: FC<StatueCollectionGridProps> = ({
     <div className="w-full py-16 my-8 relative overflow-hidden bg-[#2C1C11]">
       {/* ── 1. BACKGROUND HÒA TRỘN TỰ NHIÊN ── */}
       <div className="absolute top-0 inset-x-0 h-[850px] pointer-events-none select-none z-0 overflow-hidden bg-[#2C1C11]">
-        <img
-          src="/images/vu-tru-phat-giao/toan-canh-chua.jpg"
+        <img width={640} height={480}
+          {...TOAN_CANH_BACKDROP}
           alt="Background Tam Bảo"
           loading="lazy"
           decoding="async"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
-          }}
+          onError={swapOnError('/images/hero/toan-canh-chua-1280.webp')}
           className="w-full h-full object-cover opacity-48 mix-blend-overlay filter brightness-95"
           style={{
             WebkitMaskImage: 'radial-gradient(ellipse 72% 78% at 50% 50%, rgba(0,0,0,1) 25%, rgba(0,0,0,0) 90%)',
@@ -166,13 +162,11 @@ export const StatueCollectionGrid: FC<StatueCollectionGridProps> = ({
         {/* ── 2. SECTION HEADER: ICON & 2 ĐƯỜNG KẺ HAI BÊN ── */}
         <div className="flex flex-col items-center text-center mb-12">
           <div className="w-16 h-16 sm:w-20 sm:h-20 mb-2 flex items-center justify-center" aria-hidden="true">
-            <img
-              src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+            <img width={128} height={128}
+              src={STATUE_ICON_LARGE_SRC}
               alt="Biểu Tượng Tượng Pháp"
               className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
-              onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-              }}
+              onError={swapOnError(LOGO_ROUND_SRC)}
             />
           </div>
 

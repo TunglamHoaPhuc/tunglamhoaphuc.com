@@ -52,7 +52,7 @@ export const GoldenTimelineBar: FC<GoldenTimelineBarProps> = ({
 
               {/* Sub-label for large screens */}
               {isActive && (
-                <span className="hidden lg:inline text-[10px] opacity-85 font-medium border-l border-[#1A110B]/30 pl-1.5">
+                <span className="hidden lg:inline text-xs md:text-[10px] opacity-85 font-medium border-l border-[#1A110B]/30 pl-1.5">
                   {era.label}
                 </span>
               )}

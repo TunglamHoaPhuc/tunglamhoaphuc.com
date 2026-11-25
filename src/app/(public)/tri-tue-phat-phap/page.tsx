@@ -1,17 +1,27 @@
 // Trang Trí Tuệ Phật Pháp: các bài đang hiển thị ở D1 của www (đọc ở máy chủ). Không còn danh sách đóng gói,
 // không còn lời gọi WordPress; D1 không có bài thì trang trống.
 import { WisdomArchiveSection } from '@/features/wisdom/components/WisdomArchiveSection';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 import { livePosts } from '@/lib/v3-live';
 import { toWisdomItem, TRI_TUE_SECTION } from '@/lib/wisdom';
+import type { Metadata } from 'next';
+import { pageMetadata } from '@/lib/v3-seo';
 
 export const revalidate = 60;
+
+export const metadata: Metadata = pageMetadata({
+  title: "Trí Tuệ Phật Pháp",
+  description: "Tổng hợp bài viết, câu chuyện, pháp âm & video lưu thông pháp bảo của Tùng Lâm Hòa Phúc.",
+  path: '/tri-tue-phat-phap',
+});
 
 export default async function TriTuePhatPhapPage() {
   const items = (await livePosts(TRI_TUE_SECTION)).map(toWisdomItem);
   // Ảnh nền của đầu trang: ảnh của bài mới nhất (không có bài thì không có ảnh nền).
-  const headerBgImage = getImageUrl(items[0]?.thumbnailUrl || '');
+  // Phủ rộng cả khung nhưng mờ (opacity 0,3, mặt nạ): bậc 640 cho điện thoại, 1280 cho máy tính; không xin ảnh gốc.
+  const headerBgSource = getImageUrl(items[0]?.thumbnailUrl || '');
+  const headerBgImage = fitImage(headerBgSource, 640);
 
   return (
     <div className="min-h-screen bg-[#2A1D14] text-[#e3d2c1] selection:bg-[#F2C14E] selection:text-black">
@@ -19,12 +29,18 @@ export default async function TriTuePhatPhapPage() {
       <div className="relative w-full overflow-hidden bg-[#2A1D14] pt-24 pb-8 md:pt-28 md:pb-10">
         {/* Ảnh nền đằng sau mờ phủ gradient hòa quyện như Tông Phong Truyền Thừa */}
         {headerBgImage && (
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-30 pointer-events-none mix-blend-luminosity [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]"
-            style={{
-              backgroundImage: `url('${headerBgImage}')`,
-              backgroundPosition: 'center 25%',
-            }}
+          <img
+            src={headerBgImage}
+            srcSet={imageSrcSet(headerBgSource, [640, 1280])}
+            sizes="(min-width: 1024px) 100vw, 160px"
+            alt=""
+            aria-hidden="true"
+            width={640}
+            height={360}
+            fetchPriority="low"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none mix-blend-luminosity [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_75%)]"
+            style={{ objectPosition: 'center 25%' }}
           />
         )}
         {/* Hiệu ứng mờ mềm mại hòa vào nền nâu */}
@@ -61,7 +77,7 @@ export default async function TriTuePhatPhapPage() {
           {/* 2. Subtitle: UTM Avo, Sentence case, Text-balance */}
           <p
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className="text-xs sm:text-sm md:text-base text-[#e3d2c1] tracking-wide font-normal max-w-2xl mx-auto px-4 leading-relaxed text-balance text-center"
+            className="text-sm md:text-base text-[#e3d2c1] tracking-wide font-normal max-w-2xl mx-auto px-4 leading-relaxed text-balance text-center"
           >
             Tổng hợp bài&nbsp;viết, câu&nbsp;chuyện, pháp&nbsp;âm &amp; video lưu&nbsp;thông pháp&nbsp;bảo của Tùng&nbsp;Lâm&nbsp;Hòa&nbsp;Phúc.
           </p>
@@ -70,11 +86,6 @@ export default async function TriTuePhatPhapPage() {
 
       <main className="max-w-[1280px] mx-auto px-4 md:px-10 py-6">
         <WisdomArchiveSection items={items} />
-
-        {/* Smart Search AI Bar */}
-        <div className="mt-16 mb-12">
-          <SmartSearchAIBar contextTitle="Kho Tàng Trí Tuệ Phật Pháp" />
-        </div>
       </main>
     </div>
   );

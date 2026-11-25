@@ -49,7 +49,7 @@ export const CustomDropdown: FC<CustomDropdownProps> = ({
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="appearance-none bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 hover:border-[#F2C14E] rounded-xl px-3.5 py-1.5 pr-8 text-xs text-[#FFE5A3] focus:outline-none focus:border-[#F2C14E] cursor-pointer transition-all duration-300 hover:shadow-[0_0_15px_rgba(242,193,78,0.25)] flex items-center justify-between gap-2 shrink-0 group shadow-sm w-full"
+        className="appearance-none bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 hover:border-[#F2C14E] rounded-xl px-3.5 py-1.5 pr-8 min-h-11 md:min-h-0 text-xs text-[#FFE5A3] focus:outline-none focus:border-[#F2C14E] cursor-pointer transition-all duration-300 hover:shadow-[0_0_15px_rgba(242,193,78,0.25)] flex items-center justify-between gap-2 shrink-0 group shadow-sm w-full"
         style={{ fontFamily: "'UTM Avo', sans-serif" }}
       >
         <span className="truncate max-w-[200px]">
@@ -66,7 +66,7 @@ export const CustomDropdown: FC<CustomDropdownProps> = ({
       {/* Flyout Menu Panel with Gradient, Soft Dividers and Gold-Brown Hover */}
       {isOpen && (
         <div
-          className={`absolute left-0 top-full mt-2 z-50 ${panelWidthClass} max-h-[320px] overflow-y-auto rounded-xl border border-[#F2C14E]/50 bg-gradient-to-b from-[#2F1F15]/98 via-[#23150D]/98 to-[#160C07]/98 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.95)] p-1.5 scrollbar-thin scrollbar-thumb-[#F2C14E]/40 animate-in fade-in zoom-in-95 duration-150`}
+          className={`absolute left-0 top-full mt-2 z-50 ${panelWidthClass} max-h-[min(320px,60dvh)] overflow-y-auto rounded-xl border border-[#F2C14E]/50 bg-gradient-to-b from-[#2F1F15]/98 via-[#23150D]/98 to-[#160C07]/98 backdrop-blur-xl shadow-[0_12px_40px_rgba(0,0,0,0.95)] p-1.5 scrollbar-thin scrollbar-thumb-[#F2C14E]/40 animate-in fade-in zoom-in-95 duration-150`}
         >
           {options.map((opt) => {
             const isSelected = opt.id === value;
@@ -77,7 +77,7 @@ export const CustomDropdown: FC<CustomDropdownProps> = ({
                   onChange(opt.id);
                   setIsOpen(false);
                 }}
-                className={`px-3 py-2 text-xs rounded-lg transition-all duration-200 cursor-pointer flex items-center justify-between border-b border-[#F2C14E]/10 last:border-b-0 ${
+                className={`px-3 py-2 min-h-11 md:min-h-0 text-xs rounded-lg transition-all duration-200 cursor-pointer flex items-center justify-between border-b border-[#F2C14E]/10 last:border-b-0 ${
                   isSelected
                     ? 'bg-[#5C3F28]/80 text-[#FFE5A3] font-bold border-l-2 border-l-[#F2C14E]'
                     : 'text-[#e3d2c1] hover:bg-gradient-to-r hover:from-[#5C3F28] hover:to-[#3E2919] hover:text-[#FFE5A3] hover:translate-x-1'

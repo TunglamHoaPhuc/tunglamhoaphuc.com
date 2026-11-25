@@ -1,5 +1,7 @@
 'use client';
 import { fitImage } from '@/utils/image';
+import { imageSources } from '@/lib/image-sources';
+import { IMAGE_WIDTH } from '@/lib/tlhp-content/media';
 
 import React, { FC } from 'react';
 import Link from 'next/link';
@@ -11,9 +13,17 @@ export interface PostCardProps {
   large?: boolean;
   className?: string;
   variant?: 'portrait' | 'golden';
+  /** Thẻ đầu danh sách (trên nếp gấp): tải ngay, không lazy. */
+  priority?: boolean;
 }
 
-const DEFAULT_TEMPLE_LOGO = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/bieu-tuong-tong-chi-tu-hoc-tung-lam-hoa-phuc.webp';
+// Thẻ "golden" của danh sách Dòng Chảy: lưới 1 cột dưới 768 px (thẻ rộng 100vw trừ lề 16 px mỗi bên), 2 cột từ 768 px (lề 40 px mỗi bên,
+// khoảng cách 40 px, trần 1.280 px nên thẻ rộng nhất 580 px). Trình duyệt chọn bậc 360/640/960/1280 theo bề rộng thẻ và mật độ điểm ảnh.
+const GOLDEN_IMAGE_WIDTHS = [360, 640, 960, 1280] as const;
+const GOLDEN_IMAGE_SIZES = '(max-width: 767px) calc(100vw - 32px), (max-width: 1279px) calc((100vw - 120px) / 2), 580px';
+const GOLDEN_FALLBACK_IMAGE = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp';
+
+const DEFAULT_TEMPLE_LOGO = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/bieu-tuong-tong-chi-tu-hoc-tung-lam-hoa-phuc.webp';
 
 /**
  * Tự động ánh xạ biểu tượng đặc trưng theo từng danh mục bài viết
@@ -27,14 +37,14 @@ const getCategoryIcon = (category?: string, subCategory?: string, title?: string
   // 1. Trí Tuệ Phật Pháp / Pháp Âm
   if (cat.includes('trí tuệ') || cat.includes('tri tue') || sub.includes('pháp âm') || sub.includes('phap am') || t.includes('pháp âm') || t.includes('phap am') || cat.includes('phap-am') || sub.includes('phap-am')) {
     if (sub.includes('pháp âm') || sub.includes('phap am') || t.includes('pháp âm') || t.includes('phap am') || sub.includes('phap-am')) {
-      return '/images/icons/icon-phap-am.webp';
+      return '/images/icons/icon-phap-am-128.webp';
     }
-    return '/images/icons/icon-tri-tue-phat-phap.webp';
+    return '/images/icons/icon-tri-tue-phat-phap-128.webp';
   }
 
   // 2. Tông Chỉ Tu Học
   if (cat.includes('tông chỉ') || cat.includes('tong chi') || cat.includes('tong-chi') || cat.includes('tông phong') || cat.includes('bồ đề tâm')) {
-    return '/images/icons/icon-tong-chi-tu-hoc.webp';
+    return '/images/icons/icon-tong-chi-tu-hoc-256.webp';
   }
 
   // 3. Dòng Chảy Hoằng Pháp (4 Chuyên Mục Con Đặc Trưng)
@@ -53,7 +63,7 @@ const getCategoryIcon = (category?: string, subCategory?: string, title?: string
     t.includes('sám hối') ||
     t.includes('sam hoi')
   ) {
-    return '/images/icons/icon-khoa-le-truyen-thong.png';
+    return '/images/icons/icon-khoa-le-truyen-thong-128.webp';
   }
 
   // 3.2. Đại Lễ Sự Kiện
@@ -70,7 +80,7 @@ const getCategoryIcon = (category?: string, subCategory?: string, title?: string
     t.includes('phật đản') ||
     t.includes('phat dan')
   ) {
-    return '/images/icons/icon-dai-le-su-kien.png';
+    return '/images/icons/icon-dai-le-su-kien-128.webp';
   }
 
   // 3.3. Cộng Tu Định Kỳ
@@ -84,7 +94,7 @@ const getCategoryIcon = (category?: string, subCategory?: string, title?: string
     t.includes('niem phat') ||
     t.includes('bát quan trai')
   ) {
-    return '/images/icons/icon-cong-tu.png';
+    return '/images/icons/icon-cong-tu-128.webp';
   }
 
   // 3.4. Tịnh Độ Nhân Gian
@@ -98,12 +108,12 @@ const getCategoryIcon = (category?: string, subCategory?: string, title?: string
     t.includes('tịnh độ') ||
     t.includes('tinh do')
   ) {
-    return '/images/icons/icon-tinh-do-nhan-gian.png';
+    return '/images/icons/icon-tinh-do-nhan-gian-128.webp';
   }
 
   // 3.5. Dòng Chảy Hoằng Pháp chung
   if (cat.includes('dòng chảy') || cat.includes('dong chay') || cat.includes('hoằng pháp') || cat.includes('hoang phap') || sub.includes('hoằng pháp')) {
-    return '/images/icons/icon-dong-chay-hoang-phap.webp';
+    return '/images/icons/icon-dong-chay-hoang-phap-128.webp';
   }
 
   return DEFAULT_TEMPLE_LOGO;
@@ -115,7 +125,7 @@ const getCategoryIcon = (category?: string, subCategory?: string, title?: string
  * - Golden Typography Scale:
  *   - Title: text-[18px] md:text-[20px] (Font UTM Avo Bold, Gold #F2C14E)
  *   - Summary: text-[13px] md:text-[14px] (Font UTM Avo Normal, Cream #D3C0AD)
- *   - Tag & Meta: text-[11px] md:text-[12px]
+ *   - Tag & Meta: text-xs md:text-[12px]
  * - Golden Padding & Spacing: p-4 md:p-6 (16px ~ 24px)
  * - Art Boundary Junction: 1px Gradient line + Floating Centered Temple Logo (z-20)
  */
@@ -124,9 +134,11 @@ export const PostCard: FC<PostCardProps> = ({
   large = false,
   className = '',
   variant = 'portrait',
+  priority = false,
 }) => {
   const CardWrapper = post.targetUrl ? Link : 'div';
-  const wrapperProps = post.targetUrl ? { href: post.targetUrl } : {};
+  // prefetch={false}: một lưới có 12–24 thẻ, prefetch cả lưới ngay sau khi trang chạy tốn ~150 KB RSC; trang chi tiết tải khi bấm.
+  const wrapperProps = post.targetUrl ? { href: post.targetUrl, prefetch: false } : {};
 
   const formattedViews =
     typeof post.viewsCount === 'number'
@@ -139,6 +151,9 @@ export const PostCard: FC<PostCardProps> = ({
 
   const categoryTag = post.category1 || 'Phật Pháp – Đời Sống';
   const logoUrl = getCategoryIcon(post.category1, post.category2, post.title, post.category1IconUrl);
+  // Huy hiệu 44-54 px: icon tĩnh của site (/images/icons/…-128.webp) giữ nguyên kèm ?v=4; icon do admin chọn hay logo ở /anh-goc/ (có thể là
+  // PNG 2.000 px) đi bằng biến thể 160 px (một địa chỉ có ?v=4 thì không có biến thể).
+  const badgeUrl = logoUrl.startsWith('/images/') ? `${logoUrl}?v=4` : fitImage(logoUrl, IMAGE_WIDTH.icon);
 
   if (variant === 'golden') {
     return (
@@ -148,12 +163,14 @@ export const PostCard: FC<PostCardProps> = ({
       >
         {/* 1. Khung ảnh Thumbnail: flex-1 min-h-0 co lại mượt mà vào trong khi hover */}
         <div className="relative w-full flex-1 min-h-0 overflow-hidden bg-[#1A120B] transition-all duration-500 ease-out">
-          <img
-            src={fitImage(post.imageUrl || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp', 640)}
+          <img width={640} height={520}
+            {...imageSources(post.imageUrl || GOLDEN_FALLBACK_IMAGE, 640, GOLDEN_IMAGE_WIDTHS, GOLDEN_IMAGE_SIZES)}
             alt={post.title}
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
             style={{ objectPosition: post.thumbnailPosition || post.imagePosition || 'center 20%' }}
-            loading="lazy"
+            loading={priority ? 'eager' : 'lazy'}
+            fetchPriority={priority ? 'high' : undefined}
+            decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent pointer-events-none" />
         </div>
@@ -162,8 +179,8 @@ export const PostCard: FC<PostCardProps> = ({
         <div className="relative w-full h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/70 to-transparent z-10 shrink-0 transition-all duration-500 ease-out">
           {/* Huy hiệu Logo Chuyên mục con nổi chính giữa tim đường kẻ */}
           <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[44px] h-[44px] md:w-[50px] md:h-[50px] rounded-full border-2 border-[#F2C14E] bg-[#24160E] flex items-center justify-center p-2 shadow-[0_0_16px_rgba(242,193,78,0.6)] group-hover:scale-110 group-hover:shadow-[0_0_24px_rgba(242,193,78,0.85)] transition-all duration-300">
-            <img loading="lazy" decoding="async"
-              src={`${logoUrl}?v=4`}
+            <img width={128} height={128} loading="lazy" decoding="async"
+              src={badgeUrl}
               alt={post.title}
               className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.5)]"
             />
@@ -176,7 +193,7 @@ export const PostCard: FC<PostCardProps> = ({
           {(post.subtitle || post.category2) && (
             <p
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
-              className="text-[11.5px] sm:text-xs md:text-[13px] text-[#E5A93C] font-medium italic normal-case line-clamp-1 leading-normal w-full text-center tracking-wide"
+              className="text-xs sm:text-xs md:text-[13px] text-[#E5A93C] font-medium italic normal-case line-clamp-1 leading-normal w-full text-center tracking-wide"
             >
               {post.subtitle || post.category2}
             </p>
@@ -200,14 +217,14 @@ export const PostCard: FC<PostCardProps> = ({
                 {/* Mô tả ngắn bài viết */}
                 {post.description && (
                   <p
-                    className="text-[#c9b896] leading-relaxed line-clamp-2 md:line-clamp-3 text-justify text-[11.5px] md:text-[12.5px]"
+                    className="text-[#c9b896] leading-relaxed line-clamp-2 md:line-clamp-3 text-justify text-xs md:text-[12.5px]"
                   >
                     {post.description}
                   </p>
                 )}
 
                 {/* Meta: Ngày đăng + Lượt xem */}
-                <div className={`flex items-center ${post.publishedDate ? 'justify-between' : 'justify-end'} text-[10.5px] md:text-[11px] text-[#A69383] pt-2 border-t border-[#F2C14E]/15 mt-0.5`}>
+                <div className={`flex items-center ${post.publishedDate ? 'justify-between' : 'justify-end'} text-xs md:text-[11px] text-[#A69383] pt-2 border-t border-[#F2C14E]/15 mt-0.5`}>
                   {post.publishedDate && (
                     <div className="flex items-center gap-1.5">
                       <Calendar className="w-3.5 h-3.5 text-[#F2C14E]/70" />
@@ -234,12 +251,14 @@ export const PostCard: FC<PostCardProps> = ({
     >
       {/* 1. Khung ảnh Thumbnail tỷ lệ 3:4 linh hoạt */}
       <div className="relative w-full flex-1 min-h-0 overflow-hidden bg-[#1A120B]">
-        <img
-          src={fitImage(post.imageUrl || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp', 640)}
+        <img width={480} height={640}
+          src={fitImage(post.imageUrl || '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp', 640)}
           alt={post.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
           style={{ objectPosition: post.thumbnailPosition || post.imagePosition || 'center 20%' }}
-          loading="lazy"
+          loading={priority ? 'eager' : 'lazy'}
+          fetchPriority={priority ? 'high' : undefined}
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
       </div>
@@ -248,8 +267,8 @@ export const PostCard: FC<PostCardProps> = ({
       <div className="relative w-full h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/70 to-transparent z-10 shrink-0">
         {/* Huy hiệu Logo Danh mục nổi chính giữa tim đường kẻ (Phóng to trang nghiêm, tròn trịa cân đối) */}
         <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[46px] h-[46px] md:w-[54px] md:h-[54px] rounded-full border-2 border-[#F2C14E] bg-[#24160E] flex items-center justify-center p-2 md:p-2.5 shadow-[0_0_16px_rgba(242,193,78,0.6)] group-hover:scale-110 group-hover:shadow-[0_0_24px_rgba(242,193,78,0.85)] transition-all duration-300">
-          <img loading="lazy" decoding="async"
-            src={`${logoUrl}?v=4`}
+          <img width={128} height={128} loading="lazy" decoding="async"
+            src={badgeUrl}
             alt={categoryTag}
             className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.5)]"
           />
@@ -261,7 +280,7 @@ export const PostCard: FC<PostCardProps> = ({
         {/* Sub Tiêu Đề - Viết thường, bold nhẹ & nghiêng */}
         <div
           style={{ fontFamily: "'UTM Avo', sans-serif" }}
-          className="text-[10.5px] sm:text-[11px] md:text-[12px] font-medium italic text-[#E5A93C] tracking-wide normal-case truncate w-full text-center"
+          className="text-xs sm:text-[11px] md:text-[12px] font-medium italic text-[#E5A93C] tracking-wide normal-case truncate w-full text-center"
         >
           {post.subtitle || categoryTag}
         </div>
@@ -287,7 +306,7 @@ export const PostCard: FC<PostCardProps> = ({
               {post.description && (
                 <p
                   className={`text-[#c9b896] leading-relaxed line-clamp-2 text-justify ${
-                    large ? 'text-xs md:text-[13px] md:line-clamp-3' : 'text-[10.5px] md:text-[11px]'
+                    large ? 'text-xs md:text-[13px] md:line-clamp-3' : 'text-xs md:text-[11px]'
                   }`}
                 >
                   {post.description}
@@ -295,7 +314,7 @@ export const PostCard: FC<PostCardProps> = ({
               )}
 
               {/* Meta: Ngày đăng + Lượt xem */}
-              <div className={`flex items-center ${post.publishedDate ? 'justify-between' : 'justify-end'} text-[10px] text-[#A69383] pt-1.5 border-t border-[#F2C14E]/15 mt-0.5`}>
+              <div className={`flex items-center ${post.publishedDate ? 'justify-between' : 'justify-end'} text-xs md:text-[10px] text-[#A69383] pt-1.5 border-t border-[#F2C14E]/15 mt-0.5`}>
                 {post.publishedDate && (
                   <div className="flex items-center gap-1">
                     <Calendar className="w-3 h-3 text-[#F2C14E]/70" />

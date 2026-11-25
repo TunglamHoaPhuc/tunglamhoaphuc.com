@@ -21,7 +21,7 @@ export default function KiemTraAnhClient({ statues }: { statues: StatueRecord[] 
 
   const filtered = useMemo(() => {
     return statues.filter((s) => {
-      const isFallback = s.imgUrl === '/images/toan-canh-chua.jpg';
+      const isFallback = s.imgUrl === '/images/hero/toan-canh-chua-1280.webp';
       if (filterStatus === 'matched' && isFallback) return false;
       if (filterStatus === 'fallback' && !isFallback) return false;
 
@@ -44,7 +44,7 @@ export default function KiemTraAnhClient({ statues }: { statues: StatueRecord[] 
     let matched = 0;
     let fallback = 0;
     statues.forEach((s) => {
-      if (s.imgUrl === '/images/toan-canh-chua.jpg') fallback++;
+      if (s.imgUrl === '/images/hero/toan-canh-chua-1280.webp') fallback++;
       else matched++;
     });
     return { total: statues.length, matched, fallback };
@@ -145,7 +145,7 @@ export default function KiemTraAnhClient({ statues }: { statues: StatueRecord[] 
               </thead>
               <tbody className="divide-y divide-[#F2C14E]/10">
                 {filtered.map((item, idx) => {
-                  const isFallback = item.imgUrl === '/images/toan-canh-chua.jpg';
+                  const isFallback = item.imgUrl === '/images/hero/toan-canh-chua-1280.webp';
                   return (
                     <tr key={item.id || idx} className="hover:bg-[#321F14]/50 transition-colors">
                       <td className="p-3 font-mono font-bold text-[#F2C14E]">

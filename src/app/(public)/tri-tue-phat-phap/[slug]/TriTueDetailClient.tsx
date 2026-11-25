@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { Eye, Calendar, Play, ArrowLeft, ChevronRight, Bell, Sparkles, Video, Images, BookOpen, Clock, Landmark, ArrowRight } from 'lucide-react';
 import Header from '@/components/public/layout/Header';
 import Footer from '@/components/public/layout/Footer';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 import { HeroBanner } from '@/components/tong-chi-tu-hoc/HeroBanner';
 import { InfographicArticleRenderer } from '@/components/tong-chi-tu-hoc/chi-tiet/InfographicArticleRenderer';
 import { BookCitationSection } from '@/components/tong-chi-tu-hoc/chi-tiet/BookCitationSection';
@@ -43,10 +42,10 @@ export default function TriTueDetailClient({ item, relatedFormatted }: { item: a
           <div className="mb-6">
             <Link
               href="/tri-tue-phat-phap"
-              className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-[#F2C14E] hover:text-[#FFE5A3] transition-colors"
+              className="inline-flex items-center gap-1.5 min-h-11 sm:min-h-0 text-sm sm:text-xs uppercase tracking-widest text-[#F2C14E] hover:text-[#FFE5A3] transition-colors"
               style={{ fontFamily: "'UTM Avo', sans-serif", fontWeight: 'bold' }}
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
+              <ArrowLeft className="w-3.5 h-3.5 shrink-0" />
               <span>Quay Lại Kho Tàng Trí Tuệ Phật Pháp</span>
             </Link>
           </div>
@@ -79,9 +78,9 @@ export default function TriTueDetailClient({ item, relatedFormatted }: { item: a
           {/* Meta footer */}
           <div
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
-            className="border-t border-[#F2C14E]/20 pt-6 mt-12 flex flex-wrap items-center justify-between gap-4 text-xs md:text-sm text-[#D3C0AD]"
+            className="border-t border-[#F2C14E]/20 pt-6 mt-12 flex flex-wrap items-center justify-between gap-4 text-sm text-[#D3C0AD]"
           >
-            <div className="flex items-center gap-6">
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
               {(item.publishDate || item.publishedDate) && (
                 <span className="flex items-center gap-1.5">
                   <Calendar className="w-4 h-4 text-[#F2C14E]" />
@@ -122,7 +121,7 @@ export default function TriTueDetailClient({ item, relatedFormatted }: { item: a
 
         {/* ── 3b. PHÁP ÂM: trình phát âm thanh ── */}
         {item.audio?.src && (
-          <figure className="w-full rounded-2xl border border-[#F2C14E]/30 bg-[#25170E]/60 p-5 sm:p-6">
+          <figure className="w-full rounded-2xl border border-[#F2C14E]/30 bg-[#25170E]/60 p-4 sm:p-6">
             <figcaption className="mb-3 text-sm font-bold uppercase tracking-wider text-[#F2C14E]">
               Nghe Pháp Âm{item.audio.duration ? ` · ${item.audio.duration}` : ''}
             </figcaption>
@@ -145,11 +144,6 @@ export default function TriTueDetailClient({ item, relatedFormatted }: { item: a
         {/* ── 6. BLOCK TÌM HIỂU THÊM ── */}
         <div className="w-full">
           <DiscoverMore relatedArticles={relatedFormatted} />
-        </div>
-
-        {/* Smart Search AI Bar */}
-        <div className="my-10">
-          <SmartSearchAIBar contextTitle={item.title} />
         </div>
       </main>
 

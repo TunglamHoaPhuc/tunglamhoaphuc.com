@@ -3,6 +3,8 @@
 import { FC } from "react";
 import { X, Play, Volume2, Sparkles } from "lucide-react";
 import { WisdomItem } from "@/types/wisdom-tags";
+import { fitImage } from "@/utils/image";
+import { imageSrcSet } from "@/lib/tlhp-content/media";
 
 interface MediaPlayModalProps {
   item: WisdomItem | null;
@@ -14,15 +16,14 @@ export const MediaPlayModal: FC<MediaPlayModalProps> = ({ item, onClose }) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8 backdrop-blur-md"
       style={{
         background: "rgba(0,0,0,0.86)",
-        backdropFilter: "blur(12px)",
       }}
       onClick={onClose}
     >
       <div
-        className="relative max-w-4xl w-full rounded-2xl overflow-hidden border shadow-2xl animate-in zoom-in-95 flex flex-col"
+        className="relative max-w-4xl w-full max-h-[calc(100dvh-2rem)] overflow-y-auto overscroll-contain rounded-2xl border shadow-2xl animate-in zoom-in-95 flex flex-col"
         style={{
           background: "linear-gradient(160deg, rgba(74,55,40,0.96) 0%, rgba(26,15,8,0.98) 100%)",
           borderColor: "#F2C14E",
@@ -51,7 +52,7 @@ export const MediaPlayModal: FC<MediaPlayModalProps> = ({ item, onClose }) => {
           {/* Close button [X] */}
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-full flex items-center justify-center border transition-all hover:scale-110"
+            className="w-11 h-11 md:w-9 md:h-9 rounded-full flex items-center justify-center border transition-all hover:scale-110"
             style={{
               background: "rgba(0,0,0,0.5)",
               borderColor: "#F2C14E",
@@ -66,7 +67,10 @@ export const MediaPlayModal: FC<MediaPlayModalProps> = ({ item, onClose }) => {
         {/* ── 2. Khối Player Trung Tâm ── */}
         <div className="relative overflow-hidden group" style={{ minHeight: 320, maxHeight: 420 }}>
           <img
-            src={item.thumbnailUrl}
+            src={fitImage(item.thumbnailUrl, 960)}
+            srcSet={imageSrcSet(item.thumbnailUrl, [640, 960, 1280, 1920])}
+            sizes="(min-width: 960px) 896px, 92vw"
+            decoding="async"
             alt={item.title}
             className="w-full h-full object-cover"
           />

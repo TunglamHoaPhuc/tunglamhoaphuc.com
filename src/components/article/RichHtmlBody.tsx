@@ -2,6 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { richHtml } from '@/lib/article-html';
+import { optimizeBodyImages } from '@/lib/body-images';
 
 interface Popup {
   keyword: string;
@@ -21,7 +22,8 @@ export function RichHtmlBody({
   popups?: Popup[];
   onKeywordClick?: (keyword: string) => void;
 }) {
-  const safe = useMemo(() => richHtml(html), [html]);
+  // Sau bộ lọc: ảnh /anh-goc/ trong thân bài nhận biến thể vừa cỡ, srcset, sizes và lazy (src/lib/body-images.ts).
+  const safe = useMemo(() => optimizeBodyImages(richHtml(html)), [html]);
   if (!safe) return null;
 
   // Bấm vào chữ đậm trùng một từ khóa thì mở chú thích, như ở đường dựng cũ.
@@ -34,7 +36,12 @@ export function RichHtmlBody({
     if (hit) onKeywordClick(hit.keyword);
   };
 
-  return <div className="tlhp-rich" onClick={handleClick} dangerouslySetInnerHTML={{ __html: safe }} />;
+  // Khối ngoài chỉ để ghi đè ở điện thoại (chữ trái thay vì căn đều, tiêu đề vừa cỡ); luật gốc của .tlhp-rich ở globals.css.
+  return (
+    <div className="max-sm:[&_p]:!text-left max-sm:[&_h2]:!text-[1.875rem] max-sm:[&_h3]:!text-[1.625rem] max-sm:[&_h4]:!text-[1.375rem]">
+      <div className="tlhp-rich" onClick={handleClick} dangerouslySetInnerHTML={{ __html: safe }} />
+    </div>
+  );
 }
 
 export default RichHtmlBody;

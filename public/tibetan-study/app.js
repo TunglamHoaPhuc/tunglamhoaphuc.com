@@ -521,7 +521,9 @@ function setupSnipCropTool() {
             });
 
             const data = await res.json();
-            if (data.status === 'success') {
+            if (res.status === 429) {
+                showToast(data.message || 'Bạn thao tác hơi nhanh, mời đợi một phút rồi thử lại.');
+            } else if (data.status === 'success') {
                 if (clientCroppedImage && !data.cropped_image) {
                     data.cropped_image = clientCroppedImage;
                 }
@@ -713,6 +715,10 @@ async function openSliderWithText(text, defaultTab = 'explain') {
             body: JSON.stringify({ text: cleanText })
         });
         const data = await res.json();
+        if (res.status === 429) {
+            showToast(data.message || 'Bạn thao tác hơi nhanh, mời đợi một phút rồi thử lại.');
+            return;
+        }
         renderSliderContent(data);
 
         if (defaultTab === 'ai') {
@@ -1626,6 +1632,10 @@ async function openPronunciationStudio(text) {
             body: JSON.stringify({ text: currentStudioText })
         });
         const data = await res.json();
+        if (res.status === 429) {
+            showToast(data.message || 'Bạn thao tác hơi nhanh, mời đợi một phút rồi thử lại.');
+            return;
+        }
         renderStudioGuide(data);
     } catch (e) {
         console.error('Studio analysis failed', e);

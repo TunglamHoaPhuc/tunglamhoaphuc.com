@@ -4,6 +4,7 @@ import React, { FC, useState, useMemo } from "react";
 import { Search, ChevronLeft, ChevronRight, Eye, Calendar, RefreshCw, Volume2, Sparkles, ChevronDown } from "lucide-react";
 import { GIANG_DUONG_TOPICS, EMOTION_QUICK_TAGS, PHAP_THOAI_FEATURED, PHAP_THOAI_ALL, PhapThoaiTalk } from "@/data/giang-duong-data";
 import { CustomDropdown } from "@/components/common/CustomDropdown";
+import { STATUE_ICON_SRC, LOGO_ROUND_SRC, swapOnError, TOAN_CANH_SRC, fitProps, CARD_WIDTHS } from '@/features/universe/image-props';
 
 // ── Sub-component: PhapThoaiCard (Matching Image 0 reference) ──
 const PhapThoaiCard = React.memo(({ talk }: { talk: PhapThoaiTalk }) => {
@@ -13,15 +14,13 @@ const PhapThoaiCard = React.memo(({ talk }: { talk: PhapThoaiTalk }) => {
     >
       {/* 1. THUMBNAIL CONTAINER */}
       <div className="relative w-full aspect-[16/9] overflow-hidden bg-[#1A120B] shrink-0">
-        <img
-          src={talk.thumbnailUrl}
+        <img width={640} height={480}
+          {...fitProps(talk.thumbnailUrl, { width: 960, widths: CARD_WIDTHS, sizes: '(min-width: 1024px) 285px, (min-width: 640px) 46vw, calc(100vw - 32px)' })}
           alt={talk.title}
           loading="lazy"
           decoding="async"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-          onError={(e) => {
-            (e.target as HTMLImageElement).src = '/images/vu-tru-phat-giao/toan-canh-chua.jpg';
-          }}
+          onError={swapOnError(TOAN_CANH_SRC)}
         />
         <div
           className="absolute inset-0 pointer-events-none"
@@ -31,7 +30,7 @@ const PhapThoaiCard = React.memo(({ talk }: { talk: PhapThoaiTalk }) => {
         />
 
         {/* Duration badge */}
-        <div className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider text-[#F2C14E] bg-[#1C130D]/85 border border-[#F2C14E]/40 backdrop-blur-md">
+        <div className="absolute top-3 right-3 flex items-center gap-1.5 px-3 py-1 rounded-full text-xs sm:text-[10px] font-bold uppercase tracking-wider text-[#F2C14E] bg-[#1C130D]/85 border border-[#F2C14E]/40 sm:backdrop-blur-md">
           <Volume2 className="w-3.5 h-3.5 animate-pulse text-[#F2C14E]" />
           <span>{talk.durationText}</span>
         </div>
@@ -41,15 +40,13 @@ const PhapThoaiCard = React.memo(({ talk }: { talk: PhapThoaiTalk }) => {
       <div className="relative w-full bg-gradient-to-b from-[#25170E] to-[#1C130D] px-5 pt-6 pb-4 flex flex-col justify-between flex-1">
         {/* Center Circular Badge at Top Edge */}
         <div className="absolute top-[-24px] left-1/2 -translate-x-1/2 z-30 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#F2C14E] bg-[#25170E] flex items-center justify-center p-1 shadow-[0_0_18px_rgba(242,193,78,0.65)] overflow-hidden">
-          <img
-            src="https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/bieu-tuong-tuong-phap.webp"
+          <img width={128} height={128}
+            src={STATUE_ICON_SRC}
             alt="Biểu tượng Bảo tượng"
             loading="lazy"
             decoding="async"
             className="w-full h-full object-contain filter drop-shadow-[0_0_6px_rgba(242,193,78,0.95)] scale-135 transform-gpu"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/09-icon-minh-hoa/logo-tung-lam-hoa-phuc-tron.webp';
-            }}
+            onError={swapOnError(LOGO_ROUND_SRC)}
           />
         </div>
 
@@ -75,7 +72,7 @@ const PhapThoaiCard = React.memo(({ talk }: { talk: PhapThoaiTalk }) => {
 
           {/* Description */}
           <p
-            className="text-[#c9b896] text-xs leading-relaxed line-clamp-2 mb-4"
+            className="text-[#c9b896] text-[13px] sm:text-xs leading-relaxed line-clamp-2 mb-4"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             {talk.summary}
@@ -273,21 +270,21 @@ export const GiangDuongPhapThoai: FC = () => {
         <div className="flex flex-wrap items-center gap-3 mb-8">
           {/* Nhãn LỰA CHỌN nhẹ nhàng thanh lịch */}
           <span
-            className="text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5"
+            className="text-xs sm:text-[11px] font-bold uppercase tracking-widest text-[#F2C14E]/80 shrink-0 select-none mr-0.5"
             style={{ fontFamily: "'UTM Avo', sans-serif" }}
           >
             LỰA CHỌN:
           </span>
 
           {/* Search Input */}
-          <div className="relative flex-1 min-w-[180px] max-w-xs group">
+          <div className="relative flex-1 min-w-[180px] max-w-full sm:max-w-xs basis-full sm:basis-auto group">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#F2C14E]/60 group-hover:text-[#F2C14E] transition-colors" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Tìm pháp thoại, từ khóa..."
-              className="w-full pl-9 pr-3 py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 rounded-xl text-xs text-[#FFE5A3] placeholder-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E] hover:border-[#F2C14E]/70 transition-all shadow-inner"
+              className="w-full pl-9 pr-3 py-2.5 sm:py-1.5 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 border border-[#F2C14E]/35 rounded-xl text-base sm:text-xs text-[#FFE5A3] placeholder-[#c9b896]/50 focus:outline-none focus:border-[#F2C14E] hover:border-[#F2C14E]/70 transition-all shadow-inner"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             />
           </div>
@@ -341,7 +338,7 @@ export const GiangDuongPhapThoai: FC = () => {
             <button
               type="button"
               onClick={handleResetFilters}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-xl border border-[#F2C14E]/35 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 text-xs text-[#FFE5A3] hover:text-white hover:border-[#F2C14E] transition-all cursor-pointer hover:shadow-[0_0_10px_rgba(242,193,78,0.25)]"
+              className="flex items-center gap-1 px-3 py-2.5 sm:py-1.5 min-h-11 sm:min-h-0 rounded-xl border border-[#F2C14E]/35 bg-gradient-to-b from-[#3A2718]/90 via-[#2A1D14]/90 to-[#1C130D]/90 text-sm sm:text-xs text-[#FFE5A3] hover:text-white hover:border-[#F2C14E] transition-all cursor-pointer hover:shadow-[0_0_10px_rgba(242,193,78,0.25)]"
               title="Xóa bộ lọc"
               style={{ fontFamily: "'UTM Avo', sans-serif" }}
             >
@@ -361,7 +358,7 @@ export const GiangDuongPhapThoai: FC = () => {
                 key={tag}
                 type="button"
                 onClick={() => setActiveTag(isActive ? null : tag)}
-                className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
+                className={`px-3.5 py-2.5 sm:px-3 sm:py-1 min-h-11 sm:min-h-0 rounded-full text-sm sm:text-xs font-bold transition-all cursor-pointer ${
                   isActive
                     ? "bg-[#F2C14E] text-[#1C130D] shadow-md"
                     : "bg-[#1C130D] border border-[#F2C14E]/30 text-[#c9b896] hover:text-[#F2C14E]"
@@ -388,7 +385,7 @@ export const GiangDuongPhapThoai: FC = () => {
                 <button
                   type="button"
                   onClick={() => setDisplayCount((prev) => prev + 12)}
-                  className="px-8 py-3 rounded-full bg-[#2C1C11] border border-[#F2C14E]/60 text-[#F2C14E] text-xs font-bold hover:bg-[#F2C14E] hover:text-[#2C1C11] transition-all cursor-pointer shadow-lg uppercase tracking-wider"
+                  className="px-8 py-3 min-h-11 rounded-full bg-[#2C1C11] border border-[#F2C14E]/60 text-[#F2C14E] text-sm sm:text-xs font-bold hover:bg-[#F2C14E] hover:text-[#2C1C11] transition-all cursor-pointer shadow-lg uppercase tracking-wider"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 >
                   XEM THÊM PHÁP THOẠI (+12)

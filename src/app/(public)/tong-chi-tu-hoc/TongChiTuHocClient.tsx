@@ -7,7 +7,6 @@ import { SidebarNav } from '@/components/tong-chi-tu-hoc/SidebarNav';
 import { HeroBanner } from '@/components/tong-chi-tu-hoc/HeroBanner';
 import { SectionCarousel } from '@/components/tong-chi-tu-hoc/SectionCarousel';
 import { PageIntro } from '@/components/tong-chi-tu-hoc/PageIntro';
-import { SmartSearchAIBar } from '@/components/public/SmartSearchAIBar';
 
 // Các khối và lời mở đầu do máy chủ dựng từ D1 (page.tsx); trang không tự đi lấy gì thêm.
 export default function TongChiTuHocClient({
@@ -74,7 +73,7 @@ export default function TongChiTuHocClient({
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#2c1c11] text-[#e3d2c1] font-sans relative selection:bg-[#f2cc8f] selection:text-black overflow-x-hidden">
+    <div className="min-h-screen bg-[#2c1c11] text-[#e3d2c1] font-sans relative selection:bg-[#f2cc8f] selection:text-black overflow-x-clip md:overflow-x-hidden">
       <SubNavbar
         activeSection={activeSection}
         isScrolled={isScrolled}
@@ -93,7 +92,7 @@ export default function TongChiTuHocClient({
       <div className="px-4 sm:px-8 md:pl-20 md:pr-10">
         {/* Banner chính */}
         <HeroBanner
-          emblemUrl="/images/icons/icon-tong-chi-tu-hoc.webp"
+          emblemUrl="/images/icons/icon-tong-chi-tu-hoc-256.webp"
           emblemAlt="Biểu tượng Tông Chỉ Tu Học"
         />
 
@@ -105,10 +104,6 @@ export default function TongChiTuHocClient({
             {sections.map((section) => (
               <SectionCarousel key={section.id} section={section} />
             ))}
-          </div>
-
-          <div className="pt-8">
-            <SmartSearchAIBar contextTitle="Tông Chỉ Tu Học Tùng Lâm Hòa Phúc" />
           </div>
         </main>
       </div>

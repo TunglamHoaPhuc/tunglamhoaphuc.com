@@ -2,30 +2,39 @@
 //
 // V3's header draws two levels: a top-level link, or a top-level item with a dropdown of links. So a menu item's third level
 // is left out, and so is its icon (the dropdown has its own mark), its colour and its "open in the same tab" detail beyond
-// the new-tab flag. An address on this site that V3 has no page for (`/lien-he`) points to the same page on www instead of
-// ending in V3's 404. The footer has no slot for a menu (it holds contact lines, the map link and the social links): the
-// footer menu is not drawn. The same file turns `site.info` (name, hours, address, map, social links) and `site.announcement`
-// (the welcome notice) into what the footer and the notice draw.
+// the new-tab flag. V3 is the public site: an address on this site stays an address on this site (`/lien-he` is a page of V3),
+// and a link that spells out the site's own host (https://www.tunglamhoaphuc.com/x) is read as `/x`.
+// The footer has no slot for a menu (it holds contact lines, the map link and the social links): the footer menu is not drawn.
+// The same file turns `site.info` (name, hours, address, map, social links) and `site.announcement` (the welcome notice) into what the footer and the notice draw.
 import type { ContactLine } from "@/lib/contact-format";
 import type { MenuNode } from "@/lib/tlhp-site/siteData";
 
-/** www, where the pages V3 does not have live. */
-const WWW_ORIGIN = "https://www.tunglamhoaphuc.com";
+/** The hosts that are this site; a link to one of them leads to the same path here. */
+const OWN_HOSTS = ["tunglamhoaphuc.com", "www.tunglamhoaphuc.com"];
 
 export type ChromeLink = { label: string; href: string; newTab: boolean };
 export type ChromeNavItem = ChromeLink & { children: ChromeLink[] };
 
-/** The first path segments V3 has a page for (src/app/(public) and the home page); kept in step by a test. */
-export const V3_ROUTES = ["bao-tuong", "bao-tuong-phat-giao", "dong-chay-hoang-phap", "gioi-thieu", "kiem-tra-anh", "lich-tu-hoc", "tong-chi-tu-hoc", "tra-cuu-bai-vi", "tri-tue-phat-phap", "vu-tru-phat-giao"];
+/** The first path segments V3 has a page for (src/app/(public) and the home page); kept in step by a test. No longer used to send a link to www: V3 is the public site. */
+export const V3_ROUTES = ["bao-tuong", "bao-tuong-phat-giao", "dong-chay-hoang-phap", "gioi-thieu", "kiem-tra-anh", "lich-tu-hoc", "lien-he", "tim-kiem", "tong-chi-tu-hoc", "tra-cuu-bai-vi", "tri-tue-phat-phap", "vu-tru-phat-giao"];
 
-/** Where a menu address leads in V3: its own page when V3 has one, www's page otherwise, an https address as it is. */
+/**
+ * Where a menu address leads: a path of this site as it is (V3 is the public site, so an address it has no page for ends in its own
+ * 404, not in another site), a link that names this site's own host as the path alone, any other https address as it is.
+ */
 export function menuHref(raw: string): string {
 	const href = raw.trim();
 	if (!href || href === "#") return "#";
-	if (/^https:\/\//i.test(href)) return href;
-	if (!href.startsWith("/") || href.startsWith("//")) return "#";
-	const first = href.slice(1).split(/[/?#]/)[0];
-	return !first || V3_ROUTES.includes(first) ? href : `${WWW_ORIGIN}${href}`;
+	if (/^https:\/\//i.test(href)) {
+		try {
+			const url = new URL(href);
+			if (OWN_HOSTS.includes(url.hostname.toLowerCase()) && !url.port && !url.username && !url.password) return `${url.pathname}${url.search}${url.hash}` || "/";
+		} catch {
+			// an address that does not parse is left as the admin wrote it
+		}
+		return href;
+	}
+	return href.startsWith("/") && !href.startsWith("//") ? href : "#";
 }
 
 const linkOf = (node: MenuNode): ChromeLink => ({ label: node.label, href: menuHref(node.href), newTab: node.openNewTab });
@@ -161,7 +170,8 @@ function noticeLink(raw: unknown): ChromeLink | null {
 	const href = inSite ? given : safeHttpsUrl(given);
 	if (!href) return null;
 	const label = typeof raw.label === "string" && raw.label.trim() ? raw.label.trim().slice(0, 60) : "Xem thêm";
-	return { label, href: menuHref(href), newTab: !inSite };
+	const resolved = menuHref(href);
+	return { label, href: resolved, newTab: !resolved.startsWith("/") };
 }
 
 /** The notice to show now, from `site.announcement`. The admin's own switch (`active`) is honoured, then the text, then the last day. */

@@ -10,7 +10,7 @@ import {
   BookMarked,
   Layers,
 } from 'lucide-react';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 import { BookFlipModal } from './BookFlipModal';
 
 export interface SourceBookData {
@@ -71,7 +71,7 @@ export function BookCitationSection({ sourceBook }: BookCitationProps) {
     <section id="trich-nguon-sach" className="scroll-mt-24 max-w-4xl mx-auto px-4 my-10">
       <div
         style={{ fontFamily: "'UTM Avo', sans-serif" }}
-        className="relative rounded-3xl p-5 sm:p-7 md:p-8 bg-[#170C06]/90 border border-[#F2C14E]/30 shadow-[0_15px_45px_rgba(0,0,0,0.85)] backdrop-blur-md overflow-hidden space-y-6"
+        className="relative rounded-3xl p-5 sm:p-7 md:p-8 bg-[#170C06]/90 border border-[#F2C14E]/30 shadow-[0_15px_45px_rgba(0,0,0,0.85)] sm:backdrop-blur-md overflow-hidden space-y-6"
       >
         {/* Subtle decorative glow */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-[#F2C14E]/5 rounded-full blur-3xl pointer-events-none" />
@@ -101,7 +101,7 @@ export function BookCitationSection({ sourceBook }: BookCitationProps) {
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Tìm kiếm tác phẩm..."
-                  className="w-full pl-8 pr-3 py-1 bg-[#1C120A] border border-[#F2C14E]/30 rounded-xl text-xs text-[#FFE5A3] placeholder-[#c9b896]/40 focus:outline-none focus:border-[#F2C14E]"
+                  className="w-full pl-8 pr-3 py-2.5 sm:py-1 bg-[#1C120A] border border-[#F2C14E]/30 rounded-xl text-base sm:text-xs text-[#FFE5A3] placeholder-[#c9b896]/40 focus:outline-none focus:border-[#F2C14E]"
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                 />
               </div>
@@ -124,14 +124,15 @@ export function BookCitationSection({ sourceBook }: BookCitationProps) {
               onClick={() => setSelectedBookForFlip(displayedList[0])}
               className="relative w-32 h-44 sm:w-36 sm:h-48 md:w-44 md:h-60 rounded-2xl overflow-hidden border-2 border-[#F2C14E]/50 shadow-2xl shrink-0 bg-black/40 group cursor-pointer"
             >
-              <img
-                src={getImageUrl(displayedList[0].coverImage) || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/uploads/chua-pho-chieu-hai-phong-1787464212629.webp'}
+              <img width={300} height={400}
+                // Bìa hiển thị 128–176 px: bản 640 cho màn hình 2x.
+                src={fitImage(getImageUrl(displayedList[0].coverImage) || '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp', 640)}
                 alt={displayedList[0].bookTitle}
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 style={{ objectPosition: displayedList[0].coverPosition || 'center' }}
                 loading="lazy"
                 onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/uploads/chua-pho-chieu-hai-phong-1787464212629.webp';
+                  (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp';
                 }}
               />
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1.5 text-xs font-bold text-[#FFDE59] backdrop-blur-xs">
@@ -180,7 +181,7 @@ export function BookCitationSection({ sourceBook }: BookCitationProps) {
               {displayedList[0].description && (
                 <p 
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                  className="text-xs sm:text-sm text-[#FFE5A3]/90 leading-relaxed sm:leading-loose text-justify [text-align-last:left] whitespace-pre-line"
+                  className="text-sm text-[#FFE5A3]/90 leading-relaxed sm:leading-loose text-left sm:text-justify [text-align-last:left] whitespace-pre-line"
                 >
                   {displayedList[0].description}
                 </p>
@@ -206,14 +207,15 @@ export function BookCitationSection({ sourceBook }: BookCitationProps) {
                     onClick={() => setSelectedBookForFlip(item)}
                     className="relative w-16 h-20 sm:w-20 sm:h-24 rounded-xl overflow-hidden border border-[#F2C14E]/35 shadow-md flex-shrink-0 bg-black/40 cursor-pointer"
                   >
-                    <img
-                      src={getImageUrl(item.coverImage) || 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/uploads/chua-pho-chieu-hai-phong-1787464212629.webp'}
+                    <img width={300} height={400}
+                      // Bìa 64–80 px: bản 160.
+                      src={fitImage(getImageUrl(item.coverImage) || '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp', 160)}
                       alt={item.bookTitle}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       style={{ objectPosition: item.coverPosition || 'center' }}
                       loading="lazy"
                       onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/uploads/chua-pho-chieu-hai-phong-1787464212629.webp';
+                        (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/uploads/chua-pho-chieu-hai-phong-1787464212629.webp';
                       }}
                     />
                   </div>

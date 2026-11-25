@@ -116,20 +116,20 @@ const FrameView: FC<{ frame: HeroFrame; index: number; total: number; active: bo
 
 // Nút của khung: nổi bật hơn năm nút cố định bên dưới. Địa chỉ trong trang đi qua bộ định tuyến, địa chỉ https là liên kết thường.
 const FrameButton: FC<{ cta: NonNullable<HeroFrame["cta"]> }> = ({ cta }) => {
-  const className = "mt-2 px-6 py-3 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F2C14E]";
+  const className = "mt-2 inline-flex items-center justify-center min-h-11 px-6 py-3 rounded-full text-[13px] sm:text-sm font-bold uppercase tracking-wider transition-all hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F2C14E]";
   const style = { background: `linear-gradient(135deg, ${GOLD} 0%, #D9A22F 100%)`, color: "#1A120B", fontFamily: BUTTON_FONT, fontWeight: "bold", boxShadow: "0 0 24px rgba(242,193,78,0.35)" } as const;
   return cta.external ? (
     <a href={cta.href} rel="noopener noreferrer" className={className} style={style}>
       {cta.label}
     </a>
   ) : (
-    <Link href={cta.href} className={className} style={style}>
+    <Link prefetch={false} href={cta.href} className={className} style={style}>
       {cta.label}
     </Link>
   );
 };
 
-const CONTROL_CLASS = "inline-flex items-center justify-center w-9 h-9 rounded-full text-[#F2C14E] transition-colors hover:bg-[#F2C14E]/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F2C14E]";
+const CONTROL_CLASS = "inline-flex items-center justify-center w-11 h-11 md:w-9 md:h-9 rounded-full text-[#F2C14E] transition-colors hover:bg-[#F2C14E]/15 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F2C14E]";
 
 // Khung chữ, nút và video là của admin (home.hero, home.welcome); thiếu hoặc sai thì giữ chữ và video sẵn có (lib/v3-home-content.ts).
 export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
@@ -255,15 +255,8 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
     };
   }, [videoOn, hero.videoId, hero.cutIntro]);
 
-  const scrollToAiSearch = () => {
-    const el = document.getElementById("smart-search-ai-bar");
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-    }
-  };
-
   return (
-    <section className="relative w-full overflow-hidden flex flex-col items-center justify-between" style={{ minHeight: "100vh", background: "#1A120B" }}>
+    <section className="relative w-full overflow-hidden flex flex-col items-center justify-between min-h-svh" style={{ background: "#1A120B" }}>
       {/* ── Background Video YouTube API (Khóa hoàn toàn chuột, không hiện Pause) ── */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
         <div
@@ -314,7 +307,7 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
                       onClick={() => go(index)}
                       aria-label={`Xem khung ${index + 1} trên ${frames.length}: ${frame.title}`}
                       aria-current={index === active ? "true" : undefined}
-                      className="inline-flex items-center justify-center w-6 h-6 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F2C14E]"
+                      className="inline-flex items-center justify-center w-8 h-11 md:w-6 md:h-6 rounded-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#F2C14E]"
                     >
                       <span
                         aria-hidden="true"
@@ -345,9 +338,9 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
         {/* ── Dải 5 nút thao tác nhanh (nổi rõ rệt trên z-20, không bị lớp gradient che khuất) ── */}
         <div className="relative z-20 flex flex-wrap items-center justify-center gap-2.5 md:gap-3.5 mt-8 w-full max-w-6xl">
           {/* 1. PHÁP THOẠI MỚI NHẤT */}
-          <Link
+          <Link prefetch={false}
             href="/vu-tru-phat-giao/giang-duong"
-            className="px-4 md:px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
+            className="min-h-11 px-4 md:px-5 py-2.5 rounded-full text-[13px] md:text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
             style={{
               background: "linear-gradient(135deg, #4A3728 0%, #3D2B1F 100%)",
               border: "1.5px solid #F2C14E",
@@ -364,7 +357,7 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
           {/* 2. KHO ẢNH TƯ LIỆU */}
           <button
             onClick={() => setIsGalaxyOpen(true)}
-            className="px-4 md:px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
+            className="min-h-11 px-4 md:px-5 py-2.5 rounded-full text-[13px] md:text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
             style={{
               background: "rgba(42,29,20,0.85)",
               border: "1px solid rgba(242,193,78,0.5)",
@@ -377,9 +370,9 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
           </button>
 
           {/* 3. ẤN PHẨM PHẬT GIÁO */}
-          <Link
+          <Link prefetch={false}
             href="/tri-tue-phat-phap"
-            className="px-4 md:px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
+            className="min-h-11 px-4 md:px-5 py-2.5 rounded-full text-[13px] md:text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
             style={{
               background: "rgba(42,29,20,0.85)",
               border: "1px solid rgba(242,193,78,0.5)",
@@ -392,9 +385,9 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
           </Link>
 
           {/* 4. ĐĂNG KÝ CỘNG TU */}
-          <Link
+          <Link prefetch={false}
             href="/dong-chay-hoang-phap"
-            className="px-4 md:px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
+            className="min-h-11 px-4 md:px-5 py-2.5 rounded-full text-[13px] md:text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
             style={{
               background: "rgba(42,29,20,0.85)",
               border: "1px solid rgba(242,193,78,0.5)",
@@ -407,9 +400,9 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
           </Link>
 
           {/* 5. TÌM KIẾM & THAM VẤN */}
-          <button
-            onClick={scrollToAiSearch}
-            className="px-4 md:px-5 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
+          <Link prefetch={false}
+            href="/tim-kiem"
+            className="min-h-11 px-4 md:px-5 py-2.5 rounded-full text-[13px] md:text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
             style={{
               background: "rgba(42,29,20,0.85)",
               border: "1px solid rgba(242,193,78,0.5)",
@@ -419,7 +412,7 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
           >
             <Search className="w-4 h-4 text-[#F2C14E] flex-shrink-0" />
             <span className="whitespace-nowrap">TÌM KIẾM &amp; THAM VẤN</span>
-          </button>
+          </Link>
         </div>
       </div>
 

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
-import { getImageUrl } from '@/utils/image';
+import { fitImage, getImageUrl } from '@/utils/image';
 
 interface PortalItem {
   id: string;
@@ -26,7 +26,7 @@ const PORTAL_ITEMS: PortalItem[] = [
     categoryKey: 'nen-tang',
     description: 'Quy y Tam Bảo & Thọ trì năm giới lành của người con Phật tại gia.',
     link: '/tong-chi-tu-hoc/tam-quy',
-    image: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/nen-tang-tu-hoc/tong-chi-tu-hoc-nen-tang-tu-hoc-tam-quy-ngu-gioi-banner-sach-3-nt-5-th-jpg.webp',
+    image: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/nen-tang-tu-hoc/tong-chi-tu-hoc-nen-tang-tu-hoc-tam-quy-ngu-gioi-banner-sach-3-nt-5-th-jpg.webp',
   },
   {
     id: 'thap-thien',
@@ -36,7 +36,7 @@ const PORTAL_ITEMS: PortalItem[] = [
     categoryKey: 'nen-tang',
     description: 'Chuyển hóa mười nghiệp xấu thành mười nhân lành an vui, giải thoát.',
     link: '/tong-chi-tu-hoc/thap-thien-nghiep-con-duong-phuoc-duc',
-    image: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/nen-tang-tu-hoc/tong-chi-tu-hoc-nen-tang-tu-hoc-thap-thien-thumbnail-herobanner.webp',
+    image: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/nen-tang-tu-hoc/tong-chi-tu-hoc-nen-tang-tu-hoc-thap-thien-thumbnail-herobanner.webp',
   },
   {
     id: 'bo-tat-hanh',
@@ -46,7 +46,7 @@ const PORTAL_ITEMS: PortalItem[] = [
     categoryKey: 'nen-tang',
     description: 'Sáu hạnh nguyện dấn thân phụng sự, đem an vui chan rải đến muôn loài.',
     link: '/tong-chi-tu-hoc/bo-tat-hanh-luc-do-ba-la-mat',
-    image: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/03-dong-chay-hoang-phap/tinh-do-nhan-gian/BO-TAT-QUAN-AM.jpg',
+    image: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/03-dong-chay-hoang-phap/tinh-do-nhan-gian/BO-TAT-QUAN-AM.jpg',
   },
 
   // 2. PHƯƠNG PHÁP HÀNH TRÌ
@@ -58,7 +58,7 @@ const PORTAL_ITEMS: PortalItem[] = [
     categoryKey: 'phuong-phap',
     description: 'Nhất tâm quy kính hồng danh Phật, an định thân tâm giữa sóng gió cuộc đời.',
     link: '/tong-chi-tu-hoc/niem-phat-phuong-phap-tro-hanh',
-    image: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp',
+    image: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp',
   },
   {
     id: 'thien-tap',
@@ -68,7 +68,7 @@ const PORTAL_ITEMS: PortalItem[] = [
     categoryKey: 'phuong-phap',
     description: 'Trở về quan sát hơi thở và tâm ý, nuôi dưỡng an lạc trong hiện tại.',
     link: '/tong-chi-tu-hoc/thien-tap-tinh-lang-tu-than',
-    image: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/03-dong-chay-hoang-phap/cong-tu/thien-su-thich-nhat-hanh-4-0950.jpg',
+    image: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/03-dong-chay-hoang-phap/cong-tu/thien-su-thich-nhat-hanh-4-0950.jpg',
   },
   {
     id: 'nghe-phap-tung-kinh',
@@ -78,7 +78,7 @@ const PORTAL_ITEMS: PortalItem[] = [
     categoryKey: 'phuong-phap',
     description: 'Huân tập lời Phật dạy, thắp sáng ngọn đèn trí tuệ và chánh tín vững bền.',
     link: '/dong-chay-hoang-phap',
-    image: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/tung-kinh.webp',
+    image: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/tung-kinh.webp',
   },
 
   // 3. LỘ TRÌNH TU HỌC
@@ -90,7 +90,7 @@ const PORTAL_ITEMS: PortalItem[] = [
     categoryKey: 'lo-trinh',
     description: 'Các bước nhập môn căn bản, làm quen nếp sống thiền môn và giáo lý.',
     link: '/tong-chi-tu-hoc/lo-trinh-tu-hoc-nguoi-moi-bat-dau',
-    image: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp',
+    image: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp',
   },
   {
     id: 'lo-trinh-nguoi-tre',
@@ -100,7 +100,7 @@ const PORTAL_ITEMS: PortalItem[] = [
     categoryKey: 'lo-trinh',
     description: 'Ứng dụng Phật pháp xây dựng lý tưởng sống, rèn luyện bản lĩnh và vượt áp lực.',
     link: '/tong-chi-tu-hoc/lo-trinh-tu-hoc-nguoi-tre',
-    image: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/giang-duong/giang-duong-hoa-phuc-canh-1.webp',
+    image: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/giang-duong/giang-duong-hoa-phuc-canh-1.webp',
   },
   {
     id: 'lo-trinh-nguoi-ban-ron',
@@ -110,7 +110,7 @@ const PORTAL_ITEMS: PortalItem[] = [
     categoryKey: 'lo-trinh',
     description: 'Phương pháp tu tập ngắn gọn, chuyển hóa công việc và gia đình thành đạo tràng.',
     link: '/tong-chi-tu-hoc/lo-trinh-tu-hoc-nguoi-ban-ron',
-    image: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-tang/trien-lam/phat-giao/chua-viet-nam-xua/Bao-thap-Phuoc-Duyen-tai-chua-Thien-Mu-Hue-Bieu-tuong-ton-nghiem-cua-Phat-giao-xu-Hue.webp',
+    image: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-tang/trien-lam/phat-giao/chua-viet-nam-xua/Bao-thap-Phuoc-Duyen-tai-chua-Thien-Mu-Hue-Bieu-tuong-ton-nghiem-cua-Phat-giao-xu-Hue.webp',
   },
 
   // 4. NẾP SỐNG THIỀN GIA
@@ -122,7 +122,7 @@ const PORTAL_ITEMS: PortalItem[] = [
     categoryKey: 'nep-song',
     description: 'Lời nói khiêm cung, cử chỉ trang nghiêm nơi chốn thiền môn thanh tịnh.',
     link: '/gioi-thieu/van-hoa-ung-xu',
-    image: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/02-tong-chi-tu-hoc/van-hoa-ung-xu-giao-tiep-tai-chua.webp',
+    image: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/02-tong-chi-tu-hoc/van-hoa-ung-xu-giao-tiep-tai-chua.webp',
   },
   {
     id: 'oai-nghi',
@@ -132,7 +132,7 @@ const PORTAL_ITEMS: PortalItem[] = [
     categoryKey: 'nep-song',
     description: 'Đi đứng nằm ngồi trong tỉnh thức, toát lên phong thái an nhiên giải thoát.',
     link: '/tong-chi-tu-hoc/oai-nghi-nguoi-con-phat',
-    image: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/05-bao-tuong-phat-giao/ho_phap_than_vuong/nghe_thuat_phat_giao/vi_da_ho_phap_phu_dong_thien_vuong.webp',
+    image: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/05-bao-tuong-phat-giao/ho_phap_than_vuong/nghe_thuat_phat_giao/vi_da_ho_phap_phu_dong_thien_vuong.webp',
   },
   {
     id: 'bon-phan-tai-gia',
@@ -142,7 +142,7 @@ const PORTAL_ITEMS: PortalItem[] = [
     categoryKey: 'nep-song',
     description: 'Tròn đạo làm con, giữ vẹn nghĩa vụ gia đình và chung tay lợi ích xã hội.',
     link: '/tong-chi-tu-hoc/bon-phan-nguoi-phat-tu-tai-gia',
-    image: 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/05-bao-tuong-phat-giao/chu_thanh_ho_quoc/phu_dong_thien_vuong.webp',
+    image: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/05-bao-tuong-phat-giao/chu_thanh_ho_quoc/phu_dong_thien_vuong.webp',
   },
 ];
 
@@ -181,7 +181,7 @@ export function FourCirclesPortalSection() {
               key={cat.key}
               type="button"
               onClick={() => setSelectedCategory(cat.key)}
-              className={`px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs font-bold transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
+              className={`px-3.5 py-2.5 min-h-11 sm:min-h-0 sm:px-4 sm:py-2 rounded-full text-xs font-bold transition-all duration-300 flex items-center gap-1.5 cursor-pointer ${
                 isActive
                   ? 'bg-gradient-to-r from-[#F2C14E] to-[#FFDE59] text-[#1A120B] shadow-[0_0_20px_rgba(242,193,78,0.45)] scale-105'
                   : 'bg-[#2A180E]/90 hover:bg-[#3B2315] text-[#FFE5A3] border border-[#F2C14E]/30 hover:border-[#F2C14E]/70'
@@ -210,7 +210,7 @@ export function FourCirclesPortalSection() {
                     <span>{group.icon}</span>
                     <span>{group.name}</span>
                   </h4>
-                  <p className="text-xs text-[#FFE5A3]/75 italic">
+                  <p className="text-[13px] sm:text-xs text-[#FFE5A3]/75 italic">
                     {group.subtitle}
                   </p>
                   <div className="w-16 h-[1px] bg-gradient-to-r from-transparent via-[#F2C14E]/60 to-transparent mx-auto mt-2" />
@@ -263,6 +263,7 @@ function CirclePortalCard({
 }) {
   return (
     <Link
+      prefetch={false}
       href={item.link}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
@@ -272,13 +273,14 @@ function CirclePortalCard({
       <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 rounded-full p-1 bg-gradient-to-b from-[#C8AA6E] via-[#8B4513] to-[#452D1D] shadow-[0_0_20px_rgba(200,170,110,0.25)] group-hover:shadow-[0_0_35px_rgba(255,222,89,0.55)] group-hover:from-[#FFDE59] group-hover:to-[#F2C14E] transition-all duration-500 ease-out">
         {/* Vòng đệm bên trong */}
         <div className="w-full h-full rounded-full overflow-hidden bg-[#160D07] relative border-2 border-black/80">
-          <img
-            src={getImageUrl(item.image)}
+          <img width={640} height={480}
+            // Khung tròn 128–176 px, object-cover: ảnh ngang phải cao bằng khung nên bản 640.
+            src={fitImage(getImageUrl(item.image), 640)}
             alt={item.name}
             className="w-full h-full object-cover group-hover:scale-115 transition-transform duration-700 ease-out"
             loading="lazy"
             onError={(e) => {
-              (e.currentTarget as HTMLImageElement).src = '/images/toan-canh-chua.jpg';
+              (e.currentTarget as HTMLImageElement).src = '/images/hero/toan-canh-chua-1280.webp';
             }}
           />
 
@@ -305,11 +307,11 @@ function CirclePortalCard({
       >
         <h5
           style={{ fontFamily: "'UTM Avo', sans-serif" }}
-          className="text-xs sm:text-sm font-bold text-[#FFDE59] uppercase tracking-wider line-clamp-1 drop-shadow-md"
+          className="text-[13px] sm:text-sm font-bold text-[#FFDE59] uppercase tracking-wider line-clamp-1 drop-shadow-md"
         >
           {item.name}
         </h5>
-        <p className="text-[11px] text-[#FFE5A3]/85 uppercase tracking-widest font-medium">
+        <p className="text-xs text-[#FFE5A3]/85 uppercase tracking-widest font-medium">
           {item.subtitle}
         </p>
       </div>

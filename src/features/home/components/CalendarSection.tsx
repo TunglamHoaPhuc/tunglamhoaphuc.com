@@ -1,5 +1,6 @@
 'use client';
 import { fitImage } from '@/utils/image';
+import { imageSrcSet } from '@/lib/tlhp-content/media';
 
 import { FC, useState, useMemo, useEffect } from "react";
 import { createPortal } from "react-dom";
@@ -429,12 +430,12 @@ export const CalendarSection: FC = () => {
       {/* ── Background Ambient Aura ── */}
       <div className="absolute inset-0 pointer-events-none">
         <img
-          src={fitImage(monthTheme.bannerImg, 1280)}
+          src={fitImage(monthTheme.bannerImg, 640)}
           alt="Bối cảnh Lịch tu học"
           className="w-full h-full object-cover opacity-15 blur-sm"
           loading="lazy"
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = 'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp';
+            (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp';
           }}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-[#1A120B] via-transparent to-[#1A120B]" />
@@ -443,7 +444,7 @@ export const CalendarSection: FC = () => {
       {/* ── 1. Top Section Header ── */}
       <SectionHeader
         title={`LỊCH TU HỌC PHẬT LỊCH ${buddhistEra}`}
-        iconUrl="/images/icons/icon-lich-tu-hoc.webp"
+        iconUrl="/images/icons/icon-lich-tu-hoc-160.webp"
       />
 
       {/* ── 2. Unified Side-by-Side Calendar Container ── */}
@@ -458,7 +459,7 @@ export const CalendarSection: FC = () => {
           <div
             onMouseEnter={() => setIsSlidePaused(true)}
             onMouseLeave={() => setIsSlidePaused(false)}
-            className="w-full lg:w-[350px] xl:w-[380px] shrink-0 rounded-3xl bg-gradient-to-b from-[#2A170F] via-[#201007] to-[#150A04] border border-[#F2C14E]/40 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-md flex flex-col justify-between overflow-hidden transition-all min-h-[440px] sm:min-h-[470px] lg:min-h-[610px] xl:min-h-[620px] h-full lg:self-stretch relative group/leftcol"
+            className="w-full lg:w-[350px] xl:w-[380px] shrink-0 rounded-3xl bg-gradient-to-b from-[#2A170F] via-[#201007] to-[#150A04] border border-[#F2C14E]/40 shadow-[0_20px_60px_rgba(0,0,0,0.85)] backdrop-blur-md flex flex-col justify-between overflow-hidden transition-all min-h-[calc(380px+60vw)] sm:min-h-[470px] lg:min-h-[610px] xl:min-h-[620px] h-full lg:self-stretch relative group/leftcol"
           >
 
             {/* Slide Navigation Buttons (Prev / Next nổi tinh tế khi hover) */}
@@ -467,7 +468,7 @@ export const CalendarSection: FC = () => {
                 <button
                   type="button"
                   onClick={handlePrevSlide}
-                  className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/65 border border-[#F2C14E]/60 text-[#FFDE59] hover:bg-[#FFDE59] hover:text-[#1C0F08] transition-all flex items-center justify-center cursor-pointer opacity-70 group-hover/leftcol:opacity-100 shadow-lg backdrop-blur-sm"
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 md:w-8 md:h-8 rounded-full bg-black/65 border border-[#F2C14E]/60 text-[#FFDE59] hover:bg-[#FFDE59] hover:text-[#1C0F08] transition-all flex items-center justify-center cursor-pointer opacity-70 group-hover/leftcol:opacity-100 shadow-lg backdrop-blur-sm"
                   aria-label="Slide trước"
                 >
                   <ChevronLeft className="w-4 h-4" />
@@ -475,7 +476,7 @@ export const CalendarSection: FC = () => {
                 <button
                   type="button"
                   onClick={handleNextSlide}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/65 border border-[#F2C14E]/60 text-[#FFDE59] hover:bg-[#FFDE59] hover:text-[#1C0F08] transition-all flex items-center justify-center cursor-pointer opacity-70 group-hover/leftcol:opacity-100 shadow-lg backdrop-blur-sm"
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 w-11 h-11 md:w-8 md:h-8 rounded-full bg-black/65 border border-[#F2C14E]/60 text-[#FFDE59] hover:bg-[#FFDE59] hover:text-[#1C0F08] transition-all flex items-center justify-center cursor-pointer opacity-70 group-hover/leftcol:opacity-100 shadow-lg backdrop-blur-sm"
                   aria-label="Slide tiếp theo"
                 >
                   <ChevronRight className="w-4 h-4" />
@@ -490,11 +491,14 @@ export const CalendarSection: FC = () => {
                 {/* 1.1 TRANH MINH HỌA NGHỆ THUẬT (TỈ LỆ GỐC ASPECT 1200/1015 TRÊN DESKTOP, ASPECT 16/10 TRÊN MOBILE) */}
                 <div className="relative w-full aspect-[16/10] sm:aspect-[1200/900] lg:aspect-[1200/1015] shrink-0 overflow-hidden bg-black/40">
                   <img loading="lazy" decoding="async"
-                    src={fitImage(monthTheme.bannerImg, 1280)}
+                    src={fitImage(monthTheme.bannerImg, 960)}
+                    srcSet={imageSrcSet(monthTheme.bannerImg, [640, 960, 1280])}
+                    sizes="(min-width: 1024px) 380px, calc(100vw - 32px)"
                     alt={monthTheme.title}
                     className="w-full h-full object-cover object-top transition-transform duration-700 hover:scale-102"
                     onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).src = '/images/vu-tru-phat-giao/bao-thap/bao-thap-banner.jpg';
+                      e.currentTarget.removeAttribute('srcset');
+                      (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp';
                     }}
                   />
                   {/* Lớp gradient đáy chuyển tiếp mượt mà (h-12 sm:h-14), phủ dài hơn một xíu tạo độ hòa trộn êm ái mà không che mất chữ poster */}
@@ -506,7 +510,7 @@ export const CalendarSection: FC = () => {
                   {/* Huy hiệu Logo Quote Chủ Đề nổi chính giữa tim đường kẻ */}
                   <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-11 h-11 sm:w-12 sm:h-12 rounded-full border-2 border-[#F2C14E] bg-[#24160E] flex items-center justify-center p-2 shadow-[0_0_16px_rgba(242,193,78,0.6)]">
                     <img loading="lazy" decoding="async"
-                      src="/images/icons/icon-quote-chu-de.png"
+                      src="/images/icons/icon-quote-chu-de-128.webp"
                       alt="Quote Chủ Đề"
                       className="w-full h-full object-contain filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
                     />
@@ -585,7 +589,8 @@ export const CalendarSection: FC = () => {
                   <div
                     className="absolute inset-0 bg-cover bg-center filter blur-xl scale-110 opacity-40 pointer-events-none transition-all duration-700"
                     style={{
-                      backgroundImage: `url(${currentSlide.quote.url || monthTheme.quoteImg || monthTheme.bannerImg})`,
+                      // Lớp nền mờ (blur-xl, opacity 0,4): bản 360 là đủ, không xin ảnh gốc.
+                      backgroundImage: `url(${fitImage(currentSlide.quote.url || monthTheme.quoteImg || monthTheme.bannerImg, 360)})`,
                     }}
                   />
                   {/* Lớp vignette phủ nhẹ làm nổi bật bức tranh chính */}
@@ -626,13 +631,19 @@ export const CalendarSection: FC = () => {
                     key={idx}
                     type="button"
                     onClick={() => setActiveSlideIdx(idx)}
-                    className={`h-2 rounded-full transition-all duration-300 ease-in-out cursor-pointer shrink-0 ${
-                      isActive
-                        ? 'w-6 bg-[#FFDE59] shadow-[0_0_8px_rgba(255,222,89,0.9)] scale-100'
-                        : 'w-2 bg-[#F2C14E]/30 hover:bg-[#F2C14E]/60 hover:scale-110'
-                    }`}
+                    className="group inline-flex h-11 shrink-0 cursor-pointer items-center justify-center px-1.5 md:h-6 md:px-0.5"
                     aria-label={`Chuyển sang trang ${idx + 1}`}
-                  />
+                    aria-current={isActive ? 'true' : undefined}
+                  >
+                    <span
+                      aria-hidden="true"
+                      className={`block h-2 rounded-full transition-all duration-300 ease-in-out ${
+                        isActive
+                          ? 'w-6 bg-[#FFDE59] shadow-[0_0_8px_rgba(255,222,89,0.9)] scale-100'
+                          : 'w-2 bg-[#F2C14E]/30 group-hover:bg-[#F2C14E]/60 group-hover:scale-110'
+                      }`}
+                    />
+                  </button>
                 );
               })}
             </div>
@@ -648,7 +659,7 @@ export const CalendarSection: FC = () => {
               <button
                 type="button"
                 onClick={handlePrevMonth}
-                className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-full bg-[#3D2210] border border-[#F2C14E]/60 text-[#FFDE59] hover:bg-[#F2C14E] hover:text-[#1C0F08] transition-all flex items-center justify-center cursor-pointer shadow-md active:scale-95"
+                className="w-11 h-11 sm:w-9 sm:h-9 shrink-0 rounded-full bg-[#3D2210] border border-[#F2C14E]/60 text-[#FFDE59] hover:bg-[#F2C14E] hover:text-[#1C0F08] transition-all flex items-center justify-center cursor-pointer shadow-md active:scale-95"
                 aria-label="Tháng trước"
               >
                 <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -660,24 +671,24 @@ export const CalendarSection: FC = () => {
                 <div className="flex items-center justify-center px-2.5 sm:px-4 py-0.5 sm:py-1 rounded-full bg-[#201007]/90 border border-[#F2C14E]/50 shadow-xs">
                   <span
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                    className="text-[11px] sm:text-xs md:text-sm font-bold uppercase tracking-wider text-[#FFDE59] whitespace-nowrap"
+                    className="text-xs md:text-sm font-bold uppercase tracking-wider text-[#FFDE59] whitespace-nowrap"
                   >
                     THÁNG {String(currentMonth + 1).padStart(2, '0')} / {currentYear}
                   </span>
                 </div>
 
                 {/* Pill 2: Phật Lịch & Âm Lịch */}
-                <div className="flex items-center justify-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full bg-black/60 border border-[#F2C14E]/40 shadow-xs">
+                <div className="flex items-center justify-center gap-1 sm:gap-1.5 px-1.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-black/60 border border-[#F2C14E]/40 shadow-xs">
                   <span
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                    className="text-[9.5px] sm:text-xs font-bold text-[#FFDE59] tracking-wide shrink-0"
+                    className="text-[11px] sm:text-xs font-bold text-[#FFDE59] tracking-wide shrink-0"
                   >
                     PL. {buddhistEra}
                   </span>
-                  <span className="text-[#F2C14E]/60 text-[9px] sm:text-xs">•</span>
+                  <span className="text-[#F2C14E]/60 text-[11px] sm:text-xs">•</span>
                   <span
                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                    className="text-[9px] sm:text-xs font-medium text-amber-200/90 whitespace-nowrap"
+                    className="text-[11px] sm:text-xs font-medium text-amber-200/90 whitespace-nowrap"
                   >
                     Tháng {firstDayLunar.month === lastDayLunar.month ? firstDayLunar.month : `${firstDayLunar.month}-${lastDayLunar.month}`} ÂL {firstDayLunar.canChiYear || 'Bính Ngọ'}
                   </span>
@@ -688,7 +699,7 @@ export const CalendarSection: FC = () => {
               <button
                 type="button"
                 onClick={handleNextMonth}
-                className="w-8 h-8 sm:w-9 sm:h-9 shrink-0 rounded-full bg-[#3D2210] border border-[#F2C14E]/60 text-[#FFDE59] hover:bg-[#F2C14E] hover:text-[#1C0F08] transition-all flex items-center justify-center cursor-pointer shadow-md active:scale-95"
+                className="w-11 h-11 sm:w-9 sm:h-9 shrink-0 rounded-full bg-[#3D2210] border border-[#F2C14E]/60 text-[#FFDE59] hover:bg-[#F2C14E] hover:text-[#1C0F08] transition-all flex items-center justify-center cursor-pointer shadow-md active:scale-95"
                 aria-label="Tháng sau"
               >
                 <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -780,7 +791,7 @@ export const CalendarSection: FC = () => {
                     <div
                       key={`day-${cell.dayNumber}`}
                       onClick={() => handleDayCellClick(cell.dayNumber, cell.events)}
-                      className={`min-h-[46px] sm:min-h-[58px] md:min-h-[66px] p-1 sm:p-1.5 flex flex-col justify-between relative rounded-xl transition-all duration-300 cursor-pointer group/cell ${
+                      className={`min-h-[46px] sm:min-h-[58px] md:min-h-[66px] p-0.5 sm:p-1.5 flex flex-col justify-between relative rounded-xl transition-all duration-300 cursor-pointer group/cell ${
                         isToday
                           ? "border-2 border-[#FFDE59] shadow-[0_0_22px_rgba(255,222,89,0.9)] ring-2 ring-[#FFDE59]/70 bg-gradient-to-b from-[#552E14] via-[#3C1F0B] to-[#201007] z-20"
                           : multiDayEvent
@@ -807,7 +818,7 @@ export const CalendarSection: FC = () => {
 
                         <span
                           style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                          className={`text-[7.5px] sm:text-[9px] font-bold rounded px-1 leading-tight ${
+                          className={`text-[9px] font-bold rounded px-0.5 sm:px-1 leading-tight ${
                             cell.isFirstOrFullMoon
                               ? "bg-[#DC2626] text-white shadow-sm font-black"
                               : cell.isSamHoi
@@ -858,7 +869,7 @@ export const CalendarSection: FC = () => {
                                   {/* Dòng 1 (Ở TRÊN): Sub-tiêu đề (Lấy từ edit + bổ sung tiến trình ngày, tự động Tạ đàn / Kết khóa) */}
                                   <div
                                     style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                                    className="text-[10px] sm:text-[11px] text-amber-200/90 italic font-normal leading-tight"
+                                    className="text-[11px] text-amber-200/90 italic font-normal leading-tight"
                                   >
                                     {(() => {
                                       const rawSub = getDisplaySubtitle(ev);
@@ -940,7 +951,7 @@ export const CalendarSection: FC = () => {
               {/* Dòng chú thích căn CHÍNH GIỮA tuyệt đối giữa đường kẻ và mép đáy khung */}
               <div
                 style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                className="py-3.5 sm:py-4 flex flex-wrap items-center justify-end gap-3.5 sm:gap-4 text-[11px] sm:text-xs"
+                className="py-3.5 sm:py-4 flex flex-wrap items-center justify-end gap-3.5 sm:gap-4 text-xs"
               >
                 <span className="text-[#F2C14E] font-bold uppercase tracking-wider flex items-center gap-1">
                   ❖ Chú thích:
@@ -949,7 +960,7 @@ export const CalendarSection: FC = () => {
                 {/* Logo 1: Cộng Tu (Bỏ khung, để trên nền, chữ nghiêng) */}
                 <div className="flex items-center gap-1.5">
                   <img loading="lazy" decoding="async"
-                    src="/images/icons/icon-cong-tu.png"
+                    src="/images/icons/icon-cong-tu-128.webp"
                     alt="Cộng Tu"
                     className="w-4 h-4 object-contain"
                   />
@@ -959,7 +970,7 @@ export const CalendarSection: FC = () => {
                 {/* Logo 2: Khóa Lễ Truyền Thống (Bỏ khung, để trên nền, chữ nghiêng) */}
                 <div className="flex items-center gap-1.5">
                   <img loading="lazy" decoding="async"
-                    src="/images/icons/icon-khoa-le-truyen-thong.png"
+                    src="/images/icons/icon-khoa-le-truyen-thong-128.webp"
                     alt="Khóa Lễ Truyền Thống"
                     className="w-4 h-4 object-contain"
                   />
@@ -969,7 +980,7 @@ export const CalendarSection: FC = () => {
                 {/* Logo 3: Đại Lễ Sự Kiện (Bỏ khung, để trên nền, chữ nghiêng) */}
                 <div className="flex items-center gap-1.5">
                   <img loading="lazy" decoding="async"
-                    src="/images/icons/icon-dai-le-su-kien.png"
+                    src="/images/icons/icon-dai-le-su-kien-128.webp"
                     alt="Đại Lễ Sự Kiện"
                     className="w-4 h-4 object-contain"
                   />
@@ -991,7 +1002,7 @@ export const CalendarSection: FC = () => {
             onClick={() => setSelectedEvent(null)}
           >
             <div
-              className="relative max-w-md w-full max-h-[82vh] overflow-y-auto rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.95)] border bg-[#1E1108] transition-all animate-in zoom-in-95 flex flex-col scrollbar-none my-auto"
+              className="relative max-w-md w-full max-h-[82dvh] overflow-y-auto rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.95)] border bg-[#1E1108] transition-all animate-in zoom-in-95 flex flex-col scrollbar-none my-auto"
               style={{
                 borderColor: "#F2C14E",
                 boxShadow: "0 0 50px rgba(242,193,78,0.4)",
@@ -1001,7 +1012,7 @@ export const CalendarSection: FC = () => {
               {/* Nút Đóng Popup X */}
               <button
                 onClick={() => setSelectedEvent(null)}
-                className="absolute top-3.5 right-3.5 z-30 w-8 h-8 rounded-full bg-[#1A120B]/90 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black border border-[#F2C14E]/60 flex items-center justify-center shadow-2xl transition-all cursor-pointer backdrop-blur-md"
+                className="absolute top-3 right-3 z-30 w-11 h-11 sm:w-8 sm:h-8 rounded-full bg-[#1A120B]/90 text-[#FFE5A3] hover:bg-[#F2C14E] hover:text-black border border-[#F2C14E]/60 flex items-center justify-center shadow-2xl transition-all cursor-pointer backdrop-blur-md"
                 aria-label="Đóng Pop-up"
               >
                 <X className="w-4 h-4" />
@@ -1011,13 +1022,16 @@ export const CalendarSection: FC = () => {
               <div className="relative w-full h-[160px] sm:h-[185px] bg-black shrink-0 overflow-hidden">
                 <img loading="lazy" decoding="async"
                   src={fitImage(selectedEvent.imgUrl, 640)}
+                  srcSet={imageSrcSet(selectedEvent.imgUrl, [360, 640, 960])}
+                  sizes="(min-width: 448px) 448px, calc(100vw - 24px)"
                   alt={selectedEvent.title}
                   className="w-full h-full object-cover"
                   style={{
                     objectPosition: `center ${selectedEvent.imgPositionY ?? 50}%`,
                   }}
                   onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = '/images/vu-tru-phat-giao/bao-thap/bao-thap-banner.jpg';
+                    e.currentTarget.removeAttribute('srcset');
+                    (e.currentTarget as HTMLImageElement).src = '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/bao-thap/bao-thap-banner.webp';
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#1E1108] via-transparent to-black/40" />
@@ -1111,7 +1125,7 @@ export const CalendarSection: FC = () => {
                       <>
                         <span
                           style={{ fontFamily: "'UTM Avo', sans-serif" }}
-                          className="text-[11px] sm:text-xs font-medium uppercase text-[#FFE5A3]/90 tracking-wider block"
+                          className="text-xs font-medium uppercase text-[#FFE5A3]/90 tracking-wider block"
                         >
                           {selectedEvent.dayOfWeekStr}
                         </span>
@@ -1201,7 +1215,7 @@ export const CalendarSection: FC = () => {
                       className="text-xs sm:text-[13px] text-[#FFE5A3] flex items-center gap-2 font-medium"
                     >
                       <img loading="lazy" decoding="async"
-                        src="/images/icons/icon-cac-khu-vuc-noi-bat.webp"
+                        src="/images/icons/icon-cac-khu-vuc-noi-bat-160.webp"
                         alt="Địa điểm"
                         className="w-4 h-4 object-contain shrink-0 drop-shadow-[0_0_6px_rgba(242,193,78,0.5)]"
                       />
@@ -1229,7 +1243,7 @@ export const CalendarSection: FC = () => {
                 )}
 
                 {/* 3.6 NÚT XEM CHI TIẾT BÀI VIẾT - FONT UTM AVO KHÔNG BOLD, KHÔNG IN HOA */}
-                <Link
+                <Link prefetch={false}
                   href={`/lich-tu-hoc/${selectedEvent.slug || toSlug(selectedEvent.title)}`}
                   style={{ fontFamily: "'UTM Avo', sans-serif" }}
                   className="mt-3.5 mb-1 w-full py-2.5 px-6 rounded-full bg-[#2A180E] hover:bg-[#F2C14E] text-[#FFE5A3] hover:text-[#1A120B] border border-[#F2C14E]/60 hover:border-[#FFDE59] font-normal text-xs sm:text-sm tracking-wider flex items-center justify-center gap-2 shadow-lg hover:shadow-[0_0_20px_rgba(242,193,78,0.5)] transition-all duration-300 hover:scale-[1.01] cursor-pointer group/link"
@@ -1253,7 +1267,7 @@ export const CalendarSection: FC = () => {
             <button
               type="button"
               onClick={() => setIsQuoteZoomOpen(false)}
-              className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50 w-10 h-10 rounded-full bg-black/75 border border-[#F2C14E]/60 text-[#FFDE59] hover:bg-[#FFDE59] hover:text-[#1A120B] transition-all flex items-center justify-center cursor-pointer shadow-2xl backdrop-blur-sm group"
+              className="fixed top-4 right-4 sm:top-6 sm:right-6 z-50 w-11 h-11 sm:w-10 sm:h-10 rounded-full bg-black/75 border border-[#F2C14E]/60 text-[#FFDE59] hover:bg-[#FFDE59] hover:text-[#1A120B] transition-all flex items-center justify-center cursor-pointer shadow-2xl backdrop-blur-sm group"
               title="Đóng (ESC hoặc click ra ngoài)"
               aria-label="Đóng xem ảnh"
             >
@@ -1266,9 +1280,10 @@ export const CalendarSection: FC = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <img loading="lazy" decoding="async"
-                src={selectedZoomQuote?.url || monthTheme.quoteImg || monthTheme.bannerImg}
+                // Hộp phóng to "xem ảnh rõ nét": bậc 1920, không phải ảnh gốc.
+                src={fitImage(selectedZoomQuote?.url || monthTheme.quoteImg || monthTheme.bannerImg, 1920)}
                 alt={selectedZoomQuote?.title || monthTheme.quoteTitle || monthTheme.title || 'Quote tu học'}
-                className="max-h-[92vh] max-w-[94vw] w-auto h-auto object-contain rounded-2xl shadow-[0_25px_80px_rgba(0,0,0,0.95)] border border-[#F2C14E]/30 animate-in zoom-in-95 duration-200"
+                className="max-h-[92dvh] max-w-[94vw] w-auto h-auto object-contain rounded-2xl shadow-[0_25px_80px_rgba(0,0,0,0.95)] border border-[#F2C14E]/30 animate-in zoom-in-95 duration-200"
               />
             </div>
           </div>,
