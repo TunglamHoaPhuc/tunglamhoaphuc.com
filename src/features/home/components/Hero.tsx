@@ -102,7 +102,7 @@ const FrameView: FC<{ frame: HeroFrame; index: number; total: number; active: bo
 
       {frame.text && (
         <p
-          className="max-w-2xl text-center text-sm sm:text-base md:text-lg text-[#e3d2c1] leading-relaxed line-clamp-3"
+          className="max-w-2xl text-center text-sm sm:text-base md:text-lg text-[#e3d2c1] leading-relaxed line-clamp-2 sm:line-clamp-3"
           style={{ textShadow: "0 1px 14px rgba(0,0,0,0.75)" }}
         >
           {frame.text}
@@ -336,11 +336,11 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
         </div>
 
         {/* ── Dải 5 nút thao tác nhanh (nổi rõ rệt trên z-20, không bị lớp gradient che khuất) ── */}
-        <div className="relative z-20 flex flex-wrap items-center justify-center gap-2.5 md:gap-3.5 mt-8 w-full max-w-6xl">
+        <div className="relative z-20 grid grid-cols-2 gap-2 sm:gap-2.5 md:flex md:flex-wrap md:items-center md:justify-center md:gap-3.5 mt-4 md:mt-8 w-full max-w-sm md:max-w-6xl">
           {/* 1. PHÁP THOẠI MỚI NHẤT */}
           <Link prefetch={false}
             href="/vu-tru-phat-giao/giang-duong"
-            className="min-h-11 px-4 md:px-5 py-2.5 rounded-full text-[13px] md:text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
+            className="min-h-11 px-3 md:px-5 py-2 md:py-2.5 rounded-full text-[12px] md:text-xs font-bold uppercase tracking-wider flex flex-row items-center justify-center gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0 col-span-2 md:col-span-1"
             style={{
               background: "linear-gradient(135deg, #4A3728 0%, #3D2B1F 100%)",
               border: "1.5px solid #F2C14E",
@@ -351,13 +351,13 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
             }}
           >
             <Volume2 className="w-4 h-4 text-[#F2C14E] flex-shrink-0" />
-            <span className="whitespace-nowrap">PHÁP THOẠI MỚI NHẤT</span>
+            <span className="md:whitespace-nowrap">PHÁP THOẠI MỚI NHẤT</span>
           </Link>
 
           {/* 2. KHO ẢNH TƯ LIỆU */}
           <button
             onClick={() => setIsGalaxyOpen(true)}
-            className="min-h-11 px-4 md:px-5 py-2.5 rounded-full text-[13px] md:text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
+            className="min-h-11 px-3 md:px-5 py-2 md:py-2.5 rounded-full text-[12px] md:text-xs font-bold uppercase tracking-wider flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0"
             style={{
               background: "rgba(42,29,20,0.85)",
               border: "1px solid rgba(242,193,78,0.5)",
@@ -366,13 +366,13 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
             }}
           >
             <Sparkles className="w-4 h-4 text-[#F2C14E] flex-shrink-0" />
-            <span className="whitespace-nowrap">KHO ẢNH TƯ LIỆU</span>
+            <span className="md:whitespace-nowrap">KHO ẢNH TƯ LIỆU</span>
           </button>
 
           {/* 3. ẤN PHẨM PHẬT GIÁO */}
           <Link prefetch={false}
             href="/tri-tue-phat-phap"
-            className="min-h-11 px-4 md:px-5 py-2.5 rounded-full text-[13px] md:text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
+            className="min-h-11 px-3 md:px-5 py-2 md:py-2.5 rounded-full text-[12px] md:text-xs font-bold uppercase tracking-wider flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0"
             style={{
               background: "rgba(42,29,20,0.85)",
               border: "1px solid rgba(242,193,78,0.5)",
@@ -381,13 +381,13 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
             }}
           >
             <BookOpen className="w-4 h-4 text-[#F2C14E] flex-shrink-0" />
-            <span className="whitespace-nowrap">ẤN PHẨM PHẬT GIÁO</span>
+            <span className="md:whitespace-nowrap">ẤN PHẨM PHẬT GIÁO</span>
           </Link>
 
           {/* 4. ĐĂNG KÝ CỘNG TU */}
           <Link prefetch={false}
             href="/dong-chay-hoang-phap"
-            className="min-h-11 px-4 md:px-5 py-2.5 rounded-full text-[13px] md:text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
+            className="min-h-11 px-3 md:px-5 py-2 md:py-2.5 rounded-full text-[12px] md:text-xs font-bold uppercase tracking-wider flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0"
             style={{
               background: "rgba(42,29,20,0.85)",
               border: "1px solid rgba(242,193,78,0.5)",
@@ -396,13 +396,13 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
             }}
           >
             <Calendar className="w-4 h-4 text-[#F2C14E] flex-shrink-0" />
-            <span className="whitespace-nowrap">ĐĂNG KÝ CỘNG TU</span>
+            <span className="md:whitespace-nowrap">ĐĂNG KÝ CỘNG TU</span>
           </Link>
 
           {/* 5. TÌM KIẾM & THAM VẤN */}
           <Link prefetch={false}
             href="/tim-kiem"
-            className="min-h-11 px-4 md:px-5 py-2.5 rounded-full text-[13px] md:text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all hover:scale-105 whitespace-nowrap flex-shrink-0"
+            className="min-h-11 px-3 md:px-5 py-2 md:py-2.5 rounded-full text-[12px] md:text-xs font-bold uppercase tracking-wider flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2 text-center transition-all hover:scale-105 md:whitespace-nowrap flex-shrink-0"
             style={{
               background: "rgba(42,29,20,0.85)",
               border: "1px solid rgba(242,193,78,0.5)",
@@ -411,7 +411,7 @@ export const Hero: FC<{ hero: HomeHero }> = ({ hero }) => {
             }}
           >
             <Search className="w-4 h-4 text-[#F2C14E] flex-shrink-0" />
-            <span className="whitespace-nowrap">TÌM KIẾM &amp; THAM VẤN</span>
+            <span className="md:whitespace-nowrap">TÌM KIẾM &amp; THAM VẤN</span>
           </Link>
         </div>
       </div>
