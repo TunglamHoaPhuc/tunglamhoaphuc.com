@@ -63,6 +63,7 @@ export function LedCornerQrBadge({ targetUrl }: { targetUrl: string }) {
 
   return (
     <div
+      data-fab-avoid
       style={{ fontFamily: "'UTM Avo', sans-serif" }}
       className="fixed bottom-5 right-5 z-40 hidden md:flex items-center gap-3 p-2.5 rounded-xl bg-[#1A1009]/92 border border-[#F2C14E]/75 shadow-[0_12px_40px_rgba(0,0,0,0.85)] backdrop-blur-md"
     >
@@ -118,6 +119,7 @@ export function LedFloatingHud({
 
   return (
     <div
+      data-fab-avoid
       style={{ fontFamily: "'UTM Avo', sans-serif" }}
       className={`fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[min(95vw,820px)] rounded-2xl border border-[#F2C14E]/60 bg-[#140C07]/92 px-3.5 py-2.5 shadow-[0_16px_50px_rgba(0,0,0,0.9)] backdrop-blur-md transition-opacity duration-500 ${
         idle ? 'opacity-20 hover:opacity-100 focus-within:opacity-100' : 'opacity-100'
