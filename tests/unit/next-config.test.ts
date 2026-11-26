@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { matchRedirect, requestContextFromRequest } from "vinext/config/config-matchers";
 import nextConfig from "../../next.config.js";
 import { isPublicHost } from "../../src/libs/hosts";
 
@@ -26,7 +27,8 @@ describe("next.config headers", () => {
 		expect(bare?.permanent).toBe(true);
 		expect(new RegExp(`^${bare!.has![0].value}$`).test("tunglamhoaphuc.com")).toBe(true);
 		for (const host of ["www.tunglamhoaphuc.com", "v2.tunglamhoaphuc.com", "localhost:4175"]) expect(new RegExp(`^${bare!.has![0].value}$`).test(host), host).toBe(false);
-		const adminRules = rules.filter((rule) => rule !== bare);
+		// the rules of quantri. itself (its own describe below) are not these
+		const adminRules = rules.filter((rule) => rule !== bare && !rule.has![0].value!.startsWith("quantri"));
 		const sources = adminRules.map((rule) => rule.source);
 		for (const path of ["/admin", "/login", "/van-hanh"]) {
 			expect(sources).toContain(path);
@@ -88,6 +90,52 @@ describe("next.config headers", () => {
 			expect(headersFor(path)["Referrer-Policy"], path).toBe("strict-origin-when-cross-origin");
 			expect(headersFor(path)["Content-Security-Policy"], path).toBeUndefined();
 		}
+	});
+
+	describe("the admin host (quantri.) after the cut-over", () => {
+		// What a request to `host` + `path` gets from the redirect rules, decided by vinext's own matcher.
+		const redirectFor = async (host: string, path: string) => {
+			const rules = (await nextConfig.redirects?.()) ?? [];
+			const request = new Request(`https://${host}${path}`, { headers: { host } });
+			return matchRedirect(new URL(request.url).pathname, rules as never, requestContextFromRequest(request));
+		};
+		const ADMIN = "quantri.tunglamhoaphuc.com";
+
+		it("sends / to the admin (307)", async () => {
+			expect(await redirectFor(ADMIN, "/")).toMatchObject({ destination: "/quan-tri", statusCode: 307 });
+		});
+
+		it.each(["/quan-tri", "/quan-tri/dang-nhap", "/quan-tri/xem-truoc/bai-viet/abc", "/api/quan-tri/v1/auth/me", "/anh-goc/tlhp-media/cms/a/v1/x.jpg", "/cdn-cgi/image/width=300/anh-goc/a/b.jpg", "/_next/static/chunks/a.js", "/_vinext/image", "/brand/logo-moc-an.webp", "/images/a.png", "/favicon.ico", "/manifest.webmanifest", "/robots.txt"])(
+			"leaves %s to this Worker",
+			async (path) => expect(await redirectFor(ADMIN, path)).toBeNull(),
+		);
+
+		it.each([
+			["/gioi-thieu", "https://www.tunglamhoaphuc.com/gioi-thieu"],
+			["/dong-chay-hoang-phap/mot-bai", "https://www.tunglamhoaphuc.com/dong-chay-hoang-phap/mot-bai"],
+			["/tri-tue-phat-phap/hoc-tieng-tang", "https://www.tunglamhoaphuc.com/tri-tue-phat-phap/hoc-tieng-tang"],
+			["/lien-he", "https://www.tunglamhoaphuc.com/lien-he"],
+			["/tim-kiem", "https://www.tunglamhoaphuc.com/tim-kiem"],
+			["/sitemap.xml", "https://www.tunglamhoaphuc.com/sitemap.xml"],
+			// a name that only starts like an admin path is still a public page
+			["/quan-tri-gia", "https://www.tunglamhoaphuc.com/quan-tri-gia"],
+			["/api/analyze", "https://www.tunglamhoaphuc.com/api/analyze"],
+			["/anh-goc-gia/x", "https://www.tunglamhoaphuc.com/anh-goc-gia/x"],
+		])("sends the public page %s to the public site at the same path, for good (308)", async (path, destination) => {
+			expect(await redirectFor(ADMIN, path)).toMatchObject({ destination, statusCode: 308 });
+		});
+
+		it.each(["localhost:3001", "localhost:3021", "127.0.0.1:3001", "v2.tunglamhoaphuc.com", "www.tunglamhoaphuc.com", "tlhp-web.example.workers.dev"])(
+			"does nothing on %s (the end-to-end tests and the other hosts run as before)",
+			async (host) => {
+				for (const path of ["/", "/gioi-thieu", "/dong-chay-hoang-phap/a", "/quan-tri"]) {
+					const hit = await redirectFor(host, path);
+					// www and the bare domain have their own rules; none of them is the admin host's
+					expect(hit?.destination ?? "", `${host}${path}`).not.toBe("/quan-tri");
+					if (host !== "www.tunglamhoaphuc.com") expect(hit, `${host}${path}`).toBeNull();
+				}
+			},
+		);
 	});
 
 	it("names the same public hosts as the code that hides internal pages", () => {

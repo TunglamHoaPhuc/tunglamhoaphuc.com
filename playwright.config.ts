@@ -14,6 +14,8 @@ const welcomeNoticeSeen = {
 
 export default defineConfig({
 	testDir: "tests/e2e",
+	// The admin specs need a server with the admin on and a prepared local database (see tests/e2e/admin/helpers.ts), which CI does not have: set ADMIN_E2E=1 to run them.
+	testIgnore: process.env.ADMIN_E2E ? [] : ["**/admin/**"],
 	use: { baseURL, storageState: welcomeNoticeSeen },
 	projects: [
 		{ name: "desktop", use: { ...devices["Desktop Chrome"] } },
@@ -22,7 +24,7 @@ export default defineConfig({
 	webServer: process.env.BASE_URL
 		? undefined
 		: {
-				command: "npm run preview -- --port 4173 --strictPort",
+				command: "npm run preview -- --config vite.e2e.config.ts --port 4173 --strictPort",
 				url: baseURL,
 				reuseExistingServer: true,
 				timeout: 120_000,

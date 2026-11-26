@@ -30,6 +30,9 @@ export function ContentList({ kind }: { kind: KindName }) {
 	const [confirming, setConfirming] = useState<string | null>(null);
 	const [busy, setBusy] = useState<string | null>(null);
 	const [notice, setNotice] = useState<{ kind: "success" | "error"; text: string } | null>(null);
+	const [picked, setPicked] = useState<Set<string>>(new Set());
+	const [bulkConfirm, setBulkConfirm] = useState(false);
+	const [bulkBusy, setBulkBusy] = useState(false);
 	const search = useDebounced(q.trim(), 300);
 
 	const filters = new URLSearchParams();
@@ -65,6 +68,35 @@ export function ContentList({ kind }: { kind: KindName }) {
 			setNotice({ kind: "error", text: errorText(error) });
 			setBusy(null);
 		}
+	}
+
+	/** Bulk actions run the single-article endpoints one by one, so every article is checked (permission, version, log) exactly as on its own. */
+	async function bulk(action: "publish" | "delete") {
+		const rows = (result?.rows ?? []).filter((row) => picked.has(row.id) && (action === "delete" ? row.canDelete : row.status !== "published"));
+		if (rows.length === 0) {
+			setNotice({ kind: "error", text: action === "delete" ? "Không có bài đã chọn mà anh/chị được phép xóa." : "Các bài đã chọn đều đã xuất bản." });
+			setBulkConfirm(false);
+			return;
+		}
+		setBulkBusy(true);
+		setNotice(null);
+		const failed: string[] = [];
+		for (const row of rows) {
+			try {
+				if (action === "delete") await api("DELETE", `${kind}/${encodeURIComponent(row.id)}`);
+				else await api("POST", `${kind}/${encodeURIComponent(row.id)}/publish`, { version: row.version });
+			} catch (error) {
+				failed.push(`"${row.title}": ${errorText(error)}`);
+			}
+		}
+		const done = rows.length - failed.length;
+		const verb = action === "delete" ? "chuyển vào thùng rác" : "xuất bản";
+		setNotice({ kind: failed.length ? "error" : "success", text: `Đã ${verb} ${done}/${rows.length} bài.${failed.length ? ` Không làm được: ${failed.join("; ")}` : ""}` });
+		setPicked(new Set());
+		setBulkConfirm(false);
+		setBulkBusy(false);
+		list.reload();
+		counts.reload();
 	}
 
 	async function remove(row: ListRow) {
@@ -106,8 +138,8 @@ export function ContentList({ kind }: { kind: KindName }) {
 				})}
 			</nav>
 
-			<div className="tq-toolbar" role="search" style={{ marginBottom: 14 }}>
-				<TextField label="Tìm kiếm" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tiêu đề hoặc nội dung, gõ có dấu hay không đều được" />
+			<div className="tq-toolbar tq-toolbar--row" role="search" style={{ marginBottom: 14 }}>
+				<TextField label="Tìm kiếm" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tiêu đề, nội dung" />
 				{ui.hasSection ? (
 					<SelectField
 						label="Chuyên trang"
@@ -179,6 +211,36 @@ export function ContentList({ kind }: { kind: KindName }) {
 				<EmptyState>{anyFilter ? `Không có ${ui.one} nào khớp bộ lọc.` : `Chưa có ${ui.one} nào.`}</EmptyState>
 			) : (
 				<>
+					{picked.size > 0 ? (
+						<div role="group" aria-label="Thao tác hàng loạt" className="tq-toolbar" style={{ marginBottom: 10, alignItems: "center" }}>
+							<strong>Đã chọn {picked.size} bài</strong>
+							{can(kind, "publish") ? (
+								<Button variant="secondary" disabled={bulkBusy} onClick={() => void bulk("publish")}>
+									Xuất bản các bài đã chọn
+								</Button>
+							) : null}
+							{can(kind, "delete") ? (
+								bulkConfirm ? (
+									<span role="group" aria-label="Xác nhận xóa hàng loạt" style={{ display: "inline-flex", gap: 6, alignItems: "center" }}>
+										<span>Chuyển {picked.size} bài vào thùng rác?</span>
+										<Button variant="danger" disabled={bulkBusy} onClick={() => void bulk("delete")}>
+											Xóa
+										</Button>
+										<Button variant="secondary" onClick={() => setBulkConfirm(false)}>
+											Hủy
+										</Button>
+									</span>
+								) : (
+									<Button variant="secondary" disabled={bulkBusy} onClick={() => setBulkConfirm(true)}>
+										Xóa các bài đã chọn
+									</Button>
+								)
+							) : null}
+							<Button variant="secondary" onClick={() => setPicked(new Set())}>
+								Bỏ chọn
+							</Button>
+						</div>
+					) : null}
 					<div className="tq-table-wrap" aria-busy={list.loading || undefined}>
 						<table className="tq-table">
 							<caption className="tq-h2" style={{ textAlign: "left" }}>
@@ -186,6 +248,14 @@ export function ContentList({ kind }: { kind: KindName }) {
 							</caption>
 							<thead>
 								<tr>
+									<th scope="col" style={{ width: 36 }}>
+										<input
+											type="checkbox"
+											aria-label="Chọn tất cả bài trên trang này"
+											checked={result.rows.length > 0 && result.rows.every((row) => picked.has(row.id))}
+											onChange={(e) => setPicked(e.target.checked ? new Set(result.rows.map((row) => row.id)) : new Set())}
+										/>
+									</th>
 									<th scope="col">Tiêu đề</th>
 									<th scope="col">{ui.categoryLabel}</th>
 									<th scope="col">Trạng thái</th>
@@ -199,6 +269,21 @@ export function ContentList({ kind }: { kind: KindName }) {
 							<tbody>
 								{result.rows.map((row) => (
 									<tr key={row.id}>
+										<td>
+											<input
+												type="checkbox"
+												aria-label={`Chọn ${row.title}`}
+												checked={picked.has(row.id)}
+												onChange={(e) =>
+													setPicked((now) => {
+														const next = new Set(now);
+														if (e.target.checked) next.add(row.id);
+														else next.delete(row.id);
+														return next;
+													})
+												}
+											/>
+										</td>
 										<td style={{ minWidth: 220 }}>
 											<div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
 												{row.thumbUrl ? <img src={row.thumbUrl} alt="" width={56} height={42} loading="lazy" style={{ objectFit: "cover", borderRadius: 6, flex: "none" }} /> : null}

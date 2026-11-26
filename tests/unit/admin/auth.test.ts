@@ -296,6 +296,19 @@ describe("password change and reset", () => {
 		expect((await login(ctx, { email, password: "Mat-khau-moi-456" })).status).toBe("ok");
 	});
 
+	it("builds the link of the mail from ADMIN_BASE_URL, so with the admin host named there it opens quantri., not www", async () => {
+		const { ctx, email } = await withUser();
+		const sent: MailMessage[] = [];
+		const quantri: AuthContext = { ...ctx, env: { ...ctx.env, ADMIN_BASE_URL: "https://quantri.tunglamhoaphuc.com" } };
+		await requestPasswordReset(quantri, email, async (message) => void sent.push(message));
+		expect(sent[0].text).toMatch(/^https:\/\/quantri\.tunglamhoaphuc\.com\/quan-tri\/dat-lai-mat-khau\?token=[\w-]+$/m);
+		expect(sent[0].text).not.toContain("www.tunglamhoaphuc.com");
+		// a trailing slash in the setting does not double up
+		await requestPasswordReset({ ...quantri, env: { ...quantri.env, ADMIN_BASE_URL: "https://quantri.tunglamhoaphuc.com/" } }, email, async (message) => void sent.push(message));
+		expect(sent).toHaveLength(2);
+		expect(sent[1].text).toContain("https://quantri.tunglamhoaphuc.com/quan-tri/dat-lai-mat-khau?token=");
+	});
+
 	it("expires the link after 20 minutes and cancels an older link when a new one is asked for", async () => {
 		const { ctx, email } = await withUser();
 		const sent: MailMessage[] = [];

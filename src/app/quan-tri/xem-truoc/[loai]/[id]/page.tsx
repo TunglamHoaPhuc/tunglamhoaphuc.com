@@ -8,6 +8,7 @@ import { isAdminHost } from "@/admin/http/origin";
 import { loadPreview, type PreviewData } from "@/admin/content/service";
 import SiteShell from "@/components/layout/SiteShell";
 import { PagePreview, PostPreview, TeachingPreview } from "@/components/admin/content/PreviewArticles";
+import { PREVIEW_SITE_MAY_DIFFER } from "@/components/admin/content/previewNote";
 
 // The preview of a draft (docs/admin-architecture.md 7.4): opened with a signed link that names one version of one
 // article and lasts 30 minutes, so it needs no session. Made on every request, never cached, never indexed.
@@ -36,7 +37,7 @@ function Frame({ children, note }: { children: ReactNode; note: string }) {
 			<script dangerouslySetInnerHTML={{ __html: UNWRAP }} />
 			<style>{RESET}</style>
 			<p className="tlhp-preview-bar" role="status">
-				Bản xem trước — chưa xuất bản. {note}
+				Bản xem trước — chưa xuất bản. {note} {PREVIEW_SITE_MAY_DIFFER}
 			</p>
 			{children}
 		</div>

@@ -25,10 +25,10 @@ Chỉ tên biến, không bao giờ ghi giá trị vào repo. Cục bộ nằm t
 |---|---|
 | `ADMIN_JWT_SECRET` | Ký token truy cập (≥ 32 byte ngẫu nhiên) |
 | `ADMIN_ENC_KEY` | Khóa AES-256 (base64 của 32 byte): mã hóa bí mật 2FA và mật khẩu SMTP |
-| `ADMIN_BASE_URL` | Địa chỉ duy nhất mà admin trả lời, ví dụ `https://www.tunglamhoaphuc.com`; ở tên miền khác admin trả 404 |
+| `ADMIN_BASE_URL` | Địa chỉ duy nhất mà admin trả lời, hiện là `https://quantri.tunglamhoaphuc.com`; ở tên miền khác admin trả 404 |
 | `ADMIN_SEED_EMAIL`, `ADMIN_SEED_PASSWORD` | Chỉ dùng khi tạo Super Admin đầu tiên (`--seed`); tài khoản đó bị buộc đổi mật khẩu ở lần đăng nhập đầu |
 
-`cloudflare.config.ts` chỉ khai báo các biến trên khi chạy `vite dev` hoặc khi build với `TLHP_ADMIN=1`. **Admin đã bật trên www từ 22/11/2026** (xem `docs/van-hanh/d1.md` mục 7). `v2.` và `www` dùng chung một Worker `tlhp-web`, nên **mọi lần deploy phải giữ cả hai biến**, từ một worktree sạch: `TLHP_ADMIN=1 ADMIN_BASE_URL=https://www.tunglamhoaphuc.com npm run deploy:v2`. Thiếu chúng thì `/api/quan-tri` trả `503` ("thiếu: ADMIN_BASE_URL") và không đăng nhập được (đã xảy ra sau một lần deploy 22/11). Mật khẩu băm Argon2id tốn 236–605 ms CPU mỗi lần, nên admin cần gói Workers Paid, đang có hiệu lực; không đổi gói cước.
+`cloudflare.config.ts` chỉ khai báo các biến trên khi chạy `vite dev` hoặc khi build với `TLHP_ADMIN=1`. **Admin chạy ở `quantri.tunglamhoaphuc.com`** (Worker `tlhp-web`, xem `docs/van-hanh/d1.md` mục 7). Từ 23/11/2026 www và tên miền gốc do Worker `tlhp-v3` phục vụ, và `v2.` đã gỡ khỏi `tlhp-web` ngày 25/11/2026, nên **mọi lần deploy `tlhp-web` phải giữ cả hai biến**, từ một worktree sạch: `TLHP_ADMIN=1 ADMIN_BASE_URL=https://quantri.tunglamhoaphuc.com npm run deploy:v2`. `npm run deploy:v2` dừng ngay khi có `TLHP_ADMIN=1` mà `ADMIN_BASE_URL` trống, không phải https, hoặc trỏ về máy cục bộ (`scripts/deploy-env.mjs`). Thiếu chúng thì `/api/quan-tri` trả `503` ("thiếu: ADMIN_BASE_URL") và không đăng nhập được (đã xảy ra sau một lần deploy 22/11). Mật khẩu băm Argon2id tốn 236–605 ms CPU mỗi lần, nên admin cần gói Workers Paid, đang có hiệu lực; không đổi gói cước.
 
 ## Lệnh
 
@@ -57,3 +57,14 @@ Tài khoản đăng nhập thử cục bộ nằm trong `.dev.vars` (`ADMIN_SEED
 ## Vận hành admin
 
 Xem `docs/admin-architecture.md` (thiết kế), `docs/van-hanh/` (D1, ảnh, sao lưu, chuyển www). Các tài khoản, vai trò và quyền quản lý tại `/quan-tri/tai-khoan` và `/quan-tri/vai-tro`; nhật ký tại `/quan-tri/nhat-ky`; thùng rác tại `/quan-tri/thung-rac`.
+
+## Trình soạn thảo bài viết (nhánh feat/admin-editor-optimization)
+
+- `src/components/admin/content/RichEditor.tsx` + `editorExtensions.ts`: TipTap với phông (3 phông cố định), cỡ chữ, màu chữ, tô sáng, căn lề, thụt lề, giãn dòng, sub/sup, bảng (gộp/tách ô), ảnh có độ rộng và căn lề, liên kết nofollow, dán sạch từ Word/Docs (`cleanPastedHtml`), đếm từ, mục lục tiêu đề.
+- Định dạng được lưu là `style` nội tuyến, và **chỉ** những thuộc tính trong `safeStyle` (`src/admin/content/html.ts`) được máy chủ giữ; thêm một kiểu định dạng mới phải thêm ở đó kèm test (`tests/unit/admin/content-style.test.ts`). Trang V3 là repo riêng, hiển thị các style này qua HTML đã lọc.
+- `localDraft.ts`: bản nháp thân bài trên trình duyệt (3 giây sau khi ngừng gõ), không bao giờ tự gửi lên máy chủ.
+- Danh sách bài có chọn nhiều và xuất bản/xóa hàng loạt; chạy từng bài qua endpoint đơn nên quyền và phiên bản kiểm từng bài.
+- e2e: `tests/e2e/admin/editor-format.spec.ts`. Chạy trên bản build (`TLHP_ADMIN=1 TLHP_CONTENT_SOURCE=d1 ADMIN_BASE_URL=http://localhost:3021 npx vite build --config vite.e2e.config.ts`, rồi `vite preview --config vite.e2e.config.ts --port 3021`, `.dev.vars` cùng địa chỉ). Dev server không dùng được cho e2e admin.
+- Checklist (TaskList/TaskItem) đã có; HTML lưu `ul[data-type=taskList] > li[data-type=taskItem][data-checked]`, trang công khai và V3 cần CSS riêng để vẽ ô tích. Thư viện Media đã tải lười, bộ chọn chỉ dựng khi mở.
+- Giao diện admin thu nhỏ 7% bằng `--tq-zoom: 0.93` (admin.css; mọi `100vh` chia cho biến này). Thanh lọc `role="search"` là lưới chia đều; danh sách bài thêm `tq-toolbar--row` để nằm một hàng từ 1100px.
+- Chưa làm: mục lục tự động trên trang công khai (mã trang công khai và V3 do phiên khác giữ).

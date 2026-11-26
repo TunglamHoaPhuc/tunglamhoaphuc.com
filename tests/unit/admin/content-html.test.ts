@@ -38,7 +38,7 @@ describe("the article sanitiser keeps what the editor makes", () => {
 	});
 
 	it("maps the old tags onto the kept ones and unwraps what has no place", () => {
-		expect(clean("<h1>A</h1><h5>B</h5><p><b>c</b><i>d</i><span style='color:red'>e</span><font>f</font></p>")).toBe("<h2>A</h2><h4>B</h4><p><strong>c</strong><em>d</em>ef</p>");
+		expect(clean("<h1>A</h1><h5>B</h5><p><b>c</b><i>d</i><span class='x' onclick='1'>e</span><font>f</font></p>")).toBe("<h2>A</h2><h4>B</h4><p><strong>c</strong><em>d</em>ef</p>");
 	});
 
 	it("gives library pictures their current address by media id", () => {

@@ -77,6 +77,12 @@ test.describe("Tìm kiếm", () => {
 		await page.keyboard.press("Enter");
 		await page.waitForURL(/\/tim-kiem\?q=Vu\+Lan/);
 		await expect(status(page)).toHaveText(/^\d+ kết quả cho “Vu Lan”$/);
+		// The other tests go through open(), which waits 1.2 s. Here the page was reached by a form submit, and axe must not
+		// run while the fade of the closing block (tlhp-cta, below the fold) is in flight: its title and button then have a
+		// partial opacity and axe blends their colours into a false color-contrast failure (seen on CI, 0.82 at 300 ms).
+		await expect
+			.poll(() => page.evaluate(() => document.getAnimations().filter((a) => a.playState === "running").length), { message: "fades have finished" })
+			.toBe(0);
 		const axe = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
 		expect(axe.violations.flatMap((v) => v.nodes.map((n) => `${v.id}: ${n.target.join(" ")}`))).toEqual([]);
 	});
