@@ -140,7 +140,7 @@ test.describe("Bảo Tượng Phật Giáo", () => {
 		const art = await page.locator("#nghe-thuat .tlhp-art-card img").evaluateAll((imgs) => imgs.map((img) => (img as HTMLElement).dataset.tlhpSrc ?? img.getAttribute("src")!));
 		expect(art.length).toBeGreaterThan(0);
 		for (const src of art) expect(src).toMatch(/^\/anh-goc\/.*@640$/);
-		await expect(page.locator("#nghe-thuat .tlhp-art-card img").first()).toHaveAttribute("srcset", /width=360,.* 360w, .*width=640,.* 640w/);
+		await expect(page.locator("#nghe-thuat .tlhp-art-card img").first()).toHaveAttribute("srcset", /@360 360w, .*@640 640w/);
 	});
 
 	test("every link inside a statue page leads to a page that is there", async ({ page, request }) => {
