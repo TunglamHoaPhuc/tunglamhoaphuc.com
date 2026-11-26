@@ -26,6 +26,8 @@ const ALLOWED: Record<string, string> = {
 	"src/app/cdn-cgi/image/[...rest]/route.ts": "the fallback redirect to the WordPress host, with its log line (step 7)",
 	"src/libs/content/sources/b2.ts": "reads the JSON data files from B2 when CONTENT_SOURCE=b2; no pictures",
 	"src/libs/content/schedule.ts": "a warning about a calendar picture left on another B2 bucket; draws nothing",
+	"src/app/(van-hoa)/van-hoa-viet-nam/page.tsx": "the Văn hóa page; the live copy runs in V3 (tlhp-v3), the admin Worker does not serve it; its pictures still point at B2",
+	"src/components/van-hoa-viet-nam/data.ts": "S3_BASE of the Văn hóa page data (same page, same reason)",
 };
 
 function* files(dir: string): Generator<string> {
