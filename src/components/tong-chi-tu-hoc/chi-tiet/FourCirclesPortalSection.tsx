@@ -100,7 +100,7 @@ const PORTAL_ITEMS: PortalItem[] = [
     categoryKey: 'lo-trinh',
     description: 'Ứng dụng Phật pháp xây dựng lý tưởng sống, rèn luyện bản lĩnh và vượt áp lực.',
     link: '/tong-chi-tu-hoc/lo-trinh-tu-hoc-nguoi-tre',
-    image: '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/giang-duong/giang-duong-hoa-phuc-canh-1.webp',
+    image: '/anh-goc/s2-cnv03/tunglamhoaphuc2/01-trang-chu/Phap-hoi-niem-Phat.webp',
   },
   {
     id: 'lo-trinh-nguoi-ban-ron',
