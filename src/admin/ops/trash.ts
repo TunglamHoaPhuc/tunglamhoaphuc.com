@@ -5,6 +5,7 @@ import { num, text, type AdminStmt, type Row } from "../db";
 import { ApiError, forbidden, notFound } from "../http/errors";
 import type { Page } from "../http/paging";
 import type { MediaStore } from "../media/store";
+import { variantKeys } from "../media/variants";
 import { can, covers, loadPermissions } from "../rbac/check";
 import { mayManage } from "../users/service";
 import { registerTrashable, trashableOf, trashables, type Trashable } from "../trash";
@@ -177,7 +178,7 @@ export async function restoreTrashed(ctx: AuthContext, by: Authed, type: string,
 async function mediaKeys(ctx: AuthContext, id: string): Promise<string[]> {
 	const picture = await ctx.db.prepare("SELECT r2_key FROM media WHERE id = ?").bind(id).first();
 	const crops = await ctx.db.prepare("SELECT r2_key FROM media_crop WHERE media_id = ?").bind(id).all();
-	return [text(picture?.r2_key), ...crops.results.map((row) => text(row.r2_key))].filter((key) => key.startsWith("cms/"));
+	return [text(picture?.r2_key), ...crops.results.map((row) => text(row.r2_key))].filter((key) => key.startsWith("cms/")).flatMap((key) => [key, ...variantKeys(key)]);
 }
 
 export async function purgeTrashed(ctx: AuthContext, by: Authed, type: string, id: string, store?: MediaStore): Promise<void> {

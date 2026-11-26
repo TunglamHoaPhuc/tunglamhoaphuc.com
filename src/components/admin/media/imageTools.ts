@@ -162,6 +162,86 @@ export async function prepareImage(file: File, opts: { maxSide?: number; quality
 	}
 }
 
+// ------------------------------------------------------------------ variants
+
+/** The widths of the ready-made variants (src/libs/content/media.ts VARIANT_WIDTHS, which the site's srcset asks for) and "max". */
+const VARIANT_STEPS: readonly (number | "max")[] = [160, 360, 640, 960, 1280, 1920, "max"];
+const VARIANT_MAX_WIDTH = 2560;
+const VARIANT_QUALITY = 0.85;
+
+/** Halves the picture until one more halving would go below the target, then draws it at the target size: a big shrink in one step looks jagged. */
+function scaledCanvas(source: CanvasImageSource, from: { width: number; height: number }, width: number, height: number): HTMLCanvasElement | null {
+	let current: CanvasImageSource = source;
+	let currentWidth = from.width;
+	let currentHeight = from.height;
+	while (currentWidth / 2 >= width * 1.0001 && currentHeight / 2 >= height) {
+		const half = document.createElement("canvas");
+		half.width = Math.max(width, Math.round(currentWidth / 2));
+		half.height = Math.max(height, Math.round(currentHeight / 2));
+		const halfContext = half.getContext("2d");
+		if (!halfContext) return null;
+		halfContext.imageSmoothingQuality = "high";
+		halfContext.drawImage(current, 0, 0, half.width, half.height);
+		current = half;
+		currentWidth = half.width;
+		currentHeight = half.height;
+	}
+	const canvas = document.createElement("canvas");
+	canvas.width = width;
+	canvas.height = height;
+	const context = canvas.getContext("2d");
+	if (!context) return null;
+	context.imageSmoothingQuality = "high";
+	context.drawImage(current, 0, 0, width, height);
+	return canvas;
+}
+
+/**
+ * The WebP variants of a picture, made here so the server does not have to (and the zone's 5,000 free transformations a month are not
+ * spent): one for every standard width below the picture's own, and "max" at its own width (at most 2560), which the site's srcset
+ * uses for the widest size (the same layout scripts/media-variants.mjs makes). `source` is what the person chose (the best pixels),
+ * `stored` the size of the file that goes up. "max" is left out when it would not be smaller than that file (the site then serves the file
+ * itself). GIF and a picture the browser cannot read get none.
+ */
+export async function makeVariants(source: File, stored: { width: number; height: number; bytes: number }): Promise<{ step: number | "max"; blob: Blob }[]> {
+	const mime = mimeOf(source);
+	if (!["image/jpeg", "image/png", "image/webp"].includes(mime) || stored.width < 1 || stored.height < 1) return [];
+	let bitmap: ImageBitmap;
+	try {
+		bitmap = await createImageBitmap(source, { imageOrientation: "from-image" });
+	} catch {
+		return [];
+	}
+	try {
+		const out: { step: number | "max"; blob: Blob }[] = [];
+		for (const step of VARIANT_STEPS) {
+			if (step !== "max" && step >= stored.width) continue;
+			const width = step === "max" ? Math.min(stored.width, VARIANT_MAX_WIDTH) : step;
+			const height = Math.max(1, Math.round((width * stored.height) / stored.width));
+			const canvas = scaledCanvas(bitmap, { width: bitmap.width, height: bitmap.height }, width, height);
+			const blob = canvas ? await toBlob(canvas, "image/webp", VARIANT_QUALITY) : null;
+			if (!blob || blob.type !== "image/webp") continue;
+			if (step === "max" && blob.size >= stored.bytes) continue;
+			out.push({ step, blob });
+		}
+		return out;
+	} finally {
+		bitmap.close();
+	}
+}
+
+/** The pixel size of a picture file, 0 x 0 when the browser cannot read it. */
+export const blobSize = async (blob: Blob): Promise<{ width: number; height: number; bytes: number }> => ({ ...(await decodeSize(blob as File)), bytes: blob.size });
+
+/** Adds the variants of `source` to a multipart upload as the fields `v160` … `vmax` the server reads. */
+export async function appendVariants(form: FormData, source: File, stored: { width: number; height: number; bytes: number }): Promise<void> {
+	try {
+		for (const { step, blob } of await makeVariants(source, stored)) form.append(`v${step}`, blob, `${step}.webp`);
+	} catch {
+		// variants are an extra: the upload goes on without them
+	}
+}
+
 /** Cuts `region` (percent of the picture) out of a loaded image at its natural resolution, as WebP. */
 export async function cropToBlob(image: HTMLImageElement, region: { x: number; y: number; width: number; height: number }, maxWidth = 1920): Promise<Blob> {
 	const naturalWidth = image.naturalWidth;

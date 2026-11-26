@@ -66,12 +66,14 @@ describe("imageAt / fitting in both delivery modes", () => {
 		expect(hasVariants("wordpress/2018/09/a.jpg")).toBe(false);
 	});
 
-	it("a picture uploaded in the admin (s2-cnv03/cms/) has no variants yet, so even in 'variants' mode it keeps going through /cdn-cgi/image", () => {
+	it("a picture uploaded in the admin (s2-cnv03/cms/) has the variants the browser made at upload, so it is delivered like the others", () => {
 		const upload = "/anh-goc/s2-cnv03/cms/media-1/v1/le-hang-thuan.png";
-		expect(hasVariants(upload)).toBe(false);
-		expect(imageAt(upload, 640, "variants")).toBe(`/cdn-cgi/image/width=640,quality=75,format=auto,onerror=redirect${upload}`);
-		expect(imageSrcSet(upload, [640, 960], null, "variants")).toContain("/cdn-cgi/image/width=640,");
-		expect(albumImageAt(upload, 360, "variants")).toContain("/cdn-cgi/image/width=360,");
+		expect(hasVariants(upload)).toBe(true);
+		expect(imageAt(upload, 640, "variants")).toBe(`${upload}@640`);
+		expect(imageSrcSet(upload, [640, 960], null, "variants")).toContain(`${upload}@640 640w`);
+		expect(albumImageAt(upload, 360, "variants")).toBe(`${upload}@360`);
+		// an animated GIF has no variants, whatever its prefix
+		expect(imageAt("/anh-goc/s2-cnv03/cms/media-2/v1/anim.gif", 640, "variants")).toBe("/anh-goc/s2-cnv03/cms/media-2/v1/anim.gif");
 		// the 4,795 pictures of batch 2 (old WordPress uploads) have variants
 		expect(hasVariants("s2-cnv03/tunglamhoaphuc-com/wp-content/uploads/2021/06/a-668x501.jpg")).toBe(true);
 	});

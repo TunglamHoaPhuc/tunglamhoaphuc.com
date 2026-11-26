@@ -61,10 +61,11 @@ export async function world(seeds: Seed[]) {
 		}
 		return {
 		/** A multipart request (uploads): `fields` are text, `file` is the one file. */
-		async form(method: string, path: string, file: { bytes: Uint8Array; name: string } | null, fields: Record<string, string> = {}) {
+		async form(method: string, path: string, file: { bytes: Uint8Array; name: string } | null, fields: Record<string, string> = {}, extra: Record<string, { bytes: Uint8Array; name: string }> = {}) {
 			const body = new FormData();
 			for (const [name, value] of Object.entries(fields)) body.set(name, value);
 			if (file) body.set("file", new Blob([file.bytes as BlobPart]), file.name);
+			for (const [name, part] of Object.entries(extra)) body.set(name, new Blob([part.bytes as BlobPart]), part.name);
 			const headers: Record<string, string> = { origin: BASE };
 			if (jar.size) headers.cookie = [...jar].map(([name, value]) => `${name}=${value}`).join("; ");
 			if (csrf) headers["x-tlhp-csrf"] = csrf;

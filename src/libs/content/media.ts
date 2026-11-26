@@ -196,7 +196,7 @@ export const IMAGE_DELIVERY: ImageDelivery = "variants";
  * going through /cdn-cgi/image until its variants are made; a missing variant would only cost the route up to 14 R2 reads (then an hour in the
  * edge cache), so the list is widened as batches are generated, never to "everything" before they exist.
  */
-export const VARIANT_PREFIXES = ["media-tunglamhoaphuc/", "s2-cnv03/tunglamhoaphuc2/", "wordpress/2026/", "site/images/", "s2-cnv03/uploads/", "s2-cnv03/tunglamhoaphuc-com/"] as const;
+export const VARIANT_PREFIXES = ["media-tunglamhoaphuc/", "s2-cnv03/tunglamhoaphuc2/", "wordpress/2026/", "site/images/", "s2-cnv03/uploads/", "s2-cnv03/tunglamhoaphuc-com/", "s2-cnv03/cms/"] as const;
 
 /** True when the R2 key behind an /anh-goc/ path (with or without the leading slash) has its variants. */
 export function hasVariants(path: string): boolean {
@@ -242,16 +242,6 @@ export function parseVariantRequest(key: string[]): { base: string[]; step: Vari
 	return { base: [...key.slice(0, -1), match[1]], step, ext: (match[3] as VariantFormat | undefined) ?? null };
 }
 
-/**
- * Pictures uploaded in the admin (R2 keys under these prefixes) have no variants yet and can be camera originals of several MB, so even in
- * "variants" mode they go through /cdn-cgi/image like before: a few new pictures a month, well inside the free 5,000 transformations.
- * (Variants made at upload time retire this list.)
- */
-export const CGI_PREFIXES_IN_VARIANTS_MODE = ["s2-cnv03/cms/"] as const;
-function usesCgiInVariantsMode(source: string): boolean {
-	return !hasVariants(source) && CGI_PREFIXES_IN_VARIANTS_MODE.some((prefix) => source.replace(/^\/?anh-goc\//, "").startsWith(prefix));
-}
-
 /** The source of a transformation on this zone: always a picture of this site's /anh-goc/ route. */
 function transformSource(src: string): string | null {
 	const address = src.startsWith("/anh-goc/") ? src : mediaUrl(src);
@@ -271,7 +261,7 @@ export function imageAt(src: string, width: number, delivery: ImageDelivery = IM
 	if (!source) return src;
 	// "variants" mode never spends the transformation quota: a picture outside the prefixes that have variants is the old WordPress kind
 	// (about 668 px, median 70 KB), small enough to go as it is.
-	if (delivery === "variants" && !usesCgiInVariantsMode(source)) return hasVariants(source) ? variantUrl(`/${source}`, width) : `/${source}`;
+	if (delivery === "variants") return hasVariants(source) ? variantUrl(`/${source}`, width) : `/${source}`;
 	return `/cdn-cgi/image/width=${width},quality=75,format=auto,onerror=redirect/${source}`;
 }
 
@@ -280,13 +270,7 @@ export function imageAt(src: string, width: number, delivery: ImageDelivery = IM
  * (median 92 KB), and an album of 170 would spend the monthly quota. Variants cost no quota, so there every picture gets one.
  */
 export function albumImageAt(src: string, width: number, delivery: ImageDelivery = IMAGE_DELIVERY): string {
-	return delivery === "variants" ? (srcHasVariants(src) || srcUsesCgiInVariantsMode(src) ? imageAt(src, width, delivery) : src) : isWordPressMedia(src) ? imageAt(src, width, delivery) : src;
-}
-
-/** True when `src` is an admin upload that goes through /cdn-cgi/image even in "variants" mode (see CGI_PREFIXES_IN_VARIANTS_MODE). */
-export function srcUsesCgiInVariantsMode(src: string): boolean {
-	const source = transformSource(src);
-	return source !== null && usesCgiInVariantsMode(source);
+	return delivery === "variants" ? (srcHasVariants(src) ? imageAt(src, width, delivery) : src) : isWordPressMedia(src) ? imageAt(src, width, delivery) : src;
 }
 
 /** True when the picture behind `src` (any form `mediaUrl` understands) is one of those that have ready-made variants. */
@@ -307,7 +291,7 @@ export const IMAGE_WIDTH = { icon: 160, small: 360, card: 640, mid: 960, wide: 1
  * hears of a size that does not exist.
  */
 export function imageSrcSet(src: string, widths: readonly number[], originalWidth?: number | null, delivery: ImageDelivery = IMAGE_DELIVERY): string | undefined {
-	if (delivery === "variants" && !srcHasVariants(src) && !srcUsesCgiInVariantsMode(src)) return undefined;
+	if (delivery === "variants" && !srcHasVariants(src)) return undefined;
 	if (delivery !== "variants" || !srcHasVariants(src)) {
 		if (imageAt(src, widths[0], delivery) === src) return undefined;
 		return widths.map((width) => `${imageAt(src, width, delivery)} ${width}w`).join(", ");

@@ -125,3 +125,13 @@ Hai cách vào R2:
 - Cổng 0,96 gần như không bao giờ chặn ở độ sáng (0 biến thể bị loại vì cổng; chỉ 1 AVIF và 2 WebP phải lên mức cao hơn): SSIM của thí nghiệm trước tính thêm trên các kênh màu nên thấp hơn. Chỗ quyết định thực sự là **quy tắc kích thước gốc**: 130 biến thể không ghi vì không nhỏ hơn bản gốc thu nhỏ (75 AVIF và 9 WebP ở bậc 160, nơi tiêu đề tệp AVIF đã lớn hơn JPEG nhỏ xíu), và 274 AVIF phải hạ xuống q60.
 - Giao đúng bậc (trung vị tỉ lệ byte biến thể so với ảnh gốc của chính nó): khung 360 px AVIF 0,09 và WebP 0,09; 640 px là 0,19 và 0,21; 960 px là 0,28 và 0,30; 1280 px là 0,36 và 0,41.
 - Dung lượng thêm cho bucket: với mẫu này AVIF cộng WebP bằng khoảng 1,9 lần byte gốc (tính cả bậc `max`; ảnh WordPress cũ rộng 668 px chỉ có bậc `max` và vài bậc nhỏ).
+
+## Biến thể ảnh tạo lúc tải lên (24/11/2026)
+
+Ảnh tải lên từ admin (`cms/<id>/v<n>/…`) có biến thể ngay khi lưu, không tốn hạn mức `/cdn-cgi/image` và không tốn CPU Worker:
+
+- **Trình duyệt dựng** (`makeVariants` trong `src/components/admin/media/imageTools.ts`): với ảnh JPEG/PNG/WebP, một bản WebP chất lượng 0,85 cho mỗi chiều rộng chuẩn nhỏ hơn chiều rộng ảnh (160, 360, 640, 960, 1280, 1920), thu nhỏ từng bước một nửa để không răng cưa, và `@max` ở đúng chiều rộng ảnh (tối đa 2560) khi nó nhỏ hơn tệp đã lưu (nếu không, trang giao chính tệp đó). GIF không có biến thể. Gửi kèm trong cùng yêu cầu multipart, các trường `v160` … `vmax`.
+- **Máy chủ kiểm** (`src/admin/media/variants.ts`): chỉ giữ tệp thật sự là WebP (đọc từ byte), đúng kích thước mà bước đó nghĩa là (min(bước, chiều rộng ảnh), cùng tỷ lệ), tối đa 4 MB mỗi tệp; bản sai bị bỏ lặng lẽ, không làm hỏng việc tải lên. Ghi vào R2 ở `<khóa>@<bước>.webp`. Một bản ghi lỗi chỉ bị bỏ qua (trang rơi về bản lớn hơn hoặc tệp gốc).
+- **Cùng vòng đời với ảnh**: thay ảnh, cắt lại, xóa bản cắt và xóa hẳn khỏi thùng rác đều xóa luôn biến thể của tệp cũ; nếu ghi D1 lỗi thì tệp và biến thể vừa ghi bị dọn. Bản cắt cũng được dựng biến thể.
+- **Không có AVIF**: trình duyệt không tự mã hóa AVIF. Route `/anh-goc/` rơi từ AVIF sang WebP, nên ảnh admin giao WebP. Muốn có AVIF thì chạy `scripts/media-variants.mjs` với `--keys-file` cho các khóa `cms/` (dùng được cho ảnh cũ tải lên trước ngày này).
+- `s2-cnv03/cms/` nay nằm trong `VARIANT_PREFIXES` (cả hai bản `media.ts`); không còn đường vòng `/cdn-cgi/image` cho ảnh admin. Ảnh `cms/` tải lên bằng bản admin cũ (trước khi deploy tính năng này) không có biến thể và rơi về tệp gốc; lúc tính năng ra, thư viện chưa có ảnh `cms/` nào.

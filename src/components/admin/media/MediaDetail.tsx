@@ -5,7 +5,7 @@ import { api, ApiClientError } from "../api";
 import { useAdmin } from "../AdminProvider";
 import { Alert, errorText, fieldErrors, Loading, when } from "../ui";
 import { CropTool } from "./CropTool";
-import { flattenFolders, formatBytes, formatNumber, postForm, prepareImage, SHAPES, useLoader, type Folder, type MediaDetailData, type MediaItem } from "./imageTools";
+import { appendVariants, flattenFolders, formatBytes, formatNumber, postForm, prepareImage, SHAPES, useLoader, type Folder, type MediaDetailData, type MediaItem } from "./imageTools";
 
 const ENTITY: Record<string, string> = {
 	post: "Bài viết",
@@ -119,6 +119,7 @@ function Body({ detail, folders, reload, onChanged, onDeleted }: { detail: Media
 			const prepared = await prepareImage(file);
 			const form = new FormData();
 			form.append("file", prepared.blob, prepared.name);
+			await appendVariants(form, file, { width: prepared.width, height: prepared.height, bytes: prepared.blob.size });
 			await postForm<MediaItem>("PUT", `${base}/file`, form);
 			setMessage(`Đã thay ảnh. Mọi nơi đang dùng ảnh này đều hiện ảnh mới.${detail.crops.length ? " Các bản cắt cũ đã bị xóa, hãy cắt lại nếu cần." : ""}`);
 			onChanged();
