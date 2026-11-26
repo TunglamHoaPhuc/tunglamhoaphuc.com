@@ -6,6 +6,7 @@ import type { PostExtra } from "@/libs/content/types";
 export function safeBookLink(link: string | null): { href: string; external: boolean } | null {
 	const value = (link ?? "").trim();
 	// A backslash, a space or a control character inside is read by browsers as another address ("/\evil.example" is "//evil.example").
+	// eslint-disable-next-line no-control-regex -- the control characters are exactly what this check rejects
 	if (!value || /[\\\s\u0000-\u001f\u007f]/.test(value)) return null;
 	if (/^\/(?!\/)/.test(value)) return { href: value, external: false };
 	if (/^https?:\/\//i.test(value)) return { href: value, external: true };

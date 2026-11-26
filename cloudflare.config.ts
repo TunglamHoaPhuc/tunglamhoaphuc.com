@@ -13,7 +13,10 @@ export default defineConfig({
     entrypoint: "vinext/server/fetch-handler",
     compatibilityDate: "2026-11-02",
     compatibilityFlags: ["nodejs_compat"],
-    domains: ["quantri.tunglamhoaphuc.com", "v2.tunglamhoaphuc.com"],
+    // Only the admin host. www and the bare domain belong to the Worker tlhp-v3 (since 23/11/2026), and v2. was
+    // taken off this Worker on 25/11/2026 to stop spending Cloudflare resources on it; listing them here would let
+    // the next deploy attach v2. again or try to take www from tlhp-v3.
+    domains: ["quantri.tunglamhoaphuc.com"],
     workersDev: false,
     observability: { enabled: true },
     assets: {
@@ -33,7 +36,7 @@ export default defineConfig({
       // The site's data (T23, T24): read when CONTENT_SOURCE is d1.
       DB: bindings.d1({ id: "dfee6bc6-9acf-4fcf-b25c-3ca1535c689a", name: "tlhp-db" }),
       // Where pages read the content: snapshot | b2 | d1 (src/libs/content/repository.ts). One Worker serves
-      // v2. and, after T22, www, so this is the one switch for both. `npm run deploy:v2` sets
+      // the admin host (quantri.), so this is its one switch. `npm run deploy:v2` sets
       // TLHP_CONTENT_SOURCE to d1 (scripts/deploy-v2.mjs); everything run locally (dev, preview, CI's
       // e2e), where the simulated D1 is empty, reads the snapshot.
       CONTENT_SOURCE: bindings.text(process.env.TLHP_CONTENT_SOURCE ?? "snapshot"),

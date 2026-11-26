@@ -29,8 +29,13 @@
 	"dependencies": {
 		"@gsap/react": "^2.1.2",
 		"@noble/hashes": "^2.4.0",
+		"@tiptap/extension-highlight": "^3.35.0",
 		"@tiptap/extension-image": "^3.35.0",
+		"@tiptap/extension-subscript": "^3.35.0",
+		"@tiptap/extension-superscript": "^3.35.0",
 		"@tiptap/extension-table": "^3.35.0",
+		"@tiptap/extension-text-align": "^3.35.0",
+		"@tiptap/extension-text-style": "^3.35.0",
 		"@tiptap/extension-youtube": "^3.35.0",
 		"@tiptap/pm": "^3.35.0",
 		"@tiptap/react": "^3.35.0",

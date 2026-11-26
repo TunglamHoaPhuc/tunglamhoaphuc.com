@@ -2,8 +2,6 @@
 
 Trang web chùa Tùng Lâm Hòa Phúc: trang công khai (Next.js App Router chạy bằng **vinext** trên Cloudflare Workers, giao diện Bexon + Bootstrap/SCSS) và **Admin CMS** tại `/quan-tri`.
 
-> **Sau khi V3 làm trang chính** (kế hoạch: `docs/van-hanh/chuyen-v3-lam-site-chinh.md`): Worker `tlhp-web` của repo này **chỉ còn là admin**, ở `https://quantri.tunglamhoaphuc.com`; `www.tunglamhoaphuc.com` do Worker V3 (`tlhp-v3`, repo `tlhp-v3-doc`) phục vụ. Trên host `quantri.` mọi trang công khai của repo này chuyển 308 sang `www` cùng đường dẫn (`next.config.js`), nên đừng thêm tính năng công khai ở đây. Mọi liên kết từ admin ra trang công khai là địa chỉ tuyệt đối `PUBLIC_SITE_URL` (`src/config/site.ts`). Trước ngày chuyển, các mục dưới đây về "admin trên www" vẫn đúng.
-
 ## Cấu trúc thư mục
 
 | Đường dẫn | Nội dung |
@@ -16,7 +14,7 @@ Trang web chùa Tùng Lâm Hòa Phúc: trang công khai (Next.js App Router ch�
 | `src/libs/siteData.ts` | Trang công khai đọc cấu hình và menu do admin sửa (có dự phòng `src/config/site.ts`) |
 | `src/db/schema.ts`, `migrations/` | Schema D1 và migration (0000 khởi tạo; 0001–0004 cho admin) |
 | `scripts/` | `dev-db.ts` (D1 cục bộ), `import.ts` (nhập snapshot), `backfill-admin.ts`, … |
-| `docs/admin-architecture.md` | Thiết kế admin đã duyệt; `docs/site-inventory.md` kiểm kê trang; `docs/van-hanh/` vận hành (`chuyen-v3-lam-site-chinh.md`: trình tự chuyển V3 làm trang chính và dời admin sang `quantri.`) |
+| `docs/admin-architecture.md` | Thiết kế admin đã duyệt; `docs/site-inventory.md` kiểm kê trang; `docs/van-hanh/` vận hành |
 | `tests/unit`, `tests/e2e` | Vitest và Playwright |
 
 ## Biến môi trường và bí mật của admin
@@ -27,15 +25,10 @@ Chỉ tên biến, không bao giờ ghi giá trị vào repo. Cục bộ nằm t
 |---|---|
 | `ADMIN_JWT_SECRET` | Ký token truy cập (≥ 32 byte ngẫu nhiên) |
 | `ADMIN_ENC_KEY` | Khóa AES-256 (base64 của 32 byte): mã hóa bí mật 2FA và mật khẩu SMTP |
-| `ADMIN_BASE_URL` | Địa chỉ duy nhất mà admin trả lời: `https://quantri.tunglamhoaphuc.com` (trước ngày chuyển V3: `https://www.tunglamhoaphuc.com`); ở tên miền khác admin trả 404. Cũng là gốc của liên kết trong thư đặt lại mật khẩu |
+| `ADMIN_BASE_URL` | Địa chỉ duy nhất mà admin trả lời, hiện là `https://quantri.tunglamhoaphuc.com`; ở tên miền khác admin trả 404 |
 | `ADMIN_SEED_EMAIL`, `ADMIN_SEED_PASSWORD` | Chỉ dùng khi tạo Super Admin đầu tiên (`--seed`); tài khoản đó bị buộc đổi mật khẩu ở lần đăng nhập đầu |
 
-`cloudflare.config.ts` chỉ khai báo các biến trên khi chạy `vite dev` hoặc khi build với `TLHP_ADMIN=1`. **Admin đã bật trên www từ 22/11/2026** (xem `docs/van-hanh/d1.md` mục 7) và **dời sang `quantri.` khi V3 làm trang chính** (`docs/van-hanh/chuyen-v3-lam-site-chinh.md`). `v2.` và `www` (cho tới ngày chuyển) dùng chung một Worker `tlhp-web`, nên **mọi lần deploy phải giữ cả hai biến**, từ một worktree sạch:
-
-- từ ngày admin ở `quantri.`: `TLHP_ADMIN=1 ADMIN_BASE_URL=https://quantri.tunglamhoaphuc.com npm run deploy:v2`; Worker không còn phục vụ `www`, cookie phiên là `__Host-` (theo host) nên đổi host thì mọi người đăng nhập lại;
-- trước ngày đó: `TLHP_ADMIN=1 ADMIN_BASE_URL=https://www.tunglamhoaphuc.com npm run deploy:v2`.
-
-Thiếu một trong hai biến thì `/api/quan-tri` trả `503` ("thiếu: ADMIN_BASE_URL") và không đăng nhập được (đã xảy ra sau một lần deploy 22/11); `npm run deploy:v2` dừng ngay khi có `TLHP_ADMIN=1` mà `ADMIN_BASE_URL` trống, không phải https, hoặc trỏ về máy cục bộ (`scripts/deploy-env.mjs`). Mật khẩu băm Argon2id tốn 236–605 ms CPU mỗi lần, nên admin cần gói Workers Paid, đang có hiệu lực; không đổi gói cước.
+`cloudflare.config.ts` chỉ khai báo các biến trên khi chạy `vite dev` hoặc khi build với `TLHP_ADMIN=1`. **Admin chạy ở `quantri.tunglamhoaphuc.com`** (Worker `tlhp-web`, xem `docs/van-hanh/d1.md` mục 7). Từ 23/11/2026 www và tên miền gốc do Worker `tlhp-v3` phục vụ, và `v2.` đã gỡ khỏi `tlhp-web` ngày 25/11/2026, nên **mọi lần deploy `tlhp-web` phải giữ cả hai biến**, từ một worktree sạch: `TLHP_ADMIN=1 ADMIN_BASE_URL=https://quantri.tunglamhoaphuc.com npm run deploy:v2`. `npm run deploy:v2` dừng ngay khi có `TLHP_ADMIN=1` mà `ADMIN_BASE_URL` trống, không phải https, hoặc trỏ về máy cục bộ (`scripts/deploy-env.mjs`). Thiếu chúng thì `/api/quan-tri` trả `503` ("thiếu: ADMIN_BASE_URL") và không đăng nhập được (đã xảy ra sau một lần deploy 22/11). Mật khẩu băm Argon2id tốn 236–605 ms CPU mỗi lần, nên admin cần gói Workers Paid, đang có hiệu lực; không đổi gói cước.
 
 ## Lệnh
 
@@ -64,3 +57,14 @@ Tài khoản đăng nhập thử cục bộ nằm trong `.dev.vars` (`ADMIN_SEED
 ## Vận hành admin
 
 Xem `docs/admin-architecture.md` (thiết kế), `docs/van-hanh/` (D1, ảnh, sao lưu, chuyển www). Các tài khoản, vai trò và quyền quản lý tại `/quan-tri/tai-khoan` và `/quan-tri/vai-tro`; nhật ký tại `/quan-tri/nhat-ky`; thùng rác tại `/quan-tri/thung-rac`.
+
+## Trình soạn thảo bài viết (nhánh feat/admin-editor-optimization)
+
+- `src/components/admin/content/RichEditor.tsx` + `editorExtensions.ts`: TipTap với phông (3 phông cố định), cỡ chữ, màu chữ, tô sáng, căn lề, thụt lề, giãn dòng, sub/sup, bảng (gộp/tách ô), ảnh có độ rộng và căn lề, liên kết nofollow, dán sạch từ Word/Docs (`cleanPastedHtml`), đếm từ, mục lục tiêu đề.
+- Định dạng được lưu là `style` nội tuyến, và **chỉ** những thuộc tính trong `safeStyle` (`src/admin/content/html.ts`) được máy chủ giữ; thêm một kiểu định dạng mới phải thêm ở đó kèm test (`tests/unit/admin/content-style.test.ts`). Trang V3 là repo riêng, hiển thị các style này qua HTML đã lọc.
+- `localDraft.ts`: bản nháp thân bài trên trình duyệt (3 giây sau khi ngừng gõ), không bao giờ tự gửi lên máy chủ.
+- Danh sách bài có chọn nhiều và xuất bản/xóa hàng loạt; chạy từng bài qua endpoint đơn nên quyền và phiên bản kiểm từng bài.
+- e2e: `tests/e2e/admin/editor-format.spec.ts`. Chạy trên bản build (`TLHP_ADMIN=1 TLHP_CONTENT_SOURCE=d1 ADMIN_BASE_URL=http://localhost:3021 npx vite build --config vite.e2e.config.ts`, rồi `vite preview --config vite.e2e.config.ts --port 3021`, `.dev.vars` cùng địa chỉ). Dev server không dùng được cho e2e admin.
+- Checklist (TaskList/TaskItem) đã có; HTML lưu `ul[data-type=taskList] > li[data-type=taskItem][data-checked]`, trang công khai và V3 cần CSS riêng để vẽ ô tích. Thư viện Media đã tải lười, bộ chọn chỉ dựng khi mở.
+- Giao diện admin thu nhỏ 7% bằng `--tq-zoom: 0.93` (admin.css; mọi `100vh` chia cho biến này). Thanh lọc `role="search"` là lưới chia đều; danh sách bài thêm `tq-toolbar--row` để nằm một hàng từ 1100px.
+- Chưa làm: mục lục tự động trên trang công khai (mã trang công khai và V3 do phiên khác giữ).

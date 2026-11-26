@@ -2,9 +2,10 @@
 // the home blocks name (by media id). Read only when the site reads its content from D1 (CONTENT_SOURCE=d1); anywhere else, or when
 // a read fails, the page gets nothing extra and shows what is written in src/config/site.ts. Fresh every minute, like siteData.
 import { MEDIA_BASE } from "./content/media";
-import { contentSource, renewing } from "./content/repository";
+import { contentSource, lazy } from "./content/repository";
 import type { D1Like } from "./content/sources/d1";
 import { readHero, readQuotesSetting, readWelcome } from "./homeSettings";
+import { renewingAsync } from "./renew-async";
 import { getSettings, type SettingsMap } from "./siteData";
 
 export type HomeQuote = { id: string; text: string; author: string; source: string; sourceUrl: string };
@@ -58,7 +59,7 @@ const source = (async () => {
 	const workers = (await (import("cloudflare:workers" as string) as Promise<{ env?: { DB?: D1Like } }>).catch(() => ({}) as { env?: { DB?: D1Like } })) as { env?: { DB?: D1Like } };
 	const db = workers.env?.DB;
 	if (!db) return () => Promise.resolve(EMPTY_HOME_EXTRAS);
-	return renewing(
+	return renewingAsync(
 		() =>
 			getSettings()
 				.then((settings) => readHomeExtras(db, settings))
@@ -67,13 +68,14 @@ const source = (async () => {
 					return EMPTY_HOME_EXTRAS;
 				}),
 		60_000,
+		{ name: "homeData" },
 	);
 });
 
-let pending: Promise<() => Promise<HomeExtras>> | undefined;
+// What is kept is the function `source` made, once it exists; never the pending promise of making it.
+const reader = lazy(source, "homeData.setup");
 
 /** What the admin set for the home page, or nothing (`EMPTY_HOME_EXTRAS`): the page then looks as it always has. */
 export async function getHomeExtras(): Promise<HomeExtras> {
-	pending ??= source();
-	return (await pending)();
+	return (await reader())();
 }

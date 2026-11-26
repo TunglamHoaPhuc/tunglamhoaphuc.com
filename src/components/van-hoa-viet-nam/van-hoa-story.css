@@ -1,0 +1,796 @@
+/* Triển lãm số "Văn Hóa Soi Đường, Đạo Sáng Non Sông" (/van-hoa-viet-nam).
+   Phần CSS viết tay: nền, phông, bố cục khung ảnh, mặt nạ sương, lớp phủ đọc chữ, nút, thanh điều hướng và
+   MỌI chuyển động. Các lớp tiện ích (flex, gap, cỡ chữ...) nằm ở van-hoa-tailwind.css (sinh bằng
+   scripts/van-hoa-css.mjs). Mọi selector bắt đầu bằng .vh- hoặc nằm trong .vh-root.
+
+   Quy ước của web này:
+   - mọi chuyển động chỉ khai báo trong @media (prefers-reduced-motion: no-preference); khối cuối tệp tắt
+     hẳn animation và transition khi người xem chọn giảm chuyển động (ảnh đổi bằng cắt, chữ hiện ngay);
+   - không chữ nào dưới 16px (kể cả chú thích, nhãn, gợi ý); bố cục co giãn thay vì hạ cỡ chữ. */
+
+/* ---------------------------------------------------------------------------
+   Phông: UTM ClassizismAntiqua (nhãn, dòng phụ). Web mới chưa khai báo phông này ở fonts.css nên
+   khai báo riêng, đặt tên riêng để không đổi diện mạo các trang khác. UTM Niagara và UTM Avo đã có ở fonts.css.
+   --------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'TLHP VH Antiqua';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./utm-classizism-antiqua.woff2') format('woff2');
+}
+
+/* Chặn kéo-để-tải-lại và hiệu ứng nảy cuối trang (Chrome Android): trang này không cuộn tài liệu. */
+html:has(.vh-root),
+body:has(.vh-root) {
+  overscroll-behavior: none;
+}
+
+.vh-root {
+  --vh-font-display: 'UTM Niagara', 'UTM Niagara Fallback', serif;
+  --vh-font-label: 'TLHP VH Antiqua', 'Noto Serif', Georgia, serif;
+  --vh-font-text: 'UTM Avo', 'UTM Avo Fallback', 'Be Vietnam Pro', sans-serif;
+
+  font-family: var(--vh-font-text);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-align: left;
+  color: #e8dfd3;
+  background: #0a0806;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.vh-stage-bg {
+  background: #0a0806;
+}
+
+/* ---------------------------------------------------------------------------
+   Thay phần Preflight của Tailwind (không nạp): đặt lại những gì Bootstrap / theme của web đã đặt.
+   Độ ưu tiên (0,1,0) trở lên nên thắng các selector phần tử của Bootstrap.
+   --------------------------------------------------------------------------- */
+.vh-root,
+.vh-root *,
+.vh-root *::before,
+.vh-root *::after {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: currentColor;
+  /* Theme có `transition: all 0.3s` cho span, p, a, button, h1-h6: tắt, chuyển động khai báo riêng ở cuối tệp. */
+  transition: none;
+}
+
+.vh-root :where(h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd, ul, ol, pre) {
+  margin: 0;
+}
+
+.vh-root :where(h1, h2, h3, h4, h5, h6) {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+.vh-root :where(ul, ol) {
+  list-style: none;
+  padding: 0;
+}
+
+.vh-root :where(a) {
+  color: inherit;
+  text-decoration: inherit;
+}
+
+.vh-root :where(button) {
+  font: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  border-radius: 0;
+  text-align: inherit;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.vh-root :where(button:disabled) {
+  cursor: not-allowed;
+}
+
+.vh-root :where(img, svg, video) {
+  display: block;
+  max-width: 100%;
+}
+
+.vh-root :where(dialog) {
+  color: inherit;
+  padding: 0;
+}
+
+/* Theme của web vẽ khung, nền và dấu ngoặc kép cho blockquote: ở đây trích dẫn chỉ có vạch bên cạnh. */
+.vh-root blockquote {
+  background: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  border-radius: 0;
+  box-shadow: none;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-right: 0;
+}
+.vh-root blockquote p,
+.vh-root blockquote footer {
+  font-family: var(--vh-font-text);
+  font-weight: 400;
+}
+.vh-root blockquote::before,
+.vh-root blockquote::after {
+  content: none;
+  display: none;
+}
+
+.vh-root em,
+.vh-root strong {
+  font-family: inherit;
+}
+
+/* Vòng lấy nét rõ trên mọi nút, liên kết và vùng cuộn được: 3px vàng sáng, tương phản cao trên nền tối. */
+.vh-root :focus-visible {
+  outline: 3px solid #ffde59;
+  outline-offset: 2px;
+  box-shadow: none;
+}
+
+.vh-font-display {
+  font-family: var(--vh-font-display);
+  font-weight: 400;
+}
+.vh-font-label {
+  font-family: var(--vh-font-label);
+  font-weight: 400;
+}
+.vh-font-text {
+  font-family: var(--vh-font-text);
+}
+
+.vh-text-shadow {
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9);
+}
+
+.vh-title {
+  margin: 0;
+  text-shadow: 0 6px 26px rgba(0, 0, 0, 0.88);
+}
+
+/* Vùng cuộn được: thanh cuộn mảnh nhưng thấy được, để người xem biết chữ còn tiếp. */
+.vh-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(242, 193, 78, 0.6) transparent;
+  overscroll-behavior: contain;
+}
+
+/* ---------------------------------------------------------------------------
+   Hộp thoại gốc <dialog>
+   --------------------------------------------------------------------------- */
+dialog.vh-modal-dialog:modal {
+  overscroll-behavior: contain;
+  margin: auto;
+  max-width: min(920px, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2.5rem);
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+dialog.vh-modal-dialog::backdrop {
+  background: rgba(8, 6, 4, 0.88);
+  backdrop-filter: blur(16px);
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+/* ---------------------------------------------------------------------------
+   KHUNG ẢNH GIỮ NGUYÊN TỶ LỆ (không cắt) + MẶT NẠ SƯƠNG BỐN CẠNH
+   Tỷ lệ --img-ratio ghi sẵn trong data nên khung có kích thước đúng ngay từ lúc dựng
+   (không xê dịch bố cục khi ảnh tải xong).
+   --------------------------------------------------------------------------- */
+.vh-photo-stage-box {
+  container-type: size;
+}
+
+.vh-exact-fit-frame {
+  position: relative;
+  flex: none;
+  width: min(100cqw, calc(100cqh * var(--img-ratio, 1)));
+  height: min(100cqh, calc(100cqw / var(--img-ratio, 1)));
+}
+
+.vh-feather-photo-all,
+.vh-layer .vh-exact-fit-frame {
+  --vh-mask-x: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 6%,
+    rgba(0, 0, 0, 0.85) 14%,
+    black 22%,
+    black 78%,
+    rgba(0, 0, 0, 0.85) 86%,
+    rgba(0, 0, 0, 0.35) 94%,
+    transparent 100%
+  );
+  --vh-mask-y: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.35) 6%,
+    rgba(0, 0, 0, 0.85) 14%,
+    black 22%,
+    black 78%,
+    rgba(0, 0, 0, 0.85) 86%,
+    rgba(0, 0, 0, 0.35) 94%,
+    transparent 100%
+  );
+  -webkit-mask-image: var(--vh-mask-x), var(--vh-mask-y);
+  -webkit-mask-composite: source-in;
+  mask-image: var(--vh-mask-x), var(--vh-mask-y);
+  mask-composite: intersect;
+}
+
+/* Lớp hình toàn màn hình: mỗi lớp một thẻ <img>, mọi bố cục do thuộc tính data-* và truy vấn phương tiện chọn. */
+.vh-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #0a0806;
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.vh-layer[data-active='true'] {
+  opacity: 1;
+  z-index: 2;
+}
+.vh-layer .vh-photo-stage-box {
+  position: absolute;
+  display: flex;
+}
+
+/* Điện thoại: ảnh dọc chiếm cả chiều cao (chữ nằm đè lên phần tối ở dưới), ảnh ngang nằm ở nửa trên. */
+.vh-layer[data-orient='portrait'] .vh-photo-stage-box {
+  top: 62px;
+  bottom: 84px;
+  left: 0;
+  right: 0;
+  align-items: flex-start;
+  justify-content: center;
+}
+.vh-layer[data-orient='landscape'] .vh-photo-stage-box {
+  top: 72px;
+  left: 8px;
+  right: 8px;
+  height: 38dvh;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Lớp phủ đọc chữ: tối đủ đậm ở nơi có chữ để chữ đạt tương phản 4.5:1 trên mọi ảnh. */
+.vh-layer[data-orient='portrait'] .vh-scrim {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 8, 6, 0.72) 0%,
+    rgba(10, 8, 6, 0.14) 14%,
+    rgba(10, 8, 6, 0.2) 28%,
+    rgba(10, 8, 6, 0.72) 36%,
+    rgba(10, 8, 6, 0.92) 42%,
+    rgba(10, 8, 6, 0.97) 54%,
+    rgba(10, 8, 6, 0.99) 100%
+  );
+}
+.vh-layer[data-orient='landscape'] .vh-scrim {
+  background: linear-gradient(
+    180deg,
+    rgba(10, 8, 6, 0.76) 0%,
+    rgba(10, 8, 6, 0.12) 9%,
+    rgba(10, 8, 6, 0.16) 38%,
+    rgba(10, 8, 6, 0.9) 47%,
+    rgba(10, 8, 6, 0.97) 56%,
+    #0a0806 100%
+  );
+}
+
+@media (min-width: 1024px) {
+  /* Máy tính: ảnh dọc và ảnh ngang kiểu "side" nằm về một nửa, chữ ở nửa kia. */
+  .vh-layer[data-orient='portrait'] .vh-photo-stage-box,
+  .vh-layer[data-orient='landscape'][data-layout='side'] .vh-photo-stage-box {
+    top: 16px;
+    bottom: 16px;
+    height: auto;
+    width: 54vw;
+    align-items: center;
+  }
+  .vh-layer[data-orient='landscape'][data-layout='full'] .vh-photo-stage-box {
+    top: 12px;
+    bottom: 12px;
+    left: 12px;
+    right: 12px;
+    height: auto;
+    align-items: center;
+    justify-content: center;
+  }
+  .vh-layer[data-focal='right'][data-orient='portrait'] .vh-photo-stage-box,
+  .vh-layer[data-focal='right'][data-layout='side'] .vh-photo-stage-box {
+    right: 16px;
+    left: auto;
+    justify-content: flex-end;
+  }
+  .vh-layer[data-focal='left'][data-orient='portrait'] .vh-photo-stage-box,
+  .vh-layer[data-focal='left'][data-layout='side'] .vh-photo-stage-box {
+    left: 16px;
+    right: auto;
+    justify-content: flex-start;
+  }
+
+  /* Sương: cạnh trong của ảnh một nửa tan sâu hơn, ba cạnh còn lại nhẹ. */
+  .vh-layer[data-focal='right'][data-orient='portrait'] .vh-exact-fit-frame,
+  .vh-layer[data-focal='right'][data-layout='side'] .vh-exact-fit-frame {
+    --vh-mask-x: linear-gradient(
+      to right,
+      transparent 0%,
+      rgba(0, 0, 0, 0.35) 10%,
+      rgba(0, 0, 0, 0.85) 20%,
+      black 30%,
+      black 82%,
+      rgba(0, 0, 0, 0.45) 93%,
+      transparent 100%
+    );
+    --vh-mask-y: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 0, 0, 0.45) 6%,
+      black 15%,
+      black 84%,
+      rgba(0, 0, 0, 0.45) 94%,
+      transparent 100%
+    );
+  }
+  .vh-layer[data-focal='left'][data-orient='portrait'] .vh-exact-fit-frame,
+  .vh-layer[data-focal='left'][data-layout='side'] .vh-exact-fit-frame {
+    --vh-mask-x: linear-gradient(
+      to left,
+      transparent 0%,
+      rgba(0, 0, 0, 0.35) 10%,
+      rgba(0, 0, 0, 0.85) 20%,
+      black 30%,
+      black 82%,
+      rgba(0, 0, 0, 0.45) 93%,
+      transparent 100%
+    );
+    --vh-mask-y: linear-gradient(
+      to bottom,
+      transparent 0%,
+      rgba(0, 0, 0, 0.45) 6%,
+      black 15%,
+      black 84%,
+      rgba(0, 0, 0, 0.45) 94%,
+      transparent 100%
+    );
+  }
+
+  /* Chữ ở TRÁI (ảnh bên phải): lớp phủ đậm đến hết cột chữ (46% bề rộng) rồi mới nhạt dần. */
+  .vh-layer[data-focal='right'] .vh-scrim {
+    background:
+      linear-gradient(
+        90deg,
+        rgba(10, 8, 6, 0.96) 0%,
+        rgba(10, 8, 6, 0.9) 48%,
+        rgba(10, 8, 6, 0.5) 62%,
+        rgba(10, 8, 6, 0.1) 80%,
+        rgba(10, 8, 6, 0.12) 100%
+      ),
+      linear-gradient(180deg, rgba(10, 8, 6, 0.56) 0%, rgba(10, 8, 6, 0) 18%, rgba(10, 8, 6, 0) 80%, rgba(10, 8, 6, 0.86) 100%);
+  }
+  /* Chữ ở PHẢI (ảnh bên trái). */
+  .vh-layer[data-focal='left'] .vh-scrim {
+    background:
+      linear-gradient(
+        270deg,
+        rgba(10, 8, 6, 0.96) 0%,
+        rgba(10, 8, 6, 0.9) 48%,
+        rgba(10, 8, 6, 0.5) 62%,
+        rgba(10, 8, 6, 0.1) 80%,
+        rgba(10, 8, 6, 0.12) 100%
+      ),
+      linear-gradient(180deg, rgba(10, 8, 6, 0.56) 0%, rgba(10, 8, 6, 0) 18%, rgba(10, 8, 6, 0) 80%, rgba(10, 8, 6, 0.86) 100%);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Chú thích ảnh (tên hiện vật): có nền tối để chữ đạt tương phản trên mọi ảnh
+   --------------------------------------------------------------------------- */
+.vh-caption {
+  top: 60px;
+  left: 1rem;
+  right: 1rem;
+  margin: 0 auto;
+  width: fit-content;
+  max-width: calc(100vw - 2rem);
+  padding: 4px 14px;
+  border-radius: 12px;
+  text-align: center;
+  color: #efe3cc;
+  background: rgba(10, 8, 6, 0.82);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+@media (min-width: 1024px) {
+  .vh-caption {
+    top: auto;
+    bottom: 112px;
+    margin: 0;
+    max-width: 340px;
+    -webkit-line-clamp: 4;
+  }
+  .vh-caption-left {
+    left: 40px;
+    right: auto;
+    text-align: left;
+  }
+  .vh-caption-right {
+    left: auto;
+    right: 48px;
+    text-align: right;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Thanh trên, nút, thẻ
+   --------------------------------------------------------------------------- */
+.vh-chrome-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: #ffe5a3;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+}
+.vh-chrome-link:hover {
+  color: #ffde59;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.vh-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  border-radius: 999px;
+  font-family: var(--vh-font-text);
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.vh-glass-btn {
+  color: #ffe5a3;
+  background: rgba(10, 8, 6, 0.78);
+  border: 1px solid rgba(242, 193, 78, 0.45);
+}
+.vh-glass-btn:hover:not(:disabled) {
+  background: rgba(60, 44, 20, 0.92);
+  border-color: rgba(242, 193, 78, 0.85);
+}
+.vh-glass-btn:disabled {
+  opacity: 0.5;
+}
+
+.vh-primary-btn {
+  color: #140c07;
+  background: #f2c14e;
+  border: 1px solid #f2c14e;
+  font-weight: 600;
+}
+.vh-primary-btn:hover:not(:disabled) {
+  background: #ffde59;
+  border-color: #ffde59;
+}
+.vh-primary-btn[data-emphasis='true'] {
+  box-shadow:
+    0 0 0 3px rgba(242, 193, 78, 0.3),
+    0 0 22px rgba(242, 193, 78, 0.55);
+}
+.vh-intro-btn {
+  min-height: 48px;
+}
+
+.vh-card {
+  background: rgba(18, 12, 8, 0.9);
+  border: 1px solid rgba(242, 193, 78, 0.4);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.65);
+}
+.vh-card:hover {
+  border-color: rgba(242, 193, 78, 0.9);
+}
+.vh-card:hover .vh-card-cta {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.vh-eyebrow {
+  display: block;
+  font-family: var(--vh-font-label);
+  font-size: 1rem;
+  line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #e0c27e;
+}
+
+.vh-list-btn:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+.vh-link:hover {
+  color: #ffe8aa;
+}
+
+/* Chữ cái đầu đoạn mở đầu mỗi phần của bản toàn văn */
+.vh-drop-cap::first-letter {
+  float: left;
+  margin: 0.25rem 0.75rem 0 0;
+  font-family: var(--vh-font-label);
+  font-size: 3.75rem;
+  font-weight: 700;
+  line-height: 0.82;
+  color: #f2c14e;
+}
+
+/* ---------------------------------------------------------------------------
+   Thanh điều hướng dưới
+   --------------------------------------------------------------------------- */
+.vh-hint {
+  max-width: 100%;
+  padding: 2px 14px;
+  border-radius: 14px;
+  background: rgba(10, 8, 6, 0.85);
+  border: 1px solid rgba(242, 193, 78, 0.3);
+  line-height: 1.4;
+}
+
+.vh-nav-pill {
+  background: rgba(16, 12, 9, 0.82);
+  backdrop-filter: blur(22px) saturate(125%);
+  -webkit-backdrop-filter: blur(22px) saturate(125%);
+  border: 1px solid rgba(242, 193, 78, 0.32);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.6);
+}
+
+.vh-track {
+  position: relative;
+  height: 24px;
+  display: flex;
+  align-items: center;
+}
+.vh-track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.28);
+}
+.vh-track-fill {
+  position: absolute;
+  left: 0;
+  height: 2px;
+  width: calc(var(--vh-p, 0) * 1%);
+  border-radius: 2px;
+  background: linear-gradient(90deg, #b45309, #f2c14e, #ffde59);
+}
+.vh-track-tick {
+  position: absolute;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.45);
+}
+.vh-nav-orb {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--vh-p, 0) * 1%);
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff6d6 0%, #f2c14e 55%, #b45309 100%);
+  box-shadow:
+    0 0 14px rgba(242, 193, 78, 0.88),
+    0 0 4px rgba(255, 246, 214, 0.92);
+}
+
+/* Thanh tiến trình bên phải: mỗi khung là một nút 24 x 28 px */
+.vh-root nav[aria-label='Tiến trình'] {
+  padding: 4px 0;
+  border-radius: 12px;
+  background: rgba(10, 8, 6, 0.6);
+}
+.vh-dot-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 28px;
+  border-radius: 6px;
+}
+.vh-dot-track {
+  display: block;
+  width: 3px;
+  height: 20px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.4);
+  overflow: hidden;
+}
+.vh-dot-fill {
+  display: block;
+  width: 100%;
+  height: 0;
+  background: linear-gradient(#ffde59, #d97706);
+}
+.vh-dot-fill[data-reached='true'] {
+  height: 100%;
+}
+.vh-dot-btn[aria-current='step'] .vh-dot-track {
+  box-shadow: 0 0 0 2px #ffde59;
+}
+
+/* ---------------------------------------------------------------------------
+   Thẻ mở chương
+   --------------------------------------------------------------------------- */
+.vh-intro {
+  background: #090705;
+  color: #e8dfd3;
+}
+.vh-intro-img {
+  opacity: 0.5;
+}
+.vh-intro-veil {
+  background: radial-gradient(circle at center, rgba(10, 8, 6, 0.5) 0%, rgba(9, 7, 5, 0.92) 82%);
+}
+.vh-intro[data-phase='closing'] {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Chữ đổi: ẩn ở giữa hai khung (chỉ khi cho phép chuyển động; giảm chuyển động thì đổi ngay). */
+.vh-text-region[data-fade='out'] {
+  opacity: 0;
+}
+
+/* ---------------------------------------------------------------------------
+   CHUYỂN ĐỘNG: chỉ khi người xem không chọn giảm chuyển động.
+   Không có vòng lặp vô hạn, không có chuyển động tự chạy mãi.
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: no-preference) {
+  .vh-layer {
+    transition: opacity 0.95s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .vh-layer[data-active='true']:not([data-initial='true']) {
+    animation: vh-layer-in 1.05s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  }
+  @keyframes vh-layer-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .vh-intro {
+    transition: opacity 0.7s ease-out;
+  }
+  .vh-intro[data-animate='true'] {
+    animation: vh-intro-in 0.7s ease-out backwards;
+  }
+  @keyframes vh-intro-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .vh-text-region {
+    transition: opacity 0.24s ease;
+  }
+  @keyframes vh-text-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  .vh-title-crossfade {
+    animation: vh-text-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .vh-body-crossfade {
+    animation: vh-text-in 0.82s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .vh-char-reveal {
+    opacity: 0;
+    animation: vh-char-reveal 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes vh-char-reveal {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+      filter: blur(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+      filter: blur(0);
+    }
+  }
+  .vh-divider-bloom {
+    opacity: 0;
+    animation: vh-divider-bloom 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  @keyframes vh-divider-bloom {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .vh-track-fill {
+    transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .vh-nav-orb {
+    transition: left 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .vh-dot-fill {
+    transition: height 0.5s ease;
+  }
+
+  /* Đổi màu khi rê chuột: chỉ màu, không dịch chuyển. */
+  .vh-icon-btn,
+  .vh-card,
+  .vh-link,
+  .vh-list-btn,
+  .vh-chrome-link {
+    transition:
+      color 0.2s ease,
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+}
+
+/* Giảm chuyển động: không animation, không transition nào trong trang này. */
+@media (prefers-reduced-motion: reduce) {
+  .vh-root,
+  .vh-root *,
+  .vh-root *::before,
+  .vh-root *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

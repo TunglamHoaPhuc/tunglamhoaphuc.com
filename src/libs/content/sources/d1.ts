@@ -125,7 +125,13 @@ async function galleries(all: <T extends Row>(sql: string, ...params: unknown[])
 
 export function createD1Repository(db: D1Like): ContentRepository {
 	async function all<T extends Row = Row>(sql: string, ...params: unknown[]): Promise<T[]> {
-		return (await db.prepare(sql).bind(...params).all<T>()).results;
+		try {
+			return (await db.prepare(sql).bind(...params).all<T>()).results;
+		} catch (error) {
+			// The logs say which read failed (the first words of the statement), not only that one did.
+			console.error(`d1: câu lệnh lỗi: ${sql.trim().replace(/\s+/g, " ").slice(0, 80)}`, error);
+			throw error;
+		}
 	}
 
 	// Slugs are unique per section (the admin's index): the same slug in two sections is two posts, each at its own address.
@@ -141,7 +147,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 			posts.push(summaryOf(row));
 		}
 		return posts;
-	});
+	}, "d1.summaries");
 
 	const index = lazy(async () => {
 		const bySectionSlug = new Map<string, PostSummary>();
@@ -151,7 +157,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 			if (!bySlug.has(slugKey(post.slug))) bySlug.set(slugKey(post.slug), post);
 		}
 		return { bySectionSlug, bySlug };
-	});
+	}, "d1.index");
 
 	/** The extra fields of a post's category, with the library pictures and sounds they point at as addresses. */
 	async function extraOf(raw: unknown): Promise<PostExtra> {
@@ -398,7 +404,7 @@ export function createD1Repository(db: D1Like): ContentRepository {
 			bySection.set(text(row.section), places);
 		}
 		return bySection;
-	});
+	}, "d1.categoryPlaces");
 
 	// The smaller kinds go through the same code as the other sources; only posts are answered here.
 	const rest = createMemoryRepository([], { loadSchedule, loadAbout, loadTongChi, loadAreas, loadStatues, loadQuotes });

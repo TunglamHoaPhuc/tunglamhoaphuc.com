@@ -1,5 +1,6 @@
-# T1b: a merge into main puts the site on v2 (Worker tlhp-web). Only the deploy step sees the
-# Cloudflare secrets. The www switch (T22) is a separate, deliberate change to cloudflare.config.ts.
+# Deploys the Worker tlhp-web, which now serves only the admin (quantri.). Run by hand: a merge into main
+# no longer deploys (it would have to keep TLHP_ADMIN and ADMIN_BASE_URL, and www is served by tlhp-v3).
+# Only the deploy step sees the Cloudflare secrets.
 name: Deploy v2
 
 # Manual only since 23/11/2026: a push to main used to deploy WITHOUT TLHP_ADMIN / ADMIN_BASE_URL, which would put a Worker without the admin
@@ -28,12 +29,10 @@ jobs:
       - run: npm test
       - uses: ./.github/actions/snapshot
       # `npm run deploy:v2` builds and deploys in one go.
+      # Without these two the admin answers 503 (CLAUDE.md): keep them on every deploy.
       - run: npm run deploy:v2
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      - run: npx playwright install --with-deps chromium
-      # The deployed copy answers like the one tested: home, 404, noindex, robots, sitemap.
-      - run: npx playwright test smoke seo --project=desktop
-        env:
-          BASE_URL: https://v2.tunglamhoaphuc.com
+          TLHP_ADMIN: "1"
+          ADMIN_BASE_URL: https://quantri.tunglamhoaphuc.com

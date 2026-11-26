@@ -3,8 +3,9 @@
 // anywhere else, or when a read fails, the callers get `null`/`{}` and use what is written in src/config/site.ts.
 // A fresh read is made every minute, like the content repository.
 import { MEDIA_BASE } from "./content/media";
-import { contentSource, renewing } from "./content/repository";
+import { contentSource, lazy } from "./content/repository";
 import type { D1Like } from "./content/sources/d1";
+import { renewingAsync } from "./renew-async";
 
 type Row = Record<string, unknown>;
 const text = (value: unknown) => (typeof value === "string" ? value : "");
@@ -77,16 +78,17 @@ const loaded = (async () => {
 	const workers = (await (import("cloudflare:workers" as string) as Promise<{ env?: { DB?: D1Like } }>).catch(() => ({}) as { env?: { DB?: D1Like } })) as { env?: { DB?: D1Like } };
 	const db = workers.env?.DB;
 	if (!db) return () => Promise.resolve(EMPTY);
-	return renewing(() => load(db).catch((error: unknown) => {
+	// `renewingAsync`, not `renewing`: a read still in flight must not be awaited by another request (it can be cancelled as "hung").
+	return renewingAsync(() => load(db).catch((error: unknown) => {
 		console.error("siteData: read failed, using the defaults", error);
 		return EMPTY;
-	}), 60_000);
+	}), 60_000, { name: "siteData" });
 });
 
-let pending: Promise<() => Promise<Loaded>> | undefined;
+// What is kept is the function `loaded` made, once it exists; never the pending promise of making it.
+const reader = lazy(loaded, "siteData.setup");
 async function data(): Promise<Loaded> {
-	pending ??= loaded();
-	return (await pending)();
+	return (await reader())();
 }
 
 /** The admin's settings, or `{}`: read one with a fallback, e.g. `settings["site.info"] ?? defaults`. */

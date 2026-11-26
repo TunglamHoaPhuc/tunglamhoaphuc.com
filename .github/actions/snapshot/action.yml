@@ -1,5 +1,5 @@
 name: Content snapshot
-description: Puts data/snapshot/*.json in place (it is not in git), from cache or from the old site's public API.
+description: Puts data/snapshot/*.json in place (it is not in git), from cache, from the snapshot-data release, or (old fallback) from the old site's public API.
 runs:
   using: composite
   steps:
@@ -10,5 +10,14 @@ runs:
       with:
         path: data/snapshot
         key: snapshot-${{ hashFiles('scripts/fetch-snapshot.ts') }}-${{ steps.week.outputs.week }}
+    # www no longer serves the old site's API, so the data comes from the snapshot-data release (upload: see docs/van-hanh/ci.md).
     - shell: bash
-      run: test -f data/snapshot/posts.json -a -f data/snapshot/post-albums.json || npm run snapshot:fetch -- --albums
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        if ! test -f data/snapshot/posts.json -a -f data/snapshot/post-albums.json; then
+          mkdir -p data/snapshot
+          gh release download snapshot-data --repo "$GITHUB_REPOSITORY" --pattern snapshot.tar.gz --dir "$RUNNER_TEMP"
+          tar -xzf "$RUNNER_TEMP/snapshot.tar.gz" -C data/snapshot
+        fi
+        test -f data/snapshot/posts.json -a -f data/snapshot/post-albums.json

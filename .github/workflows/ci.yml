@@ -46,7 +46,8 @@ jobs:
           cache: npm
       - run: npm ci
       - uses: ./.github/actions/snapshot
-      - run: npm run build
+      # No Cloudflare login on the runner: build and preview with the simulated bindings (vite.e2e.config.ts).
+      - run: npx vite build --config vite.e2e.config.ts
       - run: npx playwright install --with-deps chromium
       # playwright.config.ts starts `npm run preview` on port 4173 by itself. The picture
       # comparison (visual) is on demand only.
