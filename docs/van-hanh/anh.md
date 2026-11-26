@@ -135,3 +135,5 @@ Hai cách vào R2:
 - **Cùng vòng đời với ảnh**: thay ảnh, cắt lại, xóa bản cắt và xóa hẳn khỏi thùng rác đều xóa luôn biến thể của tệp cũ; nếu ghi D1 lỗi thì tệp và biến thể vừa ghi bị dọn. Bản cắt cũng được dựng biến thể.
 - **Không có AVIF**: trình duyệt không tự mã hóa AVIF. Route `/anh-goc/` rơi từ AVIF sang WebP, nên ảnh admin giao WebP. Muốn có AVIF thì chạy `scripts/media-variants.mjs` với `--keys-file` cho các khóa `cms/` (dùng được cho ảnh cũ tải lên trước ngày này).
 - `s2-cnv03/cms/` nay nằm trong `VARIANT_PREFIXES` (cả hai bản `media.ts`); không còn đường vòng `/cdn-cgi/image` cho ảnh admin. Ảnh `cms/` tải lên bằng bản admin cũ (trước khi deploy tính năng này) không có biến thể và rơi về tệp gốc; lúc tính năng ra, thư viện chưa có ảnh `cms/` nào.
+
+**Đã deploy (26/11/2026):** tlhp-web `0effcefc`, V3 `fd0631c1`; tải thử ảnh 3000×2000 ra đủ 6 biến thể, `hit` trên www. `cloudflare.config.ts` chỉ còn domain `quantri.tunglamhoaphuc.com` (tránh kéo www khỏi `tlhp-v3`). Mọi lần deploy admin: `TLHP_ADMIN=1 ADMIN_BASE_URL=https://quantri.tunglamhoaphuc.com npm run deploy:v2`.
