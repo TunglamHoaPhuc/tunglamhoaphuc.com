@@ -1,5 +1,6 @@
 // What /tim-kiem looks in: every page the site serves, as title, a line of text and its
-// address. Made from the repository once per Worker and kept, like the repository's data.
+// address. Made from the repository once per Worker and kept, like the repository's data (the finished index is kept, never one
+// still being made: see `lazy` in content/repository.ts).
 import { calendarHref } from "@/libs/calendar";
 import type { ContentRepository, PostSummary } from "@/libs/content/types";
 import { LIVE_SECTIONS } from "@/libs/home";
@@ -8,17 +9,24 @@ import { type SearchItem, searchItem } from "@/libs/search";
 import { tongChiHref } from "@/libs/tongChiGroups";
 import { areaHref, templeAreas } from "@/libs/vuTru";
 
-const indexes = new WeakMap<ContentRepository, Promise<SearchItem[]>>();
+const indexes = new WeakMap<ContentRepository, SearchItem[]>();
 
-/** The index of this repository's content, made on the first search; made again after a failure. */
-export function searchIndex(repo: ContentRepository): Promise<SearchItem[]> {
-	let index = indexes.get(repo);
-	if (!index) {
-		index = buildIndex(repo);
-		indexes.set(repo, index);
-		index.catch(() => indexes.delete(repo));
+/**
+ * The index of this repository's content, made on the first search; made again after a failure. Only a finished index is kept: while
+ * one is being made, a search that arrives makes its own rather than awaiting the first search's (another request's) promise.
+ */
+export async function searchIndex(repo: ContentRepository): Promise<SearchItem[]> {
+	const kept = indexes.get(repo);
+	if (kept) return kept;
+	let index: SearchItem[];
+	try {
+		index = await buildIndex(repo);
+	} catch (error) {
+		console.error("searchIndex: đọc lỗi", error);
+		throw error;
 	}
-	return index;
+	if (!indexes.has(repo)) indexes.set(repo, index);
+	return indexes.get(repo) ?? index;
 }
 
 async function allPosts(repo: ContentRepository): Promise<PostSummary[]> {
