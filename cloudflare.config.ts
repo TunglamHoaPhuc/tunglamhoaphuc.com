@@ -13,7 +13,8 @@ export default defineConfig({
     entrypoint: "vinext/server/fetch-handler",
     compatibilityDate: "2026-11-02",
     compatibilityFlags: ["nodejs_compat"],
-    domains: ["v2.tunglamhoaphuc.com", "www.tunglamhoaphuc.com", "tunglamhoaphuc.com"],
+    // Only the admin: www, the bare domain and v3. belong to the Worker tlhp-v3 (moved 23/11/2026); v2. was released 25/11/2026.
+    domains: ["quantri.tunglamhoaphuc.com"],
     workersDev: false,
     observability: { enabled: true },
     assets: {
