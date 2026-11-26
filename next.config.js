@@ -1,6 +1,9 @@
 // The public hosts, as a has/missing condition. Keep in step with src/libs/hosts.ts.
 const PUBLIC_HOST = String.raw`(www\.)?tunglamhoaphuc\.com(:\d+)?`;
 const BARE_HOST = String.raw`tunglamhoaphuc\.com(:\d+)?`;
+// The admin's own host. After the cut-over (docs/van-hanh/chuyen-v3-lam-site-chinh.md) the V3 Worker is the public site
+// and this Worker serves the admin here only; the public pages it still holds must not show under this name.
+const ADMIN_HOST = String.raw`quantri\.tunglamhoaphuc\.com(:\d+)?`;
 
 // The old site's admin moves to quantri. behind Cloudflare Access (T21). Once www runs this
 // app (T22), its old addresses lead there, so bookmarks and the login page keep working.
@@ -10,6 +13,33 @@ const oldAdminRedirects = OLD_ADMIN_PATHS.flatMap((path) => [
 	{ source: path, has: [{ type: "host", value: PUBLIC_HOST }], destination: `https://quantri.tunglamhoaphuc.com${path}`, permanent: false },
 	{ source: `${path}/:rest*`, has: [{ type: "host", value: PUBLIC_HOST }], destination: `https://quantri.tunglamhoaphuc.com${path}/:rest*`, permanent: false },
 ]);
+
+// On the admin host everything but what the admin itself needs goes to the public site, at the same path (308), so no old
+// public copy shows under quantri. What stays: the admin and its API, the pictures the admin shows (/anh-goc, /cdn-cgi),
+// the framework's own files (/_next, /_vinext), the brand and picture files of the draft preview, and the files that say
+// "do not index" (robots.txt) or name the site (favicon, manifest). `/` leads to the admin (307).
+const ADMIN_HOST_KEEPS = [
+	"quan-tri(?:/|$)",
+	"api/quan-tri(?:/|$)",
+	"anh-goc(?:/|$)",
+	"cdn-cgi(?:/|$)",
+	"_next(?:/|$)",
+	"_vinext(?:/|$)",
+	"brand(?:/|$)",
+	"images(?:/|$)",
+	String.raw`favicon\.ico$`,
+	String.raw`manifest\.webmanifest$`,
+	String.raw`robots\.txt$`,
+];
+const adminHostRedirects = [
+	{ source: "/", has: [{ type: "host", value: ADMIN_HOST }], destination: "/quan-tri", permanent: false },
+	{
+		source: `/:path((?!${ADMIN_HOST_KEEPS.join("|")}).+)`,
+		has: [{ type: "host", value: ADMIN_HOST }],
+		destination: "https://www.tunglamhoaphuc.com/:path",
+		permanent: true,
+	},
+];
 
 // Safe defaults for every page and API (PageSpeed 22/11/2026, best practices): HTTPS only
 // (this host, not the subdomains), no framing by other sites, a browsing context group of
@@ -63,6 +93,7 @@ const nextConfig = {
 			// keeps the query is the better door (docs/van-hanh/chuyen-www.md); this is the fallback.
 			{ source: "/:path*", has: [{ type: "host", value: BARE_HOST }], destination: "https://www.tunglamhoaphuc.com/:path*", permanent: true },
 			...oldAdminRedirects,
+			...adminHostRedirects,
 		];
 	},
 	async headers() {

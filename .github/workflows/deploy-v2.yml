@@ -3,6 +3,8 @@
 # Only the deploy step sees the Cloudflare secrets.
 name: Deploy v2
 
+# Manual only since 23/11/2026: a push to main used to deploy WITHOUT TLHP_ADMIN / ADMIN_BASE_URL, which would put a Worker without the admin
+# on quantri. The deploy is done by hand with both variables (CLAUDE.md, docs/van-hanh/d1.md section 7).
 on:
   workflow_dispatch:
 
