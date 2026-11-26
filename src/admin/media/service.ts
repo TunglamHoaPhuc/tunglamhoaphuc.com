@@ -7,19 +7,20 @@ import { num, text, type AdminStmt, type Row } from "../db";
 import { ApiError, forbidden, notFound } from "../http/errors";
 import { likeWord, type Page } from "../http/paging";
 import { newId } from "../ids";
-import { MEDIA_BASE, imageAt, IMAGE_WIDTH } from "../../libs/content/media";
+import { MEDIA_BASE, imageAt, IMAGE_WIDTH, mediaUrl } from "../../libs/content/media";
 import { can } from "../rbac/check";
 import { slugify } from "../slug";
 import { MAX_IMAGE_BYTES, RATIOS, sniffImage, type Sniffed } from "./files";
 import type { MediaStore } from "./store";
+import { checkVariants, variantKey, variantKeys, wantsVariants, type Variant } from "./variants";
 
 const hex = (buffer: ArrayBuffer) => [...new Uint8Array(buffer)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
 const stamp = (ctx: AuthContext) => ctx.now().toISOString();
 const audit = (ctx: AuthContext, by: Authed, entry: Pick<AuditEntry, "action" | "entityType" | "entityId" | "before" | "after">) =>
 	auditStatement(ctx.db, { ...entry, userId: by.user.id, userEmail: by.user.email, ip: ctx.ip, userAgent: ctx.userAgent }, ctx.now());
 
-/** The public address of a library picture or of one the old admin left on B2 / WordPress. */
-export const mediaPath = (r2Key: string | null, url: string | null): string => (r2Key ? `${MEDIA_BASE}/${r2Key}` : (url ?? ""));
+/** The public address of a library picture, or of one the old admin left on B2 / WordPress (those come out as /anh-goc/…, so the admin, whose CSP loads only its own pictures, can show them). */
+export const mediaPath = (r2Key: string | null, url: string | null): string => (r2Key ? `${MEDIA_BASE}/${r2Key}` : (mediaUrl(url) ?? url ?? ""));
 
 export type MediaItem = {
 	id: string;
@@ -130,6 +131,14 @@ function checkFile(bytes: Uint8Array): Sniffed {
 const fileKey = (id: string, version: number, name: string, ext: string) => `cms/${id}/v${version}/${slugify(name, 60) || "anh"}.${ext}`;
 /** A cut file gets a new address each time it is cut again (`stamp`), so no cache holds the old cut. */
 const cropKey = (id: string, version: number, ratio: string, ext: string, stamp: number) => `cms/${id}/v${version}/crop-${ratio.replace(":", "x")}-${stamp.toString(36)}.${ext}`;
+/** Writes the variants the browser made, beside the picture at `key`; a failing one is skipped (the site falls back to a larger one). */
+async function putVariants(store: MediaStore, key: string, variants: Variant[] | undefined, original: { width: number; height: number }): Promise<void> {
+	if (!variants?.length || !wantsVariants(key)) return;
+	const results = await Promise.allSettled(checkVariants(variants, original).map((variant) => store.put(variantKey(key, variant.step), variant.bytes, "image/webp")));
+	for (const result of results) if (result.status === "rejected") console.error("media: variant not stored", key, result.reason);
+}
+/** The keys to delete with a picture or a crop: the file and every variant it can have. */
+export const withVariants = (key: string): string[] => [key, ...variantKeys(key)];
 const baseName = (filename: string) => filename.replace(/\.[A-Za-z0-9]{1,5}$/, "");
 
 async function checkFolder(ctx: AuthContext, folderId: string | null | undefined): Promise<string | null> {
@@ -142,7 +151,7 @@ export async function uploadMedia(
 	ctx: AuthContext,
 	by: Authed,
 	store: MediaStore,
-	input: { bytes: Uint8Array; filename: string; folderId?: string | null; alt?: string; title?: string; allowDuplicate?: boolean },
+	input: { bytes: Uint8Array; filename: string; folderId?: string | null; alt?: string; title?: string; allowDuplicate?: boolean; variants?: Variant[] },
 ): Promise<MediaItem> {
 	const kind = checkFile(input.bytes);
 	const folderId = await checkFolder(ctx, input.folderId);
@@ -156,6 +165,7 @@ export async function uploadMedia(
 	const key = fileKey(id, 1, baseName(filename), kind.ext);
 	const now = stamp(ctx);
 	await store.put(key, input.bytes, kind.mime);
+	await putVariants(store, key, input.variants, kind);
 	try {
 		await ctx.db.batch([
 			ctx.db
@@ -167,7 +177,7 @@ export async function uploadMedia(
 			audit(ctx, by, { action: "media.upload", entityType: "media", entityId: id, after: { filename, size: input.bytes.length, width: kind.width, height: kind.height, folderId } }),
 		]);
 	} catch (error) {
-		await store.delete([key]).catch(() => undefined);
+		await store.delete(withVariants(key)).catch(() => undefined);
 		throw error;
 	}
 	return toItem(await findRow(ctx, id));
@@ -206,7 +216,7 @@ export async function updateMedia(ctx: AuthContext, by: Authed, id: string, inpu
 }
 
 /** Puts a new file in place of the old one: same id, next version, new address; the old file and its crops go. */
-export async function replaceMediaFile(ctx: AuthContext, by: Authed, store: MediaStore, id: string, input: { bytes: Uint8Array; filename: string }): Promise<MediaItem> {
+export async function replaceMediaFile(ctx: AuthContext, by: Authed, store: MediaStore, id: string, input: { bytes: Uint8Array; filename: string; variants?: Variant[] }): Promise<MediaItem> {
 	const row = await findRow(ctx, id);
 	mayChange(by, "update", text(row.uploaded_by) || null);
 	if (!text(row.r2_key)) throw new ApiError(409, "not_replaceable", "Ảnh này nằm ở nguồn cũ (WordPress). Hãy tải ảnh mới lên thay vì thay thế.");
@@ -218,6 +228,7 @@ export async function replaceMediaFile(ctx: AuthContext, by: Authed, store: Medi
 	const checksum = hex(await crypto.subtle.digest("SHA-256", input.bytes as BufferSource));
 	const now = stamp(ctx);
 	await store.put(key, input.bytes, kind.mime);
+	await putVariants(store, key, input.variants, kind);
 	try {
 		await ctx.db.batch([
 			ctx.db
@@ -227,17 +238,17 @@ export async function replaceMediaFile(ctx: AuthContext, by: Authed, store: Medi
 			audit(ctx, by, { action: "media.replace", entityType: "media", entityId: id, before: { version: version - 1, size: row.size_bytes, width: row.width, height: row.height }, after: { version, size: input.bytes.length, width: kind.width, height: kind.height } }),
 		]);
 	} catch (error) {
-		await store.delete([key]).catch(() => undefined);
+		await store.delete(withVariants(key)).catch(() => undefined);
 		throw error;
 	}
 	// Only after the row points at the new file does the old one go (a failure here leaves a stray file, never a broken picture).
-	await store.delete([oldKey, ...oldCrops.results.map((crop) => text(crop.r2_key))]).catch((error) => console.error("media: old file not removed", oldKey, error));
+	await store.delete([...withVariants(oldKey), ...oldCrops.results.flatMap((crop) => withVariants(text(crop.r2_key)))]).catch((error) => console.error("media: old file not removed", oldKey, error));
 	return toItem(await findRow(ctx, id));
 }
 
 export type CropRegion = { x: number; y: number; width: number; height: number };
 
-export async function saveCrop(ctx: AuthContext, by: Authed, store: MediaStore, id: string, ratio: string, input: { bytes: Uint8Array; region: CropRegion }): Promise<MediaDetail> {
+export async function saveCrop(ctx: AuthContext, by: Authed, store: MediaStore, id: string, ratio: string, input: { bytes: Uint8Array; region: CropRegion; variants?: Variant[] }): Promise<MediaDetail> {
 	const row = await findRow(ctx, id);
 	mayChange(by, "update", text(row.uploaded_by) || null);
 	const want = RATIOS[ratio];
@@ -253,6 +264,7 @@ export async function saveCrop(ctx: AuthContext, by: Authed, store: MediaStore, 
 	const key = cropKey(id, version, ratio, kind.ext, ctx.now().getTime());
 	const previous = await ctx.db.prepare("SELECT r2_key FROM media_crop WHERE media_id = ? AND ratio = ?").bind(id, ratio).first();
 	await store.put(key, input.bytes, kind.mime);
+	await putVariants(store, key, input.variants, kind);
 	try {
 		await ctx.db.batch([
 			ctx.db
@@ -264,10 +276,10 @@ export async function saveCrop(ctx: AuthContext, by: Authed, store: MediaStore, 
 			audit(ctx, by, { action: "media.crop", entityType: "media", entityId: id, after: { ratio, x, y, width, height } }),
 		]);
 	} catch (error) {
-		await store.delete([key]).catch(() => undefined);
+		await store.delete(withVariants(key)).catch(() => undefined);
 		throw error;
 	}
-	if (previous && text(previous.r2_key) !== key) await store.delete([text(previous.r2_key)]).catch(() => undefined);
+	if (previous && text(previous.r2_key) !== key) await store.delete(withVariants(text(previous.r2_key))).catch(() => undefined);
 	return getMedia(ctx, id);
 }
 
@@ -277,7 +289,7 @@ export async function deleteCrop(ctx: AuthContext, by: Authed, store: MediaStore
 	const crop = await ctx.db.prepare("SELECT r2_key FROM media_crop WHERE media_id = ? AND ratio = ?").bind(id, ratio).first();
 	if (!crop) throw notFound("Bản cắt");
 	await ctx.db.batch([ctx.db.prepare("DELETE FROM media_crop WHERE media_id = ? AND ratio = ?").bind(id, ratio), audit(ctx, by, { action: "media.crop_delete", entityType: "media", entityId: id, before: { ratio } })]);
-	await store.delete([text(crop.r2_key)]).catch(() => undefined);
+	await store.delete(withVariants(text(crop.r2_key))).catch(() => undefined);
 }
 
 /** Moves the picture to the trash. A picture in use is refused unless `force` (a person who may delete anyone's). */

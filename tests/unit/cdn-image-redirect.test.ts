@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { GET } from "@/app/cdn-cgi/image/[...rest]/route";
 import { shapeAnalysis } from "@/libs/tibetan/api";
 
@@ -22,6 +22,19 @@ describe("/cdn-cgi/image fallback route", () => {
 	it("only follows the WordPress host for a full address", async () => {
 		expect((await ask("/cdn-cgi/image/w=1/https://evil.example/x.jpg")).status).toBe(404);
 		expect((await ask("/cdn-cgi/image/w=1/https://admin.tunglamhoaphuc.com/a.jpg")).status).toBe(302);
+	});
+
+	it("logs a picture still asked of the WordPress host, once per request", async () => {
+		const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+		try {
+			await ask("/cdn-cgi/image/w=1/https://admin.tunglamhoaphuc.com/wp-content/uploads/2026/08/a.jpg");
+			expect(warn).toHaveBeenCalledTimes(1);
+			expect(JSON.parse(String(warn.mock.calls[0][0]))).toEqual({ event: "media-fallback", reason: "cdn-image", key: "wp-content/uploads/2026/08/a.jpg", host: "admin.tunglamhoaphuc.com" });
+			await ask("/cdn-cgi/image/width=640/images/hero/a.webp");
+			expect(warn).toHaveBeenCalledTimes(1);
+		} finally {
+			warn.mockRestore();
+		}
 	});
 });
 

@@ -4,7 +4,7 @@ import { useRef, useState, type SyntheticEvent } from "react";
 import ReactCrop, { centerCrop, makeAspectCrop, type PercentCrop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
 import { Alert, errorText } from "../ui";
-import { cropToBlob, postForm, ratioNumber, SHAPES, type MediaDetailData, type MediaItem } from "./imageTools";
+import { appendVariants, blobSize, cropToBlob, postForm, ratioNumber, SHAPES, type MediaDetailData, type MediaItem } from "./imageTools";
 
 const clamp = (value: number) => Math.min(100, Math.max(0, value));
 
@@ -33,6 +33,7 @@ export function CropTool({ item, ratio, onSaved, onCancel }: { item: MediaItem; 
 			const blob = await cropToBlob(image, region);
 			const form = new FormData();
 			form.append("file", blob, `crop-${ratio.replace(":", "x")}.webp`);
+			await appendVariants(form, new File([blob], "crop.webp", { type: "image/webp" }), await blobSize(blob));
 			form.append("region", JSON.stringify(region));
 			const detail = await postForm<MediaDetailData>("PUT", `media/${encodeURIComponent(item.id)}/crops/${encodeURIComponent(ratio)}`, form);
 			onSaved(detail);

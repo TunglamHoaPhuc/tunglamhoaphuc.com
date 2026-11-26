@@ -56,13 +56,14 @@ const SECURITY_HEADERS = [
 // What the admin may load and send (docs 6.5). Scripts and styles stay 'unsafe-inline': the framework writes its own
 // inline scripts and the editor sets inline styles, and a nonce for them is not available here. What it still shuts:
 // plugins, other origins for scripts, styles, fonts and requests (nothing can be sent anywhere but home), a changed
-// <base>, a form posted elsewhere, and any frame but YouTube (the videos of an article).
+// <base>, a form posted elsewhere, and any frame but YouTube (the videos of an article). Pictures and sounds load from the site itself
+// (/anh-goc/, /brand/), data: and blob: only: every image lives on Cloudflare (R2), so an outside image address shows nothing here.
 const ADMIN_CSP = [
 	"default-src 'self'",
 	"script-src 'self' 'unsafe-inline'",
 	"style-src 'self' 'unsafe-inline'",
-	"img-src 'self' data: blob: https:",
-	"media-src 'self' blob: https:",
+	"img-src 'self' data: blob:",
+	"media-src 'self' blob:",
 	"font-src 'self' data:",
 	"connect-src 'self'",
 	"frame-src https://www.youtube-nocookie.com https://www.youtube.com",

@@ -4,6 +4,7 @@ import { registerRoutes, type Call } from "../http/api";
 import { ApiError } from "../http/errors";
 import { listResponse, pageOf } from "../http/paging";
 import { MAX_IMAGE_BYTES } from "./files";
+import { readVariants, type Variant } from "./variants";
 import {
 	createFolder, deleteCrop, deleteFolder, deleteMedia, getMedia, listFolders, listMedia, mediaStats, replaceMediaFile, saveCrop, updateFolder, updateMedia, uploadMedia,
 } from "./service";
@@ -11,11 +12,12 @@ import {
 const nullableId = z.string().max(80).nullable().optional();
 
 /** The one file of a multipart request, and its other fields. */
-async function readUpload(call: Call): Promise<{ bytes: Uint8Array; filename: string; fields: FormData }> {
+async function readUpload(call: Call): Promise<{ bytes: Uint8Array; filename: string; fields: FormData; variants: Variant[] }> {
 	const type = call.request.headers.get("content-type") ?? "";
 	if (!/^multipart\/form-data\b/i.test(type)) throw new ApiError(415, "multipart_required", "Cần gửi ảnh dạng multipart/form-data.");
 	const length = Number(call.request.headers.get("content-length"));
-	if (Number.isFinite(length) && length > MAX_IMAGE_BYTES + 1_000_000) throw new ApiError(413, "too_large", "Ảnh lớn hơn 15 MB. Hãy thu nhỏ ảnh rồi tải lại.");
+	// room for the picture and its (small) variants
+	if (Number.isFinite(length) && length > MAX_IMAGE_BYTES + 24_000_000) throw new ApiError(413, "too_large", "Ảnh lớn hơn 15 MB. Hãy thu nhỏ ảnh rồi tải lại.");
 	let form: FormData;
 	try {
 		form = await call.request.formData();
@@ -24,7 +26,8 @@ async function readUpload(call: Call): Promise<{ bytes: Uint8Array; filename: st
 	}
 	const file = form.get("file");
 	if (!(file instanceof File)) throw new ApiError(400, "invalid_input", "Chưa chọn ảnh.", { file: "Chưa chọn ảnh." });
-	return { bytes: new Uint8Array(await file.arrayBuffer()), filename: file.name, fields: form };
+	if (file.size > MAX_IMAGE_BYTES) throw new ApiError(413, "too_large", "Ảnh lớn hơn 15 MB. Hãy thu nhỏ ảnh rồi tải lại.");
+	return { bytes: new Uint8Array(await file.arrayBuffer()), filename: file.name, fields: form, variants: await readVariants(form) };
 }
 
 const field = (form: FormData, name: string) => {
@@ -81,9 +84,10 @@ registerRoutes(
 		path: "media",
 		needs: { module: "media", action: "create" },
 		handler: async (call) => {
-			const { bytes, filename, fields } = await readUpload(call);
+			const { bytes, filename, fields, variants } = await readUpload(call);
 			return uploadMedia(call.ctx, call.authed!, store(call), {
 				bytes,
+				variants,
 				filename,
 				folderId: field(fields, "folderId") || null,
 				alt: field(fields, "alt"),
@@ -107,8 +111,8 @@ registerRoutes(
 		needs: { module: "media", action: "update" },
 		own: true,
 		handler: async (call) => {
-			const { bytes, filename } = await readUpload(call);
-			return replaceMediaFile(call.ctx, call.authed!, store(call), call.params.id, { bytes, filename });
+			const { bytes, filename, variants } = await readUpload(call);
+			return replaceMediaFile(call.ctx, call.authed!, store(call), call.params.id, { bytes, filename, variants });
 		},
 	},
 	{
@@ -117,7 +121,7 @@ registerRoutes(
 		needs: { module: "media", action: "update" },
 		own: true,
 		handler: async (call) => {
-			const { bytes, fields } = await readUpload(call);
+			const { bytes, fields, variants } = await readUpload(call);
 			let region: unknown;
 			try {
 				region = JSON.parse(field(fields, "region") ?? "");
@@ -126,7 +130,7 @@ registerRoutes(
 			}
 			const parsed = z.object({ x: z.number(), y: z.number(), width: z.number(), height: z.number() }).safeParse(region);
 			if (!parsed.success) throw new ApiError(400, "invalid_input", "Vùng cắt không hợp lệ.", { region: "Vùng cắt không hợp lệ." });
-			return saveCrop(call.ctx, call.authed!, store(call), call.params.id, decodeURIComponent(call.params.ratio), { bytes, region: parsed.data });
+			return saveCrop(call.ctx, call.authed!, store(call), call.params.id, decodeURIComponent(call.params.ratio), { bytes, region: parsed.data, variants });
 		},
 	},
 	{

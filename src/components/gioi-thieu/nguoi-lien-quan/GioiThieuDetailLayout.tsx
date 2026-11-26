@@ -28,7 +28,7 @@ interface Props {
  */
 // The old page's picture when a topic has no banner (public/images/toan-canh-chua.jpg there).
 const FALLBACK_BANNER =
-  'https://media-tunglamhoaphuc.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
+  '/anh-goc/media-tunglamhoaphuc/tunglamhoaphuc2/04-vu-tru-phat-giao/toan-canh-chua.webp';
 
 export function GioiThieuDetailLayout({ detail: topic, otherTopics: allTopics }: Props) {
   const otherTopics = allTopics.filter((t) => t.id !== topic.id && t.slug !== topic.slug);

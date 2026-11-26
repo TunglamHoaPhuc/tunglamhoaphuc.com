@@ -11,7 +11,7 @@ export const vuTru = {
 	// The 2D drawing of the temple the old site's map uses (B2, 04-vu-tru-phat-giao), at the
 	// address the area covers use for the same file, so it is fetched once.
 	map: {
-		src: "https://s2-cnv03.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp",
+		src: "/anh-goc/s2-cnv03/tunglamhoaphuc2/04-vu-tru-phat-giao/canh-1.webp",
 		width: 1920,
 		height: 1087,
 	},
@@ -20,7 +20,7 @@ export const vuTru = {
 	// (04-vu-tru-phat-giao/khu-vuc), by area slug. The admin's imgUrl is a stand-in for most areas
 	// (the whole-temple view four times, a book cover for the library), so these come first.
 	// Sân La Hán and Lầu Kinh Luân are not on the old list, but their pictures are in the folder.
-	coverFolder: "https://s2-cnv03.s3.us-east-005.backblazeb2.com/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc",
+	coverFolder: "/anh-goc/s2-cnv03/tunglamhoaphuc2/04-vu-tru-phat-giao/khu-vuc",
 	covers: {
 		"tam-bao": "tam-bao.webp",
 		"to-duong": "to-duong.webp",

@@ -45,7 +45,7 @@ describe("uploading", () => {
 		const item = up.data;
 		expect(item).toMatchObject({ width: 640, height: 360, version: 1, alt: "Lễ Hằng Thuận", source: "cms", mime: "image/png", sizeBytes: bytes.length });
 		expect(item.url).toBe(`/anh-goc/s2-cnv03/cms/${item.id}/v1/le-hang-thuan-2026.png`);
-		expect(item.thumbUrl).toContain("/cdn-cgi/image/width=360");
+		expect(item.thumbUrl).toBe(`/anh-goc/s2-cnv03/cms/${item.id}/v1/le-hang-thuan-2026.png@360`);
 		expect([...w.files.keys()]).toEqual([`cms/${item.id}/v1/le-hang-thuan-2026.png`]);
 		expect(w.files.get(`cms/${item.id}/v1/le-hang-thuan-2026.png`)?.type).toBe("image/png");
 		const log = w.raw.prepare("SELECT user_email, entity_id FROM audit_log WHERE action = 'media.upload'").get() as { user_email: string; entity_id: string };
@@ -96,6 +96,102 @@ describe("uploading", () => {
 		const nobody = await w.as("nobody@example.test");
 		expect((await nobody.form("POST", "media", { bytes: await picture(100, 100), name: "a.png" })).status).toBe(403);
 		expect((await nobody.call("GET", "media")).status).toBe(403);
+	});
+});
+
+describe("variants made in the browser while uploading", () => {
+	const webp = (width: number, height: number, seed = 1) => picture(width, height, "webp", seed);
+	/** What the browser sends for a 1600 x 900 picture: the widths below it and "max" at its own width. */
+	const fields = async () => ({
+		v160: { bytes: await webp(160, 90), name: "160.webp" },
+		v640: { bytes: await webp(640, 360), name: "640.webp" },
+		vmax: { bytes: await webp(1600, 900), name: "max.webp" },
+	});
+
+	it("stores them beside the picture as <key>@<step>.webp with the WebP type", async () => {
+		const w = await world(SEEDS);
+		const editor = await w.as("editor@example.test");
+		const up = await editor.form("POST", "media", { bytes: await picture(1600, 900), name: "to.png" }, {}, await fields());
+		expect(up.status).toBe(200);
+		const key = `cms/${up.data.id}/v1/to.png`;
+		expect([...w.files.keys()].sort()).toEqual([key, `${key}@160.webp`, `${key}@640.webp`, `${key}@max.webp`].sort());
+		expect(w.files.get(`${key}@640.webp`)?.type).toBe("image/webp");
+		expect(w.files.get(`${key}`)?.type).toBe("image/png");
+	});
+
+	it("keeps only real WebP files of the size the step means, and never fails the upload over them", async () => {
+		const w = await world(SEEDS);
+		const editor = await w.as("editor@example.test");
+		const up = await editor.form(
+			"POST",
+			"media",
+			{ bytes: await picture(1600, 900), name: "to.png" },
+			{},
+			{
+				v160: { bytes: await webp(160, 90), name: "ok.webp" },
+				v360: { bytes: await webp(360, 100), name: "wrong-shape.webp" },
+				v640: { bytes: await picture(640, 360, "png"), name: "a-png.webp" },
+				v960: { bytes: new TextEncoder().encode("<script>x</script>".padEnd(64)), name: "script.webp" },
+				v1280: { bytes: await webp(2000, 1125), name: "bigger-than-asked.webp" },
+			},
+		);
+		expect(up.status).toBe(200);
+		const key = `cms/${up.data.id}/v1/to.png`;
+		expect([...w.files.keys()].sort()).toEqual([key, `${key}@160.webp`].sort());
+	});
+
+	it("makes none for a GIF, and ignores a field for a step that does not exist", async () => {
+		const w = await world(SEEDS);
+		const editor = await w.as("editor@example.test");
+		const up = await editor.form("POST", "media", { bytes: await picture(1600, 900, "gif"), name: "anim.gif" }, {}, { ...(await fields()), v777: { bytes: await webp(777, 437), name: "x.webp" } });
+		expect(up.status).toBe(200);
+		expect([...w.files.keys()]).toEqual([`cms/${up.data.id}/v1/anim.gif`]);
+	});
+
+	it("removes the picture's variants when the database refuses the record", async () => {
+		const w = await world(SEEDS);
+		const editor = await w.as("editor@example.test");
+		const bad = await editor.form("POST", "media", { bytes: await picture(1600, 900), name: "a.png" }, { folderId: "khong-co" }, await fields());
+		expect(bad.status).toBe(400);
+		expect(w.files.size).toBe(0);
+	});
+
+	it("replacing a picture writes the new variants and removes the old file's, and the crops' too", async () => {
+		const w = await world(SEEDS);
+		const editor = await w.as("editor@example.test");
+		const first = (await editor.form("POST", "media", { bytes: await picture(1600, 900), name: "bia.png" }, {}, await fields())).data;
+		const crop = await editor.form(
+			"PUT",
+			`media/${first.id}/crops/16%3A9`,
+			{ bytes: await webp(320, 180, 5), name: "c.webp" },
+			{ region: JSON.stringify({ x: 0, y: 0, width: 100, height: 100 }) },
+			{ v160: { bytes: await webp(160, 90, 5), name: "160.webp" } },
+		);
+		const cropKey = (crop.data.crops[0].url as string).replace("/anh-goc/s2-cnv03/", "");
+		expect(w.files.has(`${cropKey}@160.webp`)).toBe(true);
+
+		const next = await editor.form("PUT", `media/${first.id}/file`, { bytes: await picture(1200, 675, "jpeg", 4), name: "bia-moi.jpg" }, {}, { v360: { bytes: await webp(360, 202, 4), name: "360.webp" }, vmax: { bytes: await webp(1200, 675, 4), name: "max.webp" } });
+		expect(next.status).toBe(200);
+		const key = `cms/${first.id}/v2/bia-moi.jpg`;
+		expect([...w.files.keys()].sort()).toEqual([key, `${key}@360.webp`, `${key}@max.webp`].sort());
+	});
+
+	it("cutting again or deleting a crop removes the crop's variants", async () => {
+		const w = await world(SEEDS);
+		const editor = await w.as("editor@example.test");
+		const item = (await editor.form("POST", "media", { bytes: await picture(1600, 900), name: "to.png" })).data;
+		const region = JSON.stringify({ x: 10, y: 5, width: 50, height: 60 });
+		const make = async (seed: number) => editor.form("PUT", `media/${item.id}/crops/4%3A3`, { bytes: await webp(400, 300, seed), name: "c.webp" }, { region }, { v160: { bytes: await webp(160, 120, seed), name: "160.webp" } });
+		const one = await make(2);
+		const oneKey = (one.data.crops[0].url as string).replace("/anh-goc/s2-cnv03/", "");
+		expect(w.files.has(`${oneKey}@160.webp`)).toBe(true);
+		await new Promise((resolve) => setTimeout(resolve, 5));
+		const two = await make(3);
+		const twoKey = (two.data.crops[0].url as string).replace("/anh-goc/s2-cnv03/", "");
+		expect(w.files.has(`${oneKey}@160.webp`)).toBe(false);
+		expect(w.files.has(`${twoKey}@160.webp`)).toBe(true);
+		expect((await editor.call("DELETE", `media/${item.id}/crops/4%3A3`)).status).toBe(204);
+		expect([...w.files.keys()].filter((key) => key.includes("crop-"))).toEqual([]);
 	});
 });
 

@@ -134,13 +134,13 @@ test.describe("Bảo Tượng Phật Giáo", () => {
 		await open(page, THICH_CA);
 		const portrait = page.locator(".tlhp-about-portrait img");
 		// The address asked for: kept in data-tlhp-src when the file did not arrive and the seal stands in.
-		expect(await portrait.evaluate((img) => (img as HTMLElement).dataset.tlhpSrc ?? img.getAttribute("src"))).toMatch(/^\/cdn-cgi\/image\/width=1280,/);
+		expect(await portrait.evaluate((img) => (img as HTMLElement).dataset.tlhpSrc ?? img.getAttribute("src"))).toMatch(/^\/anh-goc\/.*@1280$/);
 		await expect(portrait).toHaveAttribute("fetchpriority", "low");
 		// A picture missing at the source shows the round seal; the address asked for is kept in data-tlhp-src.
 		const art = await page.locator("#nghe-thuat .tlhp-art-card img").evaluateAll((imgs) => imgs.map((img) => (img as HTMLElement).dataset.tlhpSrc ?? img.getAttribute("src")!));
 		expect(art.length).toBeGreaterThan(0);
-		for (const src of art) expect(src).toMatch(/^\/cdn-cgi\/image\/width=640,/);
-		await expect(page.locator("#nghe-thuat .tlhp-art-card img").first()).toHaveAttribute("srcset", /width=360,.* 360w, .*width=640,.* 640w/);
+		for (const src of art) expect(src).toMatch(/^\/anh-goc\/.*@640$/);
+		await expect(page.locator("#nghe-thuat .tlhp-art-card img").first()).toHaveAttribute("srcset", /@360 360w, .*@640 640w/);
 	});
 
 	test("every link inside a statue page leads to a page that is there", async ({ page, request }) => {

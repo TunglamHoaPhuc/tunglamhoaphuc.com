@@ -4,7 +4,7 @@ import { useEffect, useId, useRef, useState, type ChangeEvent, type DragEvent } 
 import { ApiClientError } from "../api";
 import { useAdmin } from "../AdminProvider";
 import { Alert, errorText } from "../ui";
-import { postForm, prepareImage, type MediaItem } from "./imageTools";
+import { appendVariants, postForm, prepareImage, type MediaItem } from "./imageTools";
 
 type Status = "waiting" | "preparing" | "uploading" | "done" | "duplicate" | "error";
 type Row = { key: number; name: string; status: Status; message: string; duplicateId?: string };
@@ -43,6 +43,7 @@ export function UploadZone({ folderId, onDone, onUseExisting }: { folderId: stri
 			patch(key, { status: "uploading" });
 			const form = new FormData();
 			form.append("file", prepared.blob, prepared.name);
+			await appendVariants(form, file, { width: prepared.width, height: prepared.height, bytes: prepared.blob.size });
 			if (folderId) form.append("folderId", folderId);
 			await postForm<MediaItem>("POST", "media", form);
 			patch(key, { status: "done", message: "" });

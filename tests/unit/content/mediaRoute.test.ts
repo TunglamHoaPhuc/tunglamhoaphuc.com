@@ -87,3 +87,38 @@ describe("serveMedia", () => {
 		expect(origin).not.toHaveBeenCalled();
 	});
 });
+
+// Each trip to B2 / WordPress is one JSON line in Workers Logs ("media-fallback") until the fallback is taken out.
+describe("serveMedia fallback log", () => {
+	const lines = (spy: { mock: { calls: unknown[][] } }) => spy.mock.calls.map((call) => JSON.parse(String(call[0])) as Record<string, string>);
+
+	it("logs the missing R2 key when it goes to the original, and nothing when R2 has the picture", async () => {
+		const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+		try {
+			await serveMedia("s2-cnv03", ["a", "b.jpg"], bucketWith({ "s2-cnv03/a/b.jpg": { type: "image/jpeg" } }), vi.fn());
+			expect(warn).not.toHaveBeenCalled();
+			await serveMedia("s2-cnv03", ["a", "c.png"], bucketWith({}), async () => png());
+			await serveMedia("wordpress", ["2026", "07", "x.png"], undefined, async () => png());
+			await serveMedia("s2-cnv03", ["a.jpg"], bucketWith({ "s2-cnv03/a.jpg": { type: "text/html" } }), async () => new Response("no", { status: 404 }));
+			await serveMedia("s2-cnv03", ["a.png"], { get: async () => Promise.reject(new Error("r2 down")) }, async () => png());
+			expect(lines(warn)).toEqual([
+				{ event: "media-fallback", reason: "r2-miss", key: "s2-cnv03/a/c.png", host: "s2-cnv03.s3.us-east-005.backblazeb2.com" },
+				{ event: "media-fallback", reason: "no-bucket", key: "wordpress/2026/07/x.png", host: "admin.tunglamhoaphuc.com" },
+				{ event: "media-fallback", reason: "r2-not-image", key: "s2-cnv03/a.jpg", host: "s2-cnv03.s3.us-east-005.backblazeb2.com" },
+				{ event: "media-fallback", reason: "r2-error", key: "s2-cnv03/a.png", host: "s2-cnv03.s3.us-east-005.backblazeb2.com" },
+			]);
+		} finally {
+			warn.mockRestore();
+		}
+	});
+
+	it("logs nothing for a refused bucket or key (no fallback was tried)", async () => {
+		const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+		try {
+			await serveMedia("someone-else", ["a.jpg"], bucketWith({}), vi.fn());
+			expect(warn).not.toHaveBeenCalled();
+		} finally {
+			warn.mockRestore();
+		}
+	});
+});
